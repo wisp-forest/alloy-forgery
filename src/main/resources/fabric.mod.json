@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "id": "alloy_forgery",
+  "version": "${version}",
+
+  "name": "Alloy Forgery",
+  "description": "Combine ingots into alloys.",
+  "authors": [
+    "LordDeatHunter"
+  ],
+  "contact": {
+    "homepage": "",
+    "sources": ""
+  },
+
+  "license": "MIT",
+
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "wraith.alloy_forgery.AlloyForgery"
+    ]
+  },
+  "mixins": [
+    "alloy_forgery.mixins.json"
+  ],
+
+  "depends": {
+    "fabricloader": ">=0.7.4",
+    "fabric": "*",
+    "minecraft": "1.16.x"
+  }
+}
