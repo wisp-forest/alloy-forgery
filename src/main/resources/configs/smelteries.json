@@ -1,28 +1,27 @@
 {
-  "smelteries": [
-    {
-      "materials": [
-        "minecraft:bricks"
-      ],
-      "tier": 1
-    },
-    {
-      "materials": [
-        "minecraft:stone_bricks",
-        "minecraft:cracked_stone_bricks",
-        "minecraft:mossy_stone_bricks",
-        "minecraft:chiseled_stone_bricks"
-      ],
-      "tier": 1
-    },
-    {
-      "materials": [
-        "minecraft:polished_blackstone",
-        "minecraft:chiseled_polished_blackstone",
-        "minecraft:polished_blackstone_bricks",
-        "minecraft:cracked_polished_blackstone_bricks"
-      ],
-      "tier": 2
-    }
-  ]
+  "brick_forge_controller": {
+    "controller": "",
+    "materials": [
+      "minecraft:bricks"
+    ],
+    "tier": 1
+  },
+  "stone_bricks_forge_controller": {
+    "materials": [
+      "minecraft:stone_bricks",
+      "minecraft:cracked_stone_bricks",
+      "minecraft:mossy_stone_bricks",
+      "minecraft:chiseled_stone_bricks"
+    ],
+    "tier": 1
+  },
+  "blackstone_forge_controller": {
+    "materials": [
+      "minecraft:polished_blackstone",
+      "minecraft:chiseled_polished_blackstone",
+      "minecraft:polished_blackstone_bricks",
+      "minecraft:cracked_polished_blackstone_bricks"
+    ],
+    "tier": 2
+  }
 }

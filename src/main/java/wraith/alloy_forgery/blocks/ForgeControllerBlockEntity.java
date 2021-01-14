@@ -1,10 +1,12 @@
 package wraith.alloy_forgery.blocks;
 
+import net.fabricmc.fabric.api.block.entity.BlockEntityClientSerializable;
 import net.minecraft.block.HorizontalFacingBlock;
 import net.minecraft.block.entity.LockableContainerBlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.screen.PropertyDelegate;
 import net.minecraft.screen.ScreenHandler;
@@ -12,7 +14,10 @@ import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Tickable;
 import net.minecraft.util.collection.DefaultedList;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.registry.Registry;
 import wraith.alloy_forgery.AlloyForgery;
+import wraith.alloy_forgery.Forge;
 import wraith.alloy_forgery.registry.BlockEntityRegistry;
 import wraith.alloy_forgery.screens.AlloyForgerScreenHandler;
 import wraith.alloy_forgery.screens.ImplementedInventory;
@@ -56,7 +61,7 @@ public class ForgeControllerBlockEntity extends LockableContainerBlockEntity imp
     };
 
     public ForgeControllerBlockEntity() {
-        super(BlockEntityRegistry.BLOCK_ENTITIES.get("forge_controller"));
+        super(BlockEntityRegistry.FORGE_CONTROLLER);
     }
 
     @Override
@@ -73,14 +78,103 @@ public class ForgeControllerBlockEntity extends LockableContainerBlockEntity imp
         return screen;
     }
 
-    private boolean isValidMultiblock() {
-        /*
-        switch(this.world.getBlockState(pos).get(HorizontalFacingBlock.FACING).asString()) {
+    public boolean isValidMultiblock() {
+        String controllerId = Registry.BLOCK.getId(world.getBlockState(pos).getBlock()).getPath();
+        if (!Forge.FORGES.containsKey(controllerId)) {
+            return false;
+        }
+        Forge forge = Forge.FORGES.get(controllerId);
+        String block;
+        BlockPos center;
+        switch(getCachedState().get(HorizontalFacingBlock.FACING).asString()) {
             case "north":
-                this.world.getBlockState(pos.south(2));
+                center = pos.south(1);
+
+                block = Registry.BLOCK.getId(world.getBlockState(new BlockPos(center.south())).getBlock()).toString();
+                if (!forge.materials.contains(block)) {
+                    return false;
+                }
+                block = Registry.BLOCK.getId(world.getBlockState(new BlockPos(center.east())).getBlock()).toString();
+                if (!forge.materials.contains(block)) {
+                    return false;
+                }
+                block = Registry.BLOCK.getId(world.getBlockState(new BlockPos(center.west())).getBlock()).toString();
+                if (!forge.materials.contains(block)) {
+                    return false;
+                }
+
+                break;
+            case "east":
+                center = pos.west(1);
+                block = Registry.BLOCK.getId(world.getBlockState(new BlockPos(center.south())).getBlock()).toString();
+                if (!forge.materials.contains(block)) {
+                    return false;
+                }
+                block = Registry.BLOCK.getId(world.getBlockState(new BlockPos(center.north())).getBlock()).toString();
+                if (!forge.materials.contains(block)) {
+                    return false;
+                }
+                block = Registry.BLOCK.getId(world.getBlockState(new BlockPos(center.west())).getBlock()).toString();
+                if (!forge.materials.contains(block)) {
+                    return false;
+                }
+                break;
+            case "south":
+                center = pos.north(1);
+                block = Registry.BLOCK.getId(world.getBlockState(new BlockPos(center.north())).getBlock()).toString();
+                if (!forge.materials.contains(block)) {
+                    return false;
+                }
+                block = Registry.BLOCK.getId(world.getBlockState(new BlockPos(center.east())).getBlock()).toString();
+                if (!forge.materials.contains(block)) {
+                    return false;
+                }
+                block = Registry.BLOCK.getId(world.getBlockState(new BlockPos(center.west())).getBlock()).toString();
+                if (!forge.materials.contains(block)) {
+                    return false;
+                }
+                break;
+            default:
+                center = pos.east(1);
+                block = Registry.BLOCK.getId(world.getBlockState(new BlockPos(center.south())).getBlock()).toString();
+                if (!forge.materials.contains(block)) {
+                    return false;
+                }
+                block = Registry.BLOCK.getId(world.getBlockState(new BlockPos(center.east())).getBlock()).toString();
+                if (!forge.materials.contains(block)) {
+                    return false;
+                }
+                block = Registry.BLOCK.getId(world.getBlockState(new BlockPos(center.north())).getBlock()).toString();
+                if (!forge.materials.contains(block)) {
+                    return false;
+                }
                 break;
         }
-         */
+        for (int x = -1; x <= 1; ++x) {
+            for (int z = -1; z <= 1; ++z){
+                block = Registry.BLOCK.getId(world.getBlockState(new BlockPos(center.getX() + x, center.getY() - 1, center.getZ() + z)).getBlock()).toString();
+                if (!forge.materials.contains(block)) {
+                    return false;
+                }
+            }
+        }
+        block = Registry.BLOCK.getId(world.getBlockState(new BlockPos(center.getX() + 1, center.getY() + 1, center.getZ())).getBlock()).toString();
+        if (!forge.materials.contains(block)) {
+            return false;
+        }
+        block = Registry.BLOCK.getId(world.getBlockState(new BlockPos(center.getX() - 1, center.getY() + 1, center.getZ())).getBlock()).toString();
+        if (!forge.materials.contains(block)) {
+            return false;
+        }
+        block = Registry.BLOCK.getId(world.getBlockState(new BlockPos(center.getX(), center.getY() + 1, center.getZ() + 1)).getBlock()).toString();
+        if (!forge.materials.contains(block)) {
+            return false;
+        }
+        block = Registry.BLOCK.getId(world.getBlockState(new BlockPos(center.getX(), center.getY() + 1, center.getZ() - 1)).getBlock()).toString();
+        if (!forge.materials.contains(block)) {
+            return false;
+        }
+
         return true;
     }
 
