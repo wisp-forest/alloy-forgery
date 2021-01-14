@@ -17,7 +17,7 @@ public class AlloyForgerScreenHandler extends ScreenHandler {
     private final PropertyDelegate delegate;
 
     public AlloyForgerScreenHandler(int syncId, PlayerInventory playerInventory) {
-        this(syncId, playerInventory, new SimpleInventory(2), new ArrayPropertyDelegate(2));
+        this(syncId, playerInventory, new SimpleInventory(12), new ArrayPropertyDelegate(2));
     }
 
     public AlloyForgerScreenHandler(int syncId, PlayerInventory playerInventory, Inventory inventory, PropertyDelegate delegate) {
@@ -27,6 +27,12 @@ public class AlloyForgerScreenHandler extends ScreenHandler {
         this.inventory = inventory;
         this.addSlot(new Slot(inventory, 0, 8, 58)); //Fuel
         this.addSlot(new AlloyOutputSlot(inventory, 1, 145, 34)); //Alloy Output
+
+        for (int y = 0; y < 2; ++y) {
+            for (int x = 0; x < 5; ++x) {
+                this.addSlot(new Slot(inventory,y*5 + x, 43 + x * 18, 26 + y * 18)); //Slot Generator, generates 5 slots, then moves a row down and makes 5 more
+            }
+        }
 
         for (int y = 0; y < 3; ++y) {
             for (int x = 0; x < 9; ++x) {

@@ -1,9 +1,7 @@
 package wraith.alloy_forgery.blocks;
 
 import net.minecraft.block.HorizontalFacingBlock;
-import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.block.entity.LockableContainerBlockEntity;
-import net.minecraft.block.enums.DoubleBlockHalf;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
@@ -19,11 +17,9 @@ import wraith.alloy_forgery.registry.BlockEntityRegistry;
 import wraith.alloy_forgery.screens.AlloyForgerScreenHandler;
 import wraith.alloy_forgery.screens.ImplementedInventory;
 
-import java.util.ArrayList;
-
 public class ForgeControllerBlockEntity extends LockableContainerBlockEntity implements NamedScreenHandlerFactory, ImplementedInventory, Tickable {
 
-    private DefaultedList<ItemStack> inventory = DefaultedList.ofSize(26, ItemStack.EMPTY);
+    private DefaultedList<ItemStack> inventory = DefaultedList.ofSize(12, ItemStack.EMPTY);
 
     private int heatTime = 0;
     private int heatTimeMax = 18000; //15 minutes
@@ -78,11 +74,13 @@ public class ForgeControllerBlockEntity extends LockableContainerBlockEntity imp
     }
 
     private boolean isValidMultiblock() {
+        /*
         switch(this.world.getBlockState(pos).get(HorizontalFacingBlock.FACING).asString()) {
             case "north":
                 this.world.getBlockState(pos.south(2));
                 break;
         }
+         */
         return true;
     }
 
@@ -93,7 +91,7 @@ public class ForgeControllerBlockEntity extends LockableContainerBlockEntity imp
 
     @Override
     public int size() {
-        return 2;
+        return 12;
     }
 
     @Override
