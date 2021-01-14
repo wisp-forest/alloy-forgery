@@ -19,6 +19,9 @@
   "entrypoints": {
     "main": [
       "wraith.alloy_forgery.AlloyForgery"
+    ],
+    "client": [
+      "wraith.alloy_forgery.AlloyForgeryClient"
     ]
   },
   "mixins": [

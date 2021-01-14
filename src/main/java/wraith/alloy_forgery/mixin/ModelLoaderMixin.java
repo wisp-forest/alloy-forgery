@@ -15,13 +15,21 @@ public class ModelLoaderMixin {
 
     @Inject(method = "loadModelFromJson", at = @At("HEAD"), cancellable = true)
     public void loadModelFromJson(Identifier id, CallbackInfoReturnable<JsonUnbakedModel> cir) {
-        boolean isAlloyForgery = id.getNamespace().equals(AlloyForgery.MOD_ID);
-
-            String json = Utils.createModelJson(id.getPath(), modelParent);
-
+        if (!id.getNamespace().equals(AlloyForgery.MOD_ID)) {
+            return;
+        }
+        if (id.getPath().startsWith("item/")) {
+            JsonUnbakedModel model = JsonUnbakedModel.deserialize(Utils.createBlockItemModelJson(id.getPath().split("/")[1]));
+            model.id = id.toString();
+            cir.setReturnValue(model);
+            cir.cancel();
+        } else if (id.getPath().startsWith("block/")) {
+            String json = Utils.createBlockModelJson(id.getPath().split("/")[1]);
             JsonUnbakedModel model = JsonUnbakedModel.deserialize(json);
             model.id = id.toString();
             cir.setReturnValue(model);
             cir.cancel();
         }
+    }
+
 }

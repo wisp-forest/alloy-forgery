@@ -17,7 +17,7 @@ public class AlloyForgerScreenHandler extends ScreenHandler {
     private final PropertyDelegate delegate;
 
     public AlloyForgerScreenHandler(int syncId, PlayerInventory playerInventory) {
-        this(syncId, playerInventory, new SimpleInventory(3), new ArrayPropertyDelegate(2));
+        this(syncId, playerInventory, new SimpleInventory(2), new ArrayPropertyDelegate(2));
     }
 
     public AlloyForgerScreenHandler(int syncId, PlayerInventory playerInventory, Inventory inventory, PropertyDelegate delegate) {

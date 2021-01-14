@@ -3,8 +3,11 @@ package wraith.alloy_forgery;
 import net.fabricmc.api.ModInitializer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import wraith.alloy_forgery.registry.ModRegistry;
+import wraith.alloy_forgery.registry.BlockEntityRegistry;
+import wraith.alloy_forgery.registry.ItemRegistry;
+import wraith.alloy_forgery.registry.BlockRegistry;
 import wraith.alloy_forgery.registry.ScreenHandlerRegistry;
+import wraith.alloy_forgery.utils.Utils;
 
 public class AlloyForgery implements ModInitializer {
 
@@ -13,12 +16,17 @@ public class AlloyForgery implements ModInitializer {
 
     @Override
     public void onInitialize() {
-        // Register all blocks and items
-        ModRegistry.loadBlocks();
-        ModRegistry.loadItems();
-        // Registry
-        ModRegistry.registerBlocks();
-        ModRegistry.registerItems();
+        Utils.saveFilesFromJar("configs/", "", true);
+
+        BlockRegistry.loadBlocks();
+        BlockRegistry.registerBlocks();
+
+        ItemRegistry.loadItems();
+        ItemRegistry.registerItems();
+
+        BlockEntityRegistry.loadBlockEntities();
+        BlockEntityRegistry.registerBlockEntities();
+
         ScreenHandlerRegistry.registerScreenHandlers();
         LOGGER.info("[Alloy Forgery] has been initiated.");
     }

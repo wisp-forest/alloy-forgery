@@ -14,7 +14,7 @@ public class ScreenHandlerRegistry {
     public static HashMap<String, ScreenHandlerType<? extends ScreenHandler>> SCREEN_HANDLERS = new HashMap<>();
 
     public static void registerScreenHandlers() {
-        SCREEN_HANDLERS.put("assembly_table", net.fabricmc.fabric.api.screenhandler.v1.ScreenHandlerRegistry.registerSimple(Utils.ID("alloy_forger"), AlloyForgerScreenHandler::new));
+        SCREEN_HANDLERS.put("alloy_forger", net.fabricmc.fabric.api.screenhandler.v1.ScreenHandlerRegistry.registerSimple(Utils.ID("alloy_forger"), AlloyForgerScreenHandler::new));
     }
 
 }
