@@ -1,5 +1,6 @@
 package wraith.alloy_forgery.screens;
 
+import com.mojang.datafixers.util.Pair;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.entity.player.PlayerEntity;
@@ -15,11 +16,16 @@ import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerContext;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
 import wraith.alloy_forgery.blocks.ForgeControllerBlockEntity;
 import wraith.alloy_forgery.registry.ScreenHandlerRegistry;
 import wraith.alloy_forgery.screens.slots.AlloyOutputSlot;
 import wraith.alloy_forgery.screens.slots.LavaInputSlot;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class AlloyForgerScreenHandler extends ScreenHandler {
 
@@ -108,12 +114,28 @@ public class AlloyForgerScreenHandler extends ScreenHandler {
             return;
         }
         ServerPlayerEntity serverPlayerEntity = (ServerPlayerEntity)player;
-        ItemStack recipe = ((ForgeControllerBlockEntity)inventory).getRecipe();
-        if (recipe == null) {
-            recipe = ItemStack.EMPTY;
+        Map.Entry<HashMap<String, Integer>, Pair<String, Integer>> recipe = ((ForgeControllerBlockEntity)inventory).getRecipe();
+        ItemStack recipeItem = ItemStack.EMPTY;
+        if (recipe != null) {
+            recipeItem = new ItemStack(Registry.ITEM.get(new Identifier(recipe.getValue().getFirst())), recipe.getValue().getSecond());
         }
-        this.inventory.setStack(1, recipe);
-        serverPlayerEntity.networkHandler.sendPacket(new ScreenHandlerSlotUpdateS2CPacket(syncId, 1, recipe));
+        this.inventory.setStack(1, recipeItem);
+        serverPlayerEntity.networkHandler.sendPacket(new ScreenHandlerSlotUpdateS2CPacket(syncId, 1, recipeItem));
+    }
+
+    public void updateItems(int syncId, World world, PlayerEntity player) {
+        if (world.isClient || !(inventory instanceof ForgeControllerBlockEntity)) {
+            return;
+        }
+        ServerPlayerEntity serverPlayerEntity = (ServerPlayerEntity)player;
+        Map.Entry<HashMap<String, Integer>, Pair<String, Integer>> recipe = ((ForgeControllerBlockEntity)inventory).getRecipe();
+        if (recipe == null) {
+            return;
+        }
+        for (int i = 2; i < this.inventory.size(); ++i) {
+            this.inventory.getStack(i).decrement(recipe.getValue().getSecond());
+            serverPlayerEntity.networkHandler.sendPacket(new ScreenHandlerSlotUpdateS2CPacket(syncId, 1, this.inventory.getStack(i)));
+        }
     }
 
 }

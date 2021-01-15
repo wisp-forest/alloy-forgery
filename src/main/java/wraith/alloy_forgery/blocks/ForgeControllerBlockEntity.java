@@ -3,6 +3,7 @@ package wraith.alloy_forgery.blocks;
 import com.mojang.datafixers.util.Pair;
 import net.fabricmc.fabric.api.block.entity.BlockEntityClientSerializable;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.block.HorizontalFacingBlock;
 import net.minecraft.block.entity.LockableContainerBlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -14,10 +15,10 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.screen.PropertyDelegate;
 import net.minecraft.screen.ScreenHandler;
-import net.minecraft.screen.ScreenHandlerContext;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.Tickable;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
@@ -40,7 +41,7 @@ public class ForgeControllerBlockEntity extends LockableContainerBlockEntity imp
     private int heatTimeMax = 72000; //1 hour, or 5 minutes per bucket
 
     private int smeltingTime = 0;
-    private int smeltingTimeMax = 18000; //15 minutes
+    private int smeltingTimeMax = 400; //15 minutes
 
     private boolean lastHeatStatus = false;
 
@@ -100,6 +101,9 @@ public class ForgeControllerBlockEntity extends LockableContainerBlockEntity imp
         ScreenHandler screen = null;
         if (isValidMultiblock()) {
             screen = new AlloyForgerScreenHandler(syncId, inv, this, propertyDelegate);
+        } else {
+            player.sendMessage(new TranslatableText("message.alloy_forgery.invalid_multiblock"), false);
+            player.playSound(SoundEvents.BLOCK_BASALT_FALL, SoundCategory.BLOCKS, 1.0F, 0.2F);
         }
         this.handler = (AlloyForgerScreenHandler) screen;
         return screen;
@@ -181,6 +185,9 @@ public class ForgeControllerBlockEntity extends LockableContainerBlockEntity imp
                     return false;
                 }
                 break;
+        }
+        if (world.getBlockState(center).getBlock() != Blocks.AIR) {
+            return false;
         }
         for (int x = -1; x <= 1; ++x) {
             for (int z = -1; z <= 1; ++z){
@@ -297,7 +304,7 @@ public class ForgeControllerBlockEntity extends LockableContainerBlockEntity imp
         return false;
     }
 
-    public ItemStack getRecipe() {
+    public Map.Entry<HashMap<String, Integer>, Pair<String, Integer>> getRecipe() {
         HashMap<String, Integer> items = new HashMap<>();
         for (int i = 2; i < size(); ++i) {
             if (inventory.get(i) == ItemStack.EMPTY) {
@@ -332,14 +339,10 @@ public class ForgeControllerBlockEntity extends LockableContainerBlockEntity imp
                 }
             }
             if (isRightRecipe) {
-                return new ItemStack(Registry.ITEM.get(new Identifier(recipe.getValue().getFirst())), recipe.getValue().getSecond());
+                return recipe;
             }
         }
         return null;
-    }
-
-    public PropertyDelegate getDelegate() {
-        return this.propertyDelegate;
     }
 
     @Override
@@ -367,8 +370,12 @@ public class ForgeControllerBlockEntity extends LockableContainerBlockEntity imp
     @Override
     public ItemStack removeStack(int slot, int count) {
         ItemStack result = Inventories.splitStack(getItems(), slot, count);
-        if (!result.isEmpty() && slot != 1) {
-            markDirty();
+        if (!result.isEmpty()) {
+            if (slot != 1) {
+                markDirty();
+            } else {
+                this.handler.updateItems(this.handler.syncId, this.world, this.handler.player);
+            }
         }
         return result;
     }
