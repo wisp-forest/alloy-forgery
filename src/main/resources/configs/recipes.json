@@ -2,8 +2,8 @@
   "recipes": [
     {
       "input": {
-        "iron": 3,
-        "coal": 1
+        "iron": 27,
+        "coal": 9
       },
       "output": {
         "item": "minecraft:diamond",

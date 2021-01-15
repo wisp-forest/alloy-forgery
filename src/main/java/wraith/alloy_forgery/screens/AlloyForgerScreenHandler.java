@@ -8,10 +8,15 @@ import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.network.packet.s2c.play.ScreenHandlerSlotUpdateS2CPacket;
 import net.minecraft.screen.ArrayPropertyDelegate;
 import net.minecraft.screen.PropertyDelegate;
 import net.minecraft.screen.ScreenHandler;
+import net.minecraft.screen.ScreenHandlerContext;
 import net.minecraft.screen.slot.Slot;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.world.World;
+import wraith.alloy_forgery.blocks.ForgeControllerBlockEntity;
 import wraith.alloy_forgery.registry.ScreenHandlerRegistry;
 import wraith.alloy_forgery.screens.slots.AlloyOutputSlot;
 import wraith.alloy_forgery.screens.slots.LavaInputSlot;
@@ -20,6 +25,7 @@ public class AlloyForgerScreenHandler extends ScreenHandler {
 
     private final Inventory inventory;
     private final PropertyDelegate delegate;
+    public final PlayerEntity player;
 
     public AlloyForgerScreenHandler(int syncId, PlayerInventory playerInventory) {
         this(syncId, playerInventory, new SimpleInventory(12), new ArrayPropertyDelegate(4));
@@ -28,6 +34,7 @@ public class AlloyForgerScreenHandler extends ScreenHandler {
     public AlloyForgerScreenHandler(int syncId, PlayerInventory playerInventory, Inventory inventory, PropertyDelegate delegate) {
         super(ScreenHandlerRegistry.SCREEN_HANDLERS.get("alloy_forger"), syncId);
         this.delegate = delegate;
+        this.player = playerInventory.player;
         this.addProperties(this.delegate);
         this.inventory = inventory;
         this.addSlot(new LavaInputSlot(inventory, 0, 8, 58)); //Fuel
@@ -62,7 +69,7 @@ public class AlloyForgerScreenHandler extends ScreenHandler {
         if (slot != null && slot.hasStack()) {
             ItemStack originalStack = slot.getStack();
             newStack = originalStack.copy();
-            if (invSlot < 2) {
+            if (invSlot < this.inventory.size()) {
                 if (!this.insertItem(originalStack, this.inventory.size(), this.slots.size(), true)) {
                     return ItemStack.EMPTY;
                 }
@@ -94,6 +101,19 @@ public class AlloyForgerScreenHandler extends ScreenHandler {
     @Environment(EnvType.CLIENT)
     public boolean isHeating() {
         return this.delegate.get(0) > 0;
+    }
+
+    public void updateResult(int syncId, World world, PlayerEntity player) {
+        if (world.isClient || !(inventory instanceof ForgeControllerBlockEntity)) {
+            return;
+        }
+        ServerPlayerEntity serverPlayerEntity = (ServerPlayerEntity)player;
+        ItemStack recipe = ((ForgeControllerBlockEntity)inventory).getRecipe();
+        if (recipe == null) {
+            recipe = ItemStack.EMPTY;
+        }
+        this.inventory.setStack(1, recipe);
+        serverPlayerEntity.networkHandler.sendPacket(new ScreenHandlerSlotUpdateS2CPacket(syncId, 1, recipe));
     }
 
 }

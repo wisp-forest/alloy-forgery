@@ -1,5 +1,6 @@
 package wraith.alloy_forgery.blocks;
 
+import com.mojang.datafixers.util.Pair;
 import net.fabricmc.fabric.api.block.entity.BlockEntityClientSerializable;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.HorizontalFacingBlock;
@@ -13,8 +14,10 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.screen.PropertyDelegate;
 import net.minecraft.screen.ScreenHandler;
+import net.minecraft.screen.ScreenHandlerContext;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.Tickable;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
@@ -25,12 +28,16 @@ import wraith.alloy_forgery.registry.BlockEntityRegistry;
 import wraith.alloy_forgery.screens.AlloyForgerScreenHandler;
 import wraith.alloy_forgery.screens.ImplementedInventory;
 
-public class ForgeControllerBlockEntity extends LockableContainerBlockEntity implements NamedScreenHandlerFactory, ImplementedInventory, Tickable {
+import java.util.HashMap;
+import java.util.Map;
+
+public class ForgeControllerBlockEntity extends LockableContainerBlockEntity implements NamedScreenHandlerFactory, ImplementedInventory, Tickable, BlockEntityClientSerializable {
 
     private DefaultedList<ItemStack> inventory = DefaultedList.ofSize(12, ItemStack.EMPTY);
+    private AlloyForgerScreenHandler handler;
 
     private int heatTime = 0;
-    private int heatTimeMax = 18000; //15 minutes
+    private int heatTimeMax = 72000; //1 hour, or 5 minutes per bucket
 
     private int smeltingTime = 0;
     private int smeltingTimeMax = 18000; //15 minutes
@@ -89,12 +96,18 @@ public class ForgeControllerBlockEntity extends LockableContainerBlockEntity imp
     }
 
     @Override
-    protected ScreenHandler createScreenHandler(int syncId, PlayerInventory playerInventory) {
+    public ScreenHandler createMenu(int syncId, PlayerInventory inv, PlayerEntity player) {
         ScreenHandler screen = null;
         if (isValidMultiblock()) {
-            screen = new AlloyForgerScreenHandler(syncId, playerInventory, this, propertyDelegate);
+            screen = new AlloyForgerScreenHandler(syncId, inv, this, propertyDelegate);
         }
+        this.handler = (AlloyForgerScreenHandler) screen;
         return screen;
+    }
+
+    @Override
+    protected ScreenHandler createScreenHandler(int syncId, PlayerInventory playerInventory) {
+        return createMenu(syncId, playerInventory, playerInventory.player);
     }
 
     public boolean isValidMultiblock() {
@@ -221,6 +234,7 @@ public class ForgeControllerBlockEntity extends LockableContainerBlockEntity imp
         }
     }
 
+
     @Override
     public void tick() {
         if (this.heatTime > 0) {
@@ -235,18 +249,24 @@ public class ForgeControllerBlockEntity extends LockableContainerBlockEntity imp
             this.smeltingTime = 0;
         }
 
-        if (inventory.get(0).getItem() == Items.LAVA_BUCKET){
-            int heatTime = 1500;
-            if (this.heatTime + heatTime <= this.heatTimeMax) {
-                this.inventory.set(0, new ItemStack(Items.BUCKET));
-                this.heatTime = Math.min(this.heatTime + heatTime, this.heatTimeMax);
-            }
+        if (inventory.get(0).getItem() == Items.LAVA_BUCKET && increaseHeat(1)){
+            this.inventory.set(0, new ItemStack(Items.BUCKET));
         }
 
         boolean isHeating = this.isHeating();
         if (lastHeatStatus != isHeating) {
             lastHeatStatus = isHeating;
             this.world.setBlockState(this.pos, this.world.getBlockState(pos).with(ForgeControllerBlock.LIT, isHeating));
+        }
+    }
+
+    public boolean increaseHeat(int amount) {
+        int heatTime = 6000 * amount;
+        if (this.heatTime + heatTime <= this.heatTimeMax) {
+            this.heatTime = Math.min(this.heatTime + heatTime, this.heatTimeMax);
+            return true;
+        } else {
+            return false;
         }
     }
 
@@ -277,4 +297,87 @@ public class ForgeControllerBlockEntity extends LockableContainerBlockEntity imp
         return false;
     }
 
+    public ItemStack getRecipe() {
+        HashMap<String, Integer> items = new HashMap<>();
+        for (int i = 2; i < size(); ++i) {
+            if (inventory.get(i) == ItemStack.EMPTY) {
+                continue;
+            }
+            String itemId = Registry.ITEM.getId(inventory.get(i).getItem()).toString();
+            if (items.containsKey(itemId)) {
+                items.put(itemId, items.get(itemId) + inventory.get(i).getCount());
+            } else {
+                items.put(itemId, inventory.get(i).getCount());
+            }
+        }
+        //For each recipe
+        for (Map.Entry<HashMap<String, Integer>, Pair<String, Integer>> recipe : Forge.FORGE_RECIPES.entrySet()) {
+            if (recipe.getKey().size() != items.size()) {
+                continue;
+            }
+            boolean isRightRecipe = true;
+            //For each input ingredient
+            for (Map.Entry<String, Integer> input : recipe.getKey().entrySet()) {
+                String material = input.getKey();
+                boolean isRightIngredient = false;
+                for (Map.Entry<String, Integer> ingredient : Forge.MATERIAL_WORTH.get(material).entrySet()) {
+                    if (items.containsKey(ingredient.getKey()) && items.get(ingredient.getKey()) * ingredient.getValue() >= input.getValue()) {
+                        isRightIngredient = true;
+                        break;
+                    }
+                }
+                if (!isRightIngredient) {
+                    isRightRecipe = false;
+                    break;
+                }
+            }
+            if (isRightRecipe) {
+                return new ItemStack(Registry.ITEM.get(new Identifier(recipe.getValue().getFirst())), recipe.getValue().getSecond());
+            }
+        }
+        return null;
+    }
+
+    public PropertyDelegate getDelegate() {
+        return this.propertyDelegate;
+    }
+
+    @Override
+    public void fromClientTag(CompoundTag tag) {
+        BlockState state = world.getBlockState(pos);
+        fromTag(state, tag);
+    }
+
+    @Override
+    public CompoundTag toClientTag(CompoundTag tag) {
+        return toTag(tag);
+    }
+
+    @Override
+    public void setStack(int slot, ItemStack stack) {
+        getItems().set(slot, stack);
+        if (stack.getCount() > getMaxCountPerStack()) {
+            stack.setCount(getMaxCountPerStack());
+        }
+        if (slot != 1) {
+            markDirty();
+        }
+    }
+
+    @Override
+    public ItemStack removeStack(int slot, int count) {
+        ItemStack result = Inventories.splitStack(getItems(), slot, count);
+        if (!result.isEmpty() && slot != 1) {
+            markDirty();
+        }
+        return result;
+    }
+
+    @Override
+    public void markDirty() {
+        super.markDirty();
+        if (this.handler != null) {
+            this.handler.updateResult(this.handler.syncId, this.world, this.handler.player);
+        }
+    }
 }

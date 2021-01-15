@@ -4,6 +4,8 @@ import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemPlacementContext;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
@@ -51,14 +53,24 @@ public class ForgeControllerBlock extends BlockWithEntity {
     @Override
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
         if (!world.isClient) {
-            NamedScreenHandlerFactory screenHandlerFactory = this.createScreenHandlerFactory(state, world, pos);
-            if (screenHandlerFactory != null) {
-                player.openHandledScreen((NamedScreenHandlerFactory) (world.getBlockEntity(pos)));
+            if (player.getStackInHand(hand).getItem() == Items.LAVA_BUCKET) {
+                BlockEntity entity = world.getBlockEntity(pos);
+                if (entity instanceof ForgeControllerBlockEntity && ((ForgeControllerBlockEntity)entity).increaseHeat(1) && !player.isCreative()) {
+                    player.setStackInHand(hand, new ItemStack(Items.BUCKET));
+                } else {
+                    return ActionResult.FAIL;
+                }
+            } else {
+                NamedScreenHandlerFactory screenHandlerFactory = this.createScreenHandlerFactory(state, world, pos);
+                if (screenHandlerFactory != null) {
+                    player.openHandledScreen((NamedScreenHandlerFactory) (world.getBlockEntity(pos)));
+                } else {
+                    return ActionResult.FAIL;
+                }
             }
         }
         world.getBlockEntity(pos).markDirty();
         return ActionResult.SUCCESS;
     }
-
 
 }
