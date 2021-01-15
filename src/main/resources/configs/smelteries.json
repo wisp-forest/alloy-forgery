@@ -6,7 +6,7 @@
     ],
     "tier": 1
   },
-  "stone_bricks_forge_controller": {
+  "stone_brick_forge_controller": {
     "materials": [
       "minecraft:stone_bricks",
       "minecraft:cracked_stone_bricks",

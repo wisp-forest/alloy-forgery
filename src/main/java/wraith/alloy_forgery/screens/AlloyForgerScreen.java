@@ -19,8 +19,8 @@ public class AlloyForgerScreen extends HandledScreen<ScreenHandler> {
         this.handler = (AlloyForgerScreenHandler) handler;
         this.backgroundWidth = 176;
         this.backgroundHeight = 168;
-        this.titleX += 20;
-        this.playerInventoryTitleY = this.backgroundHeight - 94;
+        this.titleX += 40;
+        this.playerInventoryTitleY = this.backgroundHeight - 90;
     }
 
     @Override
@@ -30,7 +30,18 @@ public class AlloyForgerScreen extends HandledScreen<ScreenHandler> {
         this.drawTexture(matrices, x, y, 0, 0, this.backgroundWidth, this.backgroundHeight);
         //Fuel
         if (this.handler.slots.get(0).getStack().isEmpty()) {
-            this.drawTexture(matrices, x + 8, y + 58, 203, 0, 16, 16);
+            this.drawTexture(matrices, x + 8, y + 58, 192, 0, 16, 16);
+        }
+        if ((this.handler.isHeating())) {
+            int progress = (this.handler.getHeatProgress());
+            this.drawTexture(matrices, x + 5, y + 6 + 48 - progress, this.backgroundWidth, 67 - progress, 22, progress);
+        }
+        for (int y = 0; y < 2; ++y) {
+            for (int x = 0; x < 5; ++x) {
+                if(!this.handler.slots.get(2 + y*5 + x).getStack().isEmpty()) {
+                    this.drawTexture(matrices, this.x + 43 + x * 18, this.y + 26 + y * 18, 208, 0, 18, 18);
+                }
+            }
         }
 
     }

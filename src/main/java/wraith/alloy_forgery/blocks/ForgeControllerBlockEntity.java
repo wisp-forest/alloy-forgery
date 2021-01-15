@@ -1,11 +1,14 @@
 package wraith.alloy_forgery.blocks;
 
 import net.fabricmc.fabric.api.block.entity.BlockEntityClientSerializable;
+import net.minecraft.block.BlockState;
 import net.minecraft.block.HorizontalFacingBlock;
 import net.minecraft.block.entity.LockableContainerBlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.inventory.Inventories;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.screen.PropertyDelegate;
@@ -29,6 +32,11 @@ public class ForgeControllerBlockEntity extends LockableContainerBlockEntity imp
     private int heatTime = 0;
     private int heatTimeMax = 18000; //15 minutes
 
+    private int smeltingTime = 0;
+    private int smeltingTimeMax = 18000; //15 minutes
+
+    private boolean lastHeatStatus = false;
+
     private final PropertyDelegate propertyDelegate = new PropertyDelegate() {
         @Override
         public int get(int index) {
@@ -37,6 +45,10 @@ public class ForgeControllerBlockEntity extends LockableContainerBlockEntity imp
                     return heatTime;
                 case 1:
                     return heatTimeMax;
+                case 2:
+                    return smeltingTime;
+                case 3:
+                    return smeltingTimeMax;
                 default:
                     return 0;
             }
@@ -51,12 +63,19 @@ public class ForgeControllerBlockEntity extends LockableContainerBlockEntity imp
                 case 1:
                     heatTimeMax = value;
                     break;
+                case 2:
+                    smeltingTime = value;
+                    break;
+                case 3:
+                    smeltingTimeMax = value;
+                default:
+                    break;
             }
         }
 
         @Override
         public int size() {
-            return 2;
+            return 4;
         }
     };
 
@@ -193,8 +212,6 @@ public class ForgeControllerBlockEntity extends LockableContainerBlockEntity imp
         return false;
     }
 
-    public void recreateInventory() {}
-
     @Override
     public boolean canPlayerUse(PlayerEntity player) {
         if (this.world.getBlockEntity(this.pos) != this) {
@@ -206,7 +223,53 @@ public class ForgeControllerBlockEntity extends LockableContainerBlockEntity imp
 
     @Override
     public void tick() {
+        if (this.heatTime > 0) {
+            --this.heatTime;
+        } else if (this.heatTime < 0) {
+            this.heatTime = 0;
+        }
 
+        if (this.smeltingTime > 0) {
+            --this.smeltingTime;
+        } else if (this.smeltingTime < 0) {
+            this.smeltingTime = 0;
+        }
+
+        if (inventory.get(0).getItem() == Items.LAVA_BUCKET){
+            int heatTime = 1500;
+            if (this.heatTime + heatTime <= this.heatTimeMax) {
+                this.inventory.set(0, new ItemStack(Items.BUCKET));
+                this.heatTime = Math.min(this.heatTime + heatTime, this.heatTimeMax);
+            }
+        }
+
+        boolean isHeating = this.isHeating();
+        if (lastHeatStatus != isHeating) {
+            lastHeatStatus = isHeating;
+            this.world.setBlockState(this.pos, this.world.getBlockState(pos).with(ForgeControllerBlock.LIT, isHeating));
+        }
+    }
+
+    @Override
+    public void fromTag(BlockState state, CompoundTag tag) {
+        super.fromTag(state, tag);
+        this.heatTime = tag.getInt("HeatTime");
+        this.smeltingTime = tag.getInt("SmeltingTime");
+        this.inventory = DefaultedList.ofSize(size(), ItemStack.EMPTY);
+        Inventories.fromTag(tag, inventory);
+    }
+
+    @Override
+    public CompoundTag toTag(CompoundTag tag) {
+        super.toTag(tag);
+        tag.putInt("HeatTime", this.heatTime);
+        tag.putInt("SmeltingTime", this.smeltingTime);
+        Inventories.toTag(tag, this.inventory);
+        return tag;
+    }
+
+    public boolean isHeating() {
+        return this.heatTime > 0;
     }
 
     @Override

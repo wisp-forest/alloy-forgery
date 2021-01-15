@@ -20,7 +20,9 @@ public class AlloyForgery implements ModInitializer {
     @Override
     public void onInitialize() {
         Utils.saveFilesFromJar("configs/", "", true);
-        Forge.readFromJson(Config.getJsonObject(Config.readFile(new File("config/alloy_forgery/smelteries.json"))));
+        Forge.readSmeltriesFromJson(Config.getJsonObject(Config.readFile(new File("config/alloy_forgery/smelteries.json"))));
+        Forge.readMaterialsFromJson(Config.getJsonObject(Config.readFile(new File("config/alloy_forgery/material_worth.json"))));
+        Forge.readRecipesFromJson(Config.getJsonObject(Config.readFile(new File("config/alloy_forgery/recipes.json"))));
 
         BlockRegistry.loadBlocks();
         BlockRegistry.registerBlocks();

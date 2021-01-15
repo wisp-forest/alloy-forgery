@@ -1,0 +1,32 @@
+{
+  "iron": {
+    "minecraft:iron_nugget": 1,
+    "minecraft:iron_ingot": 9,
+    "minecraft:iron_block": 81
+  },
+  "gold": {
+    "minecraft:gold_nugget": 1,
+    "minecraft:gold_ingot": 9,
+    "minecraft:gold_block": 81
+  },
+  "netherite": {
+    "minecraft:netherite_ingot": 9,
+    "minecraft:netherite_block": 81
+  },
+  "redstone": {
+    "minecraft:redstone": 2,
+    "minecraft:redstone_block": 18
+  },
+  "lapis": {
+    "minecraft:lapis_lazuli": 2,
+    "minecraft:lapis_block": 18
+  },
+  "nether_quartz": {
+    "minecraft:quartz": 9,
+    "minecraft:quartz_block": 36
+  },
+  "coal": {
+    "minecraft:coal": 9,
+    "minecraft:coal_block": 81
+  }
+}
