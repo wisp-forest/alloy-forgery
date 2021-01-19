@@ -13,6 +13,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.particle.ParticleTypes;
 import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.screen.PropertyDelegate;
 import net.minecraft.screen.ScreenHandler;
@@ -31,6 +32,7 @@ import wraith.alloy_forgery.RecipeOutput;
 import wraith.alloy_forgery.registry.BlockEntityRegistry;
 import wraith.alloy_forgery.screens.AlloyForgerScreenHandler;
 import wraith.alloy_forgery.screens.ImplementedInventory;
+import wraith.alloy_forgery.utils.Utils;
 
 import java.util.*;
 
@@ -41,6 +43,8 @@ public class ForgeControllerBlockEntity extends LockableContainerBlockEntity imp
 
     private AlloyForgerScreenHandler handler;
 
+    private int timer = 0;
+
     private int heatTime = 0;
     private int heatTimeMax = -1;
 
@@ -49,7 +53,7 @@ public class ForgeControllerBlockEntity extends LockableContainerBlockEntity imp
 
     private boolean lastHeatStatus = false;
 
-    public float getForgeTier () {
+    public float getForgeTier() {
         String id = Registry.BLOCK.getId(getCachedState().getBlock()).getPath();
         Forge forge = Forge.FORGES.getOrDefault(id, null);
         if (forge == null) {
@@ -145,6 +149,7 @@ public class ForgeControllerBlockEntity extends LockableContainerBlockEntity imp
                 return pos;
         }
     }
+
     public static BlockPos getFrontPos(BlockState state, BlockPos pos) {
         switch (state.get(ForgeControllerBlock.FACING)) {
             case NORTH:
@@ -204,7 +209,7 @@ public class ForgeControllerBlockEntity extends LockableContainerBlockEntity imp
             return false;
         }
         for (int x = -1; x <= 1; ++x) {
-            for (int z = -1; z <= 1; ++z){
+            for (int z = -1; z <= 1; ++z) {
                 blockId = Registry.BLOCK.getId(world.getBlockState(new BlockPos(center.getX() + x, center.getY() - 1, center.getZ() + z)).getBlock()).toString();
                 if (!forge.materials.contains(blockId)) {
                     return false;
@@ -251,13 +256,14 @@ public class ForgeControllerBlockEntity extends LockableContainerBlockEntity imp
         if (this.world.getBlockEntity(this.pos) != this) {
             return false;
         } else {
-            return isValidMultiblock() && player.squaredDistanceTo((double)this.pos.getX() + 0.5D, (double)this.pos.getY() + 0.5D, (double)this.pos.getZ() + 0.5D) <= 64.0D;
+            return isValidMultiblock() && player.squaredDistanceTo((double) this.pos.getX() + 0.5D, (double) this.pos.getY() + 0.5D, (double) this.pos.getZ() + 0.5D) <= 64.0D;
         }
     }
 
 
     @Override
     public void tick() {
+        renderSmoke();
         Map.Entry<HashMap<String, Integer>, RecipeOutput> currentRecipe = getRecipe();
         if (this.smeltingTime <= 0 || this.recipe != currentRecipe || (this.recipe != null && this.recipe.getValue().heatAmount > this.heatTime && this.recipe.getValue().requiredTier <= getForgeTier())) {
             if (this.smeltingTime <= 0 && this.recipe != null && this.inventory.get(1).getCount() + this.recipe.getValue().outputAmount <= this.inventory.get(1).getMaxCount()) {
@@ -286,7 +292,7 @@ public class ForgeControllerBlockEntity extends LockableContainerBlockEntity imp
             this.smeltingTime = Math.max(this.smeltingTime - 1, 0);
         }
 
-        if (inventory.get(0).getItem() == Items.LAVA_BUCKET && increaseHeat(10000)){
+        if (inventory.get(0).getItem() == Items.LAVA_BUCKET && increaseHeat(10000)) {
             this.inventory.set(0, new ItemStack(Items.BUCKET));
         }
 
@@ -416,4 +422,26 @@ public class ForgeControllerBlockEntity extends LockableContainerBlockEntity imp
         super.markDirty();
     }
 
+    public void renderSmoke() {
+        BlockPos center = getBackPos(getCachedState(), pos);
+        if (timer % 20 == 0) {
+            if (Utils.getRandomIntInRange(1, 4) == 1) {
+                world.addParticle(ParticleTypes.CAMPFIRE_SIGNAL_SMOKE, center.getX() + 0.25, center.getY(), center.getZ() + 0.25, 0, 0.08, 0);
+            }
+            if (Utils.getRandomIntInRange(1, 4) == 1) {
+                world.addParticle(ParticleTypes.CAMPFIRE_SIGNAL_SMOKE, center.getX() + 0.75, center.getY(), center.getZ() + 0.25, 0, 0.08, 0);
+            }
+            if (Utils.getRandomIntInRange(1, 4) == 1) {
+                world.addParticle(ParticleTypes.CAMPFIRE_SIGNAL_SMOKE, center.getX() + 0.25, center.getY(), center.getZ() + 0.75, 0, 0.08, 0);
+            }
+            if (Utils.getRandomIntInRange(1, 4) == 1) {
+                world.addParticle(ParticleTypes.CAMPFIRE_SIGNAL_SMOKE, center.getX() + 0.75, center.getY(), center.getZ() + 0.75, 0, 0.08, 0);
+            }
+            world.addParticle(ParticleTypes.LARGE_SMOKE, center.getX() + 0.5, center.getY(), center.getZ() + 0.5, 0, 0.05, 0);
+            world.addParticle(ParticleTypes.SMOKE, center.getX() + 0.5, center.getY(), center.getZ() + 0.5, 0, 0.05, 0);
+            timer = 0;
+        } else {
+            ++timer;
+        }
+    }
 }

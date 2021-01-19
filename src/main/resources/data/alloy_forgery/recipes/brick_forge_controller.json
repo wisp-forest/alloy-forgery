@@ -1,0 +1,20 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        "###",
+        "#B#",
+        "###"
+    ],
+    "key": {
+        "#": {
+            "item": "minecraft:bricks"
+        },
+        "B": {
+            "item": "minecraft:blast_furnace"
+        }
+    },
+    "result": {
+        "item": "alloy_forgery:brick_forge_controller",
+        "count": 1
+    }
+}

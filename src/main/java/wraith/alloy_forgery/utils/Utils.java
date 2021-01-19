@@ -12,11 +12,11 @@ import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.util.Calendar;
 import java.util.Enumeration;
+import java.util.Random;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
-
-import static wraith.alloy_forgery.AlloyForgery.MOD_ID;
 
 public class Utils {
     public static Identifier ID(String id) {
@@ -177,5 +177,10 @@ public class Utils {
 
     public static InputStream stringToInputStream(String s) {
         return new ByteArrayInputStream(s.getBytes(StandardCharsets.UTF_8));
+    }
+
+    public static final Random random = new Random(Calendar.getInstance().getTimeInMillis());
+    public static int getRandomIntInRange(int min, int max) {
+        return random.nextInt(max - min + 1) + min;
     }
 }

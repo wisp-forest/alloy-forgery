@@ -1,4 +1,7 @@
 {
+  "block.alloy_forgery.brick_forge_controller": "Brick Forge Controller",
+  "block.alloy_forgery.stone_brick_forge_controller": "Stone Brick Forge Controller",
+  "block.alloy_forgery.blackstone_forge_controller": "Blackstone Forge Controller",
   "container.alloy_forgery.alloy_forge": "Alloy Forge",
   "message.alloy_forgery.invalid_multiblock": "Invalid Multiblock Configuration"
 }
