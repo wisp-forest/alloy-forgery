@@ -24,6 +24,13 @@ public class AlloyForgerScreen extends HandledScreen<ScreenHandler> {
     }
 
     @Override
+    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+        this.renderBackground(matrices);
+        super.render(matrices, mouseX, mouseY, delta);
+        this.drawMouseoverTooltip(matrices, mouseX, mouseY);
+    }
+
+    @Override
     protected void drawBackground(MatrixStack matrices, float delta, int mouseX, int mouseY) {
         RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
         this.client.getTextureManager().bindTexture(TEXTURE);
@@ -35,6 +42,10 @@ public class AlloyForgerScreen extends HandledScreen<ScreenHandler> {
         if ((this.handler.isHeating())) {
             int progress = (this.handler.getHeatProgress());
             this.drawTexture(matrices, x + 5, y + 6 + 48 - progress, this.backgroundWidth, 67 - progress, 22, progress);
+        }
+        if ((this.handler.isSmelting())) {
+            int progress = (this.handler.getSmeltingProgress());
+            this.drawTexture(matrices, x + 147, y + 8, this.backgroundWidth, 0, 16, progress);
         }
         for (int y = 0; y < 2; ++y) {
             for (int x = 0; x < 5; ++x) {

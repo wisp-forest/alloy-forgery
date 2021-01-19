@@ -2,6 +2,7 @@ package wraith.alloy_forgery.blocks;
 
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
@@ -16,9 +17,11 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.registry.Registry;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
+import wraith.alloy_forgery.Forge;
 
 public class ForgeControllerBlock extends BlockWithEntity {
 
@@ -53,9 +56,17 @@ public class ForgeControllerBlock extends BlockWithEntity {
     @Override
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
         if (!world.isClient) {
+            if (!(world.getBlockEntity(pos) instanceof ForgeControllerBlockEntity)) {
+                return ActionResult.FAIL;
+            }
+            ForgeControllerBlockEntity entity = (ForgeControllerBlockEntity) world.getBlockEntity(pos);
+
+            String id = Registry.BLOCK.getId(this).getPath();
+            Forge forge = Forge.FORGES.getOrDefault(id, null);
+
+            entity.setMaxHeat(forge.maxHeat);
             if (player.getStackInHand(hand).getItem() == Items.LAVA_BUCKET) {
-                BlockEntity entity = world.getBlockEntity(pos);
-                if (entity instanceof ForgeControllerBlockEntity && ((ForgeControllerBlockEntity)entity).increaseHeat(1) && !player.isCreative()) {
+                if (entity.increaseHeat(10000) && !player.isCreative()) {
                     player.setStackInHand(hand, new ItemStack(Items.BUCKET));
                 } else {
                     return ActionResult.FAIL;
@@ -73,4 +84,16 @@ public class ForgeControllerBlock extends BlockWithEntity {
         return ActionResult.SUCCESS;
     }
 
+    @Override
+    public void onPlaced(World world, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack itemStack) {
+        super.onPlaced(world, pos, state, placer, itemStack);
+        if (world.getBlockEntity(pos) instanceof ForgeControllerBlockEntity) {
+            ForgeControllerBlockEntity entity = (ForgeControllerBlockEntity) world.getBlockEntity(pos);
+
+            String id = Registry.BLOCK.getId(this).getPath();
+            Forge forge = Forge.FORGES.getOrDefault(id, null);
+
+            entity.setMaxHeat(forge.maxHeat);
+        }
+    }
 }

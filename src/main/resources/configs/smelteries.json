@@ -1,10 +1,10 @@
 {
   "brick_forge_controller": {
-    "controller": "",
     "materials": [
       "minecraft:bricks"
     ],
-    "tier": 1
+    "tier": 1,
+    "max_heat": 100000
   },
   "stone_brick_forge_controller": {
     "materials": [
@@ -13,7 +13,8 @@
       "minecraft:mossy_stone_bricks",
       "minecraft:chiseled_stone_bricks"
     ],
-    "tier": 1
+    "tier": 1,
+    "max_heat": 150000
   },
   "blackstone_forge_controller": {
     "materials": [
@@ -22,6 +23,7 @@
       "minecraft:polished_blackstone_bricks",
       "minecraft:cracked_polished_blackstone_bricks"
     ],
-    "tier": 2
+    "tier": 2,
+    "max_heat": 200000
   }
 }
