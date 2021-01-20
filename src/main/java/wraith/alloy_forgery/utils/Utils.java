@@ -1,5 +1,6 @@
 package wraith.alloy_forgery.utils;
 
+import com.google.gson.JsonObject;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.util.Identifier;
 import org.apache.commons.io.FileUtils;
@@ -12,9 +13,7 @@ import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.util.Calendar;
-import java.util.Enumeration;
-import java.util.Random;
+import java.util.*;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
@@ -44,6 +43,31 @@ public class Utils {
                 "    \"side\": \"alloy_forgery:block/" + id + "_side\"\n" +
                 "  }\n" +
                 "}";
+    }
+
+    public static JsonObject createControllerRecipeJson(String forge, String material) {
+        String recipe =
+                "{\n" +
+                "    \"type\": \"minecraft:crafting_shaped\",\n" +
+                "    \"pattern\": [\n" +
+                "        \"###\",\n" +
+                "        \"#B#\",\n" +
+                "        \"###\"\n" +
+                "    ],\n" +
+                "    \"key\": {\n" +
+                "        \"#\": {\n" +
+                "            \"item\": \"" + material + "\"\n" +
+                "        },\n" +
+                "        \"B\": {\n" +
+                "            \"item\": \"minecraft:blast_furnace\"\n" +
+                "        }\n" +
+                "    },\n" +
+                "    \"result\": {\n" +
+                "        \"item\": \"alloy_forgery:" + forge + "\",\n" +
+                "        \"count\": 1\n" +
+                "    }\n" +
+                "}";
+        return Config.getJsonObject(recipe);
     }
 
     public static String createBlockStateJson(String id) {
@@ -183,4 +207,21 @@ public class Utils {
     public static int getRandomIntInRange(int min, int max) {
         return random.nextInt(max - min + 1) + min;
     }
+
+    public static String capitalize(String[] split) {
+        StringBuilder result = new StringBuilder();
+        Iterator<String> it = Arrays.asList(split).iterator();
+        while (it.hasNext()) {
+            result.append(capitalize(it.next()));
+            if (it.hasNext()) {
+                result.append(" ");
+            }
+        }
+        return result.toString();
+    }
+
+    public static String capitalize(String string) {
+        return Character.toUpperCase(string.charAt(0)) + string.substring(1);
+    }
+
 }

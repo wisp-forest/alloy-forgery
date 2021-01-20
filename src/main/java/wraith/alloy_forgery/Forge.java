@@ -15,15 +15,17 @@ public class Forge {
     public static final HashMap<HashMap<String, Integer>, RecipeOutput> FORGE_RECIPES = new HashMap<>();
 
     public HashSet<String> materials;
+    public HashSet<String> recipeMaterials;
     public String controller;
     public float tier;
     public int maxHeat;
 
-    public Forge(HashSet<String> materials, float tier, String controller, int maxHeat) {
+    public Forge(HashSet<String> materials, HashSet<String> recipeMaterials, float tier, String controller, int maxHeat) {
         this.materials = materials;
         this.tier = tier;
         this.controller = controller;
         this.maxHeat = maxHeat;
+        this.recipeMaterials = recipeMaterials;
     }
 
     @Override
@@ -58,7 +60,12 @@ public class Forge {
             for (JsonElement material : materials) {
                 materialsSet.add(material.getAsString());
             }
-            FORGES.put(controller, new Forge(materialsSet, tier, controller, maxHeat));
+            HashSet<String> recipeMaterialsSet = new HashSet<>();
+            JsonArray recipeMaterials = controllerStats.getAsJsonArray("recipe_materials");
+            for (JsonElement material : recipeMaterials) {
+                recipeMaterialsSet.add(material.getAsString());
+            }
+            FORGES.put(controller, new Forge(materialsSet, recipeMaterialsSet, tier, controller, maxHeat));
         }
     }
 
@@ -101,9 +108,14 @@ public class Forge {
             for (String material : smeltry.getValue().materials) {
                 materialArray.add(material);
             }
+            JsonArray recipeMaterialArray = new JsonArray();
+            for (String material : smeltry.getValue().recipeMaterials) {
+                recipeMaterialArray.add(material);
+            }
             controllerJson.add("materials", materialArray);
+            controllerJson.add("recipe_materials", recipeMaterialArray);
             controllerJson.addProperty("tier", smeltry.getValue().tier);
-            controllerJson.addProperty("tier", smeltry.getValue().maxHeat);
+            controllerJson.addProperty("max_heat", smeltry.getValue().maxHeat);
             json.add(smeltry.getKey(), controllerJson);
         }
     }

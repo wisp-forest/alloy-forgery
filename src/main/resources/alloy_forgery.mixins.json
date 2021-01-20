@@ -4,8 +4,10 @@
   "package": "wraith.alloy_forgery.mixin",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
+    "ItemStackMixin",
     "ModelLoaderMixin",
-    "NamespaceResourceManagerMixin"
+    "NamespaceResourceManagerMixin",
+    "RecipeManagerMixin"
   ],
   "client": [
   ],

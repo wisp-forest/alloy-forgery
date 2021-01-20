@@ -90,11 +90,19 @@ public class AlloyForgerScreenHandler extends ScreenHandler {
             } else if (!this.insertItem(originalStack, 2, this.inventory.size(), false)) {
                 return ItemStack.EMPTY;
             }
+
             if (originalStack.isEmpty()) {
                 slot.setStack(ItemStack.EMPTY);
             } else {
                 slot.markDirty();
             }
+
+            if (originalStack.getCount() == newStack.getCount()) {
+                return ItemStack.EMPTY;
+            }
+
+            slot.onTakeItem(player, originalStack);
+
         }
         return newStack;
     }

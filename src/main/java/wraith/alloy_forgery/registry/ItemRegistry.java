@@ -4,6 +4,7 @@ import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.util.registry.Registry;
+import wraith.alloy_forgery.Forge;
 import wraith.alloy_forgery.utils.Utils;
 
 import java.util.ArrayList;
@@ -15,11 +16,11 @@ public class ItemRegistry {
     public static final HashMap<String, Item> ITEMS = new HashMap<>();
 
     public static void loadItems() {
-        ITEMS.put("brick_forge_controller", new BlockItem(BlockRegistry.BLOCKS.get("brick_forge_controller"), new Item.Settings().group(ItemGroup.DECORATIONS)));
-        ITEMS.put("stone_brick_forge_controller", new BlockItem(BlockRegistry.BLOCKS.get("stone_brick_forge_controller"), new Item.Settings().group(ItemGroup.DECORATIONS)));
-        ITEMS.put("blackstone_forge_controller", new BlockItem(BlockRegistry.BLOCKS.get("blackstone_forge_controller"), new Item.Settings().group(ItemGroup.DECORATIONS)));
-
+        for (String forge : Forge.FORGES.keySet()) {
+            ITEMS.put(forge, new BlockItem(BlockRegistry.BLOCKS.get(forge), new Item.Settings().group(ItemGroup.DECORATIONS)));
+        }
     }
+
     public static void registerItems() {
         ArrayList<String> IDs = new ArrayList<>(ITEMS.keySet());
         Collections.sort(IDs);

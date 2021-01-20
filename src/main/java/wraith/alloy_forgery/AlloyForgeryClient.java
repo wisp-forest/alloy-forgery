@@ -8,7 +8,7 @@ public class AlloyForgeryClient implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
-        Utils.saveFilesFromJar("configs/textures", "textures", true);
+        Utils.saveFilesFromJar("configs/textures", "textures", false);
         ScreenRegistry.registerScreens();
     }
 }

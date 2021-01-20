@@ -423,6 +423,9 @@ public class ForgeControllerBlockEntity extends LockableContainerBlockEntity imp
     }
 
     public void renderSmoke() {
+        if (!isValidMultiblock()) {
+            return;
+        }
         BlockPos center = getBackPos(getCachedState(), pos);
         if (timer % 20 == 0) {
             if (Utils.getRandomIntInRange(1, 4) == 1) {

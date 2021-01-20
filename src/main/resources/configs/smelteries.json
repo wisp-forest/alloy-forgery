@@ -3,6 +3,9 @@
     "materials": [
       "minecraft:bricks"
     ],
+    "recipe_materials": [
+      "minecraft:bricks"
+    ],
     "tier": 1,
     "max_heat": 100000
   },
@@ -13,11 +16,23 @@
       "minecraft:mossy_stone_bricks",
       "minecraft:chiseled_stone_bricks"
     ],
+    "recipe_materials": [
+      "minecraft:stone_bricks",
+      "minecraft:cracked_stone_bricks",
+      "minecraft:mossy_stone_bricks",
+      "minecraft:chiseled_stone_bricks"
+    ],
     "tier": 1,
     "max_heat": 150000
   },
   "blackstone_forge_controller": {
     "materials": [
+      "minecraft:polished_blackstone",
+      "minecraft:chiseled_polished_blackstone",
+      "minecraft:polished_blackstone_bricks",
+      "minecraft:cracked_polished_blackstone_bricks"
+    ],
+    "recipe_materials": [
       "minecraft:polished_blackstone",
       "minecraft:chiseled_polished_blackstone",
       "minecraft:polished_blackstone_bricks",
