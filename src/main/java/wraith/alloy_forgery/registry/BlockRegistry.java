@@ -6,7 +6,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.Material;
 import net.minecraft.sound.BlockSoundGroup;
 import net.minecraft.util.registry.Registry;
-import wraith.alloy_forgery.Forge;
+import wraith.alloy_forgery.api.Forges;
 import wraith.alloy_forgery.blocks.ForgeControllerBlock;
 import wraith.alloy_forgery.utils.Utils;
 
@@ -17,7 +17,7 @@ public class BlockRegistry {
     public static final HashMap<String, Block> BLOCKS = new HashMap<>();
 
     public static void loadBlocks() {
-        for (String forge : Forge.FORGES.keySet()) {
+        for (String forge : Forges.getForgeNames()) {
             BLOCKS.put(forge, new ForgeControllerBlock(FabricBlockSettings.of(Material.STONE).requiresTool().breakByTool(FabricToolTags.PICKAXES).strength(3f, 8f).sounds(BlockSoundGroup.STONE)));
         }
     }

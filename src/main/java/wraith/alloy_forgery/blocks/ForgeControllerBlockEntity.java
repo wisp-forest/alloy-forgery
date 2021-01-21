@@ -29,6 +29,9 @@ import net.minecraft.util.registry.Registry;
 import wraith.alloy_forgery.AlloyForgery;
 import wraith.alloy_forgery.Forge;
 import wraith.alloy_forgery.RecipeOutput;
+import wraith.alloy_forgery.api.ForgeRecipes;
+import wraith.alloy_forgery.api.Forges;
+import wraith.alloy_forgery.api.MaterialWorths;
 import wraith.alloy_forgery.registry.BlockEntityRegistry;
 import wraith.alloy_forgery.screens.AlloyForgerScreenHandler;
 import wraith.alloy_forgery.screens.ImplementedInventory;
@@ -55,7 +58,7 @@ public class ForgeControllerBlockEntity extends LockableContainerBlockEntity imp
 
     public float getForgeTier() {
         String id = Registry.BLOCK.getId(getCachedState().getBlock()).getPath();
-        Forge forge = Forge.FORGES.getOrDefault(id, null);
+        Forge forge = Forges.getForge(id);
         if (forge == null) {
             return -1;
         } else {
@@ -176,10 +179,10 @@ public class ForgeControllerBlockEntity extends LockableContainerBlockEntity imp
 
     public boolean isValidMultiblock() {
         String controllerId = Registry.BLOCK.getId(world.getBlockState(pos).getBlock()).getPath();
-        if (!Forge.FORGES.containsKey(controllerId)) {
+        if (!Forges.hasForge(controllerId)) {
             return false;
         }
-        Forge forge = Forge.FORGES.get(controllerId);
+        Forge forge = Forges.getForge(controllerId);
         String blockId;
         Block block;
         BlockPos center = getBackPos(getCachedState(), pos);
@@ -353,7 +356,7 @@ public class ForgeControllerBlockEntity extends LockableContainerBlockEntity imp
             }
         }
         //For each recipe
-        for (Map.Entry<HashMap<String, Integer>, RecipeOutput> recipe : Forge.FORGE_RECIPES.entrySet()) {
+        for (Map.Entry<HashMap<String, Integer>, RecipeOutput> recipe : ForgeRecipes.getRecipes()) {
             if (recipe.getKey().size() != items.size()) {
                 continue;
             }
@@ -374,7 +377,7 @@ public class ForgeControllerBlockEntity extends LockableContainerBlockEntity imp
                         }
                     }
                 } else {
-                    for (Map.Entry<String, Integer> ingredient : Forge.MATERIAL_WORTH.get(material).entrySet()) {
+                    for (Map.Entry<String, Integer> ingredient : MaterialWorths.getMaterialWorthMapEntries(material)) {
                         if (ingredient.getKey().startsWith("#")) {
                             for (Item item : TagRegistry.item(new Identifier(ingredient.getKey().substring(1))).values()) {
                                 String id = Registry.ITEM.getId(item).toString();

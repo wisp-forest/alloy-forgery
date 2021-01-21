@@ -22,6 +22,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.registry.Registry;
 import wraith.alloy_forgery.Forge;
 import wraith.alloy_forgery.RecipeOutput;
+import wraith.alloy_forgery.api.MaterialWorths;
 import wraith.alloy_forgery.blocks.ForgeControllerBlockEntity;
 import wraith.alloy_forgery.registry.ScreenHandlerRegistry;
 import wraith.alloy_forgery.screens.slots.AlloyOutputSlot;
@@ -164,7 +165,7 @@ public class AlloyForgerScreenHandler extends ScreenHandler {
             ArrayList<String> materialWorth = null;
             String recipeMaterial = itemId;
             if (!recipe.containsKey(itemId)) {
-                for (Map.Entry<String, HashMap<String, Integer>> materialWorths : Forge.MATERIAL_WORTH.entrySet()) {
+                for (Map.Entry<String, HashMap<String, Integer>> materialWorths : MaterialWorths.getEntries()) {
                     boolean materialFound = false;
                     for (Map.Entry<String, Integer> itemWorths : materialWorths.getValue().entrySet()) {
                         if (itemWorths.getKey().equals(itemId) || itemWorths.getKey().startsWith("#") && TagRegistry.item(new Identifier(itemWorths.getKey().substring(1))).values().contains(currentStack.getItem())) {
@@ -181,8 +182,8 @@ public class AlloyForgerScreenHandler extends ScreenHandler {
 
                 materialWorth = new ArrayList<>();
                 if (material != null) {
-                    for (Map.Entry<String, Integer> values : Forge.MATERIAL_WORTH.get(material).entrySet()) {
-                        HashMap<String, Integer> entry = Forge.MATERIAL_WORTH.get(material);
+                    for (Map.Entry<String, Integer> values : MaterialWorths.getMaterialWorthMapEntries(material)) {
+                        HashMap<String, Integer> entry = MaterialWorths.getMaterialWorthMap(material);
                         boolean added = false;
                         for (int j = 0; j < materialWorth.size(); ++j) {
                             if (entry.get(materialWorth.get(j)) >= values.getValue()) {
@@ -206,7 +207,7 @@ public class AlloyForgerScreenHandler extends ScreenHandler {
                 }
             }
 
-            int worth = material == null ? 1 : Forge.MATERIAL_WORTH.get(material).get(materialKey);
+            int worth = material == null ? 1 : MaterialWorths.getMaterialWorthFromId(material, materialKey);
             int recipeAmount = recipe.get(material == null ? recipeMaterial : material);
             int stackAmount = currentStack.getCount() * worth;
             if (recipeAmount > 0) {
@@ -214,7 +215,7 @@ public class AlloyForgerScreenHandler extends ScreenHandler {
                 currentStack.decrement((int) Math.ceil((float)recipeAmount / worth));
                 if (material != null) {
                     int leftOver = worth - recipeAmount;
-                    HashMap<String, Integer> entry = Forge.MATERIAL_WORTH.get(material);
+                    HashMap<String, Integer> entry = MaterialWorths.getMaterialWorthMap(material);
                     while (leftOver > 0) {
                         boolean changed = false;
                         for (String matWorth : materialWorth) {

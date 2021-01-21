@@ -3,6 +3,9 @@ package wraith.alloy_forgery;
 import net.fabricmc.api.ModInitializer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import wraith.alloy_forgery.api.ForgeRecipes;
+import wraith.alloy_forgery.api.Forges;
+import wraith.alloy_forgery.api.MaterialWorths;
 import wraith.alloy_forgery.registry.BlockEntityRegistry;
 import wraith.alloy_forgery.registry.ItemRegistry;
 import wraith.alloy_forgery.registry.BlockRegistry;
@@ -20,9 +23,9 @@ public class AlloyForgery implements ModInitializer {
     @Override
     public void onInitialize() {
         Utils.saveFilesFromJar("configs/", "", false);
-        Forge.readSmeltriesFromJson(Config.getJsonObject(Config.readFile(new File("config/alloy_forgery/smelteries.json"))));
-        Forge.readMaterialsFromJson(Config.getJsonObject(Config.readFile(new File("config/alloy_forgery/material_worth.json"))));
-        Forge.readRecipesFromJson(Config.getJsonObject(Config.readFile(new File("config/alloy_forgery/recipes.json"))));
+        Forges.readFromJson(Config.getJsonObject(Config.readFile(new File("config/alloy_forgery/smelteries.json"))));
+        MaterialWorths.readFromJson(Config.getJsonObject(Config.readFile(new File("config/alloy_forgery/material_worth.json"))));
+        ForgeRecipes.readFromJson(Config.getJsonObject(Config.readFile(new File("config/alloy_forgery/recipes.json"))));
 
         BlockRegistry.loadBlocks();
         BlockRegistry.registerBlocks();

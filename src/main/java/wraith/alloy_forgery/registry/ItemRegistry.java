@@ -4,7 +4,7 @@ import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.util.registry.Registry;
-import wraith.alloy_forgery.Forge;
+import wraith.alloy_forgery.api.Forges;
 import wraith.alloy_forgery.utils.Utils;
 
 import java.util.ArrayList;
@@ -16,7 +16,7 @@ public class ItemRegistry {
     public static final HashMap<String, Item> ITEMS = new HashMap<>();
 
     public static void loadItems() {
-        for (String forge : Forge.FORGES.keySet()) {
+        for (String forge : Forges.getForgeNames()) {
             ITEMS.put(forge, new BlockItem(BlockRegistry.BLOCKS.get(forge), new Item.Settings().group(ItemGroup.DECORATIONS)));
         }
     }

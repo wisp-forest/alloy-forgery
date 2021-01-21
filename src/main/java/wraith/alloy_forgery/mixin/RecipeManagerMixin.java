@@ -10,6 +10,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wraith.alloy_forgery.Forge;
+import wraith.alloy_forgery.api.Forges;
 import wraith.alloy_forgery.utils.Utils;
 
 import java.util.Map;
@@ -19,7 +20,7 @@ public class RecipeManagerMixin {
 
     @Inject(method = "apply", at = @At("HEAD"))
     public void apply(Map<Identifier, JsonElement> map, ResourceManager resourceManager, Profiler profiler, CallbackInfo ci) {
-        for (Map.Entry<String, Forge> forge : Forge.FORGES.entrySet()) {
+        for (Map.Entry<String, Forge> forge : Forges.getForges()) {
             int i = 0;
             for (String material : forge.getValue().recipeMaterials) {
                 map.put(Utils.ID(forge.getKey() + "_" + i++), Utils.createControllerRecipeJson(forge.getKey(), material));

@@ -22,6 +22,7 @@ import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import wraith.alloy_forgery.Forge;
+import wraith.alloy_forgery.api.Forges;
 
 public class ForgeControllerBlock extends BlockWithEntity {
 
@@ -62,7 +63,7 @@ public class ForgeControllerBlock extends BlockWithEntity {
             ForgeControllerBlockEntity entity = (ForgeControllerBlockEntity) world.getBlockEntity(pos);
 
             String id = Registry.BLOCK.getId(this).getPath();
-            Forge forge = Forge.FORGES.getOrDefault(id, null);
+            Forge forge = Forges.getForge(id);
 
             entity.setMaxHeat(forge.maxHeat);
             if (player.getStackInHand(hand).getItem() == Items.LAVA_BUCKET) {
@@ -91,7 +92,7 @@ public class ForgeControllerBlock extends BlockWithEntity {
             ForgeControllerBlockEntity entity = (ForgeControllerBlockEntity) world.getBlockEntity(pos);
 
             String id = Registry.BLOCK.getId(this).getPath();
-            Forge forge = Forge.FORGES.getOrDefault(id, null);
+            Forge forge = Forges.getForge(id);
 
             entity.setMaxHeat(forge.maxHeat);
         }
