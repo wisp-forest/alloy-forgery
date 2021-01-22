@@ -4,16 +4,17 @@
   "version": "${version}",
 
   "name": "Alloy Forgery",
-  "description": "Combine ingots into alloys.",
+  "description": "Forge some alloys.",
   "authors": [
     "LordDeatHunter"
   ],
   "contact": {
     "homepage": "",
-    "sources": ""
+    "sources": "https://github.com/LordDeatHunter/Alloy-Forgery/"
   },
 
   "license": "MIT",
+  "icon": "icon.png",
 
   "environment": "*",
   "entrypoints": {

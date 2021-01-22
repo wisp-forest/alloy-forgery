@@ -3,6 +3,9 @@ package wraith.alloy_forgery.utils;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import wraith.alloy_forgery.AlloyForgery;
+import wraith.alloy_forgery.api.ForgeRecipes;
+import wraith.alloy_forgery.api.Forges;
+import wraith.alloy_forgery.api.MaterialWorths;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -11,6 +14,20 @@ import java.io.IOException;
 import java.util.Scanner;
 
 public class Config {
+
+    private static boolean IS_LOADED = false;
+
+    public static boolean isLoaded() {
+        return IS_LOADED;
+    }
+
+    public static void init() {
+        IS_LOADED = true;
+        Utils.saveFilesFromJar("configs/", "", false);
+        Forges.readFromJson(Config.getJsonObject(Config.readFile(new File("config/alloy_forgery/smelteries.json"))));
+        MaterialWorths.readFromJson(Config.getJsonObject(Config.readFile(new File("config/alloy_forgery/material_worth.json"))));
+        ForgeRecipes.readFromJson(Config.getJsonObject(Config.readFile(new File("config/alloy_forgery/recipes.json"))));
+    }
 
     public static void createFile(String path, String contents, boolean overwrite) {
         File file = new File(path);

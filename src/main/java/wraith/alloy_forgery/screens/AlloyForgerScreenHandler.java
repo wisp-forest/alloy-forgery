@@ -20,7 +20,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.registry.Registry;
-import wraith.alloy_forgery.Forge;
+import wraith.alloy_forgery.MaterialWorth;
 import wraith.alloy_forgery.RecipeOutput;
 import wraith.alloy_forgery.api.MaterialWorths;
 import wraith.alloy_forgery.blocks.ForgeControllerBlockEntity;
@@ -165,9 +165,9 @@ public class AlloyForgerScreenHandler extends ScreenHandler {
             ArrayList<String> materialWorth = null;
             String recipeMaterial = itemId;
             if (!recipe.containsKey(itemId)) {
-                for (Map.Entry<String, HashMap<String, Integer>> materialWorths : MaterialWorths.getEntries()) {
+                for (Map.Entry<String, HashMap<String, MaterialWorth>> materialWorths : MaterialWorths.getEntries()) {
                     boolean materialFound = false;
-                    for (Map.Entry<String, Integer> itemWorths : materialWorths.getValue().entrySet()) {
+                    for (Map.Entry<String, MaterialWorth> itemWorths : materialWorths.getValue().entrySet()) {
                         if (itemWorths.getKey().equals(itemId) || itemWorths.getKey().startsWith("#") && TagRegistry.item(new Identifier(itemWorths.getKey().substring(1))).values().contains(currentStack.getItem())) {
                             material = materialWorths.getKey();
                             materialKey = itemWorths.getKey();
@@ -182,11 +182,11 @@ public class AlloyForgerScreenHandler extends ScreenHandler {
 
                 materialWorth = new ArrayList<>();
                 if (material != null) {
-                    for (Map.Entry<String, Integer> values : MaterialWorths.getMaterialWorthMapEntries(material)) {
-                        HashMap<String, Integer> entry = MaterialWorths.getMaterialWorthMap(material);
+                    for (Map.Entry<String, MaterialWorth> values : MaterialWorths.getMaterialWorthMapEntries(material)) {
+                        HashMap<String, MaterialWorth> entry = MaterialWorths.getMaterialWorthMap(material);
                         boolean added = false;
                         for (int j = 0; j < materialWorth.size(); ++j) {
-                            if (entry.get(materialWorth.get(j)) >= values.getValue()) {
+                            if (entry.get(materialWorth.get(j)).worth >= values.getValue().worth) {
                                 materialWorth.add(j, values.getKey());
                                 added = true;
                                 break;
@@ -207,7 +207,7 @@ public class AlloyForgerScreenHandler extends ScreenHandler {
                 }
             }
 
-            int worth = material == null ? 1 : MaterialWorths.getMaterialWorthFromId(material, materialKey);
+            int worth = material == null ? 1 : MaterialWorths.getMaterialWorthFromId(material, materialKey).worth;
             int recipeAmount = recipe.get(material == null ? recipeMaterial : material);
             int stackAmount = currentStack.getCount() * worth;
             if (recipeAmount > 0) {
@@ -215,11 +215,14 @@ public class AlloyForgerScreenHandler extends ScreenHandler {
                 currentStack.decrement((int) Math.ceil((float)recipeAmount / worth));
                 if (material != null) {
                     int leftOver = worth - recipeAmount;
-                    HashMap<String, Integer> entry = MaterialWorths.getMaterialWorthMap(material);
+                    HashMap<String, MaterialWorth> entry = MaterialWorths.getMaterialWorthMap(material);
                     while (leftOver > 0) {
                         boolean changed = false;
                         for (String matWorth : materialWorth) {
-                            int currentWorth = entry.get(matWorth);
+                            if (!entry.get(matWorth).canReturn) {
+                                continue;
+                            }
+                            int currentWorth = entry.get(matWorth).worth;
                             if (currentWorth <= leftOver) {
                                 int amount = (int) Math.floor((float) leftOver / currentWorth);
                                 if (drops.containsKey(matWorth)) {
@@ -266,7 +269,7 @@ public class AlloyForgerScreenHandler extends ScreenHandler {
                         drop.setValue(0);
                     } else {
                         stack.setCount(stack.getMaxCount());
-                        drop.setValue(stack.getMaxDamage() - stack.getDamage());
+                        drop.setValue(drop.getValue() - stack.getMaxCount() + stack.getCount());
                     }
                     serverPlayerEntity.networkHandler.sendPacket(new ScreenHandlerSlotUpdateS2CPacket(syncId, i, stack));
                 }
@@ -285,6 +288,7 @@ public class AlloyForgerScreenHandler extends ScreenHandler {
                         drop.setValue(drop.getValue() - amount);
                     }
                     inventory.setStack(i, new ItemStack(item, amount));
+                    serverPlayerEntity.networkHandler.sendPacket(new ScreenHandlerSlotUpdateS2CPacket(syncId, i, stack));
                 }
             }
         }

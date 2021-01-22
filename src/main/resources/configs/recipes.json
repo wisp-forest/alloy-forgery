@@ -2,18 +2,6 @@
   "recipes": [
     {
       "input": {
-        "iron": 27,
-        "coal": 9
-      },
-      "output": {
-        "item": "#c:steel_ingots",
-        "amount": 1
-      },
-      "heat_per_tick": 10,
-      "required_tier": 1
-    },
-    {
-      "input": {
         "minecraft:iron_ore": 2
       },
       "output": {
@@ -32,18 +20,6 @@
         "amount": 3
       },
       "heat_per_tick": 5,
-      "required_tier": 1
-    },
-    {
-      "input": {
-        "#c:copper_ingots": 2,
-        "#c:zinc_ingots": 1
-      },
-      "output": {
-        "item": "#c:brass_ingots",
-        "amount": 2
-      },
-      "heat_per_tick": 4,
       "required_tier": 1
     }
   ]

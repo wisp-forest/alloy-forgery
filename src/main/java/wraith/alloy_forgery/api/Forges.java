@@ -20,7 +20,7 @@ public class Forges {
     public static void addForge(String id, Forge forge, boolean replace) {
         if (!FORGES.containsKey(id) || replace) {
             FORGES.put(id, forge);
-            saveConfig(false);
+            saveConfig(true);
         }
     }
 
@@ -34,7 +34,7 @@ public class Forges {
                 }
             }
         }
-        saveConfig(false);
+        saveConfig(true);
     }
 
     public static boolean hasForge(String id) {

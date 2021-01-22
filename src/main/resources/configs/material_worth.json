@@ -1,32 +1,80 @@
 {
   "iron": {
-    "minecraft:iron_nugget": 1,
-    "minecraft:iron_ingot": 9,
-    "minecraft:iron_block": 81
+    "minecraft:iron_nugget": {
+      "worth": 1,
+      "can_return": true
+    },
+    "minecraft:iron_ingot": {
+      "worth": 9,
+      "can_return": true
+    },
+    "minecraft:iron_block": {
+      "worth": 81,
+      "can_return": true
+    }
   },
   "gold": {
-    "minecraft:gold_nugget": 1,
-    "minecraft:gold_ingot": 9,
-    "minecraft:gold_block": 81
+    "minecraft:gold_nugget": {
+      "worth": 1,
+      "can_return": true
+    },
+    "minecraft:gold_ingot": {
+      "worth": 9,
+      "can_return": true
+    },
+    "minecraft:gold_block": {
+      "worth": 81,
+      "can_return": true
+    }
   },
   "netherite": {
-    "minecraft:netherite_ingot": 9,
-    "minecraft:netherite_block": 81
+    "minecraft:netherite_ingot": {
+      "worth": 9,
+      "can_return": true
+    },
+    "minecraft:netherite_block": {
+      "worth": 81,
+      "can_return": true
+    }
   },
   "redstone": {
-    "minecraft:redstone": 2,
-    "minecraft:redstone_block": 18
+    "minecraft:redstone": {
+      "worth": 2,
+      "can_return": true
+    },
+    "minecraft:redstone_block": {
+      "worth": 18,
+      "can_return": true
+    }
   },
   "lapis": {
-    "minecraft:lapis_lazuli": 2,
-    "minecraft:lapis_block": 18
+    "minecraft:lapis_lazuli": {
+      "worth": 2,
+      "can_return": true
+    },
+    "minecraft:lapis_block": {
+      "worth": 18,
+      "can_return": true
+    }
   },
   "nether_quartz": {
-    "minecraft:quartz": 9,
-    "minecraft:quartz_block": 36
+    "minecraft:quartz": {
+      "worth": 9,
+      "can_return": true
+    },
+    "minecraft:quartz_block": {
+      "worth": 81,
+      "can_return": true
+    }
   },
   "coal": {
-    "minecraft:coal": 9,
-    "minecraft:coal_block": 81
+    "minecraft:coal": {
+      "worth": 9,
+      "can_return": true
+    },
+    "minecraft:coal_block": {
+      "worth": 81,
+      "can_return": true
+    }
   }
 }

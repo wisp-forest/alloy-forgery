@@ -1,13 +1,6 @@
 package wraith.alloy_forgery;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import wraith.alloy_forgery.api.Forges;
-
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 
 public class Forge {
 

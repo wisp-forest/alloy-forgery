@@ -28,6 +28,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.registry.Registry;
 import wraith.alloy_forgery.AlloyForgery;
 import wraith.alloy_forgery.Forge;
+import wraith.alloy_forgery.MaterialWorth;
 import wraith.alloy_forgery.RecipeOutput;
 import wraith.alloy_forgery.api.ForgeRecipes;
 import wraith.alloy_forgery.api.Forges;
@@ -271,15 +272,7 @@ public class ForgeControllerBlockEntity extends LockableContainerBlockEntity imp
         if (this.smeltingTime <= 0 || this.recipe != currentRecipe || (this.recipe != null && this.recipe.getValue().heatAmount > this.heatTime && this.recipe.getValue().requiredTier <= getForgeTier())) {
             if (this.smeltingTime <= 0 && this.recipe != null && this.inventory.get(1).getCount() + this.recipe.getValue().outputAmount <= this.inventory.get(1).getMaxCount()) {
                 int outputAmount = this.recipe.getValue().outputAmount;
-                String outputItemId = this.recipe.getValue().outputItem;
-                Item outputItem;
-                if (outputItemId.startsWith("#")) {
-                    List<Item> tags = new ArrayList<>(TagRegistry.item(new Identifier(outputItemId.substring(1))).values());
-                    tags.sort(Comparator.comparing(Registry.ITEM::getId));
-                    outputItem = tags.get(0);
-                } else {
-                    outputItem = Registry.ITEM.get(new Identifier(outputItemId));
-                }
+                Item outputItem = this.recipe.getValue().getOutputAsItem();
                 if (this.inventory.get(1).getItem() == outputItem) {
                     outputAmount += this.inventory.get(1).getCount();
                 }
@@ -290,7 +283,9 @@ public class ForgeControllerBlockEntity extends LockableContainerBlockEntity imp
             }
             this.recipe = currentRecipe;
             this.smeltingTime = this.smeltingTimeMax;
-        } else if (this.recipe != null) { //If is smelting:
+        } else if (this.recipe != null &&
+                (this.inventory.get(1).isEmpty() || this.inventory.get(1).getItem() == this.recipe.getValue().getOutputAsItem()) &&
+                this.inventory.get(1).getCount() + this.recipe.getValue().outputAmount <= this.inventory.get(1).getMaxCount()) { //If is smelting:
             this.heatTime = Math.max(this.heatTime - this.recipe.getValue().heatAmount, 0);
             this.smeltingTime = Math.max(this.smeltingTime - 1, 0);
         }
@@ -357,48 +352,47 @@ public class ForgeControllerBlockEntity extends LockableContainerBlockEntity imp
         }
         //For each recipe
         for (Map.Entry<HashMap<String, Integer>, RecipeOutput> recipe : ForgeRecipes.getRecipes()) {
-            if (recipe.getKey().size() != items.size()) {
-                continue;
-            }
-            boolean isRightRecipe = true;
+            HashMap<String, Integer> modifiedItems = new HashMap<>(items);
+            boolean isRightRecipe = false;
             //For each input ingredient
             for (Map.Entry<String, Integer> input : recipe.getKey().entrySet()) {
+                isRightRecipe = false;
                 String material = input.getKey();
-                boolean isRightIngredient = false;
                 if (material.contains(":")) {
-                    isRightIngredient = items.containsKey(material) && items.get(material) >= input.getValue();
-                    if (material.startsWith("#")) {
+                    boolean isRightIngredient = modifiedItems.containsKey(material) && modifiedItems.get(material) >= input.getValue();
+                    if (!isRightIngredient && material.startsWith("#")) {
                         for (Item item : TagRegistry.item(new Identifier(material.substring(1))).values()) {
                             String id = Registry.ITEM.getId(item).toString();
-                            if (items.containsKey(id) && items.get(id) >= input.getValue()) {
-                                isRightIngredient = true;
+                            if (modifiedItems.containsKey(id) && modifiedItems.get(id) >= input.getValue()) {
+                                modifiedItems.remove(id);
+                                isRightRecipe = true;
                                 break;
                             }
                         }
                     }
                 } else {
-                    for (Map.Entry<String, Integer> ingredient : MaterialWorths.getMaterialWorthMapEntries(material)) {
+                    for (Map.Entry<String, MaterialWorth> ingredient : MaterialWorths.getMaterialWorthMapEntries(material)) {
                         if (ingredient.getKey().startsWith("#")) {
                             for (Item item : TagRegistry.item(new Identifier(ingredient.getKey().substring(1))).values()) {
                                 String id = Registry.ITEM.getId(item).toString();
-                                if (items.containsKey(id) && items.get(id) >= input.getValue()) {
-                                    isRightIngredient = true;
-                                    break;
+                                if (modifiedItems.containsKey(id) && modifiedItems.get(id) >= input.getValue()) {
+                                    modifiedItems.remove(id);
+                                    isRightRecipe = true;
                                 }
                             }
                         }
-                        if (items.containsKey(ingredient.getKey()) && items.get(ingredient.getKey()) * ingredient.getValue() >= input.getValue()) {
-                            isRightIngredient = true;
+                        if (modifiedItems.containsKey(ingredient.getKey()) && modifiedItems.get(ingredient.getKey()) * ingredient.getValue().worth >= input.getValue()) {
+                            modifiedItems.remove(ingredient.getKey());
+                            isRightRecipe = true;
                             break;
                         }
                     }
                 }
-                if (!isRightIngredient) {
-                    isRightRecipe = false;
+                if (!isRightRecipe) {
                     break;
                 }
             }
-            if (isRightRecipe) {
+            if (isRightRecipe && modifiedItems.isEmpty()) {
                 String output = recipe.getValue().outputItem;
                 if (!output.startsWith("#") || TagRegistry.item(new Identifier(output.substring(1))).values().size() > 0) {
                     return recipe;

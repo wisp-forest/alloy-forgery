@@ -1,7 +1,6 @@
 package wraith.alloy_forgery.api;
 
 import com.google.gson.*;
-import wraith.alloy_forgery.Forge;
 import wraith.alloy_forgery.RecipeOutput;
 import wraith.alloy_forgery.utils.Config;
 
@@ -16,12 +15,13 @@ public class ForgeRecipes {
     public static void addRecipe(HashMap<String, Integer> input, RecipeOutput output, boolean replace) {
         if (!FORGE_RECIPES.containsKey(input) || replace) {
             FORGE_RECIPES.put(input, output);
-            saveConfig(false);
+            saveConfig(true);
         }
     }
     public static boolean containsRecipe(HashMap<String, Integer> recipe) {
         return FORGE_RECIPES.containsKey(recipe);
     }
+
     public static RecipeOutput getOutput(HashMap<String, Integer> input) {
         return FORGE_RECIPES.getOrDefault(input, null);
     }
@@ -35,7 +35,7 @@ public class ForgeRecipes {
                 }
             }
         }
-        saveConfig(false);
+        saveConfig(true);
     }
     public static Set<Map.Entry<HashMap<String, Integer>, RecipeOutput>> getRecipes() {
         return FORGE_RECIPES.entrySet();
@@ -53,6 +53,7 @@ public class ForgeRecipes {
             FORGE_RECIPES.put(inputRecipes, new RecipeOutput(output.get("item").getAsString(), output.get("amount").getAsInt(), recipe.getAsJsonObject().get("heat_per_tick").getAsInt(), recipe.getAsJsonObject().get("required_tier").getAsInt()));
         }
     }
+
     public static void saveConfig(boolean overwrite) {
         JsonObject json = new JsonObject();
         JsonArray array = new JsonArray();

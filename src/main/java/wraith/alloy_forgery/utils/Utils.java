@@ -2,6 +2,7 @@ package wraith.alloy_forgery.utils;
 
 import com.google.gson.JsonObject;
 import net.fabricmc.loader.api.FabricLoader;
+import net.fabricmc.loader.api.metadata.ModMetadata;
 import net.minecraft.util.Identifier;
 import org.apache.commons.io.FileUtils;
 import wraith.alloy_forgery.AlloyForgery;
@@ -112,12 +113,22 @@ public class Utils {
         JarFile jar = null;
         try {
             jar = new JarFile(Utils.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath());
-        } catch (IOException | URISyntaxException ignored) {}
+        } catch (IOException | URISyntaxException e) {
+            ModMetadata metadata = FabricLoader.getInstance().getModContainer(AlloyForgery.MOD_ID).get().getMetadata();
+            String filename = "mods/wraith-" + AlloyForgery.MOD_ID + "-" + metadata.getVersion() + ".jar";
+            try {
+                jar = new JarFile(new File(filename));
+            } catch (IOException ignored) {
+            }
+        }
 
         if (jar != null) {
             Enumeration<JarEntry> entries = jar.entries();
             while(entries.hasMoreElements()) {
                 JarEntry entry = entries.nextElement();
+                if ((entry.getName().endsWith(".png") || entry.getName().endsWith(".mcmeta")) && !dir.contains("textures")) {
+                    continue;
+                }
                 if (!entry.getName().startsWith(dir) || (!entry.getName().endsWith(".json") && !entry.getName().endsWith(".png") && !entry.getName().endsWith(".mcmeta"))) {
                     continue;
                 }
