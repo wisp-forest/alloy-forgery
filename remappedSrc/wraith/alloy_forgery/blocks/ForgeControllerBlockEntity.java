@@ -69,7 +69,6 @@ public class ForgeControllerBlockEntity extends LockableContainerBlockEntity imp
 
     public void setMaxHeat(int maxHeat) {
         this.heatTimeMax = maxHeat;
-        this.propertyDelegate.set(1, maxHeat);
     }
 
     private final PropertyDelegate propertyDelegate = new PropertyDelegate() {
@@ -265,11 +264,12 @@ public class ForgeControllerBlockEntity extends LockableContainerBlockEntity imp
         }
     }
 
+
     @Override
     public void tick() {
         renderSmoke();
         Map.Entry<HashMap<String, Integer>, RecipeOutput> currentRecipe = getRecipe();
-        if (!isValidMultiblock()) {
+        if (isValidMultiblock()) {
             return;
         }
         if (this.smeltingTime <= 0 || this.recipe != currentRecipe || (this.recipe != null && this.recipe.getValue().heatAmount > this.heatTime && this.recipe.getValue().requiredTier <= getForgeTier())) {
