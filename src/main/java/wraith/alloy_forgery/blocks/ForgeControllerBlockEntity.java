@@ -363,7 +363,11 @@ public class ForgeControllerBlockEntity extends LockableContainerBlockEntity imp
                 String material = input.getKey();
                 if (material.contains(":")) {
                     boolean isRightIngredient = modifiedItems.containsKey(material) && modifiedItems.get(material) >= input.getValue();
-                    if (!isRightIngredient && material.startsWith("#")) {
+                    if (isRightIngredient) {
+                        modifiedItems.remove(material);
+                        isRightRecipe = true;
+                    }
+                    else if (material.startsWith("#")) {
                         for (Item item : TagRegistry.item(new Identifier(material.substring(1))).values()) {
                             String id = Registry.ITEM.getId(item).toString();
                             if (modifiedItems.containsKey(id) && modifiedItems.get(id) >= input.getValue()) {
