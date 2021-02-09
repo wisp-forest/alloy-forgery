@@ -150,7 +150,7 @@ public class AlloyForgerScreenHandler extends ScreenHandler {
         if (oldRecipe == null) {
             return;
         }
-        HashMap<String, Integer> recipe = new HashMap<>(oldRecipe.getKey());
+        HashMap<String, Integer> inputs = new HashMap<>(oldRecipe.getKey());
 
         HashMap<String, Integer> drops = new HashMap<>();
         for (int i = 2; i < this.inventory.size(); ++i) {
@@ -164,7 +164,7 @@ public class AlloyForgerScreenHandler extends ScreenHandler {
             String materialKey = null;
             ArrayList<String> materialWorth = null;
             String recipeMaterial = itemId;
-            if (!recipe.containsKey(itemId)) {
+            if (!inputs.containsKey(itemId)) {
                 for (Map.Entry<String, HashMap<String, MaterialWorth>> materialWorths : MaterialWorths.getEntries()) {
                     boolean materialFound = false;
                     for (Map.Entry<String, MaterialWorth> itemWorths : materialWorths.getValue().entrySet()) {
@@ -197,21 +197,31 @@ public class AlloyForgerScreenHandler extends ScreenHandler {
                         }
                     }
                     Collections.reverse(materialWorth);
-                } else {
-                    for (Map.Entry<String, Integer> recipeItem : recipe.entrySet()) {
-                        if (recipeItem.getKey().startsWith("#") && TagRegistry.item(new Identifier(recipeItem.getKey().substring(1))).contains(currentStack.getItem())) {
-                            recipeMaterial = recipeItem.getKey();
-                            break;
-                        }
+                }
+                for (Map.Entry<String, Integer> recipeItem : inputs.entrySet()) {
+                    if (recipeItem.getKey().startsWith("#") && TagRegistry.item(new Identifier(recipeItem.getKey().substring(1))).contains(currentStack.getItem())) {
+                        recipeMaterial = recipeItem.getKey();
+                        break;
                     }
                 }
             }
 
-            int worth = material == null ? 1 : MaterialWorths.getMaterialWorthFromId(material, materialKey).worth;
-            int recipeAmount = recipe.get(material == null ? recipeMaterial : material);
+            int worth = 1;
+            int recipeAmount;
+            // Checks the inputs in order if they are a material, recipeMaterial(item), or a materialKey(tag).
+            // The order is tag, item, and material. If it finds a material it gets it value as well.
+            if(inputs.containsKey(materialKey)) {
+                recipeAmount = inputs.get(materialKey);
+            } else if(inputs.containsKey(recipeMaterial)) {
+                recipeAmount = inputs.get(recipeMaterial);
+            } else {
+                recipeAmount = inputs.get(material);
+                worth = MaterialWorths.getMaterialWorthFromId(material, materialKey).worth;
+            }
+
             int stackAmount = currentStack.getCount() * worth;
             if (recipeAmount > 0) {
-                recipe.put(material == null ? recipeMaterial : material, recipeAmount - stackAmount);
+                inputs.put(material == null ? recipeMaterial : material, recipeAmount - stackAmount);
                 currentStack.decrement((int) Math.ceil((float)recipeAmount / worth));
                 if (material != null) {
                     int leftOver = worth - recipeAmount;
@@ -320,5 +330,5 @@ public class AlloyForgerScreenHandler extends ScreenHandler {
             }
         }
     }
-
+// thats
 }
