@@ -18,9 +18,9 @@ public class AlloyForgerScreen extends HandledScreen<ScreenHandler> {
         super(handler, inventory, title);
         this.handler = (AlloyForgerScreenHandler) handler;
         this.backgroundWidth = 176;
-        this.backgroundHeight = 168;
-        this.titleX += 40;
-        this.playerInventoryTitleY = this.backgroundHeight - 90;
+        this.backgroundHeight = 173;
+        this.titleX += 51;
+        this.playerInventoryTitleY = this.backgroundHeight - 93;
     }
 
     @Override

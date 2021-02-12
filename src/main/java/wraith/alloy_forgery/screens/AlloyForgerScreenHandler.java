@@ -48,7 +48,7 @@ public class AlloyForgerScreenHandler extends ScreenHandler {
         this.player = playerInventory.player;
         this.addProperties(this.delegate);
         this.inventory = inventory;
-        this.addSlot(new LavaInputSlot(inventory, 0, 8, 58)); //Fuel
+        this.addSlot(new LavaInputSlot(inventory, 0, 8, 58)); //Fuel Slot
         this.addSlot(new AlloyOutputSlot(this, inventory, 1, 145, 34)); //Alloy Output
 
         for (int y = 0; y < 2; ++y) {
@@ -151,7 +151,6 @@ public class AlloyForgerScreenHandler extends ScreenHandler {
             return;
         }
         HashMap<String, Integer> inputs = new HashMap<>(oldRecipe.getKey());
-
         HashMap<String, Integer> drops = new HashMap<>();
         for (int i = 2; i < this.inventory.size(); ++i) {
             if (this.inventory.getStack(i).isEmpty()) {

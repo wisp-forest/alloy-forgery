@@ -3,17 +3,17 @@ package wraith.alloy_forgery.mixin;
 import net.minecraft.resource.NamespaceResourceManager;
 import net.minecraft.resource.Resource;
 import net.minecraft.resource.ResourceImpl;
-import net.minecraft.resource.ResourcePack;
 import net.minecraft.util.Identifier;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wraith.alloy_forgery.AlloyForgery;
 import wraith.alloy_forgery.utils.Utils;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 

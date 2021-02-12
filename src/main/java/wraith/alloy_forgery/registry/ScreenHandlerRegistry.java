@@ -2,8 +2,6 @@ package wraith.alloy_forgery.registry;
 
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerType;
-import net.minecraft.util.Identifier;
-import wraith.alloy_forgery.AlloyForgery;
 import wraith.alloy_forgery.screens.AlloyForgerScreenHandler;
 import wraith.alloy_forgery.utils.Utils;
 

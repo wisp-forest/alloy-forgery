@@ -272,25 +272,27 @@ public class ForgeControllerBlockEntity extends LockableContainerBlockEntity imp
         if (!isValidMultiblock()) {
             return;
         }
-        if (this.smeltingTime <= 0 || this.recipe != currentRecipe || (this.recipe != null && this.recipe.getValue().heatAmount > this.heatTime && this.recipe.getValue().requiredTier <= getForgeTier())) {
-            if (this.smeltingTime <= 0 && this.recipe != null && this.inventory.get(1).getCount() + this.recipe.getValue().outputAmount <= this.inventory.get(1).getMaxCount()) {
-                int outputAmount = this.recipe.getValue().outputAmount;
-                Item outputItem = this.recipe.getValue().getOutputAsItem();
-                if (this.inventory.get(1).getItem() == outputItem) {
-                    outputAmount += this.inventory.get(1).getCount();
+        if (this.heatTime > 0) {
+            if (this.smeltingTime <= 0 || this.recipe != currentRecipe || (this.recipe != null && (this.recipe.getValue().heatAmount > this.heatTime) && (this.recipe.getValue().requiredTier <= getForgeTier()))) {
+                if (this.smeltingTime <= 0 && this.recipe != null && this.inventory.get(1).getCount() + this.recipe.getValue().outputAmount <= this.inventory.get(1).getMaxCount()) {
+                    int outputAmount = this.recipe.getValue().outputAmount;
+                    Item outputItem = this.recipe.getValue().getOutputAsItem();
+                    if (this.inventory.get(1).getItem() == outputItem) {
+                        outputAmount += this.inventory.get(1).getCount();
+                    }
+                    this.inventory.set(1, new ItemStack(outputItem, outputAmount));
+                    if (this.handler != null) {
+                        this.handler.updateItems(currentRecipe);
+                    }
                 }
-                this.inventory.set(1, new ItemStack(outputItem, outputAmount));
-                if (this.handler != null) {
-                    this.handler.updateItems(currentRecipe);
-                }
+                this.recipe = currentRecipe;
+                this.smeltingTime = this.smeltingTimeMax;
+            } else if (this.recipe != null &&
+                    (this.inventory.get(1).isEmpty() || this.inventory.get(1).getItem() == this.recipe.getValue().getOutputAsItem()) &&
+                    this.inventory.get(1).getCount() + this.recipe.getValue().outputAmount <= this.inventory.get(1).getMaxCount()) { //If is smelting:
+                this.heatTime = Math.max(this.heatTime - this.recipe.getValue().heatAmount, 0);
+                this.smeltingTime = Math.max(this.smeltingTime - 1, 0);
             }
-            this.recipe = currentRecipe;
-            this.smeltingTime = this.smeltingTimeMax;
-        } else if (this.recipe != null &&
-                (this.inventory.get(1).isEmpty() || this.inventory.get(1).getItem() == this.recipe.getValue().getOutputAsItem()) &&
-                this.inventory.get(1).getCount() + this.recipe.getValue().outputAmount <= this.inventory.get(1).getMaxCount()) { //If is smelting:
-            this.heatTime = Math.max(this.heatTime - this.recipe.getValue().heatAmount, 0);
-            this.smeltingTime = Math.max(this.smeltingTime - 1, 0);
         }
 
         if (inventory.get(0).getItem() == Items.LAVA_BUCKET && increaseHeat(10000)) {
