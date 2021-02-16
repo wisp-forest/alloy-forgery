@@ -44,12 +44,12 @@ public class AlloyForgerScreenHandler extends ScreenHandler {
     public AlloyForgerScreenHandler(int syncId, PlayerInventory playerInventory, Inventory inventory, PropertyDelegate delegate, BlockPos pos) {
         super(ScreenHandlerRegistry.SCREEN_HANDLERS.get("alloy_forger"), syncId);
         this.frontPos = pos;
+        checkDataCount(delegate, 4);
         this.delegate = delegate;
         this.player = playerInventory.player;
-        this.addProperties(this.delegate);
         this.inventory = inventory;
         this.addSlot(new LavaInputSlot(inventory, 0, 8, 58)); //Fuel Slot
-        this.addSlot(new AlloyOutputSlot(this, inventory, 1, 145, 34)); //Alloy Output
+        this.addSlot(new AlloyOutputSlot(inventory, 1, 145, 34)); //Alloy Output
 
         for (int y = 0; y < 2; ++y) {
             for (int x = 0; x < 5; ++x) {
@@ -66,6 +66,7 @@ public class AlloyForgerScreenHandler extends ScreenHandler {
         for (int x = 0; x < 9; ++x) {
             this.addSlot(new Slot(playerInventory, x, 8 + x * 18, 149));
         }
+        this.addProperties(delegate);
     }
 
     @Override
@@ -110,7 +111,7 @@ public class AlloyForgerScreenHandler extends ScreenHandler {
 
     @Environment(EnvType.CLIENT)
     public int getHeatProgress() {
-        return this.delegate.get(0) * 48 / this.delegate.get(1);
+        return (this.delegate.get(0) * 48) / (this.delegate.get(1));
     }
 
     @Environment(EnvType.CLIENT)
@@ -126,20 +127,6 @@ public class AlloyForgerScreenHandler extends ScreenHandler {
     @Environment(EnvType.CLIENT)
     public boolean isSmelting() {
         return this.delegate.get(2) > 0;
-    }
-
-    public void updateResult() {
-        if (player.world.isClient || !(inventory instanceof ForgeControllerBlockEntity)) {
-            return;
-        }
-        ServerPlayerEntity serverPlayerEntity = (ServerPlayerEntity)player;
-        Map.Entry<HashMap<String, Integer>, RecipeOutput> recipe = ((ForgeControllerBlockEntity)inventory).getRecipe();
-        ItemStack recipeItem = ItemStack.EMPTY;
-        if (recipe != null) {
-            recipeItem = new ItemStack(Registry.ITEM.get(new Identifier(recipe.getValue().outputItem)), recipe.getValue().outputAmount);
-        }
-        this.inventory.setStack(1, recipeItem.copy());
-        serverPlayerEntity.networkHandler.sendPacket(new ScreenHandlerSlotUpdateS2CPacket(syncId, 1, recipeItem));
     }
 
     public void updateItems(Map.Entry<HashMap<String, Integer>, RecipeOutput> oldRecipe) {

@@ -1,6 +1,5 @@
 package wraith.alloy_forgery.blocks;
 
-import net.fabricmc.fabric.api.block.entity.BlockEntityClientSerializable;
 import net.fabricmc.fabric.api.tag.TagRegistry;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -38,9 +37,10 @@ import wraith.alloy_forgery.screens.AlloyForgerScreenHandler;
 import wraith.alloy_forgery.screens.ImplementedInventory;
 import wraith.alloy_forgery.utils.Utils;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
-public class ForgeControllerBlockEntity extends LockableContainerBlockEntity implements NamedScreenHandlerFactory, ImplementedInventory, Tickable, BlockEntityClientSerializable {
+public class ForgeControllerBlockEntity extends LockableContainerBlockEntity implements NamedScreenHandlerFactory, ImplementedInventory, Tickable {
 
     private DefaultedList<ItemStack> inventory = DefaultedList.ofSize(12, ItemStack.EMPTY);
     private Map.Entry<HashMap<String, Integer>, RecipeOutput> recipe = null;
@@ -69,7 +69,6 @@ public class ForgeControllerBlockEntity extends LockableContainerBlockEntity imp
 
     public void setMaxHeat(int maxHeat) {
         this.heatTimeMax = maxHeat;
-        this.propertyDelegate.set(1, maxHeat);
     }
 
     private final PropertyDelegate propertyDelegate = new PropertyDelegate() {
@@ -103,6 +102,7 @@ public class ForgeControllerBlockEntity extends LockableContainerBlockEntity imp
                     break;
                 case 3:
                     smeltingTimeMax = value;
+                    break;
                 default:
                     break;
             }
@@ -273,7 +273,7 @@ public class ForgeControllerBlockEntity extends LockableContainerBlockEntity imp
             return;
         }
         if (this.heatTime > 0) {
-            if (this.smeltingTime <= 0 || this.recipe != currentRecipe || (this.recipe != null && (this.recipe.getValue().heatAmount > this.heatTime) && (this.recipe.getValue().requiredTier <= getForgeTier()))) {
+            if (this.smeltingTime <= 0 || this.recipe != currentRecipe) {
                 if (this.smeltingTime <= 0 && this.recipe != null && this.inventory.get(1).getCount() + this.recipe.getValue().outputAmount <= this.inventory.get(1).getMaxCount()) {
                     int outputAmount = this.recipe.getValue().outputAmount;
                     Item outputItem = this.recipe.getValue().getOutputAsItem();
@@ -288,6 +288,7 @@ public class ForgeControllerBlockEntity extends LockableContainerBlockEntity imp
                 this.recipe = currentRecipe;
                 this.smeltingTime = this.smeltingTimeMax;
             } else if (this.recipe != null &&
+                    (this.recipe.getValue().heatAmount < this.heatTime) && (this.recipe.getValue().requiredTier <= getForgeTier()) &&
                     (this.inventory.get(1).isEmpty() || this.inventory.get(1).getItem() == this.recipe.getValue().getOutputAsItem()) &&
                     this.inventory.get(1).getCount() + this.recipe.getValue().outputAmount <= this.inventory.get(1).getMaxCount()) { //If is smelting:
                 this.heatTime = Math.max(this.heatTime - this.recipe.getValue().heatAmount, 0);
@@ -413,17 +414,6 @@ public class ForgeControllerBlockEntity extends LockableContainerBlockEntity imp
     }
 
     @Override
-    public void fromClientTag(CompoundTag tag) {
-        BlockState state = world.getBlockState(pos);
-        fromTag(state, tag);
-    }
-
-    @Override
-    public CompoundTag toClientTag(CompoundTag tag) {
-        return toTag(tag);
-    }
-
-    @Override
     public void markDirty() {
         super.markDirty();
     }
@@ -453,4 +443,5 @@ public class ForgeControllerBlockEntity extends LockableContainerBlockEntity imp
             ++timer;
         }
     }
+    // hahaha ha-ha YEAH!
 }

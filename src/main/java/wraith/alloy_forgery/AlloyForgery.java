@@ -1,6 +1,11 @@
 package wraith.alloy_forgery;
 
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.loot.v1.FabricLootPoolBuilder;
+import net.fabricmc.fabric.api.loot.v1.event.LootTableLoadingCallback;
+import net.minecraft.loot.ConstantLootTableRange;
+import net.minecraft.loot.condition.SurvivesExplosionLootCondition;
+import net.minecraft.loot.entry.ItemEntry;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import wraith.alloy_forgery.registry.BlockEntityRegistry;
@@ -30,7 +35,22 @@ public class AlloyForgery implements ModInitializer {
         BlockEntityRegistry.registerBlockEntities();
 
         ScreenHandlerRegistry.registerScreenHandlers();
+
+        registerEvents();
+
         LOGGER.info("[Alloy Forgery] has been initiated.");
+    }
+
+    private void registerEvents() {
+        LootTableLoadingCallback.EVENT.register((resourceManager, lootManager, id, supplier, setter) -> {
+            if (id.getNamespace().equals(MOD_ID)) {
+                FabricLootPoolBuilder poolBuilder = FabricLootPoolBuilder.builder()
+                        .rolls(ConstantLootTableRange.create(1))
+                        .withCondition(SurvivesExplosionLootCondition.builder().build())
+                        .withEntry(ItemEntry.builder(ItemRegistry.ITEMS.get(id.toString())).build());
+                supplier.withPool(poolBuilder.build());
+            }
+        });
     }
 
 }
