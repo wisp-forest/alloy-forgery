@@ -44,7 +44,7 @@ public class AlloyForgery implements ModInitializer {
     private void registerEvents() {
         //TODO - FIX LOOT TABLE FOR THE FORGE
         LootTableLoadingCallback.EVENT.register((resourceManager, lootManager, id, supplier, setter) -> {
-|            if (id.getNamespace().contains(MOD_ID)) {
+            if (id.getNamespace().contains(MOD_ID)) {
                 FabricLootPoolBuilder poolBuilder = FabricLootPoolBuilder.builder()
                         .rolls(ConstantLootTableRange.create(1))
                         .withCondition(SurvivesExplosionLootCondition.builder().build())
