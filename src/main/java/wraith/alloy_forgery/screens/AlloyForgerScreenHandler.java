@@ -38,13 +38,13 @@ public class AlloyForgerScreenHandler extends ScreenHandler {
     private final BlockPos frontPos;
 
     public AlloyForgerScreenHandler(int syncId, PlayerInventory playerInventory) {
-        this(syncId, playerInventory, new SimpleInventory(12), new ArrayPropertyDelegate(4), null);
+        this(syncId, playerInventory, new SimpleInventory(12), new ArrayPropertyDelegate(3), null);
     }
 
     public AlloyForgerScreenHandler(int syncId, PlayerInventory playerInventory, Inventory inventory, PropertyDelegate delegate, BlockPos pos) {
         super(ScreenHandlerRegistry.SCREEN_HANDLERS.get("alloy_forger"), syncId);
         this.frontPos = pos;
-        checkDataCount(delegate, 4);
+        checkDataCount(delegate, 3);
         this.delegate = delegate;
         this.player = playerInventory.player;
         this.inventory = inventory;
@@ -111,12 +111,12 @@ public class AlloyForgerScreenHandler extends ScreenHandler {
 
     @Environment(EnvType.CLIENT)
     public int getHeatProgress() {
-        return (this.delegate.get(0) * 48) / (this.delegate.get(1));
+        return (this.delegate.get(0));
     }
 
     @Environment(EnvType.CLIENT)
     public int getSmeltingProgress() {
-        return 19 - (this.delegate.get(2) * 19 / this.delegate.get(3));
+        return 19 - (this.delegate.get(1) * 19 / this.delegate.get(2));
     }
 
     @Environment(EnvType.CLIENT)
@@ -126,7 +126,7 @@ public class AlloyForgerScreenHandler extends ScreenHandler {
 
     @Environment(EnvType.CLIENT)
     public boolean isSmelting() {
-        return this.delegate.get(2) > 0;
+        return this.delegate.get(1) > 0;
     }
 
     public void updateItems(Map.Entry<HashMap<String, Integer>, RecipeOutput> oldRecipe) {
@@ -316,5 +316,4 @@ public class AlloyForgerScreenHandler extends ScreenHandler {
             }
         }
     }
-// thats
 }

@@ -49,8 +49,9 @@ public class ForgeControllerBlockEntity extends LockableContainerBlockEntity imp
 
     private int timer = 0;
 
-    private int heatTime = 0;
-    private int heatTimeMax = -1;
+    private int heat = 0;
+    private int maxHeat = -1;
+    private int heatProgress = 0;
 
     private int smeltingTime = 0;
     private int smeltingTimeMax = 200; //10 seconds
@@ -68,7 +69,7 @@ public class ForgeControllerBlockEntity extends LockableContainerBlockEntity imp
     }
 
     public void setMaxHeat(int maxHeat) {
-        this.heatTimeMax = maxHeat;
+        this.maxHeat = maxHeat;
     }
 
     private final PropertyDelegate propertyDelegate = new PropertyDelegate() {
@@ -76,12 +77,11 @@ public class ForgeControllerBlockEntity extends LockableContainerBlockEntity imp
         public int get(int index) {
             switch (index) {
                 case 0:
-                    return heatTime;
+                    heatProgress = (heat * 48) / maxHeat;
+                    return heatProgress;
                 case 1:
-                    return heatTimeMax;
-                case 2:
                     return smeltingTime;
-                case 3:
+                case 2:
                     return smeltingTimeMax;
                 default:
                     return 0;
@@ -92,15 +92,12 @@ public class ForgeControllerBlockEntity extends LockableContainerBlockEntity imp
         public void set(int index, int value) {
             switch (index) {
                 case 0:
-                    heatTime = value;
+                    heatProgress = (short) value;
                     break;
                 case 1:
-                    heatTimeMax = value;
-                    break;
-                case 2:
                     smeltingTime = value;
                     break;
-                case 3:
+                case 2:
                     smeltingTimeMax = value;
                     break;
                 default:
@@ -110,7 +107,7 @@ public class ForgeControllerBlockEntity extends LockableContainerBlockEntity imp
 
         @Override
         public int size() {
-            return 4;
+            return 3;
         }
     };
 
@@ -272,7 +269,7 @@ public class ForgeControllerBlockEntity extends LockableContainerBlockEntity imp
         if (!isValidMultiblock()) {
             return;
         }
-        if (this.heatTime > 0) {
+        if (this.heat > 0) {
             if (this.smeltingTime <= 0 || this.recipe != currentRecipe) {
                 if (this.smeltingTime <= 0 && this.recipe != null && this.inventory.get(1).getCount() + this.recipe.getValue().outputAmount <= this.inventory.get(1).getMaxCount()) {
                     int outputAmount = this.recipe.getValue().outputAmount;
@@ -288,10 +285,10 @@ public class ForgeControllerBlockEntity extends LockableContainerBlockEntity imp
                 this.recipe = currentRecipe;
                 this.smeltingTime = this.smeltingTimeMax;
             } else if (this.recipe != null &&
-                    (this.recipe.getValue().heatAmount < this.heatTime) && (this.recipe.getValue().requiredTier <= getForgeTier()) &&
+                    (this.recipe.getValue().heatAmount < this.heat) && (this.recipe.getValue().requiredTier <= getForgeTier()) &&
                     (this.inventory.get(1).isEmpty() || this.inventory.get(1).getItem() == this.recipe.getValue().getOutputAsItem()) &&
                     this.inventory.get(1).getCount() + this.recipe.getValue().outputAmount <= this.inventory.get(1).getMaxCount()) { //If is smelting:
-                this.heatTime = Math.max(this.heatTime - this.recipe.getValue().heatAmount, 0);
+                this.heat = Math.max(this.heat - this.recipe.getValue().heatAmount, 0);
                 this.smeltingTime = Math.max(this.smeltingTime - 1, 0);
             }
         }
@@ -299,17 +296,14 @@ public class ForgeControllerBlockEntity extends LockableContainerBlockEntity imp
         if (inventory.get(0).getItem() == Items.LAVA_BUCKET && increaseHeat(10000)) {
             this.inventory.set(0, new ItemStack(Items.BUCKET));
         }
-
-        boolean isHeating = this.isHeating();
-        if (lastHeatStatus != isHeating) {
-            lastHeatStatus = isHeating;
-            this.world.setBlockState(this.pos, this.world.getBlockState(pos).with(ForgeControllerBlock.LIT, isHeating));
+        if (this.isHeating()) {
+            this.world.setBlockState(this.pos, this.world.getBlockState(pos).with(ForgeControllerBlock.LIT, this.isHeating()));
         }
     }
 
     public boolean increaseHeat(int amount) {
-        if (this.heatTime + amount <= this.heatTimeMax) {
-            this.heatTime = Math.min(this.heatTime + amount, this.heatTimeMax);
+        if (this.heat + amount <= this.maxHeat) {
+            this.heat = Math.min(this.heat + amount, this.maxHeat);
             return true;
         } else {
             return false;
@@ -319,7 +313,7 @@ public class ForgeControllerBlockEntity extends LockableContainerBlockEntity imp
     @Override
     public void fromTag(BlockState state, CompoundTag tag) {
         super.fromTag(state, tag);
-        this.heatTime = tag.getInt("HeatTime");
+        this.heat = tag.getInt("HeatTime");
         this.smeltingTime = tag.getInt("SmeltingTime");
         this.inventory = DefaultedList.ofSize(size(), ItemStack.EMPTY);
         Inventories.fromTag(tag, inventory);
@@ -328,14 +322,18 @@ public class ForgeControllerBlockEntity extends LockableContainerBlockEntity imp
     @Override
     public CompoundTag toTag(CompoundTag tag) {
         super.toTag(tag);
-        tag.putInt("HeatTime", this.heatTime);
+        tag.putInt("HeatTime", this.heat);
         tag.putInt("SmeltingTime", this.smeltingTime);
         Inventories.toTag(tag, this.inventory);
         return tag;
     }
 
     public boolean isHeating() {
-        return this.heatTime > 0;
+        if(this.heat == 0) {
+            return false;
+        } else {
+            return true;
+        }
     }
 
     @Override
@@ -443,5 +441,4 @@ public class ForgeControllerBlockEntity extends LockableContainerBlockEntity imp
             ++timer;
         }
     }
-    // hahaha ha-ha YEAH!
 }

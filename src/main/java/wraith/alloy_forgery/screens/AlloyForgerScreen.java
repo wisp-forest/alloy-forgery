@@ -41,7 +41,7 @@ public class AlloyForgerScreen extends HandledScreen<ScreenHandler> {
         }
         if ((this.handler.isHeating())) {
             int progress = (this.handler.getHeatProgress());
-            this.drawTexture(matrices, x + 5, y + 6 + 48 - progress, this.backgroundWidth, 67 - progress, 22, progress);
+            this.drawTexture(matrices, x + 5, y + 5 + 48 - progress, this.backgroundWidth, 67 - progress, 22, progress);
         }
         if ((this.handler.isSmelting())) {
             int progress = (this.handler.getSmeltingProgress());
