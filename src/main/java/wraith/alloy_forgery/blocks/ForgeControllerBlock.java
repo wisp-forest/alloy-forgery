@@ -2,6 +2,7 @@ package wraith.alloy_forgery.blocks;
 
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemPlacementContext;
@@ -103,9 +104,12 @@ public class ForgeControllerBlock extends BlockWithEntity {
     public void onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
         BlockEntity blockEntity = world.getBlockEntity(pos);
         if (blockEntity instanceof ForgeControllerBlockEntity) {
+            if(!player.isCreative()) {
+                world.spawnEntity(new ItemEntity(world, pos.getX(), pos.getY(), pos.getZ(), new ItemStack(Registry.ITEM.get(Registry.BLOCK.getId(this)))));
+            }
             ItemScatterer.spawn(world, pos, (ForgeControllerBlockEntity)blockEntity);
             world.updateComparators(pos,this);
+            super.onBreak(world, pos, state, player);
         }
     }
-
 }

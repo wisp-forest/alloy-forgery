@@ -18,7 +18,7 @@ public class BlockRegistry {
 
     public static void loadBlocks() {
         for (String forge : Forges.getForgeNames()) {
-            BLOCKS.put(forge, new ForgeControllerBlock(FabricBlockSettings.of(Material.STONE).requiresTool().breakByTool(FabricToolTags.PICKAXES).strength(3f, 8f).sounds(BlockSoundGroup.STONE)));
+            BLOCKS.put(forge, new ForgeControllerBlock(FabricBlockSettings.of(Material.STONE).breakByTool(FabricToolTags.PICKAXES, 1).requiresTool().strength(3f, 8f).sounds(BlockSoundGroup.STONE)));
         }
     }
 
