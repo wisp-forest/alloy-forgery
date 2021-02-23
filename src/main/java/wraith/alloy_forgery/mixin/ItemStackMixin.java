@@ -1,5 +1,6 @@
 package wraith.alloy_forgery.mixin;
 
+import net.minecraft.client.resource.language.I18n;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.LiteralText;
@@ -29,10 +30,17 @@ public abstract class ItemStackMixin {
     public void getName(CallbackInfoReturnable<Text> cir) {
         Identifier id = Registry.ITEM.getId(getItem());
         if (id.getNamespace().equals(AlloyForgery.MOD_ID) && id.getPath().endsWith("_forge_controller")) {
-            Text forgeText = new TranslatableText("alloy_forgery.forge_controller");
+
             Forge forge = Forges.getForge(id.getPath());
-            Text name = new LiteralText(new TranslatableText(forge.translationKey).getString() + " " + forgeText.getString());
-            cir.setReturnValue(name);
+
+            //Get the name pattern for our current language
+            String name = I18n.translate("alloy_forgery.forge_controller_name_pattern");
+
+            //Replace the keys with the important info, leave everything else intact
+            name = name.replace("{type}", I18n.translate(forge.translationKey));
+            name = name.replace("{name}", I18n.translate("alloy_forgery.forge_controller"));
+
+            cir.setReturnValue(new LiteralText(name));
         }
     }
 }

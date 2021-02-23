@@ -1,0 +1,8 @@
+{
+
+  "alloy_forgery.forge_controller_name_pattern": "{name} ({type})",
+
+  "alloy_forgery.forge_controller": "Schmelzensteurung",
+  "container.alloy_forgery.alloy_forge": "Legierungsschmelze",
+  "message.alloy_forgery.invalid_multiblock": "Falsche Multiblockstruktur"
+}
