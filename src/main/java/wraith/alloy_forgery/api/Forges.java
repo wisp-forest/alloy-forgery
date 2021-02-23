@@ -55,6 +55,7 @@ public class Forges {
             JsonObject controllerStats = entry.getValue().getAsJsonObject();
             float tier = controllerStats.get("tier").getAsFloat();
             int maxHeat = controllerStats.get("max_heat").getAsInt();
+            String translationKey = controllerStats.get("material_translation_key").getAsString();
             HashSet<String> materialsSet = new HashSet<>();
             JsonArray materials = controllerStats.getAsJsonArray("materials");
             for (JsonElement material : materials) {
@@ -65,26 +66,27 @@ public class Forges {
             for (JsonElement material : recipeMaterials) {
                 recipeMaterialsSet.add(material.getAsString());
             }
-            FORGES.put(controller, new Forge(materialsSet, recipeMaterialsSet, tier, controller, maxHeat));
+            FORGES.put(controller, new Forge(materialsSet, recipeMaterialsSet, tier, controller, translationKey, maxHeat));
         }
     }
     public static void saveConfig(boolean overwrite) {
         JsonObject json = new JsonObject();
-        for (Map.Entry<String, Forge> smeltry : Forges.getForges()) {
+        for (Map.Entry<String, Forge> smeltery : Forges.getForges()) {
             JsonObject controllerJson = new JsonObject();
             JsonArray materialArray = new JsonArray();
-            for (String material : smeltry.getValue().materials) {
+            for (String material : smeltery.getValue().materials) {
                 materialArray.add(material);
             }
             JsonArray recipeMaterialArray = new JsonArray();
-            for (String material : smeltry.getValue().recipeMaterials) {
+            for (String material : smeltery.getValue().recipeMaterials) {
                 recipeMaterialArray.add(material);
             }
             controllerJson.add("materials", materialArray);
             controllerJson.add("recipe_materials", recipeMaterialArray);
-            controllerJson.addProperty("tier", smeltry.getValue().tier);
-            controllerJson.addProperty("max_heat", smeltry.getValue().maxHeat);
-            json.add(smeltry.getKey(), controllerJson);
+            controllerJson.addProperty("tier", smeltery.getValue().tier);
+            controllerJson.addProperty("material_translation_key", smeltery.getValue().translationKey);
+            controllerJson.addProperty("max_heat", smeltery.getValue().maxHeat);
+            json.add(smeltery.getKey(), controllerJson);
         }
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         Config.createFile("config/alloy_forgery/smelteries.json", gson.toJson(json), overwrite);

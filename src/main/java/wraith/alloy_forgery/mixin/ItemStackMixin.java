@@ -13,7 +13,12 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wraith.alloy_forgery.AlloyForgery;
+import wraith.alloy_forgery.Forge;
+import wraith.alloy_forgery.api.Forges;
 import wraith.alloy_forgery.utils.Utils;
+
+import java.util.Map;
+import java.util.Set;
 
 @Mixin(ItemStack.class)
 public abstract class ItemStackMixin {
@@ -24,13 +29,9 @@ public abstract class ItemStackMixin {
     public void getName(CallbackInfoReturnable<Text> cir) {
         Identifier id = Registry.ITEM.getId(getItem());
         if (id.getNamespace().equals(AlloyForgery.MOD_ID) && id.getPath().endsWith("_forge_controller")) {
-            String[] segments = id.getPath().split("_");
-            String[] materialSegments = new String[segments.length - 2];
-            if (materialSegments.length >= 0) {
-                System.arraycopy(segments, 0, materialSegments, 0, materialSegments.length);
-            }
             Text forgeText = new TranslatableText("alloy_forgery.forge_controller");
-            Text name = new LiteralText(Utils.capitalize(materialSegments) + " " + forgeText.getString());
+            Forge forge = Forges.getForge(id.getPath());
+            Text name = new LiteralText(new TranslatableText(forge.translationKey).getString() + " " + forgeText.getString());
             cir.setReturnValue(name);
         }
     }

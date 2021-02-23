@@ -1,0 +1,5 @@
+{
+  "alloy_forgery.forge_controller": "Controller of Alloy Forgery",
+  "container.alloy_forgery.alloy_forge": "Forgery of Alloys",
+  "message.alloy_forgery.invalid_multiblock": "Unprecedented multiple-block construction"
+}
