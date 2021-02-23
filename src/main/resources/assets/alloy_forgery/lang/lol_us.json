@@ -1,5 +1,6 @@
 {
-  "alloy_forgery.forge_controller": "BETTER thing for controlzing",
+  "alloy_forgery.forge_controller_name_pattern": "{name} {type}",
+  "alloy_forgery.forge_controller": "BETTER zing for controlzing of",
   "container.alloy_forgery.alloy_forge": "POLYMERIZATION",
   "message.alloy_forgery.invalid_multiblock": "bad blockus"
 }
