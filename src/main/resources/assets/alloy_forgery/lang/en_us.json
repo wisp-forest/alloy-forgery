@@ -1,4 +1,7 @@
 {
+
+  "alloy_forgery.forge_controller_name_pattern": "{type} {name}",
+
   "alloy_forgery.forge_controller": "Forge Controller",
   "container.alloy_forgery.alloy_forge": "Alloy Forge",
   "message.alloy_forgery.invalid_multiblock": "Invalid Multiblock Configuration"
