@@ -1,0 +1,6 @@
+{
+  "alloy_forgery.forge_controller_name_pattern": "{name} ({type})",
+  "alloy_forgery.forge_controller": "Контроллер плавильной печи",
+  "container.alloy_forgery.alloy_forge": "Плавильная печь",
+  "message.alloy_forgery.invalid_multiblock": "Печь установлена неправильно"
+}
