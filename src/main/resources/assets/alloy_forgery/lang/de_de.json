@@ -4,5 +4,8 @@
 
   "alloy_forgery.forge_controller": "Schmelzensteurung",
   "container.alloy_forgery.alloy_forge": "Legierungsschmelze",
+  "container.alloy_forgery.rei.title": "Legierungsschmelze",
+  "container.alloy_forgery.rei.min_tier": "Mindeststufe: %1$f",
+  "container.alloy_forgery.rei.heat": "Benötigte Hitze: %d",
   "message.alloy_forgery.invalid_multiblock": "Falsche Multiblockstruktur"
 }
