@@ -39,7 +39,7 @@ public class Utils {
         return "{\n" +
                 "  \"parent\": \"minecraft:block/orientable\",\n" +
                 "  \"textures\": {\n" +
-                "    \"top\": \"alloy_forgery:block/" + id + "_side\",\n" +
+                "    \"top\": \"alloy_forgery:block/" + id + "_top\",\n" +
                 "    \"front\": \"alloy_forgery:block/" + id + "_front" + isOn + "\",\n" +
                 "    \"side\": \"alloy_forgery:block/" + id + "_side\"\n" +
                 "  }\n" +
