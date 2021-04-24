@@ -116,7 +116,7 @@ public class AlloyForgerScreenHandler extends ScreenHandler {
 
     @Environment(EnvType.CLIENT)
     public int getSmeltingProgress() {
-        return 19 - (this.delegate.get(1) * 19 / this.delegate.get(2) == 0 ? 200 : this.delegate.get(2));
+        return 19 - (this.delegate.get(1) * 19 / (this.delegate.get(2) == 0 ? 200 : this.delegate.get(2)));
     }
 
     @Environment(EnvType.CLIENT)

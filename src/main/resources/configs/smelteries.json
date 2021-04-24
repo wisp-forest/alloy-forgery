@@ -41,7 +41,8 @@
       "minecraft:cracked_polished_blackstone_bricks"
     ],
     "tier": 2,
-    "max_heat": 200000
+    "max_heat": 200000,
+    "material_translation_key": "block.minecraft.blackstone"
   },
   "end_stone_forge_controller": {
     "materials": [
@@ -51,7 +52,7 @@
     "recipe_materials": [
       "minecraft:end_stone",
       "minecraft:end_stone_bricks"
-    ],  
+    ],
     "tier": 2,
     "max_heat": 200000,
     "material_translation_key": "block.minecraft.end_stone"
