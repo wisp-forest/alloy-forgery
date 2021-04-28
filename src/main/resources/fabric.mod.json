@@ -11,7 +11,8 @@
   ],
   "contact": {
     "homepage": "http://discord.gg/vMjzgS4",
-    "sources": "https://github.com/LordDeatHunter/Alloy-Forgery/"
+    "sources": "https://github.com/LordDeatHunter/Alloy-Forgery/",
+    "issues": "https://github.com/LordDeatHunter/Alloy-Forgery/issues"
   },
 
   "license": "MIT",

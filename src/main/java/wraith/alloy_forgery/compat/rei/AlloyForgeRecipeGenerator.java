@@ -2,13 +2,17 @@ package wraith.alloy_forgery.compat.rei;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
-import com.google.gson.JsonObject;
+import com.google.gson.JsonSyntaxException;
 import javafx.util.Pair;
 import me.shedaniel.rei.api.ClientHelper;
 import me.shedaniel.rei.api.EntryStack;
 import me.shedaniel.rei.api.LiveRecipeGenerator;
+import net.minecraft.item.Item;
 import net.minecraft.recipe.Ingredient;
+import net.minecraft.tag.ItemTags;
+import net.minecraft.tag.Tag;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.registry.Registry;
 import wraith.alloy_forgery.AlloyForgery;
 import wraith.alloy_forgery.MaterialWorth;
 import wraith.alloy_forgery.api.ForgeRecipes;
@@ -36,14 +40,13 @@ public class AlloyForgeRecipeGenerator implements LiveRecipeGenerator<AlloyForge
 
                         inputs.put(parsed.getKey(), parsed.getValue());
                     } else {
-                        JsonObject toParse = new JsonObject();
-
                         if (s.startsWith("#")) {
-                            toParse.addProperty("tag", s.substring(1));
-                            inputs.put(Collections.singletonList(Ingredient.fromJson(toParse)), integer);
+                            Tag<Item> tag = ItemTags.getTagGroup().getTag(new Identifier(s.substring(1)));
+                            if (tag == null) throw new JsonSyntaxException("Unknown item tag: " + s);
+                            inputs.put(Collections.singletonList(Ingredient.fromTag(tag)), integer);
                         } else {
-                            toParse.addProperty("item", s);
-                            inputs.put(Collections.singletonList(Ingredient.fromJson(toParse)), integer);
+                            Item item = Registry.ITEM.getOrEmpty(new Identifier(s)).orElseThrow(() -> new JsonSyntaxException("Unknown item: " + s));
+                            inputs.put(Collections.singletonList(Ingredient.ofItems(item)), integer);
                         }
                     }
 
@@ -67,14 +70,14 @@ public class AlloyForgeRecipeGenerator implements LiveRecipeGenerator<AlloyForge
             if (targetWorth % entry.getValue().worth != 0) continue;
 
             int count = targetWorth / entry.getValue().worth;
-            JsonObject toParse = new JsonObject();
 
             if (entry.getKey().startsWith("#")) {
-                toParse.addProperty("tag", entry.getKey().substring(1));
-                amountMap.put(count, Ingredient.fromJson(toParse));
+                Tag<Item> tag = ItemTags.getTagGroup().getTag(new Identifier(entry.getKey().substring(1)));
+                if (tag == null) throw new JsonSyntaxException("Unknown item tag: " + entry.getKey());
+                amountMap.put(count, Ingredient.fromTag(tag));
             } else {
-                toParse.addProperty("item", entry.getKey());
-                amountMap.put(count, Ingredient.fromJson(toParse));
+                Item item = Registry.ITEM.getOrEmpty(new Identifier(entry.getKey())).orElseThrow(() -> new JsonSyntaxException("Unknown item: " + entry.getKey()));
+                amountMap.put(count, Ingredient.ofItems(item));
             }
         }
 
