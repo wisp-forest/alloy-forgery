@@ -5,6 +5,7 @@ import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.screen.ScreenHandler;
+import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import wraith.alloy_forgery.utils.Utils;
@@ -54,6 +55,10 @@ public class AlloyForgerScreen extends HandledScreen<ScreenHandler> {
                 }
             }
         }
-
+        if (Utils.isMouseInside(mouseX, mouseY, this.x + 3, this.y + 3, this.x + 29, this.y + 56)) {
+            String time = this.handler.getHeat() + "/" + this.handler.getMaxHeat();
+            renderTooltip(matrices, new LiteralText(time), mouseX, mouseY);
+        }
     }
+
 }

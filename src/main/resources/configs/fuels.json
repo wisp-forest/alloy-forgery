@@ -1,0 +1,16 @@
+{
+  "minecraft:lava_bucket": {
+    "burn_time": 10000,
+    "returnable_item": "minecraft:bucket",
+    "rightclickable": true
+  },
+  "minecraft:coal": {
+    "burn_time": 800
+  },
+  "minecraft:charcoal": {
+    "burn_time": 800
+  },
+  "minecraft:blaze_rod": {
+    "burn_time": 1200
+  }
+}

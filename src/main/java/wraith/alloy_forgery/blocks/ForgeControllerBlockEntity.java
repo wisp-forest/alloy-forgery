@@ -25,10 +25,8 @@ import net.minecraft.util.Tickable;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.registry.Registry;
-import wraith.alloy_forgery.AlloyForgery;
-import wraith.alloy_forgery.Forge;
-import wraith.alloy_forgery.MaterialWorth;
-import wraith.alloy_forgery.RecipeOutput;
+import wraith.alloy_forgery.*;
+import wraith.alloy_forgery.api.ForgeFuels;
 import wraith.alloy_forgery.api.ForgeRecipes;
 import wraith.alloy_forgery.api.Forges;
 import wraith.alloy_forgery.api.MaterialWorths;
@@ -83,6 +81,10 @@ public class ForgeControllerBlockEntity extends LockableContainerBlockEntity imp
                     return smeltingTime;
                 case 2:
                     return smeltingTimeMax;
+                case 3:
+                    return heat;
+                case 4:
+                    return maxHeat;
                 default:
                     return 0;
             }
@@ -100,6 +102,8 @@ public class ForgeControllerBlockEntity extends LockableContainerBlockEntity imp
                 case 2:
                     smeltingTimeMax = value;
                     break;
+                case 3:
+                    heat = value;
                 default:
                     break;
             }
@@ -107,7 +111,7 @@ public class ForgeControllerBlockEntity extends LockableContainerBlockEntity imp
 
         @Override
         public int size() {
-            return 3;
+            return 5;
         }
     };
 
@@ -293,8 +297,13 @@ public class ForgeControllerBlockEntity extends LockableContainerBlockEntity imp
             }
         }
 
-        if (inventory.get(0).getItem() == Items.LAVA_BUCKET && increaseHeat(10000)) {
-            this.inventory.set(0, new ItemStack(Items.BUCKET));
+        String itemID = Registry.ITEM.getId(inventory.get(0).getItem()).toString();
+        ForgeFuel fuel = ForgeFuels.FUELS.getOrDefault(itemID, null);
+        if (fuel != null && increaseHeat(fuel.getCookTime())) {
+            inventory.get(0).decrement(1);
+            if (fuel.hasReturnableItem()) {
+                Block.dropStack(world, getFrontPos(getCachedState(), pos), new ItemStack(Registry.ITEM.get(new Identifier(fuel.getReturnableItem()))));
+            }
         }
         if (this.isHeating()) {
             this.world.setBlockState(this.pos, this.world.getBlockState(pos).with(ForgeControllerBlock.LIT, this.isHeating()));

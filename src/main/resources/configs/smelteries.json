@@ -6,7 +6,7 @@
     "recipe_materials": [
       "minecraft:bricks"
     ],
-    "tier": 1,
+    "tier": 1.5,
     "max_heat": 100000,
     "material_translation_key": "block.minecraft.bricks"
   },
@@ -53,8 +53,8 @@
       "minecraft:end_stone",
       "minecraft:end_stone_bricks"
     ],
-    "tier": 2,
-    "max_heat": 200000,
+    "tier": 3,
+    "max_heat": 250000,
     "material_translation_key": "block.minecraft.end_stone"
   }
 }

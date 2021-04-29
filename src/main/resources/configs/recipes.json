@@ -21,6 +21,84 @@
       },
       "heat_per_tick": 5,
       "required_tier": 1
+    },
+    {
+      "input": {
+        "minecraft:diamond_ore": 2
+      },
+      "output": {
+        "item": "minecraft:diamond",
+        "amount": 3
+      },
+      "heat_per_tick": 5,
+      "required_tier": 1
+    },
+    {
+      "input": {
+        "minecraft:emerald_ore": 2
+      },
+      "output": {
+        "item": "minecraft:diamond",
+        "amount": 3
+      },
+      "heat_per_tick": 5,
+      "required_tier": 1
+    },
+    {
+      "input": {
+        "minecraft:lapis_ore": 1
+      },
+      "output": {
+        "item": "minecraft:lapis_lazuli",
+        "amount": 18
+      },
+      "heat_per_tick": 5,
+      "required_tier": 1
+    },
+    {
+      "input": {
+        "minecraft:redstone_ore": 1
+      },
+      "output": {
+        "item": "minecraft:redstone",
+        "amount": 5
+      },
+      "heat_per_tick": 5,
+      "required_tier": 1
+    },
+    {
+      "input": {
+        "minecraft:nether_quartz_ore": 2
+      },
+      "output": {
+        "item": "minecraft:quartz",
+        "amount": 5
+      },
+      "heat_per_tick": 5,
+      "required_tier": 2
+    },
+    {
+      "input": {
+        "minecraft:ancient_debris": 2
+      },
+      "output": {
+        "item": "minecraft:netherite_scrap",
+        "amount": 3
+      },
+      "heat_per_tick": 5,
+      "required_tier": 2
+    },
+    {
+      "input": {
+        "minecraft:netherite_scrap": 3,
+        "minecraft:gold_ingot": 3
+      },
+      "output": {
+        "item": "minecraft:netherite_ingot",
+        "amount": 1
+      },
+      "heat_per_tick": 5,
+      "required_tier": 2
     }
   ]
 }

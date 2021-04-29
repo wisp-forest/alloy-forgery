@@ -19,8 +19,13 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
 public class Utils {
+
     public static Identifier ID(String id) {
         return new Identifier(AlloyForgery.MOD_ID, id);
+    }
+
+    public static boolean isMouseInside(int mouseX, int mouseY, int minX, int minY, int maxX, int maxY) {
+        return minX <= mouseX && minY <= mouseY && mouseX <= maxX && mouseY <= maxY;
     }
 
     // Dynamic generators for Alloy Forger blocks

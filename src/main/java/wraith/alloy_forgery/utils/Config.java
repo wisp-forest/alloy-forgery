@@ -3,6 +3,7 @@ package wraith.alloy_forgery.utils;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import wraith.alloy_forgery.AlloyForgery;
+import wraith.alloy_forgery.api.ForgeFuels;
 import wraith.alloy_forgery.api.ForgeRecipes;
 import wraith.alloy_forgery.api.Forges;
 import wraith.alloy_forgery.api.MaterialWorths;
@@ -23,7 +24,21 @@ public class Config {
 
     public static void init() {
         IS_LOADED = true;
-        Utils.saveFilesFromJar("configs/", "", false);
+
+        String defaultConfig = "{\n" +
+                               "  \"replace_configs_with_default\": true\n" +
+                               "}";
+
+        createFile("config/alloy_forgery/config.json", defaultConfig, false);
+        boolean replace = getJsonObject(readFile(new File("config/alloy_forgery/config.json"))).get("replace_configs_with_default").getAsBoolean();
+
+        Utils.saveFilesFromJar("configs/", "", replace);
+
+        loadConfigs();
+    }
+
+    private static void loadConfigs() {
+        ForgeFuels.readFromJson(Config.getJsonObject(Config.readFile(new File("config/alloy_forgery/fuels.json"))));
         Forges.readFromJson(Config.getJsonObject(Config.readFile(new File("config/alloy_forgery/smelteries.json"))));
         MaterialWorths.readFromJson(Config.getJsonObject(Config.readFile(new File("config/alloy_forgery/material_worth.json"))));
         ForgeRecipes.readFromJson(Config.getJsonObject(Config.readFile(new File("config/alloy_forgery/recipes.json"))));

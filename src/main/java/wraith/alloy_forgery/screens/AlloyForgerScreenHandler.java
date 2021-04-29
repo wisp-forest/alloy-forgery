@@ -22,11 +22,12 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.registry.Registry;
 import wraith.alloy_forgery.MaterialWorth;
 import wraith.alloy_forgery.RecipeOutput;
+import wraith.alloy_forgery.api.ForgeFuels;
 import wraith.alloy_forgery.api.MaterialWorths;
 import wraith.alloy_forgery.blocks.ForgeControllerBlockEntity;
 import wraith.alloy_forgery.registry.ScreenHandlerRegistry;
 import wraith.alloy_forgery.screens.slots.AlloyOutputSlot;
-import wraith.alloy_forgery.screens.slots.LavaInputSlot;
+import wraith.alloy_forgery.screens.slots.FuelInputSlot;
 
 import java.util.*;
 
@@ -38,17 +39,17 @@ public class AlloyForgerScreenHandler extends ScreenHandler {
     private final BlockPos frontPos;
 
     public AlloyForgerScreenHandler(int syncId, PlayerInventory playerInventory) {
-        this(syncId, playerInventory, new SimpleInventory(12), new ArrayPropertyDelegate(3), null);
+        this(syncId, playerInventory, new SimpleInventory(12), new ArrayPropertyDelegate(5), null);
     }
 
     public AlloyForgerScreenHandler(int syncId, PlayerInventory playerInventory, Inventory inventory, PropertyDelegate delegate, BlockPos pos) {
         super(ScreenHandlerRegistry.SCREEN_HANDLERS.get("alloy_forger"), syncId);
         this.frontPos = pos;
-        checkDataCount(delegate, 3);
+        checkDataCount(delegate, 5);
         this.delegate = delegate;
         this.player = playerInventory.player;
         this.inventory = inventory;
-        this.addSlot(new LavaInputSlot(inventory, 0, 8, 58)); //Fuel Slot
+        this.addSlot(new FuelInputSlot(inventory, 0, 8, 58)); //Fuel Slot
         this.addSlot(new AlloyOutputSlot(inventory, 1, 145, 34)); //Alloy Output
 
         for (int y = 0; y < 2; ++y) {
@@ -85,7 +86,7 @@ public class AlloyForgerScreenHandler extends ScreenHandler {
                 if (!this.insertItem(originalStack, this.inventory.size(), this.slots.size(), false)) {
                     return ItemStack.EMPTY;
                 }
-            } else if (originalStack.getItem() == Items.LAVA_BUCKET) {
+            } else if (ForgeFuels.FUELS.containsKey(Registry.ITEM.getId(originalStack.getItem()).toString())) {
                 if (!this.insertItem(originalStack, 0, 1, false)) {
                     return ItemStack.EMPTY;
                 }
@@ -122,6 +123,16 @@ public class AlloyForgerScreenHandler extends ScreenHandler {
     @Environment(EnvType.CLIENT)
     public boolean isHeating() {
         return this.delegate.get(0) > 0;
+    }
+
+    @Environment(EnvType.CLIENT)
+    public int getHeat() {
+        return this.delegate.get(3);
+    }
+
+    @Environment(EnvType.CLIENT)
+    public int getMaxHeat() {
+        return this.delegate.get(4);
     }
 
     @Environment(EnvType.CLIENT)

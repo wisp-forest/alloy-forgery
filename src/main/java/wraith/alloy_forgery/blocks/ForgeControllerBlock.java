@@ -15,6 +15,7 @@ import net.minecraft.state.property.DirectionProperty;
 import net.minecraft.state.property.Properties;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.ItemScatterer;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
@@ -24,7 +25,11 @@ import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import wraith.alloy_forgery.Forge;
+import wraith.alloy_forgery.ForgeFuel;
+import wraith.alloy_forgery.api.ForgeFuels;
 import wraith.alloy_forgery.api.Forges;
+
+import java.util.HashMap;
 
 public class ForgeControllerBlock extends BlockWithEntity {
 
@@ -68,9 +73,15 @@ public class ForgeControllerBlock extends BlockWithEntity {
             Forge forge = Forges.getForge(id);
 
             entity.setMaxHeat(forge.maxHeat);
-            if (player.getStackInHand(hand).getItem() == Items.LAVA_BUCKET) {
-                if (entity.isValidMultiblock() && entity.increaseHeat(10000) && !player.isCreative()) {
-                    player.setStackInHand(hand, new ItemStack(Items.BUCKET));
+
+            String heldItemID = Registry.ITEM.getId(player.getStackInHand(hand).getItem()).toString();
+            ForgeFuel fuel = ForgeFuels.FUELS.getOrDefault(heldItemID, null);
+            if (fuel != null) {
+                if (entity.isValidMultiblock() && entity.increaseHeat(fuel.getCookTime()) && !player.isCreative()) {
+                    player.getStackInHand(hand).decrement(1);
+                    if (fuel.hasReturnableItem()) {
+                        player.inventory.offerOrDrop(world, new ItemStack(Registry.ITEM.get(new Identifier(fuel.getReturnableItem()))));
+                    }
                 } else {
                     return ActionResult.FAIL;
                 }
