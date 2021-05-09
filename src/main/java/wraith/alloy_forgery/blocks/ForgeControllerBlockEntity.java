@@ -1,5 +1,9 @@
 package wraith.alloy_forgery.blocks;
 
+import io.netty.buffer.Unpooled;
+import net.fabricmc.fabric.api.block.entity.BlockEntityClientSerializable;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.fabricmc.fabric.api.tag.TagRegistry;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -12,10 +16,12 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.PacketByteBuf;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.screen.PropertyDelegate;
 import net.minecraft.screen.ScreenHandler;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
@@ -24,7 +30,9 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.Tickable;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
 import net.minecraft.util.registry.Registry;
+import org.jetbrains.annotations.Nullable;
 import wraith.alloy_forgery.*;
 import wraith.alloy_forgery.api.ForgeFuels;
 import wraith.alloy_forgery.api.ForgeRecipes;
@@ -35,10 +43,11 @@ import wraith.alloy_forgery.screens.AlloyForgerScreenHandler;
 import wraith.alloy_forgery.screens.ImplementedInventory;
 import wraith.alloy_forgery.utils.Utils;
 
+import javax.swing.*;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ForgeControllerBlockEntity extends LockableContainerBlockEntity implements NamedScreenHandlerFactory, ImplementedInventory, Tickable {
+public class ForgeControllerBlockEntity extends LockableContainerBlockEntity implements ExtendedScreenHandlerFactory, ImplementedInventory, Tickable, BlockEntityClientSerializable {
 
     private DefaultedList<ItemStack> inventory = DefaultedList.ofSize(12, ItemStack.EMPTY);
     private Map.Entry<HashMap<String, Integer>, RecipeOutput> recipe = null;
@@ -49,12 +58,9 @@ public class ForgeControllerBlockEntity extends LockableContainerBlockEntity imp
 
     private int heat = 0;
     private int maxHeat = -1;
-    private int heatProgress = 0;
 
     private int smeltingTime = 0;
     private int smeltingTimeMax = 200; //10 seconds
-
-    private boolean lastHeatStatus = false;
 
     public float getForgeTier() {
         String id = Registry.BLOCK.getId(getCachedState().getBlock()).getPath();
@@ -70,50 +76,26 @@ public class ForgeControllerBlockEntity extends LockableContainerBlockEntity imp
         this.maxHeat = maxHeat;
     }
 
-    private final PropertyDelegate propertyDelegate = new PropertyDelegate() {
-        @Override
-        public int get(int index) {
-            switch (index) {
-                case 0:
-                    heatProgress = (heat * 48) / maxHeat;
-                    return heatProgress;
-                case 1:
-                    return smeltingTime;
-                case 2:
-                    return smeltingTimeMax;
-                case 3:
-                    return heat;
-                case 4:
-                    return maxHeat;
-                default:
-                    return 0;
-            }
+    public void syncGUI() {
+        if (world != null && !world.isClient && handler != null && handler.player != null) {
+            PacketByteBuf packet = new PacketByteBuf(Unpooled.buffer());
+            CompoundTag tag = new CompoundTag();
+            tag.putInt("heat", this.heat);
+            tag.putInt("smelting_time", this.smeltingTime);
+            packet.writeCompoundTag(tag);
+            ServerPlayNetworking.send((ServerPlayerEntity) handler.player, Utils.ID("update_gui"), packet);
         }
+    }
 
-        @Override
-        public void set(int index, int value) {
-            switch (index) {
-                case 0:
-                    heatProgress = (short) value;
-                    break;
-                case 1:
-                    smeltingTime = value;
-                    break;
-                case 2:
-                    smeltingTimeMax = value;
-                    break;
-                case 3:
-                    heat = value;
-                default:
-                    break;
-            }
-        }
+    public void updateHeat(int heat) {
+        syncGUI();
+        this.heat = heat;
+    }
+    public void updateSmeltingTime(int smeltingTime) {
+        syncGUI();
+        this.smeltingTime = smeltingTime;
+    }
 
-        @Override
-        public int size() {
-            return 5;
-        }
-    };
 
     public ForgeControllerBlockEntity() {
         super(BlockEntityRegistry.FORGE_CONTROLLER);
@@ -128,7 +110,7 @@ public class ForgeControllerBlockEntity extends LockableContainerBlockEntity imp
     public ScreenHandler createMenu(int syncId, PlayerInventory inv, PlayerEntity player) {
         AlloyForgerScreenHandler screen = null;
         if (isValidMultiblock()) {
-            screen = new AlloyForgerScreenHandler(syncId, inv, this, propertyDelegate, getFrontPos(getCachedState(), pos));
+            screen = new AlloyForgerScreenHandler(syncId, inv, this);
         } else {
             player.sendMessage(new TranslatableText("message.alloy_forgery.invalid_multiblock"), false);
             player.playSound(SoundEvents.BLOCK_BASALT_FALL, SoundCategory.BLOCKS, 1.0F, 0.2F);
@@ -138,41 +120,11 @@ public class ForgeControllerBlockEntity extends LockableContainerBlockEntity imp
     }
 
     public static BlockPos getBackPos(BlockState state, BlockPos pos) {
-        switch (state.get(ForgeControllerBlock.FACING)) {
-            case NORTH:
-                return pos.south();
-            case SOUTH:
-                return pos.north();
-            case WEST:
-                return pos.east();
-            case EAST:
-                return pos.west();
-            case UP:
-                return pos.down();
-            case DOWN:
-                return pos.up();
-            default:
-                return pos;
-        }
+        return pos.offset(state.get(ForgeControllerBlock.FACING).getOpposite());
     }
 
     public static BlockPos getFrontPos(BlockState state, BlockPos pos) {
-        switch (state.get(ForgeControllerBlock.FACING)) {
-            case NORTH:
-                return pos.north();
-            case SOUTH:
-                return pos.south();
-            case WEST:
-                return pos.west();
-            case EAST:
-                return pos.east();
-            case UP:
-                return pos.up();
-            case DOWN:
-                return pos.down();
-            default:
-                return pos;
-        }
+        return pos.offset(state.get(ForgeControllerBlock.FACING));
     }
 
     @Override
@@ -253,11 +205,6 @@ public class ForgeControllerBlockEntity extends LockableContainerBlockEntity imp
     }
 
     @Override
-    public boolean isEmpty() {
-        return false;
-    }
-
-    @Override
     public boolean canPlayerUse(PlayerEntity player) {
         if (this.world.getBlockEntity(this.pos) != this) {
             return false;
@@ -287,13 +234,13 @@ public class ForgeControllerBlockEntity extends LockableContainerBlockEntity imp
                     }
                 }
                 this.recipe = currentRecipe;
-                this.smeltingTime = this.smeltingTimeMax;
+                this.updateSmeltingTime(this.smeltingTimeMax);
             } else if (this.recipe != null &&
                     (this.recipe.getValue().heatAmount < this.heat) && (this.recipe.getValue().requiredTier <= getForgeTier()) &&
                     (this.inventory.get(1).isEmpty() || this.inventory.get(1).getItem() == this.recipe.getValue().getOutputAsItem()) &&
                     this.inventory.get(1).getCount() + this.recipe.getValue().outputAmount <= this.inventory.get(1).getMaxCount()) { //If is smelting:
-                this.heat = Math.max(this.heat - this.recipe.getValue().heatAmount, 0);
-                this.smeltingTime = Math.max(this.smeltingTime - 1, 0);
+                updateHeat(Math.max(this.heat - this.recipe.getValue().heatAmount, 0));
+                this.updateSmeltingTime(Math.max(this.smeltingTime - 1, 0));
             }
         }
 
@@ -312,7 +259,7 @@ public class ForgeControllerBlockEntity extends LockableContainerBlockEntity imp
 
     public boolean increaseHeat(int amount) {
         if (this.heat + amount <= this.maxHeat) {
-            this.heat = Math.min(this.heat + amount, this.maxHeat);
+            updateHeat(Math.min(this.heat + amount, this.maxHeat));
             return true;
         } else {
             return false;
@@ -338,11 +285,7 @@ public class ForgeControllerBlockEntity extends LockableContainerBlockEntity imp
     }
 
     public boolean isHeating() {
-        if(this.heat == 0) {
-            return false;
-        } else {
-            return true;
-        }
+        return this.heat != 0;
     }
 
     @Override
@@ -423,6 +366,9 @@ public class ForgeControllerBlockEntity extends LockableContainerBlockEntity imp
     @Override
     public void markDirty() {
         super.markDirty();
+        if (!world.isClient) {
+            sync();
+        }
     }
 
     public void renderSmoke() {
@@ -450,4 +396,46 @@ public class ForgeControllerBlockEntity extends LockableContainerBlockEntity imp
             ++timer;
         }
     }
+
+    @Override
+    public void writeScreenOpeningData(ServerPlayerEntity player, PacketByteBuf buf) {
+        CompoundTag tag = new CompoundTag();
+        tag.putInt("heat", this.heat);
+        tag.putInt("max_heat", this.maxHeat);
+        tag.putInt("smelting_time", this.smeltingTime);
+        tag.putInt("smelting_time_max", this.smeltingTimeMax);
+        buf.writeCompoundTag(tag);
+    }
+
+    @Override
+    public void fromClientTag(CompoundTag tag) {
+        this.heat = tag.getInt("HeatTime");
+        this.smeltingTime = tag.getInt("SmeltingTime");
+        this.inventory = DefaultedList.ofSize(size(), ItemStack.EMPTY);
+        Inventories.fromTag(tag, inventory);
+    }
+
+    @Override
+    public CompoundTag toClientTag(CompoundTag tag) {
+        tag.putInt("HeatTime", this.heat);
+        tag.putInt("SmeltingTime", this.smeltingTime);
+        Inventories.toTag(tag, this.inventory);
+        return tag;
+    }
+
+    @Override
+    public int[] getAvailableSlots(Direction side) {
+        return new int[]{2,3,4,5,6,7,8,9,10,11};
+    }
+
+    @Override
+    public boolean canInsert(int slot, ItemStack stack, @Nullable Direction dir) {
+        return slot > 1;
+    }
+
+    @Override
+    public boolean canExtract(int slot, ItemStack stack, Direction dir) {
+        return slot == 1;
+    }
+
 }

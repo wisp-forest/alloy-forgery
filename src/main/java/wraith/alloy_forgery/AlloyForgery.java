@@ -6,7 +6,7 @@ import org.apache.logging.log4j.Logger;
 import wraith.alloy_forgery.registry.BlockEntityRegistry;
 import wraith.alloy_forgery.registry.BlockRegistry;
 import wraith.alloy_forgery.registry.ItemRegistry;
-import wraith.alloy_forgery.registry.FortniteScreenHandlerRegistry;
+import wraith.alloy_forgery.registry.CustomScreenHandlerRegistry;
 import wraith.alloy_forgery.utils.Config;
 
 public class AlloyForgery implements ModInitializer {
@@ -29,7 +29,7 @@ public class AlloyForgery implements ModInitializer {
         BlockEntityRegistry.loadBlockEntities();
         BlockEntityRegistry.registerBlockEntities();
 
-        FortniteScreenHandlerRegistry.registerScreenHandlers();
+        CustomScreenHandlerRegistry.registerScreenHandlers();
 
         LOGGER.info("[Alloy Forgery] has been initiated.");
     }

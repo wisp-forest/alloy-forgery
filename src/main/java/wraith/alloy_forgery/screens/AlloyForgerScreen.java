@@ -59,6 +59,10 @@ public class AlloyForgerScreen extends HandledScreen<ScreenHandler> {
             String time = this.handler.getHeat() + "/" + this.handler.getMaxHeat();
             renderTooltip(matrices, new LiteralText(time), mouseX, mouseY);
         }
+        else if (Utils.isMouseInside(mouseX, mouseY, this.x + 143, this.y + 5, this.x + 161, this.y + 26)) {
+            String time = this.handler.getSmeltingPercent() + "%";
+            renderTooltip(matrices, new LiteralText(time), mouseX, mouseY);
+        }
     }
 
 }

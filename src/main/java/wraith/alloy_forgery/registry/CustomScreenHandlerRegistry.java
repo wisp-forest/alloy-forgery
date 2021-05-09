@@ -8,7 +8,7 @@ import wraith.alloy_forgery.utils.Utils;
 
 import java.util.HashMap;
 
-public class FortniteScreenHandlerRegistry {
+public class CustomScreenHandlerRegistry {
 
     public static HashMap<String, ScreenHandlerType<? extends ScreenHandler>> SCREEN_HANDLERS = new HashMap<>();
 

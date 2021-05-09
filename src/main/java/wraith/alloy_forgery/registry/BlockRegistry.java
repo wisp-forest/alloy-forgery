@@ -14,6 +14,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class BlockRegistry {
+
+    private BlockRegistry(){}
+
     public static final HashMap<String, Block> BLOCKS = new HashMap<>();
 
     public static void loadBlocks() {
