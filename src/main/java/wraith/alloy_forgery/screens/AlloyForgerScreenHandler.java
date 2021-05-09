@@ -10,7 +10,7 @@ import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
+import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.s2c.play.ScreenHandlerSlotUpdateS2CPacket;
 import net.minecraft.screen.ArrayPropertyDelegate;
 import net.minecraft.screen.PropertyDelegate;
@@ -25,7 +25,7 @@ import wraith.alloy_forgery.RecipeOutput;
 import wraith.alloy_forgery.api.ForgeFuels;
 import wraith.alloy_forgery.api.MaterialWorths;
 import wraith.alloy_forgery.blocks.ForgeControllerBlockEntity;
-import wraith.alloy_forgery.registry.ScreenHandlerRegistry;
+import wraith.alloy_forgery.registry.FortniteScreenHandlerRegistry;
 import wraith.alloy_forgery.screens.slots.AlloyOutputSlot;
 import wraith.alloy_forgery.screens.slots.FuelInputSlot;
 
@@ -34,19 +34,15 @@ import java.util.*;
 public class AlloyForgerScreenHandler extends ScreenHandler {
 
     private final Inventory inventory;
-    private final PropertyDelegate delegate;
     public final PlayerEntity player;
     private final BlockPos frontPos;
 
     public AlloyForgerScreenHandler(int syncId, PlayerInventory playerInventory) {
-        this(syncId, playerInventory, new SimpleInventory(12), new ArrayPropertyDelegate(5), null);
+        this(syncId, playerInventory, new SimpleInventory(12), null);
     }
 
-    public AlloyForgerScreenHandler(int syncId, PlayerInventory playerInventory, Inventory inventory, PropertyDelegate delegate, BlockPos pos) {
-        super(ScreenHandlerRegistry.SCREEN_HANDLERS.get("alloy_forger"), syncId);
-        this.frontPos = pos;
-        checkDataCount(delegate, 5);
-        this.delegate = delegate;
+    public AlloyForgerScreenHandler(int syncId, PlayerInventory playerInventory, Inventory inventory, PacketByteBuf buf) {
+        super(FortniteScreenHandlerRegistry.SCREEN_HANDLERS.get("alloy_forger"), syncId);
         this.player = playerInventory.player;
         this.inventory = inventory;
         this.addSlot(new FuelInputSlot(inventory, 0, 8, 58)); //Fuel Slot
@@ -67,7 +63,6 @@ public class AlloyForgerScreenHandler extends ScreenHandler {
         for (int x = 0; x < 9; ++x) {
             this.addSlot(new Slot(playerInventory, x, 8 + x * 18, 149));
         }
-        this.addProperties(delegate);
     }
 
     @Override

@@ -7,7 +7,6 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
@@ -28,8 +27,6 @@ import wraith.alloy_forgery.Forge;
 import wraith.alloy_forgery.ForgeFuel;
 import wraith.alloy_forgery.api.ForgeFuels;
 import wraith.alloy_forgery.api.Forges;
-
-import java.util.HashMap;
 
 public class ForgeControllerBlock extends BlockWithEntity {
 
@@ -76,7 +73,7 @@ public class ForgeControllerBlock extends BlockWithEntity {
 
             String heldItemID = Registry.ITEM.getId(player.getStackInHand(hand).getItem()).toString();
             ForgeFuel fuel = ForgeFuels.FUELS.getOrDefault(heldItemID, null);
-            if (fuel != null) {
+            if (fuel != null && fuel.isRightclickable()) {
                 if (entity.isValidMultiblock() && entity.increaseHeat(fuel.getCookTime()) && !player.isCreative()) {
                     player.getStackInHand(hand).decrement(1);
                     if (fuel.hasReturnableItem()) {
