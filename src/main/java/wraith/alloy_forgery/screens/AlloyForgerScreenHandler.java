@@ -10,10 +10,9 @@ import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.packet.s2c.play.ScreenHandlerSlotUpdateS2CPacket;
-import net.minecraft.screen.ArrayPropertyDelegate;
-import net.minecraft.screen.PropertyDelegate;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -25,7 +24,7 @@ import wraith.alloy_forgery.RecipeOutput;
 import wraith.alloy_forgery.api.ForgeFuels;
 import wraith.alloy_forgery.api.MaterialWorths;
 import wraith.alloy_forgery.blocks.ForgeControllerBlockEntity;
-import wraith.alloy_forgery.registry.ScreenHandlerRegistry;
+import wraith.alloy_forgery.registry.CustomScreenHandlerRegistry;
 import wraith.alloy_forgery.screens.slots.AlloyOutputSlot;
 import wraith.alloy_forgery.screens.slots.FuelInputSlot;
 
@@ -33,30 +32,46 @@ import java.util.*;
 
 public class AlloyForgerScreenHandler extends ScreenHandler {
 
-    private final Inventory inventory;
-    private final PropertyDelegate delegate;
+    private Inventory inventory;
     public final PlayerEntity player;
-    private final BlockPos frontPos;
+    private ForgeControllerBlockEntity entity;
+    private int heat = 0;
+    private int maxHeat = 0;
+    private int smeltingTime = 0;
+    private int smeltingTimeMax = 0;
 
-    public AlloyForgerScreenHandler(int syncId, PlayerInventory playerInventory) {
-        this(syncId, playerInventory, new SimpleInventory(12), new ArrayPropertyDelegate(5), null);
+    public void setHeat(int heat) {
+        this.heat = heat;
     }
 
-    public AlloyForgerScreenHandler(int syncId, PlayerInventory playerInventory, Inventory inventory, PropertyDelegate delegate, BlockPos pos) {
-        super(ScreenHandlerRegistry.SCREEN_HANDLERS.get("alloy_forger"), syncId);
-        this.frontPos = pos;
-        checkDataCount(delegate, 5);
-        this.delegate = delegate;
-        this.player = playerInventory.player;
-        this.inventory = inventory;
-        this.addSlot(new FuelInputSlot(inventory, 0, 8, 58)); //Fuel Slot
-        this.addSlot(new AlloyOutputSlot(inventory, 1, 145, 34)); //Alloy Output
+    public void setSmeltingTime(int smeltingTime) {
+        this.smeltingTime = smeltingTime;
+    }
 
-        for (int y = 0; y < 2; ++y) {
-            for (int x = 0; x < 5; ++x) {
-                this.addSlot(new Slot(inventory,2 + y * 5 + x, 44 + x * 18, 27 + y * 18)); //Slot Generator, generates 5 slots, then moves a row down and makes 5 more
-            }
+    public AlloyForgerScreenHandler(int syncId, PlayerInventory playerInventory, ForgeControllerBlockEntity entity) {
+        this(syncId, playerInventory, null, entity);
+        this.entity = entity;
+    }
+
+    public AlloyForgerScreenHandler(int syncId, PlayerInventory playerInventory, PacketByteBuf buf) {
+        this(syncId, playerInventory, buf, new SimpleInventory(12));
+    }
+
+    public AlloyForgerScreenHandler(int syncId, PlayerInventory playerInventory, PacketByteBuf buf, Inventory inventory) {
+        super(CustomScreenHandlerRegistry.SCREEN_HANDLERS.get("alloy_forger"), syncId);
+
+        this.entity = null;
+        this.inventory = inventory;
+        if (buf != null) {
+            CompoundTag tag = buf.readCompoundTag();
+            this.heat = tag.getInt("heat");
+            this.maxHeat = tag.getInt("max_heat");
+            this.smeltingTime = tag.getInt("smelting_time");
+            this.smeltingTimeMax = tag.getInt("smelting_time_max");
         }
+        addInventorySlots();
+
+        this.player = playerInventory.player;
 
         for (int y = 0; y < 3; ++y) {
             for (int x = 0; x < 9; ++x) {
@@ -67,7 +82,16 @@ public class AlloyForgerScreenHandler extends ScreenHandler {
         for (int x = 0; x < 9; ++x) {
             this.addSlot(new Slot(playerInventory, x, 8 + x * 18, 149));
         }
-        this.addProperties(delegate);
+    }
+
+    private void addInventorySlots() {
+        this.addSlot(new FuelInputSlot(inventory, 0, 8, 58)); //Fuel Slot
+        this.addSlot(new AlloyOutputSlot(inventory, 1, 145, 34)); //Alloy Output
+        for (int y = 0; y < 2; ++y) {
+            for (int x = 0; x < 5; ++x) {
+                this.addSlot(new Slot(inventory,2 + y * 5 + x, 44 + x * 18, 27 + y * 18)); //Slot Generator, generates 5 slots, then moves a row down and makes 5 more
+            }
+        }
     }
 
     @Override
@@ -112,32 +136,37 @@ public class AlloyForgerScreenHandler extends ScreenHandler {
 
     @Environment(EnvType.CLIENT)
     public int getHeatProgress() {
-        return (this.delegate.get(0));
+        return (heat * 48) / maxHeat;
     }
 
     @Environment(EnvType.CLIENT)
     public int getSmeltingProgress() {
-        return 19 - (this.delegate.get(1) * 19 / (this.delegate.get(2) == 0 ? 200 : this.delegate.get(2)));
+        return 19 - (this.smeltingTime * 19 / (this.smeltingTimeMax == 0 ? 200 : this.smeltingTimeMax));
+    }
+
+    @Environment(EnvType.CLIENT)
+    public int getSmeltingPercent() {
+        return 100 - (int) (((float)this.smeltingTime / (float)this.smeltingTimeMax) * 100);
     }
 
     @Environment(EnvType.CLIENT)
     public boolean isHeating() {
-        return this.delegate.get(0) > 0;
+        return this.getHeatProgress() > 0;
     }
 
     @Environment(EnvType.CLIENT)
     public int getHeat() {
-        return this.delegate.get(3);
+        return this.heat;
     }
 
     @Environment(EnvType.CLIENT)
     public int getMaxHeat() {
-        return this.delegate.get(4);
+        return this.maxHeat;
     }
 
     @Environment(EnvType.CLIENT)
     public boolean isSmelting() {
-        return this.delegate.get(1) > 0;
+        return this.heat > 0;
     }
 
     public void updateItems(Map.Entry<HashMap<String, Integer>, RecipeOutput> oldRecipe) {
@@ -323,7 +352,10 @@ public class AlloyForgerScreenHandler extends ScreenHandler {
                     drop.setValue(drop.getValue() - amount);
                 }
                 ItemStack stack = new ItemStack(item, amount);
-                player.world.spawnEntity(new ItemEntity(player.world, frontPos.getX() + 0.5, frontPos.getY() + 0.5, frontPos.getZ() + 0.5, stack));
+                if (this.entity != null) {
+                    BlockPos frontPos = ForgeControllerBlockEntity.getFrontPos(entity.getCachedState(), entity.getPos());
+                    player.world.spawnEntity(new ItemEntity(player.world, frontPos.getX() + 0.5, frontPos.getY() + 0.5, frontPos.getZ() + 0.5, stack));
+                }
             }
         }
     }

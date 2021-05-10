@@ -13,6 +13,8 @@ import java.util.HashMap;
 
 public class ItemRegistry {
 
+    private ItemRegistry() {}
+
     public static final HashMap<String, Item> ITEMS = new HashMap<>();
 
     public static void loadItems() {

@@ -5,11 +5,11 @@
   "compatibilityLevel": "JAVA_8",
   "mixins": [
     "ItemStackMixin",
-    "ModelLoaderMixin",
     "NamespaceResourceManagerMixin",
     "RecipeManagerMixin"
   ],
   "client": [
+    "ModelLoaderMixin"
   ],
   "injectors": {
     "defaultRequire": 1
