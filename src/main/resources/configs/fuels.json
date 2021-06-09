@@ -1,6 +1,6 @@
 {
   "minecraft:lava_bucket": {
-    "burn_time": 10000,
+    "burn_time": 20000,
     "returnable_item": "minecraft:bucket",
     "rightclickable": true
   },

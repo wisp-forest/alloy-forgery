@@ -44,6 +44,26 @@
     "max_heat": 200000,
     "material_translation_key": "block.minecraft.blackstone"
   },
+  "deepslate_forge_controller": {
+    "materials": [
+      "minecraft:deepslate",
+      "minecraft:polished_deepslate",
+      "minecraft:chiseled_deepslate",
+      "minecraft:deepslate_bricks",
+      "minecraft:deepslate_tiles",
+      "minecraft:cobbled_deepslate"
+    ],
+    "recipe_materials": [
+      "minecraft:deepslate",
+      "minecraft:polished_deepslate",
+      "minecraft:chiseled_deepslate",
+      "minecraft:deepslate_bricks",
+      "minecraft:cdeepslate_tiles"
+    ],
+    "tier": 2,
+    "max_heat": 200000,
+    "material_translation_key": "block.minecraft.deepslate"
+  },
   "end_stone_forge_controller": {
     "materials": [
       "minecraft:end_stone",

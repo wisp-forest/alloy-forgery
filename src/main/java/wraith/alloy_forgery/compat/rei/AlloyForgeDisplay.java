@@ -1,17 +1,17 @@
 package wraith.alloy_forgery.compat.rei;
 
-import me.shedaniel.rei.api.EntryStack;
-import me.shedaniel.rei.api.RecipeDisplay;
+import me.shedaniel.rei.api.common.category.CategoryIdentifier;
+import me.shedaniel.rei.api.common.display.Display;
+import me.shedaniel.rei.api.common.entry.EntryIngredient;
+import me.shedaniel.rei.api.common.util.EntryIngredients;
 import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.Ingredient;
-import net.minecraft.util.Identifier;
-import org.jetbrains.annotations.NotNull;
 import wraith.alloy_forgery.RecipeOutput;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class AlloyForgeDisplay implements RecipeDisplay {
+public class AlloyForgeDisplay implements Display {
 
     private final HashMap<List<Ingredient>, Integer> inputs;
     private final RecipeOutput output;
@@ -22,36 +22,19 @@ public class AlloyForgeDisplay implements RecipeDisplay {
     }
 
     @Override
-    public @NotNull List<List<EntryStack>> getInputEntries() {
-
-        List<List<EntryStack>> inputStacks = new ArrayList<>();
-
-        inputs.forEach((ingredientList, integer) -> {
-
-            List<EntryStack> entry = new ArrayList<>();
-
-            ingredientList.forEach(ingredient -> {
-                entry.addAll(Arrays.stream(ingredient.getMatchingStacksClient()).map(itemStack -> {
-                    ItemStack actual = itemStack.copy();
-                    actual.setCount(integer);
-                    return EntryStack.create(actual);
-                }).collect(Collectors.toList()));
-            });
-
-            inputStacks.add(entry);
-
-        });
-
+    public List<EntryIngredient> getInputEntries() {
+        List<EntryIngredient> inputStacks = new ArrayList<>();
+        inputs.forEach((ingredients, integer) -> inputStacks.add(EntryIngredients.ofItemStacks(ingredients.stream().map(Ingredient::getMatchingStacksClient).flatMap(Arrays::stream).collect(Collectors.toList()))));
         return inputStacks;
     }
 
     @Override
-    public @NotNull List<List<EntryStack>> getResultingEntries() {
-        return Collections.singletonList(Collections.singletonList(EntryStack.create(new ItemStack(output.getOutputAsItem(), output.outputAmount))));
+    public List<EntryIngredient> getOutputEntries() {
+        return Collections.singletonList(EntryIngredients.of(new ItemStack(output.getOutputAsItem(), output.outputAmount)));
     }
 
     @Override
-    public @NotNull Identifier getRecipeCategory() {
+    public CategoryIdentifier<?> getCategoryIdentifier() {
         return AlloyForgeryREIPlugin.ALLOY_FORGE_CATEGORY_ID;
     }
 

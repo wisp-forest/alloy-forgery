@@ -25,7 +25,7 @@ public class ItemRegistry {
 
     public static void registerItems() {
         ArrayList<String> IDs = new ArrayList<>(ITEMS.keySet());
-        Collections.sort(IDs);
+        //Collections.sort(IDs);
         for (String id : IDs) {
             Registry.register(Registry.ITEM, Utils.ID(id), ITEMS.get(id));
         }

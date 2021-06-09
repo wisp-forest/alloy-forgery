@@ -8,6 +8,7 @@ import net.fabricmc.fabric.api.tag.TagRegistry;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.LockableContainerBlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
@@ -15,7 +16,7 @@ import net.minecraft.inventory.Inventories;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.screen.NamedScreenHandlerFactory;
@@ -27,11 +28,11 @@ import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.Tickable;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.registry.Registry;
+import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import wraith.alloy_forgery.*;
 import wraith.alloy_forgery.api.ForgeFuels;
@@ -47,7 +48,10 @@ import javax.swing.*;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ForgeControllerBlockEntity extends LockableContainerBlockEntity implements ExtendedScreenHandlerFactory, ImplementedInventory, Tickable, BlockEntityClientSerializable {
+// Tickable removed, likely replaced by BlockEntityTicker.getTicker
+// Otherwise minor refactors for CompoundTag to NbtCompound
+
+public class ForgeControllerBlockEntity extends LockableContainerBlockEntity implements ExtendedScreenHandlerFactory, ImplementedInventory, BlockEntityClientSerializable {
 
     private DefaultedList<ItemStack> inventory = DefaultedList.ofSize(12, ItemStack.EMPTY);
     private Map.Entry<HashMap<String, Integer>, RecipeOutput> recipe = null;
@@ -79,10 +83,10 @@ public class ForgeControllerBlockEntity extends LockableContainerBlockEntity imp
     public void syncGUI() {
         if (world != null && !world.isClient && handler != null && handler.player != null) {
             PacketByteBuf packet = new PacketByteBuf(Unpooled.buffer());
-            CompoundTag tag = new CompoundTag();
+            NbtCompound tag = new NbtCompound();
             tag.putInt("heat", this.heat);
             tag.putInt("smelting_time", this.smeltingTime);
-            packet.writeCompoundTag(tag);
+            packet.writeNbt(tag);
             ServerPlayNetworking.send((ServerPlayerEntity) handler.player, Utils.ID("update_gui"), packet);
         }
     }
@@ -97,8 +101,8 @@ public class ForgeControllerBlockEntity extends LockableContainerBlockEntity imp
     }
 
 
-    public ForgeControllerBlockEntity() {
-        super(BlockEntityRegistry.FORGE_CONTROLLER);
+    public ForgeControllerBlockEntity(BlockPos pos, BlockState state) {
+        super(BlockEntityRegistry.FORGE_CONTROLLER, pos, state);
     }
 
     @Override
@@ -213,7 +217,10 @@ public class ForgeControllerBlockEntity extends LockableContainerBlockEntity imp
         }
     }
 
-    @Override
+    public static <T extends BlockEntity> void ticker(World world, BlockPos blockPos, BlockState blockState, ForgeControllerBlockEntity forge) {
+        forge.tick();
+    }
+
     public void tick() {
         renderSmoke();
         Map.Entry<HashMap<String, Integer>, RecipeOutput> currentRecipe = getRecipe();
@@ -249,10 +256,12 @@ public class ForgeControllerBlockEntity extends LockableContainerBlockEntity imp
         if (fuel != null && increaseHeat(fuel.getCookTime())) {
             inventory.get(0).decrement(1);
             if (fuel.hasReturnableItem()) {
+                assert world != null;
                 Block.dropStack(world, getFrontPos(getCachedState(), pos), new ItemStack(Registry.ITEM.get(new Identifier(fuel.getReturnableItem()))));
             }
         }
         if (this.isHeating()) {
+            assert this.world != null;
             this.world.setBlockState(this.pos, this.world.getBlockState(pos).with(ForgeControllerBlock.LIT, this.isHeating()));
         }
     }
@@ -267,20 +276,20 @@ public class ForgeControllerBlockEntity extends LockableContainerBlockEntity imp
     }
 
     @Override
-    public void fromTag(BlockState state, CompoundTag tag) {
-        super.fromTag(state, tag);
+    public void readNbt(NbtCompound tag) {
+        super.readNbt(tag);
         this.heat = tag.getInt("HeatTime");
         this.smeltingTime = tag.getInt("SmeltingTime");
         this.inventory = DefaultedList.ofSize(size(), ItemStack.EMPTY);
-        Inventories.fromTag(tag, inventory);
+        Inventories.readNbt(tag, inventory);
     }
 
     @Override
-    public CompoundTag toTag(CompoundTag tag) {
-        super.toTag(tag);
+    public NbtCompound writeNbt(NbtCompound tag) {
+        super.writeNbt(tag);
         tag.putInt("HeatTime", this.heat);
         tag.putInt("SmeltingTime", this.smeltingTime);
-        Inventories.toTag(tag, this.inventory);
+        Inventories.writeNbt(tag, this.inventory);
         return tag;
     }
 
@@ -366,6 +375,7 @@ public class ForgeControllerBlockEntity extends LockableContainerBlockEntity imp
     @Override
     public void markDirty() {
         super.markDirty();
+        assert world != null;
         if (!world.isClient) {
             sync();
         }
@@ -377,6 +387,7 @@ public class ForgeControllerBlockEntity extends LockableContainerBlockEntity imp
         }
         BlockPos center = getBackPos(getCachedState(), pos);
         if (timer % 20 == 0) {
+            assert world != null;
             if (Utils.getRandomIntInRange(1, 4) == 1) {
                 world.addParticle(ParticleTypes.CAMPFIRE_SIGNAL_SMOKE, center.getX() + 0.25, center.getY(), center.getZ() + 0.25, 0, 0.08, 0);
             }
@@ -399,27 +410,27 @@ public class ForgeControllerBlockEntity extends LockableContainerBlockEntity imp
 
     @Override
     public void writeScreenOpeningData(ServerPlayerEntity player, PacketByteBuf buf) {
-        CompoundTag tag = new CompoundTag();
+        NbtCompound tag = new NbtCompound();
         tag.putInt("heat", this.heat);
         tag.putInt("max_heat", this.maxHeat);
         tag.putInt("smelting_time", this.smeltingTime);
         tag.putInt("smelting_time_max", this.smeltingTimeMax);
-        buf.writeCompoundTag(tag);
+        buf.writeNbt(tag);
     }
 
     @Override
-    public void fromClientTag(CompoundTag tag) {
+    public void fromClientTag(NbtCompound tag) {
         this.heat = tag.getInt("HeatTime");
         this.smeltingTime = tag.getInt("SmeltingTime");
         this.inventory = DefaultedList.ofSize(size(), ItemStack.EMPTY);
-        Inventories.fromTag(tag, inventory);
+        Inventories.readNbt(tag, inventory);
     }
 
     @Override
-    public CompoundTag toClientTag(CompoundTag tag) {
+    public NbtCompound toClientTag(NbtCompound tag) {
         tag.putInt("HeatTime", this.heat);
         tag.putInt("SmeltingTime", this.smeltingTime);
-        Inventories.toTag(tag, this.inventory);
+        Inventories.writeNbt(tag, this.inventory);
         return tag;
     }
 
@@ -437,5 +448,6 @@ public class ForgeControllerBlockEntity extends LockableContainerBlockEntity imp
     public boolean canExtract(int slot, ItemStack stack, Direction dir) {
         return slot == 1;
     }
+
 
 }

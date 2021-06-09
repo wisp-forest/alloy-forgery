@@ -2,6 +2,8 @@ package wraith.alloy_forgery.blocks;
 
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.entity.BlockEntityTicker;
+import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -20,16 +22,18 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.registry.Registry;
-import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
+import net.minecraft.world.event.listener.GameEventListener;
 import org.jetbrains.annotations.Nullable;
 import wraith.alloy_forgery.Forge;
 import wraith.alloy_forgery.ForgeFuel;
 import wraith.alloy_forgery.api.ForgeFuels;
 import wraith.alloy_forgery.api.Forges;
+import wraith.alloy_forgery.registry.BlockEntityRegistry;
+
+import java.util.Objects;
 
 public class ForgeControllerBlock extends BlockWithEntity {
-
     public static final DirectionProperty FACING = HorizontalFacingBlock.FACING;
     public static final BooleanProperty LIT = Properties.LIT;
 
@@ -54,17 +58,18 @@ public class ForgeControllerBlock extends BlockWithEntity {
     }
 
     @Override
-    public @Nullable BlockEntity createBlockEntity(BlockView world) {
-        return new ForgeControllerBlockEntity();
+    @Nullable
+    // Changed from BlockView to BlockPos + BlockState
+    public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+        return new ForgeControllerBlockEntity(pos, state);
     }
 
     @Override
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
         if (!world.isClient) {
-            if (!(world.getBlockEntity(pos) instanceof ForgeControllerBlockEntity)) {
+            if (!(world.getBlockEntity(pos) instanceof ForgeControllerBlockEntity entity)) {
                 return ActionResult.FAIL;
             }
-            ForgeControllerBlockEntity entity = (ForgeControllerBlockEntity) world.getBlockEntity(pos);
 
             String id = Registry.BLOCK.getId(this).getPath();
             Forge forge = Forges.getForge(id);
@@ -77,7 +82,8 @@ public class ForgeControllerBlock extends BlockWithEntity {
                 if (entity.isValidMultiblock() && entity.increaseHeat(fuel.getCookTime()) && !player.isCreative()) {
                     player.getStackInHand(hand).decrement(1);
                     if (fuel.hasReturnableItem()) {
-                        player.inventory.offerOrDrop(world, new ItemStack(Registry.ITEM.get(new Identifier(fuel.getReturnableItem()))));
+                        // No longer specifies world
+                        player.getInventory().offerOrDrop(new ItemStack(Registry.ITEM.get(new Identifier(fuel.getReturnableItem()))));
                     }
                 } else {
                     return ActionResult.FAIL;
@@ -91,15 +97,14 @@ public class ForgeControllerBlock extends BlockWithEntity {
                 }
             }
         }
-        world.getBlockEntity(pos).markDirty();
+        Objects.requireNonNull(world.getBlockEntity(pos)).markDirty();
         return ActionResult.SUCCESS;
     }
 
     @Override
     public void onPlaced(World world, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack itemStack) {
         super.onPlaced(world, pos, state, placer, itemStack);
-        if (world.getBlockEntity(pos) instanceof ForgeControllerBlockEntity) {
-            ForgeControllerBlockEntity entity = (ForgeControllerBlockEntity) world.getBlockEntity(pos);
+        if (world.getBlockEntity(pos) instanceof ForgeControllerBlockEntity entity) {
 
             String id = Registry.BLOCK.getId(this).getPath();
             Forge forge = Forges.getForge(id);
@@ -119,5 +124,18 @@ public class ForgeControllerBlock extends BlockWithEntity {
             world.updateComparators(pos,this);
             super.onBreak(world, pos, state, player);
         }
+    }
+
+    // New methods implemented from BlockEntity
+    @Nullable
+    @Override
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
+        return checkType(type, BlockEntityRegistry.FORGE_CONTROLLER, ForgeControllerBlockEntity::ticker);
+    }
+
+    @Nullable
+    @Override
+    public <T extends BlockEntity> GameEventListener getGameEventListener(World world, T blockEntity) {
+        return super.getGameEventListener(world, blockEntity);
     }
 }

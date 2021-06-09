@@ -2,7 +2,7 @@
   "recipes": [
     {
       "input": {
-        "minecraft:iron_ore": 2
+        "#minecraft:iron_ores": 2
       },
       "output": {
         "item": "minecraft:iron_ingot",
@@ -24,7 +24,7 @@
     },
     {
       "input": {
-        "minecraft:diamond_ore": 2
+        "#minecraft:diamond_ores": 2
       },
       "output": {
         "item": "minecraft:diamond",
@@ -35,10 +35,10 @@
     },
     {
       "input": {
-        "minecraft:emerald_ore": 2
+        "#minecraft:emerald_ores": 2
       },
       "output": {
-        "item": "minecraft:diamond",
+        "item": "minecraft:emerald",
         "amount": 3
       },
       "heat_per_tick": 5,
@@ -46,7 +46,7 @@
     },
     {
       "input": {
-        "minecraft:lapis_ore": 1
+        "#minecraft:lapis_ores": 1
       },
       "output": {
         "item": "minecraft:lapis_lazuli",
@@ -57,7 +57,7 @@
     },
     {
       "input": {
-        "minecraft:redstone_ore": 1
+        "#minecraft:redstone_ores": 1
       },
       "output": {
         "item": "minecraft:redstone",
