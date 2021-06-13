@@ -1,5 +1,5 @@
 {
   "alloy_forgery.forge_controller": "冶煉爐控制器",
   "container.alloy_forgery.alloy_forge": "冶煉爐",
-  "message.alloy_forgery.invalid_multiblock": "多方塊結構未完成"
+  "message.alloy_forgery.invalid_multiblock": "無效的多方塊結構"
 }
