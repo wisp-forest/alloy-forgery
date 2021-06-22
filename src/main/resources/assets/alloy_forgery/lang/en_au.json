@@ -1,0 +1,11 @@
+{
+
+  "alloy_forgery.forge_controller_name_pattern": "{type} {name}",
+
+  "alloy_forgery.forge_controller": "Forge Controller",
+  "container.alloy_forgery.alloy_forge": "Alloy Forge",
+  "container.alloy_forgery.rei.title": "Alloy Forging",
+  "container.alloy_forgery.rei.min_tier": "Minimum Tier: %1$f",
+  "container.alloy_forgery.rei.heat": "Required Heat: %d",
+  "message.alloy_forgery.invalid_multiblock": "Nah, its fucked"
+}

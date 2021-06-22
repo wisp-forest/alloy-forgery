@@ -8,6 +8,10 @@
       "worth": 9,
       "can_return": true
     },
+    "minecraft:raw_iron": {
+      "worth": 9,
+      "can_return": true
+    },
     "minecraft:iron_block": {
       "worth": 81,
       "can_return": true
@@ -19,6 +23,10 @@
       "can_return": true
     },
     "minecraft:gold_ingot": {
+      "worth": 9,
+      "can_return": true
+    },
+    "minecraft:raw_gold": {
       "worth": 9,
       "can_return": true
     },
@@ -76,5 +84,47 @@
       "worth": 81,
       "can_return": true
     }
+  },
+    "copper": {
+      "minecraft:copper_ingot": {
+        "worth": 9,
+        "can_return": true
+      },
+      "minecraft:raw_ingot": {
+        "worth": 9,
+        "can_return": true
+      },
+      "minecraft:copper_block": {
+        "worth": 81,
+        "can_return": true
+      },
+      "minecraft:exposed_copper": {
+        "worth": 72,
+        "can_return": true
+      },
+      "minecraft:weathered_copper": {
+        "worth": 63,
+        "can_return": true
+      },
+      "minecraft:oxidized_copper": {
+        "worth": 54,
+        "can_return": true
+      },
+      "minecraft:cut_copper": {
+        "worth": 81,
+        "can_return": true
+      },
+      "minecraft:exposed_cut_copper": {
+        "worth": 72,
+        "can_return": true
+      },
+      "minecraft:weathered_cut_copper": {
+        "worth": 63,
+        "can_return": true
+      },
+      "minecraft:oxidized_cut_copper": {
+        "worth": 54,
+        "can_return": true
+      }
+    }
   }
-}

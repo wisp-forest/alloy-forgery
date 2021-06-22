@@ -2,13 +2,16 @@ package wraith.alloy_forgery.compat.rei;
 
 import me.shedaniel.math.Point;
 import me.shedaniel.math.Rectangle;
-import me.shedaniel.rei.api.EntryStack;
-import me.shedaniel.rei.api.RecipeCategory;
-import me.shedaniel.rei.api.widgets.Label;
-import me.shedaniel.rei.api.widgets.Slot;
-import me.shedaniel.rei.api.widgets.Widgets;
-import me.shedaniel.rei.gui.widget.Widget;
-import net.minecraft.item.ItemStack;
+import me.shedaniel.rei.api.client.gui.Renderer;
+import me.shedaniel.rei.api.client.gui.widgets.Label;
+import me.shedaniel.rei.api.client.gui.widgets.Slot;
+import me.shedaniel.rei.api.client.gui.widgets.Widget;
+import me.shedaniel.rei.api.client.gui.widgets.Widgets;
+import me.shedaniel.rei.api.client.registry.display.DisplayCategory;
+import me.shedaniel.rei.api.common.category.CategoryIdentifier;
+import me.shedaniel.rei.api.common.entry.EntryIngredient;
+import me.shedaniel.rei.api.common.util.EntryStacks;
+import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.NotNull;
@@ -18,28 +21,28 @@ import wraith.alloy_forgery.registry.ItemRegistry;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AlloyForgeCategory implements RecipeCategory<AlloyForgeDisplay> {
+public class AlloyForgeCategory implements DisplayCategory<AlloyForgeDisplay> {
 
     public static TranslatableText NAME = new TranslatableText("container.alloy_forgery.rei.title");
 
     @Override
-    public @NotNull Identifier getIdentifier() {
+    public int getDisplayHeight() {
+        return 88;
+    }
+
+    @Override
+    public CategoryIdentifier<? extends AlloyForgeDisplay> getCategoryIdentifier() {
         return AlloyForgeryREIPlugin.ALLOY_FORGE_CATEGORY_ID;
     }
 
     @Override
-    public @NotNull String getCategoryName() {
-        return NAME.getString();
+    public Renderer getIcon() {
+        return EntryStacks.of(ItemRegistry.ITEMS.values().iterator().next());
     }
 
     @Override
-    public @NotNull EntryStack getLogo() {
-        return EntryStack.create(new ItemStack(ItemRegistry.ITEMS.values().iterator().next()));
-    }
-
-    @Override
-    public int getDisplayHeight() {
-        return 88;
+    public Text getTitle() {
+        return NAME;
     }
 
     @Override
@@ -49,7 +52,7 @@ public class AlloyForgeCategory implements RecipeCategory<AlloyForgeDisplay> {
         List<Widget> widgets = new ArrayList<>();
         widgets.add(Widgets.createRecipeBase(bounds));
 
-        List<List<EntryStack>> inputs = recipeDisplay.getInputEntries();
+        List<EntryIngredient> inputs = recipeDisplay.getInputEntries();
         List<Slot> slots = new ArrayList<>();
 
         widgets.add(Widgets.createTexturedWidget(new Identifier(AlloyForgery.MOD_ID, "textures/gui/forge_controller.png"), origin.x - 6, origin.y - 6, 42, 25, 92, 38));
@@ -68,7 +71,7 @@ public class AlloyForgeCategory implements RecipeCategory<AlloyForgeDisplay> {
 
         widgets.addAll(slots);
         widgets.add(Widgets.createResultSlotBackground(new Point(origin.x + 100, origin.y + 4)));
-        widgets.add(Widgets.createSlot(new Point(origin.x + 100, origin.y + 4)).entries(recipeDisplay.getResultingEntries().get(0)).disableBackground().markOutput());
+        widgets.add(Widgets.createSlot(new Point(origin.x + 100, origin.y + 4)).entries(recipeDisplay.getOutputEntries().get(0)).disableBackground().markOutput());
 
         Label tierWidget = Widgets.createLabel(new Point(origin.x - 4, origin.y + 38), new TranslatableText("container.alloy_forgery.rei.min_tier", recipeDisplay.getOutput().requiredTier)).color(0x3F3F3F).shadow(false);
         tierWidget.leftAligned();

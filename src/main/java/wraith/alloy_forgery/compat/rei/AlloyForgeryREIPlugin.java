@@ -1,36 +1,31 @@
 package wraith.alloy_forgery.compat.rei;
 
-import me.shedaniel.rei.api.EntryStack;
-import me.shedaniel.rei.api.RecipeHelper;
-import me.shedaniel.rei.api.plugins.REIPluginV0;
+import me.shedaniel.rei.api.client.plugins.REIClientPlugin;
+import me.shedaniel.rei.api.client.registry.category.CategoryRegistry;
+import me.shedaniel.rei.api.client.registry.display.DisplayRegistry;
+import me.shedaniel.rei.api.common.category.CategoryIdentifier;
+import me.shedaniel.rei.api.common.util.EntryStacks;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.Identifier;
 import wraith.alloy_forgery.AlloyForgery;
 import wraith.alloy_forgery.registry.ItemRegistry;
 
-public class AlloyForgeryREIPlugin implements REIPluginV0 {
+public class AlloyForgeryREIPlugin implements REIClientPlugin {
 
-    public static final Identifier ID = new Identifier(AlloyForgery.MOD_ID, "rei_plugin");
-    public static final Identifier ALLOY_FORGE_CATEGORY_ID = new Identifier(AlloyForgery.MOD_ID, "alloy_forge");
-
-    @Override
-    public Identifier getPluginIdentifier() {
-        return ID;
-    }
+    public static final CategoryIdentifier<AlloyForgeDisplay> ALLOY_FORGE_CATEGORY_ID = CategoryIdentifier.of(AlloyForgery.MOD_ID, "alloy_forging");
 
     @Override
-    public void registerOthers(RecipeHelper recipeHelper) {
+    public void registerCategories(CategoryRegistry registry) {
+        registry.add(new AlloyForgeCategory());
 
         for (Item item : ItemRegistry.ITEMS.values()) {
-            recipeHelper.registerWorkingStations(ALLOY_FORGE_CATEGORY_ID, EntryStack.create(new ItemStack(item)));
+            registry.addWorkstations(ALLOY_FORGE_CATEGORY_ID, EntryStacks.of(item));
         }
 
-        recipeHelper.registerLiveRecipeGenerator(new AlloyForgeRecipeGenerator());
     }
 
     @Override
-    public void registerPluginCategories(RecipeHelper recipeHelper) {
-        recipeHelper.registerCategories(new AlloyForgeCategory());
+    public void registerDisplays(DisplayRegistry registry) {
+        registry.registerDisplayGenerator(ALLOY_FORGE_CATEGORY_ID, new AlloyForgeRecipeGenerator());
+
     }
 }

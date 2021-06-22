@@ -1,5 +1,6 @@
 package wraith.alloy_forgery.registry;
 
+import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
 import net.minecraft.block.Block;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.util.registry.Registry;
@@ -23,7 +24,7 @@ public class BlockEntityRegistry {
             blocks [i++] = BlockRegistry.BLOCKS.get(eachForge.getKey());
 
         }
-            FORGE_CONTROLLER = BlockEntityType.Builder.create(ForgeControllerBlockEntity::new,
+            FORGE_CONTROLLER = FabricBlockEntityTypeBuilder.create(ForgeControllerBlockEntity::new,
                    blocks
             ).build(null);
     }

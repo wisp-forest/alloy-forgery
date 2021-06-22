@@ -20,8 +20,8 @@ dependencies {
 	mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
-	modCompileOnly "me.shedaniel:RoughlyEnoughItems-api:5.10.184"
-	modRuntime "me.shedaniel:RoughlyEnoughItems:5.10.184"
+	modCompileOnly "me.shedaniel:RoughlyEnoughItems-fabric:6.0.249-alpha"
+	modRuntime "me.shedaniel:RoughlyEnoughItems-fabric:6.0.249-alpha"
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 }
 
