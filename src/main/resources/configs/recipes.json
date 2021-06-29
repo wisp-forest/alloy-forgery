@@ -2,18 +2,62 @@
   "recipes": [
     {
       "input": {
-        "#minecraft:iron_ores": 2
+        "#minecraft:iron_ores": 1
       },
       "output": {
         "item": "minecraft:iron_ingot",
         "amount": 3
       },
-      "heat_per_tick": 6,
+      "heat_per_tick": 5,
       "required_tier": 1
     },
     {
       "input": {
-        "#minecraft:gold_ores": 2
+        "#minecraft:raw_iron": 2
+      },
+      "output": {
+        "item": "minecraft:iron_ingot",
+        "amount": 3
+      },
+      "heat_per_tick": 5,
+      "required_tier": 1
+    },
+    {
+    "input": {
+      "#minecraft:copper_ores": 1
+    },
+    "output": {
+      "item": "minecraft:copper_ingot",
+      "amount": 3
+    },
+    "heat_per_tick": 5,
+    "required_tier": 1
+    },
+    {
+      "input": {
+        "#minecraft:raw_copper": 2
+      },
+      "output": {
+        "item": "minecraft:copper_ingot",
+        "amount": 3
+      },
+      "heat_per_tick": 5,
+      "required_tier": 1
+    },
+    {
+      "input": {
+        "#minecraft:gold_ores": 1
+      },
+      "output": {
+        "item": "minecraft:gold_ingot",
+        "amount": 3
+      },
+      "heat_per_tick": 5,
+      "required_tier": 1
+    },
+    {
+      "input": {
+        "#minecraft:raw_gold": 2
       },
       "output": {
         "item": "minecraft:gold_ingot",
@@ -85,7 +129,7 @@
         "item": "minecraft:netherite_scrap",
         "amount": 3
       },
-      "heat_per_tick": 5,
+      "heat_per_tick": 10,
       "required_tier": 2
     },
     {
@@ -97,7 +141,7 @@
         "item": "minecraft:netherite_ingot",
         "amount": 1
       },
-      "heat_per_tick": 5,
+      "heat_per_tick": 10,
       "required_tier": 2
     }
   ]

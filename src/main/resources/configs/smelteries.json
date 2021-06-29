@@ -58,7 +58,7 @@
       "minecraft:polished_deepslate",
       "minecraft:chiseled_deepslate",
       "minecraft:deepslate_bricks",
-      "minecraft:cdeepslate_tiles"
+      "minecraft:deepslate_tiles"
     ],
     "tier": 2,
     "max_heat": 200000,
