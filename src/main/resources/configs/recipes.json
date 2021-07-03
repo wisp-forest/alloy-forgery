@@ -13,7 +13,7 @@
     },
     {
       "input": {
-        "#minecraft:raw_iron": 2
+        "minecraft:raw_iron": 2
       },
       "output": {
         "item": "minecraft:iron_ingot",
@@ -35,7 +35,7 @@
     },
     {
       "input": {
-        "#minecraft:raw_copper": 2
+        "minecraft:raw_copper": 2
       },
       "output": {
         "item": "minecraft:copper_ingot",
@@ -57,7 +57,7 @@
     },
     {
       "input": {
-        "#minecraft:raw_gold": 2
+        "minecraft:raw_gold": 2
       },
       "output": {
         "item": "minecraft:gold_ingot",
