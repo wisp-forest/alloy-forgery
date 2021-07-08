@@ -12,5 +12,6 @@
   "container.alloy_forgery.rei.min_tier": "Surströmming",
   "container.alloy_forgery.rei.fuel_per_tick": "Surströmming",
 
-  "message.alloy_forgery.invalid_multiblock": "Surströmming"
+  "message.alloy_forgery.invalid_multiblock": "Surströmming",
+  "itemGroup.alloy_forgery.alloy_forgery": "Surströmming"
 }

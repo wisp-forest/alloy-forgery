@@ -14,5 +14,6 @@
   "container.alloy_forgery.rei.min_tier": "wanted cat lvl: %d",
   "container.alloy_forgery.rei.fuel_per_tick": "snackz per tick: %d",
 
-  "message.alloy_forgery.invalid_multiblock": "bad blockus, sad kitteh"
+  "message.alloy_forgery.invalid_multiblock": "bad blockus, sad kitteh",
+  "itemGroup.alloy_forgery.alloy_forgery": "frOgery controlZ"
 }

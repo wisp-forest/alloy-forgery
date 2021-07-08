@@ -75,7 +75,7 @@ public class ForgeRegistry {
             final var id = AlloyForgery.id(Registry.BLOCK.getId(forgeDefinition.material()).getPath() + "_forge_controller");
 
             Registry.register(Registry.BLOCK, id, newController);
-            Registry.register(Registry.ITEM, id, new ForgeControllerItem(newController, new Item.Settings()));
+            Registry.register(Registry.ITEM, id, new ForgeControllerItem(newController, new Item.Settings().group(AlloyForgery.ALLOY_FORGERY_GROUP)));
 
             CONTROLLER_BLOCK_REGISTRY.put(identifier, newController);
         });

@@ -14,5 +14,6 @@
   "container.alloy_forgery.rei.min_tier": "Required Tier: %d",
   "container.alloy_forgery.rei.fuel_per_tick": "Fuel per tick: %d",
 
-  "message.alloy_forgery.invalid_multiblock": "Invalid Multiblock Configuration"
+  "message.alloy_forgery.invalid_multiblock": "Invalid Multiblock Configuration",
+  "itemGroup.alloy_forgery.alloy_forgery": "Alloy Forgery"
 }

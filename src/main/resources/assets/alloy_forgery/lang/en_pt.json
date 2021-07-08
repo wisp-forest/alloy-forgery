@@ -14,5 +14,6 @@
   "container.alloy_forgery.rei.min_tier": "Required Level: %d",
   "container.alloy_forgery.rei.fuel_per_tick": "Fuel per tick: %d",
 
-  "message.alloy_forgery.invalid_multiblock": "Multiblock Be Shipwrecked"
+  "message.alloy_forgery.invalid_multiblock": "Multiblock Be Shipwrecked",
+  "itemGroup.alloy_forgery.alloy_forgery": "Menu o' Metal Forgeries"
 }
