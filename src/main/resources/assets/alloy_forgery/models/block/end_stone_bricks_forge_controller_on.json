@@ -1,0 +1,6 @@
+{
+  "parent": "alloy_forgery:block/end_stone_bricks_forge_controller",
+  "textures": {
+    "front": "alloy_forgery:blocks/end_stone_bricks_forge_controller_front_on"
+  }
+}

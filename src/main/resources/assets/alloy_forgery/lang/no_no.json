@@ -1,0 +1,16 @@
+{
+  "block.alloy_forgery.bricks_forge_controller": "Surströmming",
+  "block.alloy_forgery.stone_bricks_forge_controller": "Surströmming",
+  "block.alloy_forgery.deepslate_bricks_forge_controller": "Surströmming",
+
+  "tooltip.alloy_forgery.forge_tier": "Surströmming",
+  "tooltip.alloy_forgery.fuel_capacity": "Surströmming",
+
+  "container.alloy_forgery.forge_controller": "Surströmming",
+
+  "container.alloy_forgery.rei.title": "Surströmming",
+  "container.alloy_forgery.rei.min_tier": "Surströmming",
+  "container.alloy_forgery.rei.fuel_per_tick": "Surströmming",
+
+  "message.alloy_forgery.invalid_multiblock": "Surströmming"
+}

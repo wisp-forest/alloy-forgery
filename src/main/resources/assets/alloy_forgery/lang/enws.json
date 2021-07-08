@@ -1,0 +1,18 @@
+{
+  "block.alloy_forgery.bricks_forge_controller": "Mechanical Implement Fabricated of Bricks for Incorporating various Minerals",
+  "block.alloy_forgery.stone_bricks_forge_controller": "Mechanical Implement Fabricated of Stone Bricks for Incorporating various Minerals",
+  "block.alloy_forgery.deepslate_bricks_forge_controller": "Mechanical Implement Fabricated of Deepethslate for Incorporating various Minerals",
+  "block.alloy_forgery.end_stone_bricks_forge_controller": "Mechanical Implement Fabricated of End Stone for Incorporating various Minerals",
+  "block.alloy_forgery.polished_blackstone_forge_controller": "Mechanical Implement Fabricated of Polish'd Blackstone for Incorporating various Minerals",
+
+  "tooltip.alloy_forgery.forge_tier": "Grade: %d",
+  "tooltip.alloy_forgery.fuel_capacity": "Combustible Archive: %d",
+
+  "container.alloy_forgery.forge_controller": "Forgery of Alloys",
+
+  "container.alloy_forgery.rei.title": "Alloy Forging",
+  "container.alloy_forgery.rei.min_tier": "Compulsory Grade: %d",
+  "container.alloy_forgery.rei.fuel_per_tick": "Combustibles per tick: %d",
+
+  "message.alloy_forgery.invalid_multiblock": "Unprecedented multiple-block construction"
+}

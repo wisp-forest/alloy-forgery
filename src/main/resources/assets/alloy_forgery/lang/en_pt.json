@@ -1,0 +1,18 @@
+{
+  "block.alloy_forgery.bricks_forge_controller": "Metal Forgery o' Bricks o' Clay",
+  "block.alloy_forgery.stone_bricks_forge_controller": "Metal Forgery o' Bricks o' Rock",
+  "block.alloy_forgery.deepslate_bricks_forge_controller": "Metal Forgery o' Bricks o' tough rock",
+  "block.alloy_forgery.end_stone_bricks_forge_controller": "Metal Forgery o' Foreign Stone Bricks",
+  "block.alloy_forgery.polished_blackstone_forge_controller": "Metal Forgery o' Good lookin' Bricks o' Rock o' Black",
+
+  "tooltip.alloy_forgery.forge_tier": "Level: %d",
+  "tooltip.alloy_forgery.fuel_capacity": "Fuel Barrel: %d",
+
+  "container.alloy_forgery.forge_controller": "Smithy's Menu",
+
+  "container.alloy_forgery.rei.title": "Metal Forging",
+  "container.alloy_forgery.rei.min_tier": "Required Level: %d",
+  "container.alloy_forgery.rei.fuel_per_tick": "Fuel per tick: %d",
+
+  "message.alloy_forgery.invalid_multiblock": "Multiblock Be Shipwrecked"
+}

@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "id": "alloy_forgery",
+  "version": "${version}",
+  "name": "Alloy Forgery",
+  "description": "Configurable, data-driven alloy forges for all your smelting needs",
+  "authors": [
+    "glisco"
+  ],
+  "contributors": [
+    "Noaaan",
+    "LordDeatHunter"
+  ],
+  "contact": {
+    "sources": "https://github.com/LordDeatHunter/Alloy-Forgery",
+    "issues": "https://github.com/LordDeatHunter/Alloy-Forgery/issues"
+  },
+  "license": "MIT",
+  "icon": "assets/alloy_forgery/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "client": [
+      "wraith.alloyforgery.client.AlloyForgeryClient"
+    ],
+    "main": [
+      "wraith.alloyforgery.AlloyForgery"
+    ],
+    "rei_plugins": [
+      "wraith.alloyforgery.compat.rei.AlloyForgeryPlugin"
+    ]
+  },
+  "mixins": [
+    "alloy-forgery.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.10",
+    "fabric": "*",
+    "minecraft": "1.17"
+  },
+  "custom": {
+    "modmenu": {
+      "links": {
+        "modmenu.discord": "http://discord.gg/Pa5wDVm8Xv"
+      }
+    }
+  }
+}

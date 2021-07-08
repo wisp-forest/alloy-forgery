@@ -1,0 +1,35 @@
+{
+  "type": "alloy_forgery:forging",
+  "inputs": [
+    {
+      "item": "minecraft:gold_ingot"
+    },
+    {
+      "item": "minecraft:gold_ingot"
+    },
+    {
+      "item": "minecraft:gold_ingot"
+    },
+    {
+      "item": "minecraft:gold_ingot"
+    },
+    {
+      "item": "minecraft:netherite_scrap"
+    },
+    {
+      "item": "minecraft:netherite_scrap"
+    },
+    {
+      "item": "minecraft:netherite_scrap"
+    },
+    {
+      "item": "minecraft:netherite_scrap"
+    }
+  ],
+  "output": {
+    "id": "minecraft:netherite_ingot",
+    "count": 2
+  },
+  "min_forge_tier": 3,
+  "fuel_per_tick": 100
+}

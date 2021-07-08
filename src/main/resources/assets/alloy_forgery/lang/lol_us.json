@@ -1,0 +1,18 @@
+{
+  "block.alloy_forgery.bricks_forge_controller": "brikz froge controler",
+  "block.alloy_forgery.stone_bricks_forge_controller": "froge cntrol WITH PATTERNZ",
+  "block.alloy_forgery.deepslate_bricks_forge_controller": "dank brick forge control",
+  "block.alloy_forgery.end_stone_bricks_forge_controller": "cat litter briKz control for da forge",
+  "block.alloy_forgery.polished_blackstone_forge_controller": "forge w/ preteh blek stakd rOk",
+
+  "tooltip.alloy_forgery.forge_tier": "cat lvl: %d",
+  "tooltip.alloy_forgery.fuel_capacity": "snak storage: %d",
+
+  "container.alloy_forgery.forge_controller": "POLYMERIZ",
+
+  "container.alloy_forgery.rei.title": "POLYMERIZATION",
+  "container.alloy_forgery.rei.min_tier": "wanted cat lvl: %d",
+  "container.alloy_forgery.rei.fuel_per_tick": "snackz per tick: %d",
+
+  "message.alloy_forgery.invalid_multiblock": "bad blockus, sad kitteh"
+}

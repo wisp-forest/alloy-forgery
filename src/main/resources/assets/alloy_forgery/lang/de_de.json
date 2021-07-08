@@ -1,0 +1,18 @@
+{
+  "block.alloy_forgery.bricks_forge_controller": "Schmelzensteuerung (Ziegelsteine)",
+  "block.alloy_forgery.stone_bricks_forge_controller": "Schmelzensteuerung (Steinziegel)",
+  "block.alloy_forgery.deepslate_bricks_forge_controller": "Schmelzensteuerung (Tiefenschieferziegel)",
+  "block.alloy_forgery.end_stone_bricks_forge_controller": "Schmelzensteuerung (Endstein)",
+  "block.alloy_forgery.polished_blackstone_forge_controller": "Schmelzensteuerung (Polierter Schwarzstein)",
+
+  "tooltip.alloy_forgery.forge_tier": "Stufe: %d",
+  "tooltip.alloy_forgery.fuel_capacity": "Brennstoffkapazität: %d",
+
+  "container.alloy_forgery.forge_controller": "Legierungsschmelze",
+
+  "container.alloy_forgery.rei.title": "Legieren",
+  "container.alloy_forgery.rei.min_tier": "Benötigte Stufe: %d",
+  "container.alloy_forgery.rei.fuel_per_tick": "Brennstoff: %d",
+
+  "message.alloy_forgery.invalid_multiblock": "Ungültige Multiblockstruktur"
+}

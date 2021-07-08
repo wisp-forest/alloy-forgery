@@ -1,0 +1,10 @@
+{
+  "material": "minecraft:polished_blackstone",
+  "additional_materials": [
+    "minecraft:polished_blackstone_bricks",
+    "minecraft:chiseled_polished_blackstone"
+  ],
+  "tier": 2,
+  "speed_multiplier": 1.5,
+  "fuel_capacity": 96000
+}

@@ -1,0 +1,25 @@
+{
+  "fuels": [
+    {
+      "item": "minecraft:lava_bucket",
+      "return_item": "minecraft:bucket",
+      "fuel": 24000
+    },
+    {
+      "item": "minecraft:coal",
+      "fuel": 1000
+    },
+    {
+      "item": "minecraft:charcoal",
+      "fuel": 1000
+    },
+    {
+      "item": "minecraft:blaze_rod",
+      "fuel": 2000
+    },
+    {
+      "item": "minecraft:coal_block",
+      "fuel": 9000
+    }
+  ]
+}

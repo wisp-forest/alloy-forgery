@@ -1,0 +1,23 @@
+{
+  "type": "alloy_forgery:forging",
+  "inputs": [
+    {
+      "item": "minecraft:raw_gold"
+    },
+	{
+      "item": "minecraft:raw_gold"
+    }
+  ],
+  "output": {
+    "id": "minecraft:gold_ingot",
+    "count": 3
+  },
+  "overrides": {
+    "2+": {
+      "id": "minecraft:gold_ingot",
+      "count": 4
+    }
+  },
+  "min_forge_tier": 1,
+  "fuel_per_tick": 5
+}

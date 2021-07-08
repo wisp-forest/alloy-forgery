@@ -1,0 +1,24 @@
+{
+  "type": "alloy_forgery:forging",
+  "inputs": [
+    {
+      "tag": "minecraft:copper_ores"
+    }
+  ],
+  "output": {
+    "id": "minecraft:copper_ingot",
+    "count": 3
+  },
+  "overrides": {
+    "2": {
+      "id": "minecraft:copper_ingot",
+      "count": 4
+    },
+    "3+": {
+      "id": "minecraft:copper_ingot",
+      "count": 5
+    }
+  },
+  "min_forge_tier": 1,
+  "fuel_per_tick": 5
+}
