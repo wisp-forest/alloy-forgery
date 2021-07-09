@@ -18,7 +18,7 @@ import java.util.*;
 
 public class ForgeRegistry {
 
-    private static final Gson GSON = new Gson();
+    public static final Gson GSON = new Gson();
 
     private static final Map<Identifier, ForgeDefinition> FORGE_DEFINITION_REGISTRY = new HashMap<>();
     private static final Map<Identifier, Block> CONTROLLER_BLOCK_REGISTRY = new HashMap<>();

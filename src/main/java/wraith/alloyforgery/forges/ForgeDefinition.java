@@ -2,6 +2,7 @@ package wraith.alloyforgery.forges;
 
 import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 import net.minecraft.block.Block;
@@ -22,6 +23,30 @@ public record ForgeDefinition(int forgeTier,
                               ImmutableList<Block> additionalMaterials) {
 
     private static final int BASE_MAX_SMELT_TIME = 200;
+    //why kubejs why
+    private static final String RECIPE_PATTERN =
+            """
+            {
+                "type": "minecraft:crafting_shaped",
+                "pattern": [
+                    "###",
+                    "#B#",
+                    "###"
+                ],
+                "key": {
+                    "#": {
+                        "item": "{material}"
+                    },
+                    "B": {
+                        "item": "minecraft:blast_furnace"
+                    }
+                },
+                "result": {
+                    "item": "{controller}",
+                    "count": 1
+                }
+            }
+            """;
 
     private ForgeDefinition(int forgeTier, float speedMultiplier, int fuelCapacity, Block material, ImmutableList<Block> additionalMaterials) {
         this(forgeTier, speedMultiplier, fuelCapacity, (int) (BASE_MAX_SMELT_TIME / speedMultiplier), material, additionalMaterials);
@@ -45,17 +70,11 @@ public record ForgeDefinition(int forgeTier,
         return block == material || this.additionalMaterials.contains(block);
     }
 
-    public ShapedRecipe generateRecipe(Identifier id) {
+    public JsonElement generateRecipe(Identifier id) {
+        String recipe = RECIPE_PATTERN.replace("{material}", Registry.ITEM.getId(material.asItem()).toString());
+        recipe = recipe.replace("{controller}", Registry.ITEM.getId(ForgeRegistry.getControllerBlock(id).get().asItem()).toString());
 
-        final var ingredients = DefaultedList.ofSize(9, Ingredient.EMPTY);
-        for (int i = 0; i < 9; i++) {
-            ingredients.set(i, Ingredient.ofItems(material));
-        }
-
-        ingredients.set(4, Ingredient.ofItems(Blocks.BLAST_FURNACE));
-
-        return new ShapedRecipe(id, "", 3, 3, ingredients, new ItemStack(ForgeRegistry.getControllerBlock(id).get()));
-
+        return ForgeRegistry.GSON.fromJson(recipe, JsonObject.class);
     }
 
     @Override

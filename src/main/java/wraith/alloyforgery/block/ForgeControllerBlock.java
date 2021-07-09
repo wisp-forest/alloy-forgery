@@ -1,6 +1,6 @@
 package wraith.alloyforgery.block;
 
-import com.glisco.owo.client.ClientParticles;
+import com.glisco.owo.particles.ClientParticles;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
@@ -129,7 +129,7 @@ public class ForgeControllerBlock extends BlockWithEntity {
 
     @Override
     public int getComparatorOutput(BlockState state, World world, BlockPos pos) {
-        return Math.round(((ForgeControllerBlockEntity)world.getBlockEntity(pos)).getSmeltProgress() * 0.46875f);
+        return Math.round(((ForgeControllerBlockEntity) world.getBlockEntity(pos)).getSmeltProgress() * 0.46875f);
     }
 
     @Override

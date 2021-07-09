@@ -1,7 +1,7 @@
 package wraith.alloyforgery.client;
 
-import com.glisco.owo.ServerParticles;
-import com.glisco.owo.client.ClientParticles;
+import com.glisco.owo.particles.ClientParticles;
+import com.glisco.owo.particles.ServerParticles;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;

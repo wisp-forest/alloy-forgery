@@ -1,7 +1,7 @@
 package wraith.alloyforgery.block;
 
-import com.glisco.owo.ItemOps;
-import com.glisco.owo.ServerParticles;
+import com.glisco.owo.ops.ItemOps;
+import com.glisco.owo.particles.ServerParticles;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
