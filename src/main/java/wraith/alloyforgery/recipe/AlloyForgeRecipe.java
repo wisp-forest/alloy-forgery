@@ -9,7 +9,6 @@ import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.world.World;
 import wraith.alloyforgery.AlloyForgery;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 

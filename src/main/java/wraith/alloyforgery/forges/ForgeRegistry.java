@@ -63,8 +63,6 @@ public class ForgeRegistry {
             }
         });
 
-        FORGE_DEFINITION_REGISTRY.forEach((identifier, forgeDefinition) -> System.out.println(identifier + "-->" + forgeDefinition));
-
     }
 
     public static void registerBlocks() {

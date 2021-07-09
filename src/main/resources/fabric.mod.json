@@ -22,6 +22,9 @@
     "client": [
       "wraith.alloyforgery.client.AlloyForgeryClient"
     ],
+    "server": [
+      "wraith.alloyforgery.AlloyForgeryServer"
+    ],
     "main": [
       "wraith.alloyforgery.AlloyForgery"
     ],
