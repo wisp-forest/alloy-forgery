@@ -8,5 +8,6 @@ You can configure what type of forges there are, which items act as fuel, and th
 Curseforge: https://www.curseforge.com/minecraft/mc-mods/alloy-forgery
 
 Authored by DH, with contributions from Noaaan and glisco  
+Now fully re-written by glisco
 
 If you want to contact us do it through the Wraith Modding Discord: https://discord.gg/Pa5wDVm8Xv
