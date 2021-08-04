@@ -3,9 +3,11 @@ package wraith.alloyforgery.block;
 import com.glisco.owo.ops.ItemOps;
 import com.glisco.owo.particles.ServerParticles;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventories;
@@ -129,7 +131,8 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
             this.currentSmeltTime = 0;
 
             final var currentState = world.getBlockState(pos);
-            if (currentState.get(ForgeControllerBlock.LIT)) world.setBlockState(pos, currentState.with(ForgeControllerBlock.LIT, false));
+            if (currentState.get(ForgeControllerBlock.LIT))
+                world.setBlockState(pos, currentState.with(ForgeControllerBlock.LIT, false));
 
             return;
         }
@@ -211,7 +214,8 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
     public boolean verifyMultiblock() {
 
         final BlockState belowController = world.getBlockState(multiblockPositions.get(0));
-        if (!(belowController.isOf(Blocks.HOPPER) || forgeDefinition.isBlockValid(belowController.getBlock()))) return false;
+        if (!(belowController.isOf(Blocks.HOPPER) || forgeDefinition.isBlockValid(belowController.getBlock())))
+            return false;
 
         for (int i = 1; i < multiblockPositions.size(); i++) {
             if (!forgeDefinition.isBlockValid(world.getBlockState(multiblockPositions.get(i)).getBlock())) return false;
@@ -284,5 +288,19 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
 
     public static void ticker(World world, BlockPos blockPos, BlockState state, ForgeControllerBlockEntity controller) {
         controller.tick();
+    }
+
+    public static class Type extends BlockEntityType<ForgeControllerBlockEntity> {
+
+        public static Type INSTANCE = new Type();
+
+        public Type() {
+            super(ForgeControllerBlockEntity::new, ImmutableSet.of(), null);
+        }
+
+        @Override
+        public boolean supports(BlockState state) {
+            return state.getBlock() instanceof ForgeControllerBlock;
+        }
     }
 }

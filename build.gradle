@@ -44,6 +44,10 @@ dependencies {
     modImplementation "com.ptsmods:devlogin:1.2"
 }
 
+minecraft {
+    accessWidener file("src/main/resources/alloy_forgery.accesswidener")
+}
+
 processResources {
     inputs.property "version", project.version
 

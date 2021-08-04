@@ -7,6 +7,7 @@ import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
+import org.apache.commons.io.FilenameUtils;
 import wraith.alloyforgery.AlloyForgery;
 import wraith.alloyforgery.ForgeControllerItem;
 import wraith.alloyforgery.block.ForgeControllerBlock;
@@ -14,6 +15,7 @@ import wraith.alloyforgery.block.ForgeControllerBlock;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
 
 public class ForgeRegistry {
@@ -39,44 +41,56 @@ public class ForgeRegistry {
         return CONTROLLER_BLOCK_REGISTRY.values().stream().toList();
     }
 
-    public static void loadFromJson() {
+    public static void readJsonAndEnqueueRegistration() {
 
         FabricLoader.getInstance().getAllMods().forEach(modContainer -> {
             try {
                 final var targetPath = modContainer.getRootPath().resolve(String.format("data/%s/alloy_forges", modContainer.getMetadata().getId()));
 
                 if (!Files.exists(targetPath)) return;
-
                 Files.walk(targetPath).forEach(path -> {
-
-                    if (!path.toString().endsWith(".json")) return;
-
-                    try {
-                        final InputStreamReader forgeData = new InputStreamReader(Files.newInputStream(path));
-                        FORGE_DEFINITION_REGISTRY.put(new Identifier(modContainer.getMetadata().getId(), path.getFileName().toString()), ForgeDefinition.fromJson(GSON.fromJson(forgeData, JsonObject.class)));
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+                    tryReadFromPath(modContainer.getMetadata().getId(), path);
                 });
             } catch (IOException e) {
                 e.printStackTrace();
             }
         });
 
+        final var forgePath = FabricLoader.getInstance().getGameDir().resolve("alloy_forges");
+        if (!Files.exists(forgePath)) return;
+
+        try {
+            Files.walk(forgePath).forEach(path -> {
+                tryReadFromPath(AlloyForgery.MOD_ID, path);
+            });
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
-    public static void registerBlocks() {
+    private static void tryReadFromPath(String namespace, Path path) {
+        if (!path.toString().endsWith(".json")) return;
+        try {
+            final InputStreamReader forgeData = new InputStreamReader(Files.newInputStream(path));
+            ForgeDefinition.loadAndEnqueue(new Identifier(namespace, FilenameUtils.removeExtension(path.getFileName().toString())), GSON.fromJson(forgeData, JsonObject.class));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
-        FORGE_DEFINITION_REGISTRY.forEach((identifier, forgeDefinition) -> {
+    static void registerDefinition(Identifier forgeDefinitionId, ForgeDefinition definition) {
+        final var controllerBlock = new ForgeControllerBlock(definition);
+        final var controllerBlockRegistryId = AlloyForgery.id(Registry.BLOCK.getId(definition.material()).getPath() + "_forge_controller");
 
-            final var newController = new ForgeControllerBlock(forgeDefinition);
-            final var id = AlloyForgery.id(Registry.BLOCK.getId(forgeDefinition.material()).getPath() + "_forge_controller");
+        Registry.register(Registry.BLOCK, controllerBlockRegistryId, controllerBlock);
+        Registry.register(Registry.ITEM, controllerBlockRegistryId, new ForgeControllerItem(controllerBlock, new Item.Settings().group(AlloyForgery.ALLOY_FORGERY_GROUP)));
 
-            Registry.register(Registry.BLOCK, id, newController);
-            Registry.register(Registry.ITEM, id, new ForgeControllerItem(newController, new Item.Settings().group(AlloyForgery.ALLOY_FORGERY_GROUP)));
+        store(forgeDefinitionId, definition, controllerBlock);
+    }
 
-            CONTROLLER_BLOCK_REGISTRY.put(identifier, newController);
-        });
+    private static void store(Identifier id, ForgeDefinition definition, ForgeControllerBlock block) {
+        FORGE_DEFINITION_REGISTRY.put(id, definition);
+        CONTROLLER_BLOCK_REGISTRY.put(id, block);
     }
 
 }

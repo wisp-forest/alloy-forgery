@@ -15,15 +15,13 @@
     "sources": "https://github.com/LordDeatHunter/Alloy-Forgery",
     "issues": "https://github.com/LordDeatHunter/Alloy-Forgery/issues"
   },
+  "accessWidener": "alloy_forgery.accesswidener",
   "license": "MIT",
   "icon": "assets/alloy_forgery/icon.png",
   "environment": "*",
   "entrypoints": {
     "client": [
       "wraith.alloyforgery.client.AlloyForgeryClient"
-    ],
-    "server": [
-      "wraith.alloyforgery.AlloyForgeryServer"
     ],
     "main": [
       "wraith.alloyforgery.AlloyForgery"
