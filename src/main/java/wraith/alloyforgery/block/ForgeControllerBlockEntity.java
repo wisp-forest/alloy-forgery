@@ -121,6 +121,10 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
         return smeltProgress;
     }
 
+    public int getCurrentSmeltTime() {
+        return currentSmeltTime;
+    }
+
     public void tick() {
         this.smeltProgress = Math.round((this.currentSmeltTime / (float) forgeDefinition.maxSmeltTime()) * 19);
         this.fuelProgress = Math.round((this.fuel / (float) forgeDefinition.fuelCapacity()) * 48);

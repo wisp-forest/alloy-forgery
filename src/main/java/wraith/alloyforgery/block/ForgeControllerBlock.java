@@ -69,7 +69,8 @@ public class ForgeControllerBlock extends BlockWithEntity {
             final var controller = (ForgeControllerBlockEntity) world.getBlockEntity(pos);
 
             if (fuelDefinition.hasReturnType() && controller.canAddFuel(fuelDefinition.fuel())) {
-                if (!player.getAbilities().creativeMode) player.setStackInHand(hand, new ItemStack(fuelDefinition.returnType()));
+                if (!player.getAbilities().creativeMode)
+                    player.setStackInHand(hand, new ItemStack(fuelDefinition.returnType()));
                 controller.addFuel(fuelDefinition.fuel());
             } else {
 
@@ -129,7 +130,8 @@ public class ForgeControllerBlock extends BlockWithEntity {
 
     @Override
     public int getComparatorOutput(BlockState state, World world, BlockPos pos) {
-        return Math.round(((ForgeControllerBlockEntity) world.getBlockEntity(pos)).getSmeltProgress() * 0.46875f);
+        final var controller = (ForgeControllerBlockEntity) world.getBlockEntity(pos);
+        return controller.getCurrentSmeltTime() == 0 ? 0 : Math.max(1, Math.round(controller.getSmeltProgress() * 0.46875f));
     }
 
     @Override
