@@ -23,6 +23,7 @@ import net.minecraft.text.TranslatableText;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import wraith.alloyforgery.AlloyForgeScreenHandler;
@@ -193,7 +194,7 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
                 this.fuel -= fuelRequirement;
 
                 if (world.random.nextDouble() > 0.75) {
-                    ServerParticles.issueEvent((ServerWorld) world, pos, AlloyForgery.id("smelting_particles"), buf -> buf.writeVarInt(facing.ordinal()));
+                    ServerParticles.issueEvent((ServerWorld) world, Vec3d.of(pos), AlloyForgery.id("smelting_particles"), buf -> buf.writeEnumConstant(facing));
                 }
 
             } else {
