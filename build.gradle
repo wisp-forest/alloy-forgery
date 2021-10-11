@@ -39,7 +39,6 @@ dependencies {
     modImplementation "com.terraformersmc:modmenu:${project.modmenu_version}"
 
     modImplementation "com.github.glisco03:owo-lib:${project.owo_version}"
-    include "com.github.glisco03:owo-lib:${project.owo_version}"
 
     modImplementation "com.ptsmods:devlogin:1.2"
 }

@@ -1,5 +1,6 @@
 package wraith.alloyforgery;
 
+import com.glisco.owo.moddata.ModDataLoader;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.client.itemgroup.FabricItemGroupBuilder;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
@@ -34,7 +35,7 @@ public class AlloyForgery implements ModInitializer {
 
         ResourceManagerHelper.get(ResourceType.SERVER_DATA).registerReloadListener(new FuelDataLoader());
 
-        ForgeRegistry.readJsonAndEnqueueRegistration();
+        ModDataLoader.load(new ForgeRegistry.Loader());
         FORGE_CONTROLLER_BLOCK_ENTITY = ForgeControllerBlockEntity.Type.INSTANCE;
 
         Registry.register(Registry.BLOCK_ENTITY_TYPE, id("forge_controller"), FORGE_CONTROLLER_BLOCK_ENTITY);

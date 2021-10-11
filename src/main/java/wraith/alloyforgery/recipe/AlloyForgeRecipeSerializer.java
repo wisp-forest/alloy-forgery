@@ -37,15 +37,15 @@ public class AlloyForgeRecipeSerializer implements RecipeSerializer<AlloyForgeRe
             final var overrideString = entry.getKey();
             AlloyForgeRecipe.OverrideRange overrideRange = null;
 
-            if(overrideString.matches("\\d+\\+")){
+            if (overrideString.matches("\\d+\\+")) {
                 overrideRange = new AlloyForgeRecipe.OverrideRange(Integer.parseInt(overrideString.substring(0, overrideString.length() - 1)));
-            } else if(overrideString.matches("\\d+ to \\d+")){
+            } else if (overrideString.matches("\\d+ to \\d+")) {
                 overrideRange = new AlloyForgeRecipe.OverrideRange(Integer.parseInt(overrideString.substring(0, overrideString.indexOf(" "))), Integer.parseInt(overrideString.substring(overrideString.lastIndexOf(" ") + 1, overrideString.length())));
-            } else if(overrideString.matches("\\d+")){
+            } else if (overrideString.matches("\\d+")) {
                 overrideRange = new AlloyForgeRecipe.OverrideRange(Integer.parseInt(overrideString), Integer.parseInt(overrideString));
             }
 
-            if(overrideRange == null){
+            if (overrideRange == null) {
                 throw new JsonSyntaxException("Invalid override range token: " + overrideString);
             }
 

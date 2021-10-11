@@ -1,21 +1,16 @@
 package wraith.alloyforgery.forges;
 
+import com.glisco.owo.moddata.ModDataConsumer;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
-import org.apache.commons.io.FilenameUtils;
 import wraith.alloyforgery.AlloyForgery;
 import wraith.alloyforgery.ForgeControllerItem;
 import wraith.alloyforgery.block.ForgeControllerBlock;
 
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.*;
 
 public class ForgeRegistry {
@@ -41,43 +36,6 @@ public class ForgeRegistry {
         return CONTROLLER_BLOCK_REGISTRY.values().stream().toList();
     }
 
-    public static void readJsonAndEnqueueRegistration() {
-
-        FabricLoader.getInstance().getAllMods().forEach(modContainer -> {
-            try {
-                final var targetPath = modContainer.getRootPath().resolve(String.format("data/%s/alloy_forges", modContainer.getMetadata().getId()));
-
-                if (!Files.exists(targetPath)) return;
-                Files.walk(targetPath).forEach(path -> {
-                    tryReadFromPath(modContainer.getMetadata().getId(), path);
-                });
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        });
-
-        final var forgePath = FabricLoader.getInstance().getGameDir().resolve("alloy_forges");
-        if (!Files.exists(forgePath)) return;
-
-        try {
-            Files.walk(forgePath).forEach(path -> {
-                tryReadFromPath(AlloyForgery.MOD_ID, path);
-            });
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private static void tryReadFromPath(String namespace, Path path) {
-        if (!path.toString().endsWith(".json")) return;
-        try {
-            final InputStreamReader forgeData = new InputStreamReader(Files.newInputStream(path));
-            ForgeDefinition.loadAndEnqueue(new Identifier(namespace, FilenameUtils.removeExtension(path.getFileName().toString())), GSON.fromJson(forgeData, JsonObject.class));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
     static void registerDefinition(Identifier forgeDefinitionId, ForgeDefinition definition) {
         final var controllerBlock = new ForgeControllerBlock(definition);
         final var controllerBlockRegistryId = AlloyForgery.id(Registry.BLOCK.getId(definition.material()).getPath() + "_forge_controller");
@@ -91,6 +49,19 @@ public class ForgeRegistry {
     private static void store(Identifier id, ForgeDefinition definition, ForgeControllerBlock block) {
         FORGE_DEFINITION_REGISTRY.put(id, definition);
         CONTROLLER_BLOCK_REGISTRY.put(id, block);
+    }
+
+    public static final class Loader implements ModDataConsumer {
+
+        @Override
+        public String getDataSubdirectory() {
+            return "alloy_forges";
+        }
+
+        @Override
+        public void acceptParsedFile(Identifier id, JsonObject object) {
+            ForgeDefinition.loadAndEnqueue(id, object);
+        }
     }
 
 }

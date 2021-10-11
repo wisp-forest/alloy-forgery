@@ -16,7 +16,7 @@ public abstract class HopperBlockEntityMixin {
 
     @Inject(method = "getInputInventory", at = @At("RETURN"), cancellable = true)
     private static void injectPassthroughInventory(World world, Hopper hopper, CallbackInfoReturnable<Inventory> cir) {
-        if(cir.getReturnValue() != null) return;
+        if (cir.getReturnValue() != null) return;
 
         final var pos = new BlockPos(hopper.getHopperX(), hopper.getHopperY() + 2, hopper.getHopperZ());
         if (!(world.getBlockEntity(pos) instanceof ForgeControllerBlockEntity)) return;

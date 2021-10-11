@@ -126,10 +126,10 @@ public class AlloyForgeRecipe implements Recipe<Inventory> {
                 if (upperBound == -1) {
                     chars.add('+');
                 } else {
-                    var to = " to ".chars().mapToObj(value -> (char)value).collect(Collectors.toList());
+                    var to = " to ".chars().mapToObj(value -> (char) value).collect(Collectors.toList());
                     to.forEach(character -> chars.add(character));
 
-                    var bound = String.valueOf(upperBound).chars().mapToObj(value -> (char)value).collect(Collectors.toList());
+                    var bound = String.valueOf(upperBound).chars().mapToObj(value -> (char) value).collect(Collectors.toList());
                     bound.forEach(character -> chars.add(character));
                 }
             }

@@ -19,7 +19,7 @@ public class ForgeFuelRegistry {
         return REGISTRY.getOrDefault(item, ForgeFuelDefinition.EMPTY);
     }
 
-    public static boolean hasFuel(Item item){
+    public static boolean hasFuel(Item item) {
         return REGISTRY.containsKey(item);
     }
 
