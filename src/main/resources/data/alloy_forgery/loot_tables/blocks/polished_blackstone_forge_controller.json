@@ -1,0 +1,13 @@
+{
+  "pools": [
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "alloy_forgery:polished_blackstone_forge_controller"
+        }
+      ]
+    }
+  ]
+}

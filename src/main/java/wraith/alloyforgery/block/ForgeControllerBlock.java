@@ -2,6 +2,7 @@ package wraith.alloyforgery.block;
 
 import com.glisco.owo.particles.ClientParticles;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
+import net.fabricmc.fabric.api.tool.attribute.v1.FabricToolTags;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
@@ -39,7 +40,7 @@ public class ForgeControllerBlock extends BlockWithEntity {
     public final ForgeDefinition forgeDefinition;
 
     public ForgeControllerBlock(ForgeDefinition forgeDefinition) {
-        super(FabricBlockSettings.copyOf(Blocks.BLACKSTONE));
+        super(FabricBlockSettings.copyOf(Blocks.BLACKSTONE).breakByTool(FabricToolTags.PICKAXES));
         this.forgeDefinition = forgeDefinition;
         this.setDefaultState(this.getStateManager().getDefaultState().with(LIT, false));
     }
