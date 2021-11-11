@@ -2,10 +2,12 @@
   "required": true,
   "minVersion": "0.8",
   "package": "wraith.alloyforgery.mixin",
+  "plugin": "wraith.alloyforgery.mixin.AlloyForgeryMixinPlugin",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
     "DefaultedRegistryMixin",
     "HopperBlockEntityMixin",
+    "HopperHelperMixin",
     "RecipeManagerMixin"
   ],
   "client": [

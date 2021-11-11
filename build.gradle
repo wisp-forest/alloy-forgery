@@ -19,6 +19,14 @@ repositories {
     maven { url 'https://jitpack.io' }
 
     maven { url "https://maven.shedaniel.me/" }
+
+    maven {
+        name = "Modrinth"
+        url = "https://api.modrinth.com/maven"
+        content {
+            includeGroup "maven.modrinth"
+        }
+    }
 }
 
 dependencies {
@@ -39,6 +47,8 @@ dependencies {
     modImplementation "com.terraformersmc:modmenu:${project.modmenu_version}"
 
     modImplementation "com.github.glisco03:owo-lib:${project.owo_version}"
+
+    modCompileOnly "maven.modrinth:lithium:${project.lithium_version}"
 
     modImplementation "com.ptsmods:devlogin:1.2"
 }
