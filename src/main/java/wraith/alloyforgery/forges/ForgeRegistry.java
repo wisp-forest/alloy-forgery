@@ -1,6 +1,6 @@
 package wraith.alloyforgery.forges;
 
-import com.glisco.owo.moddata.ModDataConsumer;
+import io.wispforest.owo.moddata.ModDataConsumer;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import net.minecraft.block.Block;

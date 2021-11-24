@@ -1,7 +1,7 @@
 package wraith.alloyforgery.forges;
 
-import com.glisco.owo.registration.ComplexRegistryAction;
-import com.glisco.owo.util.ModCompatHelpers;
+import io.wispforest.owo.registration.ComplexRegistryAction;
+import io.wispforest.owo.util.ModCompatHelpers;
 import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;

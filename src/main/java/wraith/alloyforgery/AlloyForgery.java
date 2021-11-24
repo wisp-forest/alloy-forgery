@@ -1,6 +1,6 @@
 package wraith.alloyforgery;
 
-import com.glisco.owo.moddata.ModDataLoader;
+import io.wispforest.owo.moddata.ModDataLoader;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.client.itemgroup.FabricItemGroupBuilder;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;

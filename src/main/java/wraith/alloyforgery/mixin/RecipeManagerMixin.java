@@ -16,7 +16,7 @@ import java.util.Map;
 @Mixin(RecipeManager.class)
 public class RecipeManagerMixin {
 
-    @Inject(method = "apply", at = @At("HEAD"))
+    @Inject(method = "apply(Ljava/util/Map;Lnet/minecraft/resource/ResourceManager;Lnet/minecraft/util/profiler/Profiler;)V", at = @At("HEAD"))
     public void injectForgeRecipes(Map<Identifier, JsonElement> map, ResourceManager resourceManager, Profiler profiler, CallbackInfo ci) {
         for (var id : ForgeRegistry.getForgeIds()) {
             final var forgeDefinition = ForgeRegistry.getForgeDefinition(id).get();

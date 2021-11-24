@@ -1,7 +1,7 @@
 package wraith.alloyforgery.block;
 
-import com.glisco.owo.ops.ItemOps;
-import com.glisco.owo.particles.ServerParticles;
+import io.wispforest.owo.ops.ItemOps;
+import io.wispforest.owo.particles.ServerParticles;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import net.minecraft.block.BlockState;
@@ -93,12 +93,11 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
     }
 
     @Override
-    public NbtCompound writeNbt(NbtCompound nbt) {
+    public void writeNbt(NbtCompound nbt) {
         Inventories.writeNbt(nbt, ITEMS);
 
         nbt.putInt("Fuel", fuel);
         nbt.putInt("CurrentSmeltTime", currentSmeltTime);
-        return super.writeNbt(nbt);
     }
 
     @Override
