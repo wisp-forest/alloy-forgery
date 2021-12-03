@@ -2,7 +2,6 @@ package wraith.alloyforgery.block;
 
 import io.wispforest.owo.particles.ClientParticles;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
-import net.fabricmc.fabric.api.tool.attribute.v1.FabricToolTags;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
@@ -40,8 +39,7 @@ public class ForgeControllerBlock extends BlockWithEntity {
     public final ForgeDefinition forgeDefinition;
 
     public ForgeControllerBlock(ForgeDefinition forgeDefinition) {
-        // TODO: migrate to tags
-        super(FabricBlockSettings.copyOf(Blocks.BLACKSTONE).breakByTool(FabricToolTags.PICKAXES));
+        super(FabricBlockSettings.copyOf(Blocks.BLACKSTONE));
         this.forgeDefinition = forgeDefinition;
         this.setDefaultState(this.getStateManager().getDefaultState().with(LIT, false));
     }

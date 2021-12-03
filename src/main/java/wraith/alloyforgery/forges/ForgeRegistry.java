@@ -1,8 +1,9 @@
 package wraith.alloyforgery.forges;
 
-import io.wispforest.owo.moddata.ModDataConsumer;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import io.wispforest.owo.moddata.ModDataConsumer;
+import io.wispforest.owo.util.TagInjector;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.util.Identifier;
@@ -16,6 +17,7 @@ import java.util.*;
 public class ForgeRegistry {
 
     public static final Gson GSON = new Gson();
+    private static final Identifier MINEABLE_PICKAXE = new Identifier("mineable/pickaxe");
 
     private static final Map<Identifier, ForgeDefinition> FORGE_DEFINITION_REGISTRY = new HashMap<>();
     private static final Map<Identifier, Block> CONTROLLER_BLOCK_REGISTRY = new HashMap<>();
@@ -42,6 +44,8 @@ public class ForgeRegistry {
 
         Registry.register(Registry.BLOCK, controllerBlockRegistryId, controllerBlock);
         Registry.register(Registry.ITEM, controllerBlockRegistryId, new ForgeControllerItem(controllerBlock, new Item.Settings().group(AlloyForgery.ALLOY_FORGERY_GROUP)));
+
+        TagInjector.injectBlocks(MINEABLE_PICKAXE, controllerBlock);
 
         store(forgeDefinitionId, definition, controllerBlock);
     }

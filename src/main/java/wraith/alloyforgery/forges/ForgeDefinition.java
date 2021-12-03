@@ -1,11 +1,11 @@
 package wraith.alloyforgery.forges;
 
-import io.wispforest.owo.registration.ComplexRegistryAction;
-import io.wispforest.owo.util.ModCompatHelpers;
 import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import io.wispforest.owo.registration.ComplexRegistryAction;
+import io.wispforest.owo.util.ModCompatHelpers;
 import net.minecraft.block.Block;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.JsonHelper;
@@ -69,6 +69,7 @@ public record ForgeDefinition(int forgeTier,
             final var definition = new ForgeDefinition(forgeTier, speedMultiplier, fuelCapacity, mainMaterial, additionalMaterialsBuilder.build());
 
             ForgeRegistry.registerDefinition(id, definition);
+
         }).entry(mainMaterialId).entries(additionalMaterialIds).build();
 
         ModCompatHelpers.getRegistryHelper(Registry.BLOCK).runWhenPresent(action);

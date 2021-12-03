@@ -1,9 +1,9 @@
 package wraith.alloyforgery.block;
 
-import io.wispforest.owo.ops.ItemOps;
-import io.wispforest.owo.particles.ServerParticles;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import io.wispforest.owo.ops.ItemOps;
+import io.wispforest.owo.particles.ServerParticles;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
