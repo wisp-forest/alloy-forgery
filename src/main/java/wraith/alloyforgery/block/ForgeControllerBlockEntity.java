@@ -262,7 +262,7 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
             return DOWN_SLOTS;
         } else if (side == facing.rotateYClockwise()) {
             return LEFT_SLOTS;
-        } else if (side == facing.rotateYCounterclockwise()) {
+        } else if (side == facing.rotateYCounterclockwise() && this.currentSmeltTime == 0) {
             return RIGHT_SLOTS;
         } else {
             return new int[0];

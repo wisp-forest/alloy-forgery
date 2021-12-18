@@ -7,6 +7,7 @@
   "mixins": [
     "DefaultedRegistryMixin",
     "HopperBlockEntityMixin",
+    "HopperHelperMixin",
     "RecipeManagerMixin"
   ],
   "client": [
