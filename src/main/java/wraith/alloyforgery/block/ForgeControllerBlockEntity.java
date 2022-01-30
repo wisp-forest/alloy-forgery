@@ -3,7 +3,6 @@ package wraith.alloyforgery.block;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import io.wispforest.owo.ops.ItemOps;
-import io.wispforest.owo.particles.ServerParticles;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
@@ -17,7 +16,6 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.screen.PropertyDelegate;
 import net.minecraft.screen.ScreenHandler;
-import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.collection.DefaultedList;
@@ -193,7 +191,7 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
                 this.fuel -= fuelRequirement;
 
                 if (world.random.nextDouble() > 0.75) {
-                    ServerParticles.issueEvent((ServerWorld) world, Vec3d.of(pos), AlloyForgery.id("smelting_particles"), buf -> buf.writeEnumConstant(facing));
+                    AlloyForgery.FORGE_PARTICLES.spawn(world, Vec3d.of(pos), facing);
                 }
 
             } else {
