@@ -1,0 +1,19 @@
+{
+  "block.alloy_forgery.bricks_forge_controller": "砖块合金锻造炉控制器",
+  "block.alloy_forgery.stone_bricks_forge_controller": "石砖合金锻造炉控制器",
+  "block.alloy_forgery.deepslate_bricks_forge_controller": "深板岩合金锻造炉控制器",
+  "block.alloy_forgery.end_stone_bricks_forge_controller": "末地石合金锻造炉控制器",
+  "block.alloy_forgery.polished_blackstone_forge_controller": "磨制黑石合金锻造炉控制器",
+
+  "tooltip.alloy_forgery.forge_tier": "等级: %d",
+  "tooltip.alloy_forgery.fuel_capacity": "燃料容量: %d",
+
+  "container.alloy_forgery.forge_controller": "合金锻造",
+
+  "container.alloy_forgery.rei.title": "合金锻造",
+  "container.alloy_forgery.rei.min_tier": "需要等级: %d",
+  "container.alloy_forgery.rei.fuel_per_tick": "燃料每Tick消耗量: %d",
+
+  "message.alloy_forgery.invalid_multiblock": "无效的多方块配置",
+  "itemGroup.alloy_forgery.alloy_forgery": "合金锻造"
+}
