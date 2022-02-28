@@ -26,6 +26,8 @@ repositories {
             includeGroup "maven.modrinth"
         }
     }
+
+    mavenLocal()
 }
 
 dependencies {
@@ -37,17 +39,19 @@ dependencies {
     // Fabric API. This is technically optional, but you probably want it anyway.
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
-    modCompileOnly "me.shedaniel:RoughlyEnoughItems-api-fabric:${project.rei_version}"
-    modRuntime "me.shedaniel:RoughlyEnoughItems-fabric:${project.rei_version}"
+//    modCompileOnly "me.shedaniel:RoughlyEnoughItems-api-fabric:${project.rei_version}"
+//    modRuntime "me.shedaniel:RoughlyEnoughItems-fabric:${project.rei_version}"
 
-    modImplementation "com.terraformersmc:modmenu:${project.modmenu_version}"
+//    modImplementation "com.terraformersmc:modmenu:${project.modmenu_version}"
 
     modImplementation "io.wispforest:owo-lib:${project.owo_version}"
     include "io.wispforest:owo-sentinel:${project.owo_version}"
 
-    modCompileOnly "maven.modrinth:lithium:${project.lithium_version}"
+//    modCompileOnly "maven.modrinth:lithium:${project.lithium_version}" {
+//        exclude group: 'net.fabricmc.fabric-api'
+//    }
 
-    modImplementation 'com.ptsmods:devlogin:1.2.1'
+//    modImplementation 'com.ptsmods:devlogin:1.2.1'
 }
 
 loom {
