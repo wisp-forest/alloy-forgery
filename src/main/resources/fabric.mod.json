@@ -37,7 +37,10 @@
     "fabricloader": ">=0.10",
     "fabric": "*",
     "minecraft": ">=1.18",
-    "owo": ">=0.3.8"
+    "owo": ">=0.5.4"
+  },
+  "suggests": {
+    "roughlyenoughitems": ">=8.0.0"
   },
   "custom": {
     "modmenu": {

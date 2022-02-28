@@ -24,18 +24,24 @@ public class AlloyForgeScreen extends HandledScreen<AlloyForgeScreenHandler> {
     protected void drawBackground(MatrixStack matrices, float delta, int mouseX, int mouseY) {
         renderBackground(matrices);
         RenderSystem.setShaderTexture(0, TEXTURE);
-        int x = (width - backgroundWidth) / 2;
-        int y = (height - backgroundHeight) / 2;
-        drawTexture(matrices, x, y, 0, 0, backgroundWidth, backgroundHeight);
+        drawTexture(matrices, this.x, this.y, 0, 0, backgroundWidth, backgroundHeight);
 
-        drawTexture(matrices, x + 147, y + 8, 176, 0, 15, handler.getSmeltProgress());
-        drawTexture(matrices, x + 5, y + 54 - handler.getFuelProgress(), 176, 68 - handler.getFuelProgress(), 22, handler.getFuelProgress());
+        drawTexture(matrices, this.x + 147, this.y + 8, 176, 0, 15, handler.getSmeltProgress());
+        drawTexture(matrices, this.x + 5, this.y + 54 - handler.getFuelProgress(), 176, 68 - handler.getFuelProgress(), 22, handler.getFuelProgress());
 
         for (int i = 2; i < 12; i++) {
             final var slot = handler.slots.get(i);
             if (!slot.hasStack()) continue;
-            drawTexture(matrices, x + slot.x - 1, y + slot.y - 1, 208, 0, 18, 18);
+            drawTexture(matrices, this.x + slot.x - 1, this.y + slot.y - 1, 208, 0, 18, 18);
         }
+    }
+
+    public int rootX() {
+        return this.x;
+    }
+
+    public int rootY() {
+        return this.y;
     }
 
     @Override
