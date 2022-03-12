@@ -42,16 +42,14 @@ dependencies {
     modCompileOnly "me.shedaniel:RoughlyEnoughItems-api-fabric:${project.rei_version}"
     modLocalRuntime "me.shedaniel:RoughlyEnoughItems-fabric:${project.rei_version}"
 
-//    modImplementation "com.terraformersmc:modmenu:${project.modmenu_version}"
+    modImplementation "com.terraformersmc:modmenu:${project.modmenu_version}"
 
     modImplementation "io.wispforest:owo-lib:${project.owo_version}"
     include "io.wispforest:owo-sentinel:${project.owo_version}"
 
-//    modCompileOnly ("maven.modrinth:lithium:${project.lithium_version}") {
-//        exclude group: 'net.fabricmc.fabric-api'
-//    }
+    modCompileOnly ("maven.modrinth:lithium:${project.lithium_version}")
 
-//    modImplementation 'com.ptsmods:devlogin:1.2.1'
+    modImplementation 'com.ptsmods:devlogin:1.2.1'
 }
 
 loom {
