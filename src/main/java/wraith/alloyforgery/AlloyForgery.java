@@ -8,6 +8,7 @@ import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.client.itemgroup.FabricItemGroupBuilder;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.fabricmc.fabric.api.screenhandler.v1.ScreenHandlerRegistry;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
@@ -19,7 +20,6 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.registry.Registry;
-import net.minecraft.util.registry.RegistryKey;
 import wraith.alloyforgery.block.ForgeControllerBlockEntity;
 import wraith.alloyforgery.forges.ForgeRegistry;
 import wraith.alloyforgery.forges.FuelDataLoader;
@@ -43,6 +43,7 @@ public class AlloyForgery implements ModInitializer {
     });
 
     @Override
+    @SuppressWarnings("UnstableApiUsage")
     public void onInitialize() {
         ALLOY_FORGERY_GROUP = FabricItemGroupBuilder.create(id("alloy_forgery")).icon(() -> new ItemStack(Items.BRICKS)).build();
         ALLOY_FORGE_SCREEN_HANDLER_TYPE = ScreenHandlerRegistry.registerSimple(id("alloy_forge"), AlloyForgeScreenHandler::new);
@@ -53,6 +54,7 @@ public class AlloyForgery implements ModInitializer {
         FORGE_CONTROLLER_BLOCK_ENTITY = ForgeControllerBlockEntity.Type.INSTANCE;
 
         Registry.register(Registry.BLOCK_ENTITY_TYPE, id("forge_controller"), FORGE_CONTROLLER_BLOCK_ENTITY);
+        FluidStorage.SIDED.registerSelf(FORGE_CONTROLLER_BLOCK_ENTITY);
 
         Registry.register(Registry.RECIPE_TYPE, AlloyForgeRecipe.Type.ID, AlloyForgeRecipe.Type.INSTANCE);
         Registry.register(Registry.RECIPE_SERIALIZER, AlloyForgeRecipe.Type.ID, AlloyForgeRecipeSerializer.INSTANCE);

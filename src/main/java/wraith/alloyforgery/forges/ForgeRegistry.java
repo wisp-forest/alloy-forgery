@@ -22,6 +22,9 @@ public class ForgeRegistry {
     private static final Map<Identifier, ForgeDefinition> FORGE_DEFINITION_REGISTRY = new HashMap<>();
     private static final Map<Identifier, Block> CONTROLLER_BLOCK_REGISTRY = new HashMap<>();
 
+    private static final Set<Block> CONTROLLER_BLOCKS = new HashSet<>();
+    private static final Set<Block> CONTROLLER_BLOCKS_VIEW = Collections.unmodifiableSet(CONTROLLER_BLOCKS);
+
     public static Optional<ForgeDefinition> getForgeDefinition(Identifier id) {
         return FORGE_DEFINITION_REGISTRY.containsKey(id) ? Optional.of(FORGE_DEFINITION_REGISTRY.get(id)) : Optional.empty();
     }
@@ -36,6 +39,10 @@ public class ForgeRegistry {
 
     public static List<Block> getControllerBlocks() {
         return CONTROLLER_BLOCK_REGISTRY.values().stream().toList();
+    }
+
+    public static Set<Block> controllerBlocksView() {
+        return CONTROLLER_BLOCKS_VIEW;
     }
 
     static void registerDefinition(Identifier forgeDefinitionId, ForgeDefinition definition) {
@@ -53,6 +60,7 @@ public class ForgeRegistry {
     private static void store(Identifier id, ForgeDefinition definition, ForgeControllerBlock block) {
         FORGE_DEFINITION_REGISTRY.put(id, definition);
         CONTROLLER_BLOCK_REGISTRY.put(id, block);
+        CONTROLLER_BLOCKS.add(block);
     }
 
     public static final class Loader implements ModDataConsumer {

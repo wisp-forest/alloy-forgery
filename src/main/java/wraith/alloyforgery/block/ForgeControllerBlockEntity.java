@@ -1,14 +1,20 @@
 package wraith.alloyforgery.block;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
 import io.wispforest.owo.ops.ItemOps;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
+import net.fabricmc.fabric.api.transfer.v1.storage.StorageView;
+import net.fabricmc.fabric.api.transfer.v1.storage.base.InsertionOnlyStorage;
+import net.fabricmc.fabric.api.transfer.v1.storage.base.SingleVariantStorage;
+import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.fluid.Fluids;
 import net.minecraft.inventory.Inventories;
 import net.minecraft.inventory.SidedInventory;
 import net.minecraft.item.ItemStack;
@@ -22,42 +28,43 @@ import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import wraith.alloyforgery.AlloyForgeScreenHandler;
 import wraith.alloyforgery.AlloyForgery;
 import wraith.alloyforgery.forges.ForgeDefinition;
 import wraith.alloyforgery.forges.ForgeFuelRegistry;
+import wraith.alloyforgery.forges.ForgeRegistry;
 import wraith.alloyforgery.recipe.AlloyForgeRecipe;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
-public class ForgeControllerBlockEntity extends BlockEntity implements ImplementedInventory, SidedInventory, NamedScreenHandlerFactory {
+@SuppressWarnings("UnstableApiUsage")
+public class ForgeControllerBlockEntity extends BlockEntity implements ImplementedInventory, SidedInventory, NamedScreenHandlerFactory, InsertionOnlyStorage<FluidVariant> {
 
     private static final int[] DOWN_SLOTS = new int[]{10, 11};
     private static final int[] RIGHT_SLOTS = new int[]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
     private static final int[] LEFT_SLOTS = new int[]{11};
 
-    private final DefaultedList<ItemStack> ITEMS = DefaultedList.ofSize(12, ItemStack.EMPTY);
+    private final DefaultedList<ItemStack> items = DefaultedList.ofSize(12, ItemStack.EMPTY);
+    private final FluidHolder fluidHolder = new FluidHolder();
 
     private final ForgeDefinition forgeDefinition;
     private final ImmutableList<BlockPos> multiblockPositions;
-    private final BlockPos passthroughPos;
     private final Direction facing;
-
-    private int smeltProgress;
-    private int fuelProgress;
 
     private int fuel;
     private int currentSmeltTime;
+
+    private int smeltProgress;
+    private int fuelProgress;
 
     public ForgeControllerBlockEntity(BlockPos pos, BlockState state) {
         super(AlloyForgery.FORGE_CONTROLLER_BLOCK_ENTITY, pos, state);
         forgeDefinition = ((ForgeControllerBlock) state.getBlock()).forgeDefinition;
         facing = state.get(ForgeControllerBlock.FACING);
 
-        passthroughPos = pos.down();
         multiblockPositions = generateMultiblockPositions(pos.toImmutable(), state.get(ForgeControllerBlock.FACING));
     }
 
@@ -84,23 +91,32 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
 
     @Override
     public void readNbt(NbtCompound nbt) {
-        Inventories.readNbt(nbt, ITEMS);
+        Inventories.readNbt(nbt, items);
 
         this.currentSmeltTime = nbt.getInt("CurrentSmeltTime");
         this.fuel = nbt.getInt("Fuel");
+
+        final var fluidNbt = nbt.getCompound("FuelFluidInput");
+        this.fluidHolder.amount = fluidNbt.getLong("Amount");
+        this.fluidHolder.variant = FluidVariant.fromNbt(nbt.getCompound("Variant"));
     }
 
     @Override
     public void writeNbt(NbtCompound nbt) {
-        Inventories.writeNbt(nbt, ITEMS);
+        Inventories.writeNbt(nbt, items);
 
         nbt.putInt("Fuel", fuel);
         nbt.putInt("CurrentSmeltTime", currentSmeltTime);
+
+        final var fluidNbt = new NbtCompound();
+        fluidNbt.putLong("Amount", this.fluidHolder.amount);
+        fluidNbt.put("Variant", this.fluidHolder.variant.toNbt());
+        nbt.put("FuelFluidInput", fluidNbt);
     }
 
     @Override
     public DefaultedList<ItemStack> getItems() {
-        return ITEMS;
+        return items;
     }
 
     public ItemStack getFuelStack() {
@@ -153,6 +169,14 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
             }
         }
 
+        if (this.fluidHolder.amount >= 81) {
+            final long fuelInsertAmount = Math.min((this.fluidHolder.amount / 81) * 24,
+                    ((this.forgeDefinition.fuelCapacity() - this.fuel) / 24) * 24);
+
+            this.fuel += fuelInsertAmount;
+            this.fluidHolder.amount -= (fuelInsertAmount / 24) * 81;
+        }
+
         final var currentBlockState = this.world.getBlockState(pos);
         if (this.fuel > 100 && !currentBlockState.get(ForgeControllerBlock.LIT)) {
             this.world.setBlockState(pos, currentBlockState.with(ForgeControllerBlock.LIT, true));
@@ -197,7 +221,7 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
             } else {
 
                 for (int i = 0; i < 10; i++) {
-                    if (!ItemOps.emptyAwareDecrement(this.ITEMS.get(i))) this.ITEMS.set(i, ItemStack.EMPTY);
+                    if (!ItemOps.emptyAwareDecrement(this.items.get(i))) this.items.set(i, ItemStack.EMPTY);
                 }
 
                 if (outputStack.isEmpty()) {
@@ -213,6 +237,7 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
 
     }
 
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public boolean verifyMultiblock() {
 
         final BlockState belowController = world.getBlockState(multiblockPositions.get(0));
@@ -288,21 +313,49 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
         return new AlloyForgeScreenHandler(syncId, inv, this, PROPERTIES);
     }
 
-    public static void ticker(World world, BlockPos blockPos, BlockState state, ForgeControllerBlockEntity controller) {
-        controller.tick();
+    @Override
+    public long insert(FluidVariant resource, long maxAmount, TransactionContext transaction) {
+        return this.fluidHolder.insert(resource, maxAmount, transaction);
+    }
+
+    @Override
+    public Iterator<StorageView<FluidVariant>> iterator(TransactionContext transaction) {
+        return this.fluidHolder.iterator(transaction);
+    }
+
+    private class FluidHolder extends SingleVariantStorage<FluidVariant> implements InsertionOnlyStorage<FluidVariant> {
+        @Override
+        protected FluidVariant getBlankVariant() {
+            return FluidVariant.blank();
+        }
+
+        @Override
+        protected long getCapacity(FluidVariant variant) {
+            return FluidConstants.BUCKET;
+        }
+
+        @Override
+        protected void onFinalCommit() {
+            ForgeControllerBlockEntity.this.markDirty();
+        }
+
+        @Override
+        protected boolean canInsert(FluidVariant variant) {
+            return variant.isOf(Fluids.LAVA);
+        }
+
+        @Override
+        protected boolean canExtract(FluidVariant variant) {
+            return false;
+        }
     }
 
     public static class Type extends BlockEntityType<ForgeControllerBlockEntity> {
 
         public static Type INSTANCE = new Type();
 
-        public Type() {
-            super(ForgeControllerBlockEntity::new, ImmutableSet.of(), null);
-        }
-
-        @Override
-        public boolean supports(BlockState state) {
-            return state.getBlock() instanceof ForgeControllerBlock;
+        private Type() {
+            super(ForgeControllerBlockEntity::new, ForgeRegistry.controllerBlocksView(), null);
         }
     }
 }
