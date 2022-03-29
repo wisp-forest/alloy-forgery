@@ -14,7 +14,9 @@ import java.util.Map;
 
 public class FuelDataLoader extends JsonDataLoader implements IdentifiableResourceReloadListener {
 
-    public FuelDataLoader() {
+    public static final FuelDataLoader INSTANCE = new FuelDataLoader();
+
+    private FuelDataLoader() {
         super(new Gson(), "alloy_forge_fuels");
     }
 

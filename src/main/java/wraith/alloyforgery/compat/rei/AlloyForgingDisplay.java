@@ -22,7 +22,6 @@ public class AlloyForgingDisplay implements Display {
     public final Map<AlloyForgeRecipe.OverrideRange, ItemStack> overrides;
 
     public AlloyForgingDisplay(AlloyForgeRecipe recipe) {
-
         this.inputs = recipe.getIngredients().stream().map(EntryIngredients::ofIngredient).toList();
         this.output = EntryIngredients.of(recipe.getOutput());
 
@@ -30,10 +29,6 @@ public class AlloyForgingDisplay implements Display {
         this.requiredFuel = recipe.getFuelPerTick();
 
         this.overrides = recipe.getTierOverrides();
-    }
-
-    public Map<AlloyForgeRecipe.OverrideRange, ItemStack> getOverrides() {
-        return overrides;
     }
 
     @Override

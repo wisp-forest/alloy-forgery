@@ -107,7 +107,7 @@ public class AlloyForgeRecipe implements Recipe<Inventory> {
         return tierOverrides;
     }
 
-    public static record OverrideRange(int lowerBound, int upperBound) {
+    public record OverrideRange(int lowerBound, int upperBound) {
 
         public OverrideRange(int lowerBound) {
             this(lowerBound, -1);

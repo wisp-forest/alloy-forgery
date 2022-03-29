@@ -10,7 +10,6 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.particle.ParticleTypes;
-import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.state.property.DirectionProperty;
@@ -45,42 +44,25 @@ public class ForgeControllerBlock extends BlockWithEntity {
     }
 
     @Override
-    public BlockRenderType getRenderType(BlockState state) {
-        return BlockRenderType.MODEL;
-    }
-
-    @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
-        builder.add(LIT, FACING);
-    }
-
-    @Nullable
-    @Override
-    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
-        return world.isClient ? null : checkType(type, AlloyForgery.FORGE_CONTROLLER_BLOCK_ENTITY, (world1, pos, state1, blockEntity) -> blockEntity.tick());
-    }
-
-    @Override
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
         if (!world.isClient) {
             final var playerStack = player.getStackInHand(hand);
 
             final var fuelDefinition = ForgeFuelRegistry.getFuelForItem(playerStack.getItem());
-            final var controller = (ForgeControllerBlockEntity) world.getBlockEntity(pos);
+            if (!(world.getBlockEntity(pos) instanceof ForgeControllerBlockEntity controller)) return ActionResult.PASS;
 
             if (fuelDefinition.hasReturnType() && controller.canAddFuel(fuelDefinition.fuel())) {
-                if (!player.getAbilities().creativeMode)
+                if (!player.getAbilities().creativeMode) {
                     player.setStackInHand(hand, new ItemStack(fuelDefinition.returnType()));
+                }
                 controller.addFuel(fuelDefinition.fuel());
             } else {
-
                 if (!controller.verifyMultiblock()) {
                     player.sendMessage(new TranslatableText("message.alloy_forgery.invalid_multiblock").formatted(Formatting.GRAY), true);
                     return ActionResult.SUCCESS;
                 }
 
-                NamedScreenHandlerFactory screenHandlerFactory = state.createScreenHandlerFactory(world, pos);
-
+                final var screenHandlerFactory = state.createScreenHandlerFactory(world, pos);
                 if (screenHandlerFactory != null) {
                     player.openHandledScreen(screenHandlerFactory);
                 }
@@ -91,18 +73,13 @@ public class ForgeControllerBlock extends BlockWithEntity {
         return ActionResult.SUCCESS;
     }
 
-    @Nullable
-    @Override
-    public BlockState getPlacementState(ItemPlacementContext ctx) {
-        return getDefaultState().with(FACING, ctx.getPlayerFacing().getOpposite());
-    }
-
     @Override
     public void onStateReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean moved) {
         if (state.getBlock() != newState.getBlock()) {
-            final var forgeController = (ForgeControllerBlockEntity) world.getBlockEntity(pos);
-            ItemScatterer.spawn(world, pos, forgeController);
-            ItemScatterer.spawn(world, pos.getX(), pos.getY(), pos.getZ(), forgeController.getFuelStack());
+            if (world.getBlockEntity(pos) instanceof ForgeControllerBlockEntity forgeController) {
+                ItemScatterer.spawn(world, pos, forgeController);
+                ItemScatterer.spawn(world, pos.getX(), pos.getY(), pos.getZ(), forgeController.getFuelStack());
+            }
             super.onStateReplaced(state, world, pos, newState, moved);
         }
     }
@@ -129,8 +106,30 @@ public class ForgeControllerBlock extends BlockWithEntity {
     }
 
     @Override
+    public BlockRenderType getRenderType(BlockState state) {
+        return BlockRenderType.MODEL;
+    }
+
+    @Override
+    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+        builder.add(LIT, FACING);
+    }
+
+    @Nullable
+    @Override
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
+        return world.isClient ? null : checkType(type, AlloyForgery.FORGE_CONTROLLER_BLOCK_ENTITY, (world1, pos, state1, blockEntity) -> blockEntity.tick());
+    }
+
+    @Nullable
+    @Override
+    public BlockState getPlacementState(ItemPlacementContext ctx) {
+        return getDefaultState().with(FACING, ctx.getPlayerFacing().getOpposite());
+    }
+
+    @Override
     public int getComparatorOutput(BlockState state, World world, BlockPos pos) {
-        final var controller = (ForgeControllerBlockEntity) world.getBlockEntity(pos);
+        if (!(world.getBlockEntity(pos) instanceof ForgeControllerBlockEntity controller)) return 0;
         return controller.getCurrentSmeltTime() == 0 ? 0 : Math.max(1, Math.round(controller.getSmeltProgress() * 0.46875f));
     }
 

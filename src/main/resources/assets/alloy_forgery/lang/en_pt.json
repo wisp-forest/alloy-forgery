@@ -4,6 +4,7 @@
   "block.alloy_forgery.deepslate_bricks_forge_controller": "Metal Forgery o' Bricks o' tough rock",
   "block.alloy_forgery.end_stone_bricks_forge_controller": "Metal Forgery o' Foreign Stone Bricks",
   "block.alloy_forgery.polished_blackstone_forge_controller": "Metal Forgery o' Good lookin' Bricks o' Rock o' Black",
+  "block.alloy_forgery.prismarine_bricks_forge_controller": "Metal Forgery o' Bricks o' Prismarine",
 
   "tooltip.alloy_forgery.forge_tier": "Level: %d",
   "tooltip.alloy_forgery.fuel_capacity": "Fuel Barrel: %d",

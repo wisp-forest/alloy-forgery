@@ -2,6 +2,7 @@ package wraith.alloyforgery.block;
 
 import com.google.common.collect.ImmutableList;
 import io.wispforest.owo.ops.ItemOps;
+import io.wispforest.owo.util.ImplementedInventory;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.StorageView;
@@ -47,7 +48,8 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
     private static final int[] RIGHT_SLOTS = new int[]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
     private static final int[] LEFT_SLOTS = new int[]{11};
 
-    private final DefaultedList<ItemStack> items = DefaultedList.ofSize(12, ItemStack.EMPTY);
+    public static final int INVENTORY_SIZE = 12;
+    private final DefaultedList<ItemStack> items = DefaultedList.ofSize(INVENTORY_SIZE, ItemStack.EMPTY);
     private final FluidHolder fluidHolder = new FluidHolder();
 
     private final ForgeDefinition forgeDefinition;
@@ -59,6 +61,7 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
 
     private int smeltProgress;
     private int fuelProgress;
+    private int lavaProgress;
 
     public ForgeControllerBlockEntity(BlockPos pos, BlockState state) {
         super(AlloyForgery.FORGE_CONTROLLER_BLOCK_ENTITY, pos, state);
@@ -68,24 +71,22 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
         multiblockPositions = generateMultiblockPositions(pos.toImmutable(), state.get(ForgeControllerBlock.FACING));
     }
 
-    private final PropertyDelegate PROPERTIES = new PropertyDelegate() {
+    private final PropertyDelegate properties = new PropertyDelegate() {
         @Override
         public int get(int index) {
-            return index == 0 ? smeltProgress : fuelProgress;
+            return switch (index) {
+                case 0 -> smeltProgress;
+                case 1 -> fuelProgress;
+                default -> lavaProgress;
+            };
         }
 
         @Override
-        public void set(int index, int value) {
-            if (index == 0) {
-                smeltProgress = value;
-            } else {
-                fuelProgress = value;
-            }
-        }
+        public void set(int index, int value) {}
 
         @Override
         public int size() {
-            return 2;
+            return 3;
         }
     };
 
@@ -142,8 +143,9 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
     public void tick() {
         this.smeltProgress = Math.round((this.currentSmeltTime / (float) forgeDefinition.maxSmeltTime()) * 19);
         this.fuelProgress = Math.round((this.fuel / (float) forgeDefinition.fuelCapacity()) * 48);
+        this.lavaProgress = Math.round((this.fluidHolder.getAmount() / (float) FluidConstants.BUCKET) * 50);
 
-        world.updateComparators(pos, Blocks.AIR);
+        world.updateComparators(pos, getCachedState().getBlock());
 
         if (!verifyMultiblock()) {
             this.currentSmeltTime = 0;
@@ -239,7 +241,6 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
 
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public boolean verifyMultiblock() {
-
         final BlockState belowController = world.getBlockState(multiblockPositions.get(0));
         if (!(belowController.isOf(Blocks.HOPPER) || forgeDefinition.isBlockValid(belowController.getBlock())))
             return false;
@@ -252,9 +253,7 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
     }
 
     public static ImmutableList<BlockPos> generateMultiblockPositions(BlockPos controllerPos, Direction controllerFacing) {
-
         final List<BlockPos> posses = new ArrayList<>();
-
         final BlockPos center = controllerPos.offset(controllerFacing.getOpposite());
 
         for (BlockPos pos : BlockPos.iterate(center.add(1, -1, 1), center.add(-1, -1, -1))) {
@@ -265,7 +264,6 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
         posses.add(0, controllerPos.down());
 
         for (int i = 0; i < 2; i++) {
-
             final var newCenter = center.add(0, i, 0);
 
             posses.add(newCenter.east());
@@ -275,7 +273,6 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
         }
 
         posses.remove(controllerPos);
-
         return ImmutableList.copyOf(posses);
     }
 
@@ -310,7 +307,7 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
     @Nullable
     @Override
     public ScreenHandler createMenu(int syncId, PlayerInventory inv, PlayerEntity player) {
-        return new AlloyForgeScreenHandler(syncId, inv, this, PROPERTIES);
+        return new AlloyForgeScreenHandler(syncId, inv, this, properties);
     }
 
     @Override
