@@ -23,7 +23,7 @@ public class AlloyForgeryItemGroup extends OwoItemGroup {
 
     @Override
     public ItemStack createIcon() {
-        return this.controllerCache.isEmpty() ? Items.BRICKS.getDefaultStack() : this.controllerCache.get(0);
+        return this.controllerCache != null && this.controllerCache.isEmpty() ? Items.BRICKS.getDefaultStack() : this.controllerCache.get(0);
     }
 
     @Override
