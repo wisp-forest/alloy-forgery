@@ -50,7 +50,7 @@ public class AlloyForgingCategory implements DisplayCategory<AlloyForgingDisplay
 
         widgets.add(Widgets.createRecipeBase(bounds));
 
-        widgets.add(Widgets.createTexturedWidget(GUI_TEXTURE, origin.x + 10, origin.y + 18, 42, 5, 124, 58));
+        widgets.add(Widgets.createTexturedWidget(GUI_TEXTURE, origin.x + 10, origin.y + 18, 42, 21, 124, 58));
         widgets.add(Widgets.createTexturedWidget(GUI_TEXTURE, origin.x + 115, origin.y + 21, 176, 0, 15, 19));
 
         for (int i = 0; i < display.getInputEntries().size(); i++) {

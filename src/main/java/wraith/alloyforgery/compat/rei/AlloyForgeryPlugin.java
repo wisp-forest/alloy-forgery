@@ -24,7 +24,7 @@ public class AlloyForgeryPlugin implements REIClientPlugin {
     @Override
     public void registerScreens(ScreenRegistry registry) {
         registry.registerClickArea(screen -> {
-            return new Rectangle(screen.rootX() + 142, screen.rootY() + 4, 21, 24);
+            return new Rectangle(screen.rootX() + 142, screen.rootY() + 20, 21, 24);
         }, AlloyForgeScreen.class, AlloyForgingCategory.ID);
     }
 
