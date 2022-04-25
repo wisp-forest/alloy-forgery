@@ -98,7 +98,7 @@ public class ForgeControllerBlockEntity extends BlockEntity implements UnifiedIn
     @Override
     public void readNbt(NbtCompound nbt) {
         Inventories.readNbt(nbt, items);
-        unifiedItems = this.readUnifiedInv(nbt);
+        this.readUnifiedInv(nbt);
 
         this.currentSmeltTime = nbt.getInt("CurrentSmeltTime");
         this.fuel = nbt.getInt("Fuel");

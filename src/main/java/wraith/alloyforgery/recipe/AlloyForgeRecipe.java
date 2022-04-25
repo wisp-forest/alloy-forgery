@@ -114,15 +114,12 @@ public class AlloyForgeRecipe implements Recipe<Inventory> {
         UnifiedInventory unifiedInventory = (UnifiedInventory)inventory;
 
         for(Map.Entry<Item, Integer> invEntry : unifiedInventory.getUnifiedInventory().entrySet()){
-
             for(Map.Entry<Ingredient, Integer> inputEntry : inputs.entrySet()){
-
                 if(inputEntry.getKey().test(invEntry.getKey().getDefaultStack())){
                     unifiedInventory.removeItems(invEntry.getKey(), inputEntry.getValue());
                 }
             }
         }
-
     }
 
     @Override

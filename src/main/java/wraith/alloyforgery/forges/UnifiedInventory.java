@@ -141,7 +141,7 @@ public interface UnifiedInventory extends ImplementedInventory {
         setUnifiedInv(unifiedInv);
     }
 
-    default Map<Item, Integer> readUnifiedInv(NbtCompound nbt){
+    default void readUnifiedInv(NbtCompound nbt){
         Map<Item, Integer> inv = new HashMap<>();
 
         for(NbtElement nbtEntry : nbt.getList(UNIFIED_INV_KEY, NbtElement.COMPOUND_TYPE)){
@@ -151,7 +151,7 @@ public interface UnifiedInventory extends ImplementedInventory {
             inv.put(item, count);
         }
 
-        return inv;
+        setUnifiedInv(inv);
     }
 
     default void writeUnifiedInv(NbtCompound nbt, List<ItemStack> items){
