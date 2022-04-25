@@ -29,7 +29,7 @@ public interface UnifiedInventory extends ImplementedInventory {
         if(slot <= 9)
             this.removeItem(this.getStack(slot).getItem(), count);
 
-        return ImplementedInventory.super.removeStack(slot);
+        return ImplementedInventory.super.removeStack(slot, count);
     }
 
     @Override
