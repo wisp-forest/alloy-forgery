@@ -2,21 +2,28 @@ package wraith.alloyforgery.recipe;
 
 import com.google.common.collect.ImmutableMap;
 import net.minecraft.inventory.Inventory;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.*;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.world.World;
 import wraith.alloyforgery.AlloyForgery;
+import wraith.alloyforgery.forges.UnifiedInventory;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class AlloyForgeRecipe implements Recipe<Inventory> {
 
     private final Identifier id;
 
-    private final List<Ingredient> inputs;
+    private final Map<Ingredient, Integer> inputs;
+    private final int ingredientCount;
+
     private final ItemStack output;
 
     private final int minForgeTier;
@@ -24,7 +31,7 @@ public class AlloyForgeRecipe implements Recipe<Inventory> {
 
     private final ImmutableMap<OverrideRange, ItemStack> tierOverrides;
 
-    public AlloyForgeRecipe(Identifier id, List<Ingredient> inputs, ItemStack output, int minForgeTier, int fuelPerTick, ImmutableMap<OverrideRange, ItemStack> overrides) {
+    public AlloyForgeRecipe(Identifier id, Map<Ingredient, Integer> inputs, ItemStack output, int minForgeTier, int fuelPerTick, ImmutableMap<OverrideRange, ItemStack> overrides) {
         this.id = id;
         this.inputs = inputs;
         this.output = output;
@@ -32,6 +39,14 @@ public class AlloyForgeRecipe implements Recipe<Inventory> {
         this.fuelPerTick = fuelPerTick;
 
         this.tierOverrides = overrides;
+
+        int maxIngredientRequired = 0;
+
+        for(Integer count : inputs.values()){
+            maxIngredientRequired += count;
+        }
+
+        this.ingredientCount = maxIngredientRequired;
     }
 
     @Override
@@ -41,28 +56,73 @@ public class AlloyForgeRecipe implements Recipe<Inventory> {
 
     @Override
     public boolean matches(Inventory inventory, World world) {
-        RecipeMatcher recipeMatcher = new RecipeMatcher();
-        int nonEmptyStacks = 0;
+        int matchedIngredients = 0;
 
-        for (int j = 0; j < inventory.size() - 2; ++j) {
-            ItemStack itemStack = inventory.getStack(j);
-            if (!itemStack.isEmpty()) {
-                ++nonEmptyStacks;
-                recipeMatcher.addInput(itemStack, 1);
+        UnifiedInventory unifiedInventory = (UnifiedInventory)inventory;
+
+        if(unifiedInventory.getUnifiedInventory().size() != inputs.size())
+            return false;
+
+        List<Map.Entry<Ingredient, Integer>> localInputs = new ArrayList<>(inputs.entrySet());
+
+        for(Map.Entry<Item, Integer> invEntry : unifiedInventory.getUnifiedInventory().entrySet()){
+            boolean isValidIngredient = false;
+
+            for(int i = 0; i < localInputs.size(); i++){
+                Map.Entry<Ingredient, Integer> inputEntry = localInputs.get(i);
+
+                if(inputEntry.getKey().test(invEntry.getKey().getDefaultStack()) && (invEntry.getValue() - inputEntry.getValue() >= 0)){
+                    isValidIngredient = true;
+
+                    matchedIngredients++;
+
+                    localInputs.remove(i);
+                }
+            }
+
+            if(!isValidIngredient){
+                return false;
             }
         }
 
-        return nonEmptyStacks == this.inputs.size() && recipeMatcher.match(this, null);
+        return matchedIngredients == inputs.size();
     }
 
     @Override
     public DefaultedList<Ingredient> getIngredients() {
-        return DefaultedList.copyOf(Ingredient.EMPTY, inputs.toArray(new Ingredient[0]));
+        List<Ingredient> allIngredients = new ArrayList<>();
+
+        for(Map.Entry<Ingredient, Integer> entry : inputs.entrySet()){
+            for(int i = 0; i < entry.getValue(); i++){
+                allIngredients.add(entry.getKey());
+            }
+        }
+
+        return DefaultedList.copyOf(Ingredient.EMPTY, allIngredients.toArray(new Ingredient[0]));
+    }
+
+    public Map<Ingredient, Integer> getIngredientsMap(){
+        return inputs;
     }
 
     @Override
     public ItemStack craft(Inventory inventory) {
         return ItemStack.EMPTY;
+    }
+
+    public void consumeNeededIngredients(Inventory inventory){
+        UnifiedInventory unifiedInventory = (UnifiedInventory)inventory;
+
+        for(Map.Entry<Item, Integer> invEntry : unifiedInventory.getUnifiedInventory().entrySet()){
+
+            for(Map.Entry<Ingredient, Integer> inputEntry : inputs.entrySet()){
+
+                if(inputEntry.getKey().test(invEntry.getKey().getDefaultStack())){
+                    unifiedInventory.removeItems(invEntry.getKey(), inputEntry.getValue());
+                }
+            }
+        }
+
     }
 
     @Override

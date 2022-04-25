@@ -17,9 +17,13 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.inventory.Inventories;
+import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SidedInventory;
+import net.minecraft.inventory.SimpleInventory;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.recipe.Ingredient;
 import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.screen.PropertyDelegate;
 import net.minecraft.screen.ScreenHandler;
@@ -35,14 +39,13 @@ import wraith.alloyforgery.AlloyForgery;
 import wraith.alloyforgery.forges.ForgeDefinition;
 import wraith.alloyforgery.forges.ForgeFuelRegistry;
 import wraith.alloyforgery.forges.ForgeRegistry;
+import wraith.alloyforgery.forges.UnifiedInventory;
 import wraith.alloyforgery.recipe.AlloyForgeRecipe;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 @SuppressWarnings("UnstableApiUsage")
-public class ForgeControllerBlockEntity extends BlockEntity implements ImplementedInventory, SidedInventory, NamedScreenHandlerFactory, InsertionOnlyStorage<FluidVariant> {
+public class ForgeControllerBlockEntity extends BlockEntity implements UnifiedInventory, SidedInventory, NamedScreenHandlerFactory, InsertionOnlyStorage<FluidVariant> {
 
     private static final int[] DOWN_SLOTS = new int[]{10, 11};
     private static final int[] RIGHT_SLOTS = new int[]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
@@ -50,6 +53,8 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
 
     public static final int INVENTORY_SIZE = 12;
     private final DefaultedList<ItemStack> items = DefaultedList.ofSize(INVENTORY_SIZE, ItemStack.EMPTY);
+    private Map<Item, Integer> unifiedItems = new HashMap<>();
+
     private final FluidHolder fluidHolder = new FluidHolder();
 
     private final ForgeDefinition forgeDefinition;
@@ -93,6 +98,7 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
     @Override
     public void readNbt(NbtCompound nbt) {
         Inventories.readNbt(nbt, items);
+        unifiedItems = this.readUnifiedInv(nbt);
 
         this.currentSmeltTime = nbt.getInt("CurrentSmeltTime");
         this.fuel = nbt.getInt("Fuel");
@@ -105,6 +111,7 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
     @Override
     public void writeNbt(NbtCompound nbt) {
         Inventories.writeNbt(nbt, items);
+        this.writeUnifiedInv(nbt, items);
 
         nbt.putInt("Fuel", fuel);
         nbt.putInt("CurrentSmeltTime", currentSmeltTime);
@@ -118,6 +125,22 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
     @Override
     public DefaultedList<ItemStack> getItems() {
         return items;
+    }
+
+    @Override
+    public Map<Item, Integer> getUnifiedInventory() {
+        return unifiedItems;
+    }
+
+    @Override
+    public void setUnifiedInv(Map<Item, Integer> inv) {
+        this.unifiedItems = inv;
+    }
+
+    @Override
+    public void markDirty() {
+        UnifiedInventory.super.markDirty();
+        super.markDirty();
     }
 
     public ItemStack getFuelStack() {
@@ -222,6 +245,79 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
 
             } else {
 
+                recipe.consumeNeededIngredients(this);
+
+                if (outputStack.isEmpty()) {
+                    this.setStack(10, recipeOutput);
+                } else {
+                    outputStack.increment(recipeOutput.getCount());
+                }
+
+                this.currentSmeltTime = 0;
+                markDirty();
+            }
+        }
+
+    }
+
+
+
+    public void attemptRecipeCode(){
+        final var recipeOptional = world.getRecipeManager().getFirstMatch(AlloyForgeRecipe.Type.INSTANCE, this, world);
+
+        if (recipeOptional.isEmpty()) {
+            List<ItemStack> stacks = new ArrayList<>();
+
+            for(ItemStack stack : this.getItems()){
+                if(stack != ItemStack.EMPTY){
+                    stacks.add(stack);
+                }
+            }
+
+            for(int recipeSize = stacks.size() - 1; recipeSize > 0; recipeSize--){
+//                for(int ){
+//                    Inventory inv = new SimpleInventory(stacks.subList());
+//                }
+
+
+            }
+
+        }
+
+        if (recipeOptional.isEmpty()) {
+            this.currentSmeltTime = 0;
+        } else {
+            final var recipe = recipeOptional.get();
+            if (recipe.getMinForgeTier() > forgeDefinition.forgeTier()) {
+                this.currentSmeltTime = 0;
+                return;
+            }
+
+            final var outputStack = this.getStack(10);
+            final var recipeOutput = recipe.getOutput(forgeDefinition.forgeTier());
+
+            if (!outputStack.isEmpty() && (!ItemOps.canStack(outputStack, recipeOutput) || outputStack.getCount() + recipeOutput.getCount() > outputStack.getMaxCount())) {
+                this.currentSmeltTime = 0;
+                return;
+            }
+
+            if (this.currentSmeltTime < forgeDefinition.maxSmeltTime()) {
+
+                final float fuelRequirement = recipe.getFuelPerTick() * forgeDefinition.speedMultiplier();
+                if (this.fuel - fuelRequirement < 0) {
+                    this.currentSmeltTime = 0;
+                    return;
+                }
+
+                this.currentSmeltTime += forgeDefinition.speedMultiplier();
+                this.fuel -= fuelRequirement;
+
+                if (world.random.nextDouble() > 0.75) {
+                    AlloyForgery.FORGE_PARTICLES.spawn(world, Vec3d.of(pos), facing);
+                }
+
+            } else {
+
                 for (int i = 0; i < 10; i++) {
                     if (!ItemOps.emptyAwareDecrement(this.items.get(i))) this.items.set(i, ItemStack.EMPTY);
                 }
@@ -236,7 +332,6 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
                 markDirty();
             }
         }
-
     }
 
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
@@ -319,6 +414,8 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
     public Iterator<StorageView<FluidVariant>> iterator(TransactionContext transaction) {
         return this.fluidHolder.iterator(transaction);
     }
+
+
 
     private class FluidHolder extends SingleVariantStorage<FluidVariant> implements InsertionOnlyStorage<FluidVariant> {
         @Override
