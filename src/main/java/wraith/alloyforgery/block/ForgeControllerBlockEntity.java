@@ -209,7 +209,7 @@ public class ForgeControllerBlockEntity extends BlockEntity implements UnifiedIn
             this.world.setBlockState(pos, currentBlockState.with(ForgeControllerBlock.LIT, false));
         }
 
-        if(this.isUnifiedInvEmpty()){
+        if(!this.isUnifiedInvEmpty()){
             final var recipeOptional = world.getRecipeManager().getFirstMatch(AlloyForgeRecipe.Type.INSTANCE, this, world);
 
             if (recipeOptional.isEmpty()) {
@@ -258,80 +258,8 @@ public class ForgeControllerBlockEntity extends BlockEntity implements UnifiedIn
                     markDirty();
                 }
             }
-        }
-    }
-
-
-
-    public void attemptRecipeCode(){
-        final var recipeOptional = world.getRecipeManager().getFirstMatch(AlloyForgeRecipe.Type.INSTANCE, this, world);
-
-        if (recipeOptional.isEmpty()) {
-            List<ItemStack> stacks = new ArrayList<>();
-
-            for(ItemStack stack : this.getItems()){
-                if(stack != ItemStack.EMPTY){
-                    stacks.add(stack);
-                }
-            }
-
-            for(int recipeSize = stacks.size() - 1; recipeSize > 0; recipeSize--){
-//                for(int ){
-//                    Inventory inv = new SimpleInventory(stacks.subList());
-//                }
-
-
-            }
-
-        }
-
-        if (recipeOptional.isEmpty()) {
+        }else{
             this.currentSmeltTime = 0;
-        } else {
-            final var recipe = recipeOptional.get();
-            if (recipe.getMinForgeTier() > forgeDefinition.forgeTier()) {
-                this.currentSmeltTime = 0;
-                return;
-            }
-
-            final var outputStack = this.getStack(10);
-            final var recipeOutput = recipe.getOutput(forgeDefinition.forgeTier());
-
-            if (!outputStack.isEmpty() && (!ItemOps.canStack(outputStack, recipeOutput) || outputStack.getCount() + recipeOutput.getCount() > outputStack.getMaxCount())) {
-                this.currentSmeltTime = 0;
-                return;
-            }
-
-            if (this.currentSmeltTime < forgeDefinition.maxSmeltTime()) {
-
-                final float fuelRequirement = recipe.getFuelPerTick() * forgeDefinition.speedMultiplier();
-                if (this.fuel - fuelRequirement < 0) {
-                    this.currentSmeltTime = 0;
-                    return;
-                }
-
-                this.currentSmeltTime += forgeDefinition.speedMultiplier();
-                this.fuel -= fuelRequirement;
-
-                if (world.random.nextDouble() > 0.75) {
-                    AlloyForgery.FORGE_PARTICLES.spawn(world, Vec3d.of(pos), facing);
-                }
-
-            } else {
-
-                for (int i = 0; i < 10; i++) {
-                    if (!ItemOps.emptyAwareDecrement(this.items.get(i))) this.items.set(i, ItemStack.EMPTY);
-                }
-
-                if (outputStack.isEmpty()) {
-                    this.setStack(10, recipeOutput);
-                } else {
-                    outputStack.increment(recipeOutput.getCount());
-                }
-
-                this.currentSmeltTime = 0;
-                markDirty();
-            }
         }
     }
 

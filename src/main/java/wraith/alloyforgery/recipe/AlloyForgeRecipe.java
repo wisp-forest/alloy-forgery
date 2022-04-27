@@ -11,10 +11,7 @@ import net.minecraft.world.World;
 import wraith.alloyforgery.AlloyForgery;
 import wraith.alloyforgery.forges.UnifiedInventory;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class AlloyForgeRecipe implements Recipe<Inventory> {
@@ -110,7 +107,7 @@ public class AlloyForgeRecipe implements Recipe<Inventory> {
     public void consumeNeededIngredients(Inventory inventory){
         UnifiedInventory unifiedInventory = (UnifiedInventory)inventory;
 
-        for(Map.Entry<Item, Integer> invEntry : unifiedInventory.getUnifiedInventory().entrySet()){
+        for(Map.Entry<Item, Integer> invEntry : new HashSet<>(unifiedInventory.getUnifiedInventory().entrySet())){
             for(Map.Entry<Ingredient, Integer> inputEntry : inputs.entrySet()){
                 if(inputEntry.getKey().test(invEntry.getKey().getDefaultStack())){
                     unifiedInventory.removeItems(invEntry.getKey(), inputEntry.getValue());
