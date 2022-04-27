@@ -209,55 +209,56 @@ public class ForgeControllerBlockEntity extends BlockEntity implements UnifiedIn
             this.world.setBlockState(pos, currentBlockState.with(ForgeControllerBlock.LIT, false));
         }
 
-        final var recipeOptional = world.getRecipeManager().getFirstMatch(AlloyForgeRecipe.Type.INSTANCE, this, world);
+        if(this.isUnifiedInvEmpty()){
+            final var recipeOptional = world.getRecipeManager().getFirstMatch(AlloyForgeRecipe.Type.INSTANCE, this, world);
 
-        if (recipeOptional.isEmpty()) {
-            this.currentSmeltTime = 0;
-        } else {
-            final var recipe = recipeOptional.get();
-            if (recipe.getMinForgeTier() > forgeDefinition.forgeTier()) {
+            if (recipeOptional.isEmpty()) {
                 this.currentSmeltTime = 0;
-                return;
-            }
-
-            final var outputStack = this.getStack(10);
-            final var recipeOutput = recipe.getOutput(forgeDefinition.forgeTier());
-
-            if (!outputStack.isEmpty() && (!ItemOps.canStack(outputStack, recipeOutput) || outputStack.getCount() + recipeOutput.getCount() > outputStack.getMaxCount())) {
-                this.currentSmeltTime = 0;
-                return;
-            }
-
-            if (this.currentSmeltTime < forgeDefinition.maxSmeltTime()) {
-
-                final float fuelRequirement = recipe.getFuelPerTick() * forgeDefinition.speedMultiplier();
-                if (this.fuel - fuelRequirement < 0) {
+            } else {
+                final var recipe = recipeOptional.get();
+                if (recipe.getMinForgeTier() > forgeDefinition.forgeTier()) {
                     this.currentSmeltTime = 0;
                     return;
                 }
 
-                this.currentSmeltTime += forgeDefinition.speedMultiplier();
-                this.fuel -= fuelRequirement;
+                final var outputStack = this.getStack(10);
+                final var recipeOutput = recipe.getOutput(forgeDefinition.forgeTier());
 
-                if (world.random.nextDouble() > 0.75) {
-                    AlloyForgery.FORGE_PARTICLES.spawn(world, Vec3d.of(pos), facing);
+                if (!outputStack.isEmpty() && (!ItemOps.canStack(outputStack, recipeOutput) || outputStack.getCount() + recipeOutput.getCount() > outputStack.getMaxCount())) {
+                    this.currentSmeltTime = 0;
+                    return;
                 }
 
-            } else {
+                if (this.currentSmeltTime < forgeDefinition.maxSmeltTime()) {
 
-                recipe.consumeNeededIngredients(this);
+                    final float fuelRequirement = recipe.getFuelPerTick() * forgeDefinition.speedMultiplier();
+                    if (this.fuel - fuelRequirement < 0) {
+                        this.currentSmeltTime = 0;
+                        return;
+                    }
 
-                if (outputStack.isEmpty()) {
-                    this.setStack(10, recipeOutput);
+                    this.currentSmeltTime += forgeDefinition.speedMultiplier();
+                    this.fuel -= fuelRequirement;
+
+                    if (world.random.nextDouble() > 0.75) {
+                        AlloyForgery.FORGE_PARTICLES.spawn(world, Vec3d.of(pos), facing);
+                    }
+
                 } else {
-                    outputStack.increment(recipeOutput.getCount());
-                }
 
-                this.currentSmeltTime = 0;
-                markDirty();
+                    recipe.consumeNeededIngredients(this);
+
+                    if (outputStack.isEmpty()) {
+                        this.setStack(10, recipeOutput);
+                    } else {
+                        outputStack.increment(recipeOutput.getCount());
+                    }
+
+                    this.currentSmeltTime = 0;
+                    markDirty();
+                }
             }
         }
-
     }
 
 

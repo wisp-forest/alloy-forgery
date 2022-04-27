@@ -22,7 +22,6 @@ public class AlloyForgeRecipe implements Recipe<Inventory> {
     private final Identifier id;
 
     private final Map<Ingredient, Integer> inputs;
-    private final int ingredientCount;
 
     private final ItemStack output;
 
@@ -39,14 +38,6 @@ public class AlloyForgeRecipe implements Recipe<Inventory> {
         this.fuelPerTick = fuelPerTick;
 
         this.tierOverrides = overrides;
-
-        int maxIngredientRequired = 0;
-
-        for(Integer count : inputs.values()){
-            maxIngredientRequired += count;
-        }
-
-        this.ingredientCount = maxIngredientRequired;
     }
 
     @Override
@@ -57,9 +48,9 @@ public class AlloyForgeRecipe implements Recipe<Inventory> {
     @Override
     public boolean matches(Inventory inventory, World world) {
         int matchedIngredients = 0;
-
         UnifiedInventory unifiedInventory = (UnifiedInventory)inventory;
 
+        //Confirm that the there is enough items for this recipe to even work
         if(unifiedInventory.getUnifiedInventory().size() != inputs.size())
             return false;
 
@@ -71,12 +62,15 @@ public class AlloyForgeRecipe implements Recipe<Inventory> {
             for(int i = 0; i < localInputs.size(); i++){
                 Map.Entry<Ingredient, Integer> inputEntry = localInputs.get(i);
 
-                if(inputEntry.getKey().test(invEntry.getKey().getDefaultStack()) && (invEntry.getValue() - inputEntry.getValue() >= 0)){
+                //First test if we have enough Items based on the Ingredients needed amount for the recipe and then test if the item is am ingredient
+                if((invEntry.getValue() - inputEntry.getValue() >= 0) && inputEntry.getKey().test(invEntry.getKey().getDefaultStack())){
                     isValidIngredient = true;
 
                     matchedIngredients++;
 
                     localInputs.remove(i);
+
+                    break;
                 }
             }
 
@@ -110,6 +104,9 @@ public class AlloyForgeRecipe implements Recipe<Inventory> {
         return ItemStack.EMPTY;
     }
 
+    /**
+     * Method to reduce the Items within the Unified Inventory based of the recipe ingredient requirements
+     */
     public void consumeNeededIngredients(Inventory inventory){
         UnifiedInventory unifiedInventory = (UnifiedInventory)inventory;
 
