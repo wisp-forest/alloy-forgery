@@ -33,6 +33,13 @@ public class UnifiedInventoryView {
     public UnifiedInventoryView(Inventory inventory, int beginIndex, int endIndex){
         this.mainInventory = inventory;
 
+        if(!(beginIndex < inventory.size() && beginIndex >= 0))
+            throw new IndexOutOfBoundsException("The Beginning Index is out of Bounds for the given Inventory!");
+        else if(!(endIndex < inventory.size() && endIndex >= 0))
+            throw new IndexOutOfBoundsException("The Ending Index is out of Bounds for the given Inventory!");
+        else if(beginIndex > endIndex)
+            throw new IndexOutOfBoundsException("The beginning index must be less than the ending index!");
+
         this.beginIndex = beginIndex;
         this.endIndex = endIndex;
 
