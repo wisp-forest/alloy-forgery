@@ -4,14 +4,21 @@ import com.google.common.collect.ImmutableMap;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.recipe.*;
+import net.minecraft.recipe.Ingredient;
+import net.minecraft.recipe.Recipe;
+import net.minecraft.recipe.RecipeSerializer;
+import net.minecraft.recipe.RecipeType;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.world.World;
 import wraith.alloyforgery.AlloyForgery;
-import wraith.alloyforgery.forges.UnifiedInventory;
+import wraith.alloyforgery.block.ForgeControllerBlockEntity;
+import wraith.alloyforgery.forges.UnifiedInventoryView;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class AlloyForgeRecipe implements Recipe<Inventory> {
@@ -45,7 +52,7 @@ public class AlloyForgeRecipe implements Recipe<Inventory> {
     @Override
     public boolean matches(Inventory inventory, World world) {
         int matchedIngredients = 0;
-        UnifiedInventory unifiedInventory = (UnifiedInventory)inventory;
+        UnifiedInventoryView unifiedInventory = ((ForgeControllerBlockEntity)inventory).getInventoryViewer();
 
         //Confirm that the there is enough items for this recipe to even work
         if(unifiedInventory.getUnifiedInventory().size() != inputs.size())
@@ -105,7 +112,7 @@ public class AlloyForgeRecipe implements Recipe<Inventory> {
      * Method to reduce the Items within the Unified Inventory based of the recipe ingredient requirements
      */
     public void consumeNeededIngredients(Inventory inventory){
-        UnifiedInventory unifiedInventory = (UnifiedInventory)inventory;
+        UnifiedInventoryView unifiedInventory = ((ForgeControllerBlockEntity)inventory).getInventoryViewer();
 
         for(Map.Entry<Item, Integer> invEntry : new HashSet<>(unifiedInventory.getUnifiedInventory().entrySet())){
             for(Map.Entry<Ingredient, Integer> inputEntry : inputs.entrySet()){

@@ -17,13 +17,9 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.inventory.Inventories;
-import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SidedInventory;
-import net.minecraft.inventory.SimpleInventory;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.recipe.Ingredient;
 import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.screen.PropertyDelegate;
 import net.minecraft.screen.ScreenHandler;
@@ -39,13 +35,13 @@ import wraith.alloyforgery.AlloyForgery;
 import wraith.alloyforgery.forges.ForgeDefinition;
 import wraith.alloyforgery.forges.ForgeFuelRegistry;
 import wraith.alloyforgery.forges.ForgeRegistry;
-import wraith.alloyforgery.forges.UnifiedInventory;
+import wraith.alloyforgery.forges.UnifiedInventoryView;
 import wraith.alloyforgery.recipe.AlloyForgeRecipe;
 
 import java.util.*;
 
 @SuppressWarnings("UnstableApiUsage")
-public class ForgeControllerBlockEntity extends BlockEntity implements UnifiedInventory, SidedInventory, NamedScreenHandlerFactory, InsertionOnlyStorage<FluidVariant> {
+public class ForgeControllerBlockEntity extends BlockEntity implements ImplementedInventory, SidedInventory, NamedScreenHandlerFactory, InsertionOnlyStorage<FluidVariant> {
 
     private static final int[] DOWN_SLOTS = new int[]{10, 11};
     private static final int[] RIGHT_SLOTS = new int[]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
@@ -53,7 +49,7 @@ public class ForgeControllerBlockEntity extends BlockEntity implements UnifiedIn
 
     public static final int INVENTORY_SIZE = 12;
     private final DefaultedList<ItemStack> items = DefaultedList.ofSize(INVENTORY_SIZE, ItemStack.EMPTY);
-    private Map<Item, Integer> unifiedItems = new HashMap<>();
+    private final UnifiedInventoryView inventoryViewer;
 
     private final FluidHolder fluidHolder = new FluidHolder();
 
@@ -74,6 +70,8 @@ public class ForgeControllerBlockEntity extends BlockEntity implements UnifiedIn
         facing = state.get(ForgeControllerBlock.FACING);
 
         multiblockPositions = generateMultiblockPositions(pos.toImmutable(), state.get(ForgeControllerBlock.FACING));
+
+        inventoryViewer = new UnifiedInventoryView(this);
     }
 
     private final PropertyDelegate properties = new PropertyDelegate() {
@@ -98,7 +96,7 @@ public class ForgeControllerBlockEntity extends BlockEntity implements UnifiedIn
     @Override
     public void readNbt(NbtCompound nbt) {
         Inventories.readNbt(nbt, items);
-        this.readUnifiedInv(nbt);
+        inventoryViewer.updateUnifiedInv();
 
         this.currentSmeltTime = nbt.getInt("CurrentSmeltTime");
         this.fuel = nbt.getInt("Fuel");
@@ -111,7 +109,6 @@ public class ForgeControllerBlockEntity extends BlockEntity implements UnifiedIn
     @Override
     public void writeNbt(NbtCompound nbt) {
         Inventories.writeNbt(nbt, items);
-        this.writeUnifiedInv(nbt, items);
 
         nbt.putInt("Fuel", fuel);
         nbt.putInt("CurrentSmeltTime", currentSmeltTime);
@@ -123,24 +120,18 @@ public class ForgeControllerBlockEntity extends BlockEntity implements UnifiedIn
     }
 
     @Override
+    public void markDirty() {
+        inventoryViewer.updateUnifiedInv();
+        super.markDirty();
+    }
+
+    @Override
     public DefaultedList<ItemStack> getItems() {
         return items;
     }
 
-    @Override
-    public Map<Item, Integer> getUnifiedInventory() {
-        return unifiedItems;
-    }
-
-    @Override
-    public void setUnifiedInv(Map<Item, Integer> inv) {
-        this.unifiedItems = inv;
-    }
-
-    @Override
-    public void markDirty() {
-        UnifiedInventory.super.markDirty();
-        super.markDirty();
+    public UnifiedInventoryView getInventoryViewer(){
+        return this.inventoryViewer;
     }
 
     public ItemStack getFuelStack() {
@@ -209,7 +200,7 @@ public class ForgeControllerBlockEntity extends BlockEntity implements UnifiedIn
             this.world.setBlockState(pos, currentBlockState.with(ForgeControllerBlock.LIT, false));
         }
 
-        if(!this.isUnifiedInvEmpty()){
+        if(!inventoryViewer.isUnifiedInvEmpty()){
             final var recipeOptional = world.getRecipeManager().getFirstMatch(AlloyForgeRecipe.Type.INSTANCE, this, world);
 
             if (recipeOptional.isEmpty()) {
@@ -255,7 +246,7 @@ public class ForgeControllerBlockEntity extends BlockEntity implements UnifiedIn
                     }
 
                     this.currentSmeltTime = 0;
-                    markDirty();
+                    inventoryViewer.updateUnifiedInv();
                 }
             }
         }else{
@@ -343,8 +334,6 @@ public class ForgeControllerBlockEntity extends BlockEntity implements UnifiedIn
     public Iterator<StorageView<FluidVariant>> iterator(TransactionContext transaction) {
         return this.fluidHolder.iterator(transaction);
     }
-
-
 
     private class FluidHolder extends SingleVariantStorage<FluidVariant> implements InsertionOnlyStorage<FluidVariant> {
         @Override
