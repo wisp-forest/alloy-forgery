@@ -26,12 +26,12 @@ public class AlloyForgeRecipeSerializer implements RecipeSerializer<AlloyForgeRe
 
         Map<JsonObject, Integer> jsonObjectIntegerMap = new HashMap<>();
 
-        for(JsonElement entry : JsonHelper.getArray(json, "inputs")){
+        for(JsonElement entry : JsonHelper.getArray(json, "inputs")) {
             JsonObject object = entry.getAsJsonObject();
 
-            if(jsonObjectIntegerMap.containsKey(object)){
+            if(jsonObjectIntegerMap.containsKey(object)) {
                 jsonObjectIntegerMap.replace(object, jsonObjectIntegerMap.get(object) + 1);
-            }else{
+            } else {
                 jsonObjectIntegerMap.put(object, 1);
             }
         }
@@ -40,7 +40,7 @@ public class AlloyForgeRecipeSerializer implements RecipeSerializer<AlloyForgeRe
 
         Map<Ingredient, Integer> ingredientIntegerMap = new HashMap<>();
 
-        for(Map.Entry<JsonObject, Integer> entry : jsonObjectIntegerMap.entrySet()){
+        for(Map.Entry<JsonObject, Integer> entry : jsonObjectIntegerMap.entrySet()) {
             ingredientIntegerMap.put(Ingredient.fromJson(entry.getKey()), entry.getValue());
         }
 

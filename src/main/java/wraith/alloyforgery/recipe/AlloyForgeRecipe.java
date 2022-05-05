@@ -52,7 +52,7 @@ public class AlloyForgeRecipe implements Recipe<Inventory> {
     @Override
     public boolean matches(Inventory inventory, World world) {
         int matchedIngredients = 0;
-        UnifiedInventoryView unifiedInventory = ((ForgeControllerBlockEntity)inventory).getInventoryViewer();
+        final var unifiedInventory = ((ForgeControllerBlockEntity)inventory).getInventoryViewer();
 
         //Confirm that the there is enough items for this recipe to even work
         if(unifiedInventory.getUnifiedInventory().size() != inputs.size())
@@ -88,7 +88,7 @@ public class AlloyForgeRecipe implements Recipe<Inventory> {
 
     @Override
     public DefaultedList<Ingredient> getIngredients() {
-        List<Ingredient> allIngredients = new ArrayList<>();
+        final var allIngredients = new ArrayList<>();
 
         for(Map.Entry<Ingredient, Integer> entry : inputs.entrySet()){
             for(int i = 0; i < entry.getValue(); i++){
@@ -112,7 +112,7 @@ public class AlloyForgeRecipe implements Recipe<Inventory> {
      * Method to reduce the Items within the Unified Inventory based of the recipe ingredient requirements
      */
     public void consumeNeededIngredients(Inventory inventory){
-        UnifiedInventoryView unifiedInventory = ((ForgeControllerBlockEntity)inventory).getInventoryViewer();
+        final var unifiedInventory = ((ForgeControllerBlockEntity)inventory).getInventoryViewer();
 
         for(Map.Entry<Item, Integer> invEntry : new HashSet<>(unifiedInventory.getUnifiedInventory().entrySet())){
             for(Map.Entry<Ingredient, Integer> inputEntry : inputs.entrySet()){

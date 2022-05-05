@@ -49,6 +49,7 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
 
     public static final int INVENTORY_SIZE = 12;
     private final DefaultedList<ItemStack> items = DefaultedList.ofSize(INVENTORY_SIZE, ItemStack.EMPTY);
+
     private final UnifiedInventoryView inventoryViewer;
 
     private final FluidHolder fluidHolder = new FluidHolder();
