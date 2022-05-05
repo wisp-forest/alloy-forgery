@@ -16,18 +16,53 @@ public class UnifiedInventoryView {
 
     private final Inventory mainInventory;
 
-    private Map<Item, Integer> unifiedInv = new HashMap<>();
+    private final int beginIndex;
+    private final int endIndex;
+
+    private final Map<Item, Integer> unifiedInv = new HashMap<>();
+
+    private boolean isDirty = false;
 
     public UnifiedInventoryView(Inventory inventory){
+        this(inventory, 0, inventory.size() - 1);
+    }
+
+    /**
+     * Note: The given begin and end Indices are just to tell the code what slots it can view from within the {@link #mainInventory}
+     */
+    public UnifiedInventoryView(Inventory inventory, int beginIndex, int endIndex){
         this.mainInventory = inventory;
 
-        updateUnifiedInv();
+        this.beginIndex = beginIndex;
+        this.endIndex = endIndex;
+
+        markDirty();
     }
 
     /**
      * @return the current Unified Inventory View of the given Inventory
      */
     public Map<Item, Integer> getUnifiedInventory(){
+        if(isDirty){
+            this.unifiedInv.clear();
+
+            for(int i = beginIndex; i <= endIndex; i++) {
+                final var stack = mainInventory.getStack(i);
+
+                if (!stack.isEmpty()) {
+                    final var item = stack.getItem();
+
+                    if (unifiedInv.containsKey(item)) {
+                        unifiedInv.replace(item, unifiedInv.get(item) + stack.getCount());
+                    } else {
+                        unifiedInv.put(item, stack.getCount());
+                    }
+                }
+            }
+
+            isDirty = false;
+        }
+
         return unifiedInv;
     }
 
@@ -50,7 +85,7 @@ public class UnifiedInventoryView {
 
                 int leftToRemove = removalAmount;
 
-                for(int i = 0; i <= 9; i++) {
+                for(int i = beginIndex; i <= endIndex; i++) {
                     ItemStack stack = mainInventory.getStack(i);
 
                     if(stack.isOf(item)) {
@@ -72,7 +107,7 @@ public class UnifiedInventoryView {
             } else {
                 getUnifiedInventory().remove(item);
 
-                for(int i = 0; i <= 9; i++) {
+                for(int i = beginIndex; i <= endIndex; i++) {
                     final var stack = mainInventory.getStack(i);
 
                     if(stack.isOf(item)) {
@@ -83,31 +118,17 @@ public class UnifiedInventoryView {
                 hasRemovedGivenCount = true;
             }
 
-            updateUnifiedInv();
+            markDirty();
         }
 
         return hasRemovedGivenCount;
     }
 
     /**
-     * Method that updates {@link #unifiedInv}. Should be called when the Inventory is changed in anyway
+     * Method used to tell the {@link #getUnifiedInventory()} that it needs to re-cache the {@link #unifiedInv} Map from the linked {@link #mainInventory}
      */
-    public void updateUnifiedInv() {
-        this.unifiedInv = new HashMap<>();
-
-        for(int i = 0; i <= 9; i++) {
-            final var stack = mainInventory.getStack(i);
-
-            if (!stack.isEmpty()) {
-                final var item = stack.getItem();
-
-                if (unifiedInv.containsKey(item)) {
-                    unifiedInv.replace(item, unifiedInv.get(item) + stack.getCount());
-                } else {
-                    unifiedInv.put(item, stack.getCount());
-                }
-            }
-        }
+    public void markDirty() {
+        this.isDirty = true;
     }
 
     /**

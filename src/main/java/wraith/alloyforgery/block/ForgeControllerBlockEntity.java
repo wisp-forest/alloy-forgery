@@ -72,7 +72,7 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
 
         multiblockPositions = generateMultiblockPositions(pos.toImmutable(), state.get(ForgeControllerBlock.FACING));
 
-        inventoryViewer = new UnifiedInventoryView(this);
+        inventoryViewer = new UnifiedInventoryView(this, 0, 9);
     }
 
     private final PropertyDelegate properties = new PropertyDelegate() {
@@ -97,7 +97,7 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
     @Override
     public void readNbt(NbtCompound nbt) {
         Inventories.readNbt(nbt, items);
-        inventoryViewer.updateUnifiedInv();
+        inventoryViewer.markDirty();
 
         this.currentSmeltTime = nbt.getInt("CurrentSmeltTime");
         this.fuel = nbt.getInt("Fuel");
@@ -122,7 +122,7 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
 
     @Override
     public void markDirty() {
-        inventoryViewer.updateUnifiedInv();
+        inventoryViewer.markDirty();
         super.markDirty();
     }
 
@@ -247,7 +247,7 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
                     }
 
                     this.currentSmeltTime = 0;
-                    inventoryViewer.updateUnifiedInv();
+                    inventoryViewer.markDirty();
                 }
             }
         }else{
