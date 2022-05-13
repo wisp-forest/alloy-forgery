@@ -1,9 +1,9 @@
 {
   "block.alloy_forgery.bricks_forge_controller": "Контроллер кузницы из кирпичей",
   "block.alloy_forgery.stone_bricks_forge_controller": "Контроллер кузницы из каменных кирпичей",
-  "block.alloy_forgery.deepslate_bricks_forge_controller": "Контроллер кузницы из глубинного сланца",
+  "block.alloy_forgery.deepslate_bricks_forge_controller": "Контроллер кузницы из глубинносланцевых кирпичей",
   "block.alloy_forgery.end_stone_bricks_forge_controller": "Контроллер кузницы из эндерняковых кирпичей",
-  "block.alloy_forgery.polished_blackstone_forge_controller": "Контроллер кузницы из полированного глубинного сланца",
+  "block.alloy_forgery.polished_blackstone_forge_controller": "Контроллер кузницы из полированного чернита",
 
   "tooltip.alloy_forgery.forge_tier": "Уровень: %d",
   "tooltip.alloy_forgery.fuel_capacity": "Запас топлива: %d",
