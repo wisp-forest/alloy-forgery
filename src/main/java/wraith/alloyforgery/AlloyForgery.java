@@ -35,8 +35,15 @@ public class AlloyForgery implements ModInitializer {
     private static final ParticleSystemController CONTROLLER = new ParticleSystemController(id("particles"));
     public static final ParticleSystem<Direction> FORGE_PARTICLES = CONTROLLER.register(Direction.class, (world, pos, facing) -> {
         final Vec3d particleSide = pos.add(0.5 + facing.getOffsetX() * 0.515, 0.25, 0.5 + facing.getOffsetZ() * 0.515);
-        ClientParticles.spawnPrecise(ParticleTypes.FLAME, world, particleSide, facing.getOffsetZ() * 0.65, 0.175, facing.getOffsetX() * 0.65);
-        ClientParticles.spawnPrecise(ParticleTypes.SMOKE, world, particleSide, facing.getOffsetZ() * 0.65, 0.175, facing.getOffsetX() * 0.65);
+        ClientParticles.spawnPrecise(ParticleTypes.FLAME, world, particleSide,
+                facing.getOffsetZ() * 0.65,
+                0.175,
+                facing.getOffsetX() * 0.65);
+
+        ClientParticles.spawnPrecise(ParticleTypes.SMOKE, world, particleSide,
+                facing.getOffsetZ() * 0.65,
+                0.175,
+                facing.getOffsetX() * 0.65);
     });
 
     @Override
