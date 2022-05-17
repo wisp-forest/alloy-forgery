@@ -35,11 +35,10 @@ import wraith.alloyforgery.AlloyForgery;
 import wraith.alloyforgery.forges.ForgeDefinition;
 import wraith.alloyforgery.forges.ForgeFuelRegistry;
 import wraith.alloyforgery.forges.ForgeRegistry;
+import wraith.alloyforgery.forges.UnifiedInventoryView;
 import wraith.alloyforgery.recipe.AlloyForgeRecipe;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 @SuppressWarnings("UnstableApiUsage")
 public class ForgeControllerBlockEntity extends BlockEntity implements ImplementedInventory, SidedInventory, NamedScreenHandlerFactory, InsertionOnlyStorage<FluidVariant> {
@@ -50,6 +49,9 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
 
     public static final int INVENTORY_SIZE = 12;
     private final DefaultedList<ItemStack> items = DefaultedList.ofSize(INVENTORY_SIZE, ItemStack.EMPTY);
+
+    private final UnifiedInventoryView inventoryViewer;
+
     private final FluidHolder fluidHolder = new FluidHolder();
 
     private final ForgeDefinition forgeDefinition;
@@ -69,6 +71,8 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
         facing = state.get(ForgeControllerBlock.FACING);
 
         multiblockPositions = generateMultiblockPositions(pos.toImmutable(), state.get(ForgeControllerBlock.FACING));
+
+        inventoryViewer = new UnifiedInventoryView(this, 0, 9);
     }
 
     private final PropertyDelegate properties = new PropertyDelegate() {
@@ -93,6 +97,7 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
     @Override
     public void readNbt(NbtCompound nbt) {
         Inventories.readNbt(nbt, items);
+        inventoryViewer.markDirty();
 
         this.currentSmeltTime = nbt.getInt("CurrentSmeltTime");
         this.fuel = nbt.getInt("Fuel");
@@ -116,8 +121,18 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
     }
 
     @Override
+    public void markDirty() {
+        inventoryViewer.markDirty();
+        super.markDirty();
+    }
+
+    @Override
     public DefaultedList<ItemStack> getItems() {
         return items;
+    }
+
+    public UnifiedInventoryView getInventoryViewer(){
+        return this.inventoryViewer;
     }
 
     public ItemStack getFuelStack() {
@@ -186,57 +201,58 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
             this.world.setBlockState(pos, currentBlockState.with(ForgeControllerBlock.LIT, false));
         }
 
-        final var recipeOptional = world.getRecipeManager().getFirstMatch(AlloyForgeRecipe.Type.INSTANCE, this, world);
+        if(!inventoryViewer.isUnifiedInvEmpty()){
+            final var recipeOptional = world.getRecipeManager().getFirstMatch(AlloyForgeRecipe.Type.INSTANCE, this, world);
 
-        if (recipeOptional.isEmpty()) {
-            this.currentSmeltTime = 0;
-        } else {
-            final var recipe = recipeOptional.get();
-            if (recipe.getMinForgeTier() > forgeDefinition.forgeTier()) {
+            if (recipeOptional.isEmpty()) {
                 this.currentSmeltTime = 0;
-                return;
-            }
-
-            final var outputStack = this.getStack(10);
-            final var recipeOutput = recipe.getOutput(forgeDefinition.forgeTier());
-
-            if (!outputStack.isEmpty() && (!ItemOps.canStack(outputStack, recipeOutput) || outputStack.getCount() + recipeOutput.getCount() > outputStack.getMaxCount())) {
-                this.currentSmeltTime = 0;
-                return;
-            }
-
-            if (this.currentSmeltTime < forgeDefinition.maxSmeltTime()) {
-
-                final float fuelRequirement = recipe.getFuelPerTick() * forgeDefinition.speedMultiplier();
-                if (this.fuel - fuelRequirement < 0) {
+            } else {
+                final var recipe = recipeOptional.get();
+                if (recipe.getMinForgeTier() > forgeDefinition.forgeTier()) {
                     this.currentSmeltTime = 0;
                     return;
                 }
 
-                this.currentSmeltTime += forgeDefinition.speedMultiplier();
-                this.fuel -= fuelRequirement;
+                final var outputStack = this.getStack(10);
+                final var recipeOutput = recipe.getOutput(forgeDefinition.forgeTier());
 
-                if (world.random.nextDouble() > 0.75) {
-                    AlloyForgery.FORGE_PARTICLES.spawn(world, Vec3d.of(pos), facing);
+                if (!outputStack.isEmpty() && (!ItemOps.canStack(outputStack, recipeOutput) || outputStack.getCount() + recipeOutput.getCount() > outputStack.getMaxCount())) {
+                    this.currentSmeltTime = 0;
+                    return;
                 }
 
-            } else {
+                if (this.currentSmeltTime < forgeDefinition.maxSmeltTime()) {
 
-                for (int i = 0; i < 10; i++) {
-                    if (!ItemOps.emptyAwareDecrement(this.items.get(i))) this.items.set(i, ItemStack.EMPTY);
-                }
+                    final float fuelRequirement = recipe.getFuelPerTick() * forgeDefinition.speedMultiplier();
+                    if (this.fuel - fuelRequirement < 0) {
+                        this.currentSmeltTime = 0;
+                        return;
+                    }
 
-                if (outputStack.isEmpty()) {
-                    this.setStack(10, recipeOutput);
+                    this.currentSmeltTime += forgeDefinition.speedMultiplier();
+                    this.fuel -= fuelRequirement;
+
+                    if (world.random.nextDouble() > 0.75) {
+                        AlloyForgery.FORGE_PARTICLES.spawn(world, Vec3d.of(pos), facing);
+                    }
+
                 } else {
-                    outputStack.increment(recipeOutput.getCount());
+
+                    recipe.consumeNeededIngredients(this);
+
+                    if (outputStack.isEmpty()) {
+                        this.setStack(10, recipeOutput);
+                    } else {
+                        outputStack.increment(recipeOutput.getCount());
+                    }
+
+                    this.currentSmeltTime = 0;
+                    inventoryViewer.markDirty();
                 }
-
-                this.currentSmeltTime = 0;
-                markDirty();
             }
+        }else{
+            this.currentSmeltTime = 0;
         }
-
     }
 
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")

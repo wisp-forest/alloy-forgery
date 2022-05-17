@@ -1,6 +1,8 @@
 package wraith.alloyforgery.recipe;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 import net.minecraft.item.ItemStack;
@@ -11,6 +13,9 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.JsonHelper;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
 
 public class AlloyForgeRecipeSerializer implements RecipeSerializer<AlloyForgeRecipe> {
 
@@ -19,10 +24,25 @@ public class AlloyForgeRecipeSerializer implements RecipeSerializer<AlloyForgeRe
     @Override
     public AlloyForgeRecipe read(Identifier id, JsonObject json) {
 
-        final var inputs = new ArrayList<Ingredient>();
+        Map<JsonObject, Integer> jsonObjectIntegerMap = new HashMap<>();
 
-        JsonHelper.getArray(json, "inputs").forEach(jsonElement -> inputs.add(Ingredient.fromJson(jsonElement)));
-        if (inputs.isEmpty()) throw new JsonSyntaxException("Inputs cannot be empty");
+        for(JsonElement entry : JsonHelper.getArray(json, "inputs")) {
+            JsonObject object = entry.getAsJsonObject();
+
+            if(jsonObjectIntegerMap.containsKey(object)) {
+                jsonObjectIntegerMap.replace(object, jsonObjectIntegerMap.get(object) + 1);
+            } else {
+                jsonObjectIntegerMap.put(object, 1);
+            }
+        }
+
+        if (jsonObjectIntegerMap.isEmpty()) throw new JsonSyntaxException("Inputs cannot be empty");
+
+        Map<Ingredient, Integer> ingredientIntegerMap = new HashMap<>();
+
+        for(Map.Entry<JsonObject, Integer> entry : jsonObjectIntegerMap.entrySet()) {
+            ingredientIntegerMap.put(Ingredient.fromJson(entry.getKey()), entry.getValue());
+        }
 
         final var outputStack = getItemStack(JsonHelper.getObject(json, "output"));
 
@@ -52,7 +72,7 @@ public class AlloyForgeRecipeSerializer implements RecipeSerializer<AlloyForgeRe
             overridesBuilder.put(overrideRange, getItemStack(entry.getValue().getAsJsonObject()));
         }
 
-        return new AlloyForgeRecipe(id, inputs, outputStack, minForgeTier, requiredFuel, overridesBuilder.build());
+        return new AlloyForgeRecipe(id, ingredientIntegerMap, outputStack, minForgeTier, requiredFuel, overridesBuilder.build());
     }
 
     private ItemStack getItemStack(JsonObject json) {
@@ -65,7 +85,9 @@ public class AlloyForgeRecipeSerializer implements RecipeSerializer<AlloyForgeRe
     @Override
     public AlloyForgeRecipe read(Identifier id, PacketByteBuf buf) {
 
-        final var inputs = buf.readCollection(value -> new ArrayList<>(), Ingredient::fromPacket);
+//        final var inputs = buf.readCollection(value -> new ArrayList<>(), Ingredient::fromPacket);
+        final var inputs = buf.readMap(value -> new HashMap<Ingredient, Integer>(), Ingredient::fromPacket, PacketByteBuf::readVarInt);
+
         final var output = buf.readItemStack();
 
         final int minForgeTier = buf.readVarInt();
@@ -78,7 +100,9 @@ public class AlloyForgeRecipeSerializer implements RecipeSerializer<AlloyForgeRe
 
     @Override
     public void write(PacketByteBuf buf, AlloyForgeRecipe recipe) {
-        buf.writeCollection(recipe.getIngredients(), (buf1, ingredient) -> ingredient.write(buf1));
+        buf.writeMap(recipe.getIngredientsMap(), (buf1, ingredient) -> ingredient.write(buf1), PacketByteBuf::writeVarInt);
+
+        //buf.writeCollection(recipe.getIngredients(), (buf1, ingredient) -> ingredient.write(buf1));
         buf.writeItemStack(recipe.getOutput());
 
         buf.writeVarInt(recipe.getMinForgeTier());
