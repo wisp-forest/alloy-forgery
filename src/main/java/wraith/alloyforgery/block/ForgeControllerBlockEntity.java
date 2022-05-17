@@ -50,7 +50,7 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
     public static final int INVENTORY_SIZE = 12;
     private final DefaultedList<ItemStack> items = DefaultedList.ofSize(INVENTORY_SIZE, ItemStack.EMPTY);
 
-    private final UnifiedInventoryView inventoryViewer;
+    private final UnifiedInventoryView unifiedView;
 
     private final FluidHolder fluidHolder = new FluidHolder();
 
@@ -72,7 +72,7 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
 
         multiblockPositions = generateMultiblockPositions(pos.toImmutable(), state.get(ForgeControllerBlock.FACING));
 
-        inventoryViewer = new UnifiedInventoryView(this, 0, 9);
+        unifiedView = new UnifiedInventoryView(this, 0, 9);
     }
 
     private final PropertyDelegate properties = new PropertyDelegate() {
@@ -97,7 +97,7 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
     @Override
     public void readNbt(NbtCompound nbt) {
         Inventories.readNbt(nbt, items);
-        inventoryViewer.markDirty();
+        unifiedView.markDirty();
 
         this.currentSmeltTime = nbt.getInt("CurrentSmeltTime");
         this.fuel = nbt.getInt("Fuel");
@@ -122,7 +122,7 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
 
     @Override
     public void markDirty() {
-        inventoryViewer.markDirty();
+        unifiedView.markDirty();
         super.markDirty();
     }
 
@@ -131,8 +131,8 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
         return items;
     }
 
-    public UnifiedInventoryView getInventoryViewer(){
-        return this.inventoryViewer;
+    public UnifiedInventoryView asUnifiedView(){
+        return this.unifiedView;
     }
 
     public ItemStack getFuelStack() {
@@ -201,7 +201,7 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
             this.world.setBlockState(pos, currentBlockState.with(ForgeControllerBlock.LIT, false));
         }
 
-        if(!inventoryViewer.isUnifiedInvEmpty()){
+        if(!this.unifiedView.isUnifiedInvEmpty()){
             final var recipeOptional = world.getRecipeManager().getFirstMatch(AlloyForgeRecipe.Type.INSTANCE, this, world);
 
             if (recipeOptional.isEmpty()) {
@@ -216,7 +216,7 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
                 final var outputStack = this.getStack(10);
                 final var recipeOutput = recipe.getOutput(forgeDefinition.forgeTier());
 
-                if (!outputStack.isEmpty() && (!ItemOps.canStack(outputStack, recipeOutput) || outputStack.getCount() + recipeOutput.getCount() > outputStack.getMaxCount())) {
+                if (!outputStack.isEmpty() && !ItemOps.canStack(outputStack, recipeOutput)) {
                     this.currentSmeltTime = 0;
                     return;
                 }
@@ -235,9 +235,7 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
                     if (world.random.nextDouble() > 0.75) {
                         AlloyForgery.FORGE_PARTICLES.spawn(world, Vec3d.of(pos), facing);
                     }
-
                 } else {
-
                     recipe.consumeNeededIngredients(this);
 
                     if (outputStack.isEmpty()) {
@@ -247,7 +245,7 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
                     }
 
                     this.currentSmeltTime = 0;
-                    inventoryViewer.markDirty();
+                    this.unifiedView.markDirty();
                 }
             }
         }else{

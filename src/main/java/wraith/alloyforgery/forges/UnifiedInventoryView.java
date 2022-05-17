@@ -9,8 +9,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * A way to view an {@link Inventory} as a Slot-less representation of the base items within the said Inventory.
- * <p> This dose ignore NBT data and only the Base {@link Item} of a stack will be used to store Info</p>
+ * A way to view an {@link Inventory} as a slot-less representation of the items within the said inventory.
+ * <p>This ignores NBT data and only the base {@link Item} of a stack will be stored and compared against</p>
  */
 public class UnifiedInventoryView {
 
@@ -23,21 +23,21 @@ public class UnifiedInventoryView {
 
     private boolean isDirty = false;
 
-    public UnifiedInventoryView(Inventory inventory){
+    public UnifiedInventoryView(Inventory inventory) {
         this(inventory, 0, inventory.size() - 1);
     }
 
     /**
      * Note: The given begin and end Indices are just to tell the code what slots it can view from within the {@link #mainInventory}
      */
-    public UnifiedInventoryView(Inventory inventory, int beginIndex, int endIndex){
+    public UnifiedInventoryView(Inventory inventory, int beginIndex, int endIndex) {
         this.mainInventory = inventory;
 
-        if(!(beginIndex < inventory.size() && beginIndex >= 0))
+        if (!(beginIndex < inventory.size() && beginIndex >= 0))
             throw new IndexOutOfBoundsException("The Beginning Index is out of Bounds for the given Inventory!");
-        else if(!(endIndex < inventory.size() && endIndex >= 0))
+        else if (!(endIndex < inventory.size() && endIndex >= 0))
             throw new IndexOutOfBoundsException("The Ending Index is out of Bounds for the given Inventory!");
-        else if(beginIndex > endIndex)
+        else if (beginIndex > endIndex)
             throw new IndexOutOfBoundsException("The beginning index must be less than the ending index!");
 
         this.beginIndex = beginIndex;
@@ -49,11 +49,11 @@ public class UnifiedInventoryView {
     /**
      * @return the current Unified Inventory View of the given Inventory
      */
-    public Map<Item, Integer> getUnifiedInventory(){
-        if(isDirty){
+    public Map<Item, Integer> getUnifiedInventory() {
+        if (isDirty) {
             this.unifiedInv.clear();
 
-            for(int i = beginIndex; i <= endIndex; i++) {
+            for (int i = beginIndex; i <= endIndex; i++) {
                 final var stack = mainInventory.getStack(i);
 
                 if (!stack.isEmpty()) {
@@ -76,14 +76,15 @@ public class UnifiedInventoryView {
     /**
      * Removes the given Item with a certain amount from the given {@link #mainInventory}.
      * <p>If the given removalAmount is 0 or less, it will remove all instances of the item from the inventory</p>
-     * @param item The item to be removed
+     *
+     * @param item          The item to be removed
      * @param removalAmount The amount to be removed
      * @return If the given amount wanted to be removed was actually removed
      */
-    public boolean removeItems(Item item, int removalAmount){
+    public boolean removeItems(Item item, int removalAmount) {
         boolean hasRemovedGivenCount = false;
 
-        if(item != Items.AIR && getUnifiedInventory().containsKey(item)) {
+        if (item != Items.AIR && getUnifiedInventory().containsKey(item)) {
             final int currentItemCount = getUnifiedInventory().get(item);
             final int remainder = currentItemCount - removalAmount;
 
@@ -92,11 +93,11 @@ public class UnifiedInventoryView {
 
                 int leftToRemove = removalAmount;
 
-                for(int i = beginIndex; i <= endIndex; i++) {
+                for (int i = beginIndex; i <= endIndex; i++) {
                     ItemStack stack = mainInventory.getStack(i);
 
-                    if(stack.isOf(item)) {
-                        if(leftToRemove - stack.getCount() < 0){
+                    if (stack.isOf(item)) {
+                        if (leftToRemove - stack.getCount() < 0) {
                             stack.setCount(stack.getCount() - leftToRemove);
 
                             break;
@@ -108,16 +109,16 @@ public class UnifiedInventoryView {
                     }
                 }
 
-                if(leftToRemove < 0){
+                if (leftToRemove < 0) {
                     hasRemovedGivenCount = true;
                 }
             } else {
                 getUnifiedInventory().remove(item);
 
-                for(int i = beginIndex; i <= endIndex; i++) {
+                for (int i = beginIndex; i <= endIndex; i++) {
                     final var stack = mainInventory.getStack(i);
 
-                    if(stack.isOf(item)) {
+                    if (stack.isOf(item)) {
                         mainInventory.removeStack(i);
                     }
                 }
@@ -141,7 +142,7 @@ public class UnifiedInventoryView {
     /**
      * Checks if the {@link #unifiedInv} is empty
      */
-    public boolean isUnifiedInvEmpty(){
+    public boolean isUnifiedInvEmpty() {
         return this.getUnifiedInventory().isEmpty();
     }
 }
