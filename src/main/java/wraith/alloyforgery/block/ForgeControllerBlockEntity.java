@@ -24,7 +24,6 @@ import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.screen.PropertyDelegate;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -38,7 +37,9 @@ import wraith.alloyforgery.forges.ForgeRegistry;
 import wraith.alloyforgery.forges.UnifiedInventoryView;
 import wraith.alloyforgery.recipe.AlloyForgeRecipe;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 @SuppressWarnings("UnstableApiUsage")
 public class ForgeControllerBlockEntity extends BlockEntity implements ImplementedInventory, SidedInventory, NamedScreenHandlerFactory, InsertionOnlyStorage<FluidVariant> {
@@ -131,7 +132,7 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
         return items;
     }
 
-    public UnifiedInventoryView asUnifiedView(){
+    public UnifiedInventoryView asUnifiedView() {
         return this.unifiedView;
     }
 
@@ -201,7 +202,7 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
             this.world.setBlockState(pos, currentBlockState.with(ForgeControllerBlock.LIT, false));
         }
 
-        if(!this.unifiedView.isUnifiedInvEmpty()){
+        if (!this.unifiedView.isUnifiedInvEmpty()) {
             final var recipeOptional = world.getRecipeManager().getFirstMatch(AlloyForgeRecipe.Type.INSTANCE, this, world);
 
             if (recipeOptional.isEmpty()) {
@@ -248,7 +249,7 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
                     this.unifiedView.markDirty();
                 }
             }
-        }else{
+        } else {
             this.currentSmeltTime = 0;
         }
     }
@@ -315,7 +316,7 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
 
     @Override
     public Text getDisplayName() {
-        return new TranslatableText("container.alloy_forgery.forge_controller");
+        return Text.translatable("container.alloy_forgery.forge_controller");
     }
 
     @Nullable
@@ -330,8 +331,8 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
     }
 
     @Override
-    public Iterator<StorageView<FluidVariant>> iterator(TransactionContext transaction) {
-        return this.fluidHolder.iterator(transaction);
+    public Iterator<StorageView<FluidVariant>> iterator() {
+        return this.fluidHolder.iterator();
     }
 
     private class FluidHolder extends SingleVariantStorage<FluidVariant> implements InsertionOnlyStorage<FluidVariant> {

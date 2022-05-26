@@ -1,9 +1,10 @@
 plugins {
-    id 'fabric-loom' version '0.10-SNAPSHOT'
+    id 'fabric-loom' version '0.12-SNAPSHOT'
     id 'maven-publish'
-    id 'io.github.juuxel.loom-quiltflower-mini' version '1.2.1'
+    id 'io.github.juuxel.loom-quiltflower' version '1.7.1'
 }
 
+// TODO fix mc dep in fmj
 version = "${project.mod_version}+${project.minecraft_base_version}"
 group = project.maven_group
 
@@ -38,16 +39,17 @@ dependencies {
 
     // Fabric API. This is technically optional, but you probably want it anyway.
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+    //
 
-    modCompileOnly "me.shedaniel:RoughlyEnoughItems-api-fabric:${project.rei_version}"
-    modLocalRuntime "me.shedaniel:RoughlyEnoughItems-fabric:${project.rei_version}"
+//    modCompileOnly "me.shedaniel:RoughlyEnoughItems-api-fabric:${project.rei_version}"
+//    modLocalRuntime "me.shedaniel:RoughlyEnoughItems-fabric:${project.rei_version}"
 
     modImplementation "com.terraformersmc:modmenu:${project.modmenu_version}"
 
     modImplementation "io.wispforest:owo-lib:${project.owo_version}"
     include "io.wispforest:owo-sentinel:${project.owo_version}"
 
-    modCompileOnly ("maven.modrinth:lithium:${project.lithium_version}")
+//    modCompileOnly ("maven.modrinth:lithium:${project.lithium_version}")
 
     modImplementation 'com.ptsmods:devlogin:1.2.1'
 }

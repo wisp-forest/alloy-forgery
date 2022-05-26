@@ -14,7 +14,7 @@ import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.state.property.DirectionProperty;
 import net.minecraft.state.property.Properties;
-import net.minecraft.text.TranslatableText;
+import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Hand;
@@ -22,13 +22,12 @@ import net.minecraft.util.ItemScatterer;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import wraith.alloyforgery.AlloyForgery;
 import wraith.alloyforgery.forges.ForgeDefinition;
 import wraith.alloyforgery.forges.ForgeFuelRegistry;
-
-import java.util.Random;
 
 public class ForgeControllerBlock extends BlockWithEntity {
 
@@ -58,7 +57,7 @@ public class ForgeControllerBlock extends BlockWithEntity {
                 controller.addFuel(fuelDefinition.fuel());
             } else {
                 if (!controller.verifyMultiblock()) {
-                    player.sendMessage(new TranslatableText("message.alloy_forgery.invalid_multiblock").formatted(Formatting.GRAY), true);
+                    player.sendMessage(Text.translatable("message.alloy_forgery.invalid_multiblock").formatted(Formatting.GRAY), true);
                     return ActionResult.SUCCESS;
                 }
 
