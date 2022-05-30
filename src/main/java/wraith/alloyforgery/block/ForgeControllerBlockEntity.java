@@ -59,7 +59,7 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
     private final ImmutableList<BlockPos> multiblockPositions;
     private final Direction facing;
 
-    private int fuel;
+    private float fuel;
     private int currentSmeltTime;
 
     private int smeltProgress;
@@ -112,7 +112,7 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
     public void writeNbt(NbtCompound nbt) {
         Inventories.writeNbt(nbt, items);
 
-        nbt.putInt("Fuel", fuel);
+        nbt.putInt("Fuel", Math.round(fuel));
         nbt.putInt("CurrentSmeltTime", currentSmeltTime);
 
         final var fluidNbt = new NbtCompound();
@@ -188,8 +188,7 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
         }
 
         if (this.fluidHolder.amount >= 81) {
-            final long fuelInsertAmount = Math.min((this.fluidHolder.amount / 81) * 24,
-                    ((this.forgeDefinition.fuelCapacity() - this.fuel) / 24) * 24);
+            final float fuelInsertAmount = Math.min((this.fluidHolder.amount / 81f) * 24, ((this.forgeDefinition.fuelCapacity() - this.fuel) / 24) * 24);
 
             this.fuel += fuelInsertAmount;
             this.fluidHolder.amount -= (fuelInsertAmount / 24) * 81;
@@ -230,7 +229,7 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
                         return;
                     }
 
-                    this.currentSmeltTime += forgeDefinition.speedMultiplier();
+                    this.currentSmeltTime++;
                     this.fuel -= fuelRequirement;
 
                     if (world.random.nextDouble() > 0.75) {

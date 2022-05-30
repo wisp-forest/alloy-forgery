@@ -1,3 +1,4 @@
+//file:noinspection GradlePackageVersionRange
 plugins {
     id 'fabric-loom' version '0.12-SNAPSHOT'
     id 'maven-publish'
@@ -39,10 +40,11 @@ dependencies {
 
     // Fabric API. This is technically optional, but you probably want it anyway.
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
-    //
 
-//    modCompileOnly "me.shedaniel:RoughlyEnoughItems-api-fabric:${project.rei_version}"
-//    modLocalRuntime "me.shedaniel:RoughlyEnoughItems-fabric:${project.rei_version}"
+    modCompileOnly "me.shedaniel:RoughlyEnoughItems-api-fabric:${project.rei_version}"
+    modLocalRuntime "me.shedaniel:RoughlyEnoughItems-fabric:${project.rei_version}"
+
+    modLocalRuntime "dev.architectury:architectury-fabric:5.4.14"
 
     modImplementation "com.terraformersmc:modmenu:${project.modmenu_version}"
 

@@ -3,7 +3,7 @@
   "id": "alloy_forgery",
   "version": "${version}",
   "name": "Alloy Forgery",
-  "description": "Configurable, data-driven alloy forges for all your smelting needs",
+  "description": "Configurable, data-driven Alloy Forges for all your smelting needs",
   "authors": [
     "glisco"
   ],
@@ -27,7 +27,7 @@
     "main": [
       "wraith.alloyforgery.AlloyForgery"
     ],
-    "rei_plugins": [
+    "rei_client": [
       "wraith.alloyforgery.compat.rei.AlloyForgeryPlugin"
     ]
   },
@@ -38,7 +38,7 @@
     "fabricloader": ">=0.10",
     "fabric": "*",
     "minecraft": ">=1.19-beta.3",
-    "owo": ">=0.5.4"
+    "owo": ">=0.7.2"
   },
   "suggests": {
     "roughlyenoughitems": ">=8.0.0"
