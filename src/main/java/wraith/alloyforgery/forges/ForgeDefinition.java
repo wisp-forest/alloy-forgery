@@ -5,7 +5,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import io.wispforest.owo.registration.ComplexRegistryAction;
-import io.wispforest.owo.util.ModCompatHelpers;
+import io.wispforest.owo.registration.RegistryHelper;
 import net.minecraft.block.Block;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.JsonHelper;
@@ -72,7 +72,7 @@ public record ForgeDefinition(int forgeTier,
 
         }).entry(mainMaterialId).entries(additionalMaterialIds).build();
 
-        ModCompatHelpers.getRegistryHelper(Registry.BLOCK).runWhenPresent(action);
+        RegistryHelper.get(Registry.BLOCK).runWhenPresent(action);
     }
 
     public boolean isBlockValid(Block block) {
