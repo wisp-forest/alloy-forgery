@@ -37,7 +37,7 @@
   "depends": {
     "fabricloader": ">=0.10",
     "fabric": "*",
-    "minecraft": ">=1.19-beta.3",
+    "minecraft": ">=1.19",
     "owo": ">=0.7.2"
   },
   "suggests": {
