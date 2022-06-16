@@ -2,6 +2,7 @@ package wraith.alloyforgery.compat.rei;
 
 import me.shedaniel.math.Point;
 import me.shedaniel.math.Rectangle;
+import me.shedaniel.rei.api.client.REIRuntime;
 import me.shedaniel.rei.api.client.gui.Renderer;
 import me.shedaniel.rei.api.client.gui.widgets.Widget;
 import me.shedaniel.rei.api.client.gui.widgets.Widgets;
@@ -23,6 +24,7 @@ import java.util.List;
 public class AlloyForgingCategory implements DisplayCategory<AlloyForgingDisplay> {
 
     final Identifier GUI_TEXTURE = AlloyForgery.id("textures/gui/forge_controller.png");
+    final Identifier DARK_GUI_TEXTURE = AlloyForgery.id("textures/gui/forge_controller_dark.png");
 
     public static final CategoryIdentifier<AlloyForgingDisplay> ID = CategoryIdentifier.of(AlloyForgery.id("forging"));
 
@@ -46,16 +48,17 @@ public class AlloyForgingCategory implements DisplayCategory<AlloyForgingDisplay
         Point origin = bounds.getLocation();
 
         final var widgets = new ArrayList<Widget>();
+        final var texture = REIRuntime.getInstance().isDarkThemeEnabled() ? DARK_GUI_TEXTURE : GUI_TEXTURE;
 
         widgets.add(Widgets.createRecipeBase(bounds));
 
-        widgets.add(Widgets.createTexturedWidget(GUI_TEXTURE, origin.x + 10, origin.y + 18, 42, 21, 124, 58));
-        widgets.add(Widgets.createTexturedWidget(GUI_TEXTURE, origin.x + 115, origin.y + 21, 176, 0, 15, 19));
+        widgets.add(Widgets.createTexturedWidget(texture, origin.x + 10, origin.y + 18, 42, 21, 124, 58));
+        widgets.add(Widgets.createTexturedWidget(texture, origin.x + 115, origin.y + 21, 176, 0, 15, 19));
 
         for (int i = 0; i < display.getInputEntries().size(); i++) {
             final var slotLocation = new Point(origin.x + 12 + i % 5 * 18, origin.y + 40 + (i > 4 ? 1 : 0) * 18);
             widgets.add(Widgets.createSlot(slotLocation).entries(display.getInputEntries().get(i)).markInput().disableBackground());
-            widgets.add(Widgets.createTexturedWidget(GUI_TEXTURE, slotLocation.x - 1, slotLocation.y - 1, 208, 0, 18, 18));
+            widgets.add(Widgets.createTexturedWidget(texture, slotLocation.x - 1, slotLocation.y - 1, 208, 0, 18, 18));
         }
 
         final var resultSlot = Widgets.createSlot(new Point(origin.x + 113, origin.y + 47));
