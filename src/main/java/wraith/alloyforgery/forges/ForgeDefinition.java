@@ -6,10 +6,12 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import io.wispforest.owo.registration.ComplexRegistryAction;
 import io.wispforest.owo.registration.RegistryHelper;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage;
 import net.minecraft.block.Block;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.JsonHelper;
 import net.minecraft.util.registry.Registry;
+import wraith.alloyforgery.AlloyForgery;
 
 import java.util.ArrayList;
 
@@ -50,6 +52,7 @@ public record ForgeDefinition(int forgeTier,
         this(forgeTier, speedMultiplier, fuelCapacity, (int) (BASE_MAX_SMELT_TIME / speedMultiplier), material, additionalMaterials);
     }
 
+    @SuppressWarnings("UnstableApiUsage")
     public static void loadAndEnqueue(Identifier id, JsonObject json) {
 
         final int forgeTier = JsonHelper.getInt(json, "tier");
@@ -69,6 +72,7 @@ public record ForgeDefinition(int forgeTier,
             final var definition = new ForgeDefinition(forgeTier, speedMultiplier, fuelCapacity, mainMaterial, additionalMaterialsBuilder.build());
 
             ForgeRegistry.registerDefinition(id, definition);
+            FluidStorage.SIDED.registerSelf(AlloyForgery.FORGE_CONTROLLER_BLOCK_ENTITY);
 
         }).entry(mainMaterialId).entries(additionalMaterialIds).build();
 

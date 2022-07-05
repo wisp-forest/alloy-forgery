@@ -20,7 +20,7 @@ public class RecipeManagerMixin {
     public void injectForgeRecipes(Map<Identifier, JsonElement> map, ResourceManager resourceManager, Profiler profiler, CallbackInfo ci) {
         for (var id : ForgeRegistry.getForgeIds()) {
             final var forgeDefinition = ForgeRegistry.getForgeDefinition(id).get();
-            map.put(id, forgeDefinition.generateRecipe(id));
+            map.putIfAbsent(id, forgeDefinition.generateRecipe(id));
         }
     }
 

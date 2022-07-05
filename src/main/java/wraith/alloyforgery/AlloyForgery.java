@@ -7,8 +7,6 @@ import io.wispforest.owo.particles.systems.ParticleSystem;
 import io.wispforest.owo.particles.systems.ParticleSystemController;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
-import net.fabricmc.fabric.api.screenhandler.v1.ScreenHandlerRegistry;
-import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.resource.ResourceType;
@@ -29,7 +27,7 @@ public class AlloyForgery implements ModInitializer {
 
     public static final OwoItemGroup ALLOY_FORGERY_GROUP = new AlloyForgeryItemGroup(id("alloy_forgery"));
 
-    public static BlockEntityType<ForgeControllerBlockEntity> FORGE_CONTROLLER_BLOCK_ENTITY;
+    public static BlockEntityType<ForgeControllerBlockEntity> FORGE_CONTROLLER_BLOCK_ENTITY = ForgeControllerBlockEntity.Type.INSTANCE;
     public static ScreenHandlerType<AlloyForgeScreenHandler> ALLOY_FORGE_SCREEN_HANDLER_TYPE;
 
     private static final ParticleSystemController CONTROLLER = new ParticleSystemController(id("particles"));
@@ -47,17 +45,13 @@ public class AlloyForgery implements ModInitializer {
     });
 
     @Override
-    @SuppressWarnings("UnstableApiUsage")
     public void onInitialize() {
-        ALLOY_FORGE_SCREEN_HANDLER_TYPE = ScreenHandlerRegistry.registerSimple(id("alloy_forge"), AlloyForgeScreenHandler::new);
+        ALLOY_FORGE_SCREEN_HANDLER_TYPE = Registry.register(Registry.SCREEN_HANDLER, id("alloy_forge"), new ScreenHandlerType<>(AlloyForgeScreenHandler::new));
 
         ResourceManagerHelper.get(ResourceType.SERVER_DATA).registerReloadListener(FuelDataLoader.INSTANCE);
-
         ModDataLoader.load(ForgeRegistry.Loader.INSTANCE);
-        FORGE_CONTROLLER_BLOCK_ENTITY = ForgeControllerBlockEntity.Type.INSTANCE;
 
         Registry.register(Registry.BLOCK_ENTITY_TYPE, id("forge_controller"), FORGE_CONTROLLER_BLOCK_ENTITY);
-        FluidStorage.SIDED.registerSelf(FORGE_CONTROLLER_BLOCK_ENTITY);
 
         Registry.register(Registry.RECIPE_TYPE, AlloyForgeRecipe.Type.ID, AlloyForgeRecipe.Type.INSTANCE);
         Registry.register(Registry.RECIPE_SERIALIZER, AlloyForgeRecipe.Type.ID, AlloyForgeRecipeSerializer.INSTANCE);
