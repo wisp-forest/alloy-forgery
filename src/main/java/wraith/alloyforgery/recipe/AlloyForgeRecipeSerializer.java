@@ -1,21 +1,21 @@
 package wraith.alloyforgery.recipe;
 
 import com.google.common.collect.ImmutableMap;
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.recipe.Ingredient;
 import net.minecraft.recipe.RecipeSerializer;
+import net.minecraft.tag.TagKey;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.JsonHelper;
+import net.minecraft.util.Pair;
+import net.minecraft.util.registry.Registry;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
+import java.util.*;
 
 public class AlloyForgeRecipeSerializer implements RecipeSerializer<AlloyForgeRecipe> {
 
@@ -24,25 +24,69 @@ public class AlloyForgeRecipeSerializer implements RecipeSerializer<AlloyForgeRe
     @Override
     public AlloyForgeRecipe read(Identifier id, JsonObject json) {
 
-        Map<JsonObject, Integer> jsonObjectIntegerMap = new HashMap<>();
+        Map<Pair<String, String>, Integer> jsonObjectIntegerMap = new LinkedHashMap<>();
 
         for(JsonElement entry : JsonHelper.getArray(json, "inputs")) {
             JsonObject object = entry.getAsJsonObject();
 
-            if(jsonObjectIntegerMap.containsKey(object)) {
-                jsonObjectIntegerMap.replace(object, jsonObjectIntegerMap.get(object) + 1);
+            Pair<String, String> recipeInput;
+
+            int recipeInputCount = 1;
+
+            if(object.keySet().contains("item")){
+                recipeInput = new BetterPair<>(object.get("item").getAsString(), "item");
+            } else if(object.keySet().contains("tag")){
+                recipeInput = new BetterPair<>(object.get("tag").getAsString(), "tag");
             } else {
-                jsonObjectIntegerMap.put(object, 1);
+                throw new JsonSyntaxException("Alloy Forge Recipes only allow for item or tag inputs!");
+            }
+
+            if(object.keySet().contains("count")){
+                recipeInputCount = object.get("count").getAsInt();
+            }
+
+            if(jsonObjectIntegerMap.containsKey(recipeInput)) {
+                jsonObjectIntegerMap.replace(recipeInput, jsonObjectIntegerMap.get(recipeInput) + recipeInputCount);
+            } else {
+                jsonObjectIntegerMap.put(recipeInput, recipeInputCount);
             }
         }
 
         if (jsonObjectIntegerMap.isEmpty()) throw new JsonSyntaxException("Inputs cannot be empty");
 
-        Map<Ingredient, Integer> ingredientIntegerMap = new HashMap<>();
+        Map<Ingredient, Integer> ingredientIntegerMap = new LinkedHashMap<>();
 
-        for(Map.Entry<JsonObject, Integer> entry : jsonObjectIntegerMap.entrySet()) {
-            ingredientIntegerMap.put(Ingredient.fromJson(entry.getKey()), entry.getValue());
+        for(Map.Entry<Pair<String, String>, Integer> entry : jsonObjectIntegerMap.entrySet()) {
+            Ingredient ingredient;
+
+            Identifier identifier = Identifier.tryParse(entry.getKey().getLeft());
+
+            if(identifier == null){
+                throw new JsonSyntaxException(entry.getKey().getLeft() + " is a invalid Identifier");
+            }
+
+            if(Objects.equals(entry.getKey().getRight(), "item")){
+                Optional<Item> item = Registry.ITEM.getOrEmpty(identifier);
+
+                if(item.isPresent()) {
+                    ingredient = Ingredient.ofItems(item.get());
+                } else {
+                    throw new JsonSyntaxException("Item identifier [" + entry.getKey().getLeft() + "] could not be found within the item Registry");
+                }
+            } else {
+                ingredient = Ingredient.fromTag(TagKey.of(Registry.ITEM_KEY, identifier));
+            }
+
+            ingredientIntegerMap.put(ingredient, entry.getValue());
         }
+
+        if(ingredientIntegerMap.keySet().size() > 10)
+            throw new JsonSyntaxException("The number of Unique ingredients was higher than the max allowed which is 10");
+
+        int totalAmountOFIngredients = ingredientIntegerMap.values().stream().mapToInt(integer -> integer).sum();
+
+        if(totalAmountOFIngredients > (10 * 64))
+            throw new JsonSyntaxException("The total count of the entire recipe exceeded the max count of " + (10 * 64));
 
         final var outputStack = getItemStack(JsonHelper.getObject(json, "output"));
 
@@ -84,9 +128,7 @@ public class AlloyForgeRecipeSerializer implements RecipeSerializer<AlloyForgeRe
 
     @Override
     public AlloyForgeRecipe read(Identifier id, PacketByteBuf buf) {
-
-//        final var inputs = buf.readCollection(value -> new ArrayList<>(), Ingredient::fromPacket);
-        final var inputs = buf.readMap(value -> new HashMap<Ingredient, Integer>(), Ingredient::fromPacket, PacketByteBuf::readVarInt);
+        final var inputs = buf.readMap(value -> new LinkedHashMap<>(), Ingredient::fromPacket, PacketByteBuf::readVarInt);
 
         final var output = buf.readItemStack();
 
@@ -102,7 +144,6 @@ public class AlloyForgeRecipeSerializer implements RecipeSerializer<AlloyForgeRe
     public void write(PacketByteBuf buf, AlloyForgeRecipe recipe) {
         buf.writeMap(recipe.getIngredientsMap(), (buf1, ingredient) -> ingredient.write(buf1), PacketByteBuf::writeVarInt);
 
-        //buf.writeCollection(recipe.getIngredients(), (buf1, ingredient) -> ingredient.write(buf1));
         buf.writeItemStack(recipe.getOutput());
 
         buf.writeVarInt(recipe.getMinForgeTier());
@@ -112,5 +153,35 @@ public class AlloyForgeRecipeSerializer implements RecipeSerializer<AlloyForgeRe
             buf1.writeVarInt(overrideRange.lowerBound());
             buf1.writeVarInt(overrideRange.upperBound());
         }, PacketByteBuf::writeItemStack);
+    }
+
+    private static class BetterPair<A, B> extends Pair<A, B> {
+
+        public BetterPair(A left, B right) {
+            super(left, right);
+        }
+
+        @Override
+        public int hashCode() {
+            int hash = getLeft().hashCode();
+
+            hash = 31 * hash + getRight().hashCode();
+
+            return hash;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if(obj instanceof Pair<?, ?> pair){
+                return pair.getLeft().equals(getLeft()) && pair.getRight().equals(getRight());
+            }
+
+            return super.equals(obj);
+        }
+
+        @Override
+        public String toString() {
+            return this.getLeft().toString() + " / " + this.getRight().toString();
+        }
     }
 }
