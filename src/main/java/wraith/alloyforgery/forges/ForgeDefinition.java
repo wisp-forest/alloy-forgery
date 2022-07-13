@@ -72,8 +72,6 @@ public record ForgeDefinition(int forgeTier,
             final var definition = new ForgeDefinition(forgeTier, speedMultiplier, fuelCapacity, mainMaterial, additionalMaterialsBuilder.build());
 
             ForgeRegistry.registerDefinition(id, definition);
-            FluidStorage.SIDED.registerSelf(AlloyForgery.FORGE_CONTROLLER_BLOCK_ENTITY);
-
         }).entry(mainMaterialId).entries(additionalMaterialIds).build();
 
         RegistryHelper.get(Registry.BLOCK).runWhenPresent(action);
