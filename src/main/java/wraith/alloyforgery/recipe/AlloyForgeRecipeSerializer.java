@@ -3,6 +3,7 @@ package wraith.alloyforgery.recipe;
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSyntaxException;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -14,6 +15,7 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.JsonHelper;
 import net.minecraft.util.Pair;
 import net.minecraft.util.registry.Registry;
+import org.apache.commons.lang3.mutable.MutableInt;
 
 import java.util.*;
 
@@ -24,39 +26,30 @@ public class AlloyForgeRecipeSerializer implements RecipeSerializer<AlloyForgeRe
     @Override
     public AlloyForgeRecipe read(Identifier id, JsonObject json) {
 
-        Map<Pair<String, String>, Integer> jsonObjectIntegerMap = new LinkedHashMap<>();
+        Map<Pair<String, String>, MutableInt> ingredientDataToCount = new LinkedHashMap<>();
 
         for(JsonElement entry : JsonHelper.getArray(json, "inputs")) {
             JsonObject object = entry.getAsJsonObject();
 
             Pair<String, String> recipeInput;
 
-            int recipeInputCount = 1;
-
             if(object.keySet().contains("item")){
-                recipeInput = new BetterPair<>(object.get("item").getAsString(), "item");
+                recipeInput = new HashPair<>(object.get("item").getAsString(), "item");
             } else if(object.keySet().contains("tag")){
-                recipeInput = new BetterPair<>(object.get("tag").getAsString(), "tag");
+                recipeInput = new HashPair<>(object.get("tag").getAsString(), "tag");
             } else {
                 throw new JsonSyntaxException("Alloy Forge Recipes only allow for item or tag inputs!");
             }
 
-            if(object.keySet().contains("count")){
-                recipeInputCount = object.get("count").getAsInt();
-            }
-
-            if(jsonObjectIntegerMap.containsKey(recipeInput)) {
-                jsonObjectIntegerMap.replace(recipeInput, jsonObjectIntegerMap.get(recipeInput) + recipeInputCount);
-            } else {
-                jsonObjectIntegerMap.put(recipeInput, recipeInputCount);
-            }
+            ingredientDataToCount.putIfAbsent(recipeInput, new MutableInt(1))
+                    .add(object.keySet().contains("count") ? object.get("count").getAsInt() : 1);
         }
 
-        if (jsonObjectIntegerMap.isEmpty()) throw new JsonSyntaxException("Inputs cannot be empty");
+        if (ingredientDataToCount.isEmpty()) throw new JsonSyntaxException("Inputs cannot be empty");
 
-        Map<Ingredient, Integer> ingredientIntegerMap = new LinkedHashMap<>();
+        Map<Ingredient, Integer> ingredientToCount = new LinkedHashMap<>();
 
-        for(Map.Entry<Pair<String, String>, Integer> entry : jsonObjectIntegerMap.entrySet()) {
+        for(var entry : ingredientDataToCount.entrySet()) {
             Ingredient ingredient;
 
             Identifier identifier = Identifier.tryParse(entry.getKey().getLeft());
@@ -66,27 +59,23 @@ public class AlloyForgeRecipeSerializer implements RecipeSerializer<AlloyForgeRe
             }
 
             if(Objects.equals(entry.getKey().getRight(), "item")){
-                Optional<Item> item = Registry.ITEM.getOrEmpty(identifier);
-
-                if(item.isPresent()) {
-                    ingredient = Ingredient.ofItems(item.get());
-                } else {
-                    throw new JsonSyntaxException("Item identifier [" + entry.getKey().getLeft() + "] could not be found within the item Registry");
-                }
+                ingredient = Ingredient.ofItems(JsonHelper.asItem(new JsonPrimitive(entry.getKey().getLeft()), identifier.toString()));
             } else {
                 ingredient = Ingredient.fromTag(TagKey.of(Registry.ITEM_KEY, identifier));
             }
 
-            ingredientIntegerMap.put(ingredient, entry.getValue());
+            ingredientToCount.put(ingredient, entry.getValue().intValue());
         }
 
-        if(ingredientIntegerMap.keySet().size() > 10)
+        if(ingredientToCount.keySet().size() > 10) {
             throw new JsonSyntaxException("The number of Unique ingredients was higher than the max allowed which is 10");
+        }
 
-        int totalAmountOFIngredients = ingredientIntegerMap.values().stream().mapToInt(integer -> integer).sum();
+        final int totalAmountOFIngredients = ingredientToCount.values().stream().mapToInt(integer -> integer).sum();
 
-        if(totalAmountOFIngredients > (10 * 64))
+        if(totalAmountOFIngredients > (10 * 64)) {
             throw new JsonSyntaxException("The total count of the entire recipe exceeded the max count of " + (10 * 64));
+        }
 
         final var outputStack = getItemStack(JsonHelper.getObject(json, "output"));
 
@@ -116,7 +105,7 @@ public class AlloyForgeRecipeSerializer implements RecipeSerializer<AlloyForgeRe
             overridesBuilder.put(overrideRange, getItemStack(entry.getValue().getAsJsonObject()));
         }
 
-        return new AlloyForgeRecipe(id, ingredientIntegerMap, outputStack, minForgeTier, requiredFuel, overridesBuilder.build());
+        return new AlloyForgeRecipe(id, ingredientToCount, outputStack, minForgeTier, requiredFuel, overridesBuilder.build());
     }
 
     private ItemStack getItemStack(JsonObject json) {
@@ -155,9 +144,9 @@ public class AlloyForgeRecipeSerializer implements RecipeSerializer<AlloyForgeRe
         }, PacketByteBuf::writeItemStack);
     }
 
-    private static class BetterPair<A, B> extends Pair<A, B> {
+    private static class HashPair<A, B> extends Pair<A, B> {
 
-        public BetterPair(A left, B right) {
+        public HashPair(A left, B right) {
             super(left, right);
         }
 

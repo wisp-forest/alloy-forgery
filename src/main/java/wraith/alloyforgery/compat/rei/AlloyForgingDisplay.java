@@ -9,7 +9,6 @@ import net.minecraft.recipe.Ingredient;
 import wraith.alloyforgery.recipe.AlloyForgeRecipe;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class AlloyForgingDisplay implements Display {
 
@@ -32,7 +31,7 @@ public class AlloyForgingDisplay implements Display {
                     EntryIngredients.ofItemStacks(Arrays.stream(entry.getKey().getMatchingStacks())
                         .map(ItemStack::copy)
                         .peek(stack -> stack.setCount(stackCount))
-                        .collect(Collectors.toList())));
+                        .toList()));
 
                 i -= stackCount;
             }
