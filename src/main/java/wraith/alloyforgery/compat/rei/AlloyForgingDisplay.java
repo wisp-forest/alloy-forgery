@@ -5,11 +5,10 @@ import me.shedaniel.rei.api.common.display.Display;
 import me.shedaniel.rei.api.common.entry.EntryIngredient;
 import me.shedaniel.rei.api.common.util.EntryIngredients;
 import net.minecraft.item.ItemStack;
+import net.minecraft.recipe.Ingredient;
 import wraith.alloyforgery.recipe.AlloyForgeRecipe;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class AlloyForgingDisplay implements Display {
 
@@ -22,7 +21,23 @@ public class AlloyForgingDisplay implements Display {
     public final Map<AlloyForgeRecipe.OverrideRange, ItemStack> overrides;
 
     public AlloyForgingDisplay(AlloyForgeRecipe recipe) {
-        this.inputs = recipe.getIngredients().stream().map(EntryIngredients::ofIngredient).toList();
+        List<EntryIngredient> convertedInputs = new ArrayList<>();
+
+        for(Map.Entry<Ingredient, Integer> entry : recipe.getIngredientsMap().entrySet()){
+            for(int i = entry.getValue(); i > 0;) {
+                int stackCount = Math.min(i, 64);
+
+                convertedInputs.add(
+                    EntryIngredients.ofItemStacks(Arrays.stream(entry.getKey().getMatchingStacks())
+                        .map(ItemStack::copy)
+                        .peek(stack -> stack.setCount(stackCount))
+                        .toList()));
+
+                i -= stackCount;
+            }
+        }
+
+        this.inputs = convertedInputs;
         this.output = EntryIngredients.of(recipe.getOutput());
 
         this.minForgeTier = recipe.getMinForgeTier();
