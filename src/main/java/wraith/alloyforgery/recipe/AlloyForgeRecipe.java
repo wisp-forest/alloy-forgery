@@ -56,34 +56,35 @@ public class AlloyForgeRecipe implements Recipe<Inventory> {
         this.tierOverrides = overrides;
     }
 
-    public void finishRecipe(RecipeFinisher finisher){
-        final var itemEntryList = Registry.ITEM.getEntryList(finisher.pair.getLeft());
+    public void finishRecipe(RecipeFinisher finisher) {
+        if(finisher.pair != null) {
+            final var itemEntryList = Registry.ITEM.getEntryList(finisher.pair.getLeft());
 
-        itemEntryList.ifPresentOrElse(registryEntries -> {
-            LOGGER.info(registryEntries.toString());
+            itemEntryList.ifPresentOrElse(registryEntries -> {
+                this.output = registryEntries.get(0).value().getDefaultStack();
 
-            this.output = registryEntries.get(0).value().getDefaultStack();
+                this.output.setCount(finisher.pair.getRight());
 
-            this.output.setCount(finisher.pair.getRight());
-
-            final var mapBuilder = ImmutableMap.<OverrideRange, ItemStack>builder();
-
-            finisher.unfinishedTierOverrides.forEach((key, pair) -> {
-                if (pair.getRight() != -1) {
-                    ItemStack stack = this.output.copy();
-
-                    stack.setCount(pair.getRight());
-
-                    mapBuilder.put(key, stack);
-                } else {
-                    mapBuilder.put(key, pair.getLeft());
-                }
+            }, () -> {
+                throw new InvaildRecipeTagException("[AlloyForgeRecipe]: A Recipe with a Default tag was found to be empty and was loaded!!!!");
             });
+        }
 
-            tierOverrides = mapBuilder.build();
-        }, () -> {
-            LOGGER.error("[AlloyForgeRecipe]: A Recipe with a Default tag was found to be empty and was loaded!!!!");
+        final var mapBuilder = ImmutableMap.<OverrideRange, ItemStack>builder();
+
+        finisher.unfinishedTierOverrides.forEach((key, pair) -> {
+            if (pair.getRight() != -1) {
+                ItemStack stack = output.copy();
+
+                stack.setCount(pair.getRight());
+
+                mapBuilder.put(key, stack);
+            } else {
+                mapBuilder.put(key, pair.getLeft());
+            }
         });
+
+        tierOverrides = mapBuilder.build();
     }
 
     @Override
