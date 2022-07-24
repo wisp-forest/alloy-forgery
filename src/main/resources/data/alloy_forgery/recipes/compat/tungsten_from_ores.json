@@ -1,0 +1,36 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:item_tags_populated",
+      "values": [
+        "c:tungsten_ores",
+        "c:tungsten_ingots"
+      ]
+    }
+  ],
+  "type": "alloy_forgery:forging",
+  "inputs": [
+    {
+      "tag": "c:tungsten_ores"
+    }
+  ],
+  "output": {
+    "priority": [
+      "techreborn:tungsten_ingot",
+      "indrev:tungsten_ingot",
+      "modern_industrialization:tungsten_ingot"
+    ],
+    "default": "c:tungsten_ingots",
+    "count": 3
+  },
+  "overrides": {
+    "2": {
+      "count": 4
+    },
+    "3+": {
+      "count": 5
+    }
+  },
+  "min_forge_tier": 1,
+  "fuel_per_tick": 5
+}

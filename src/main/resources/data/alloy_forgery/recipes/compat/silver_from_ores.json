@@ -3,24 +3,25 @@
     {
       "condition": "fabric:item_tags_populated",
       "values": [
-        "c:tin_ores",
-        "c:tin_ingots"
+        "c:silver_ores",
+        "c:silver_ingots"
       ]
     }
   ],
   "type": "alloy_forgery:forging",
   "inputs": [
     {
-      "tag": "c:tin_ores"
+      "tag": "c:silver_ores"
     }
   ],
   "output": {
     "priority": [
-      "mythicmetals:tin_ingot",
-      "indrev:tin_ingot",
-      "modern_industrialization:tin_ingot"
+      "mythicmetals:silver_ingot",
+      "techreborn:silver_ingot",
+      "indrev:silver_ingot",
+      "modern_industrialization:silver_ingot"
     ],
-    "default": "c:tin_ingots",
+    "default": "c:silver_ingots",
     "count": 3
   },
   "overrides": {
