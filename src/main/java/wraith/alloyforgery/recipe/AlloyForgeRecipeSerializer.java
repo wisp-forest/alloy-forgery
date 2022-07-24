@@ -152,7 +152,7 @@ public class AlloyForgeRecipeSerializer implements RecipeSerializer<AlloyForgeRe
             ImmutableMap.Builder<AlloyForgeRecipe.OverrideRange, ItemStack> builder = ImmutableMap.builder();
 
             for(Map.Entry<AlloyForgeRecipe.OverrideRange, Pair<ItemStack, Integer>> entry : overridesBuilder.build().entrySet()){
-                ImmutableMap.builder().put(entry.getKey(), entry.getValue().getLeft());
+                builder.put(entry.getKey(), entry.getValue().getLeft());
             }
 
             recipe.setTierOverrides(builder.build());
