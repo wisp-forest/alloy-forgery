@@ -12,7 +12,7 @@ import wraith.alloyforgery.recipe.AlloyForgeRecipe;
 public class DataPackContentsMixin {
 
     @Inject(method = "refresh", at = @At("TAIL"))
-    private void alloy_forgery$onRefresh(DynamicRegistryManager dynamicRegistryManager, CallbackInfo ci){
+    private void alloy_forgery$onRefresh(DynamicRegistryManager dynamicRegistryManager, CallbackInfo ci) {
         AlloyForgeRecipe.PENDING_RECIPES.forEach(AlloyForgeRecipe::finishRecipe);
     }
 

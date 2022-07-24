@@ -52,7 +52,7 @@ public class AlloyForgeRecipe implements Recipe<Inventory> {
         this.tierOverrides = overrides;
     }
 
-    public void setTierOverrides(ImmutableMap<OverrideRange, ItemStack> overrides){
+    public void setTierOverrides(ImmutableMap<OverrideRange, ItemStack> overrides) {
         this.tierOverrides = overrides;
     }
 
@@ -177,7 +177,7 @@ public class AlloyForgeRecipe implements Recipe<Inventory> {
     public ItemStack getOutput(int forgeTier) {
         ItemStack stack = tierOverrides.getOrDefault(tierOverrides.keySet().stream().filter(overrideRange -> overrideRange.test(forgeTier)).findAny().orElse(null), output).copy();
 
-        if(stack.getItem() == Items.AIR){
+        if (stack.getItem() == Items.AIR) {
             int stackCount = stack.getCount();
 
             stack = output.copy();
@@ -251,11 +251,19 @@ public class AlloyForgeRecipe implements Recipe<Inventory> {
     }
 
     public static class Type implements RecipeType<AlloyForgeRecipe> {
-        private Type() {}
+        private Type() {
+        }
 
         public static final Identifier ID = AlloyForgery.id("forging");
         public static final Type INSTANCE = new Type();
     }
 
-    public static record RecipeFinisher(Pair<TagKey<Item>, Integer> pair, ImmutableMap<OverrideRange, Pair<ItemStack, Integer>> unfinishedTierOverrides){ }
+    public static record RecipeFinisher(@Nullable Pair<TagKey<Item>, Integer> pair,
+                                        ImmutableMap<OverrideRange, Pair<ItemStack, Integer>> unfinishedTierOverrides) {}
+
+    public static class InvaildRecipeTagException extends RuntimeException {
+        public InvaildRecipeTagException(String message) {
+            super(message);
+        }
+    }
 }

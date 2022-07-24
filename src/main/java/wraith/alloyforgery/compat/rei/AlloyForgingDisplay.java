@@ -23,15 +23,15 @@ public class AlloyForgingDisplay implements Display {
     public AlloyForgingDisplay(AlloyForgeRecipe recipe) {
         List<EntryIngredient> convertedInputs = new ArrayList<>();
 
-        for(Map.Entry<Ingredient, Integer> entry : recipe.getIngredientsMap().entrySet()){
-            for(int i = entry.getValue(); i > 0;) {
+        for (Map.Entry<Ingredient, Integer> entry : recipe.getIngredientsMap().entrySet()) {
+            for (int i = entry.getValue(); i > 0; ) {
                 int stackCount = Math.min(i, 64);
 
                 convertedInputs.add(
-                    EntryIngredients.ofItemStacks(Arrays.stream(entry.getKey().getMatchingStacks())
-                        .map(ItemStack::copy)
-                        .peek(stack -> stack.setCount(stackCount))
-                        .toList()));
+                        EntryIngredients.ofItemStacks(Arrays.stream(entry.getKey().getMatchingStacks())
+                                .map(ItemStack::copy)
+                                .peek(stack -> stack.setCount(stackCount))
+                                .toList()));
 
                 i -= stackCount;
             }

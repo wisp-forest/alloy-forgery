@@ -87,7 +87,8 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
         }
 
         @Override
-        public void set(int index, int value) {}
+        public void set(int index, int value) {
+        }
 
         @Override
         public int size() {
