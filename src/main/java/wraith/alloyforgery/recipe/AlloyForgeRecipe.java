@@ -4,33 +4,43 @@ import com.google.common.collect.ImmutableMap;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.recipe.Ingredient;
 import net.minecraft.recipe.Recipe;
 import net.minecraft.recipe.RecipeSerializer;
 import net.minecraft.recipe.RecipeType;
+import net.minecraft.tag.TagKey;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.Pair;
 import net.minecraft.util.collection.DefaultedList;
+import net.minecraft.util.registry.Registry;
+import net.minecraft.util.registry.RegistryEntryList;
 import net.minecraft.world.World;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.Nullable;
 import wraith.alloyforgery.AlloyForgery;
 import wraith.alloyforgery.block.ForgeControllerBlockEntity;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class AlloyForgeRecipe implements Recipe<Inventory> {
+
+    private static final Logger LOGGER = LogManager.getLogger(AlloyForgeRecipe.class);
+
+    public static final Map<AlloyForgeRecipe, RecipeFinisher> PENDING_RECIPES = new HashMap<>();
 
     private final Identifier id;
 
     private final Map<Ingredient, Integer> inputs;
 
-    private final ItemStack output;
+    private ItemStack output;
 
     private final int minForgeTier;
     private final int fuelPerTick;
 
-    private final ImmutableMap<OverrideRange, ItemStack> tierOverrides;
+    private ImmutableMap<OverrideRange, ItemStack> tierOverrides;
 
     public AlloyForgeRecipe(Identifier id, Map<Ingredient, Integer> inputs, ItemStack output, int minForgeTier, int fuelPerTick, ImmutableMap<OverrideRange, ItemStack> overrides) {
         this.id = id;
@@ -40,6 +50,38 @@ public class AlloyForgeRecipe implements Recipe<Inventory> {
         this.fuelPerTick = fuelPerTick;
 
         this.tierOverrides = overrides;
+    }
+
+    public void finishRecipe(RecipeFinisher finisher){
+        Optional<RegistryEntryList.Named<Item>> itemEntryList = Registry.ITEM.getEntryList(finisher.pair.getLeft());
+
+        itemEntryList.ifPresentOrElse(registryEntries -> {
+            LOGGER.info(registryEntries.toString());
+
+            this.output = registryEntries.get(0).value().getDefaultStack();
+
+            this.output.setCount(finisher.pair.getRight());
+
+            ImmutableMap.Builder<OverrideRange, ItemStack> mapBuilder = ImmutableMap.builder();
+
+            for(Map.Entry<OverrideRange, Pair<ItemStack, Integer>> entry : finisher.unfinishedTierOverrides.entrySet()){
+                Pair<ItemStack, Integer> pair = entry.getValue();
+
+                if(pair.getRight() != -1){
+                    ItemStack stack = this.output.copy();
+
+                    stack.setCount(pair.getRight());
+
+                    mapBuilder.put(entry.getKey(), stack);
+                } else {
+                    mapBuilder.put(entry.getKey(), pair.getLeft());
+                }
+            }
+
+            tierOverrides = mapBuilder.build();
+        }, () -> {
+            LOGGER.error("[AlloyForgeRecipe]: A Recipe with a Default tag was found to be empty and was loaded!!!!");
+        });
     }
 
     @Override
@@ -131,7 +173,17 @@ public class AlloyForgeRecipe implements Recipe<Inventory> {
     }
 
     public ItemStack getOutput(int forgeTier) {
-        return tierOverrides.getOrDefault(tierOverrides.keySet().stream().filter(overrideRange -> overrideRange.test(forgeTier)).findAny().orElse(null), output).copy();
+        ItemStack stack = tierOverrides.getOrDefault(tierOverrides.keySet().stream().filter(overrideRange -> overrideRange.test(forgeTier)).findAny().orElse(null), output).copy();
+
+        if(stack.getItem() == Items.AIR){
+            int stackCount = stack.getCount();
+
+            stack = output.copy();
+
+            stack.setCount(stackCount);
+        }
+
+        return stack;
     }
 
     @Override
@@ -202,4 +254,6 @@ public class AlloyForgeRecipe implements Recipe<Inventory> {
         public static final Identifier ID = AlloyForgery.id("forging");
         public static final Type INSTANCE = new Type();
     }
+
+    public static record RecipeFinisher(Pair<TagKey<Item>, Integer> pair, ImmutableMap<OverrideRange, Pair<ItemStack, Integer>> unfinishedTierOverrides){ }
 }
