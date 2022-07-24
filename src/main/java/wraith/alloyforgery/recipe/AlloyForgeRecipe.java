@@ -57,7 +57,7 @@ public class AlloyForgeRecipe implements Recipe<Inventory> {
     }
 
     public void finishRecipe(RecipeFinisher finisher){
-        Optional<RegistryEntryList.Named<Item>> itemEntryList = Registry.ITEM.getEntryList(finisher.pair.getLeft());
+        final var itemEntryList = Registry.ITEM.getEntryList(finisher.pair.getLeft());
 
         itemEntryList.ifPresentOrElse(registryEntries -> {
             LOGGER.info(registryEntries.toString());
@@ -66,21 +66,19 @@ public class AlloyForgeRecipe implements Recipe<Inventory> {
 
             this.output.setCount(finisher.pair.getRight());
 
-            ImmutableMap.Builder<OverrideRange, ItemStack> mapBuilder = ImmutableMap.builder();
+            final var mapBuilder = ImmutableMap.<OverrideRange, ItemStack>builder();
 
-            for(Map.Entry<OverrideRange, Pair<ItemStack, Integer>> entry : finisher.unfinishedTierOverrides.entrySet()){
-                Pair<ItemStack, Integer> pair = entry.getValue();
-
-                if(pair.getRight() != -1){
+            finisher.unfinishedTierOverrides.forEach((key, pair) -> {
+                if (pair.getRight() != -1) {
                     ItemStack stack = this.output.copy();
 
                     stack.setCount(pair.getRight());
 
-                    mapBuilder.put(entry.getKey(), stack);
+                    mapBuilder.put(key, stack);
                 } else {
-                    mapBuilder.put(entry.getKey(), pair.getLeft());
+                    mapBuilder.put(key, pair.getLeft());
                 }
-            }
+            });
 
             tierOverrides = mapBuilder.build();
         }, () -> {

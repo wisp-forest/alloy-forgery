@@ -83,7 +83,6 @@ public class AlloyForgeRecipeSerializer implements RecipeSerializer<AlloyForgeRe
         final var output = JsonHelper.getObject(json, "output");
 
         ItemStack outputStack = null;
-
         Pair<TagKey<Item>, Integer> outputStackTag = null;
 
         if(output.has("priority")){
@@ -97,16 +96,14 @@ public class AlloyForgeRecipeSerializer implements RecipeSerializer<AlloyForgeRe
                 if(item.isPresent()){
                     outputStack = item.get().getDefaultStack();
 
+                    outputStack.setCount(JsonHelper.getInt(output, "count"));
+
                     break;
                 }
             }
 
             if(outputStack == null){
                 outputStackTag = new Pair<>(TagKey.of(Registry.ITEM_KEY, Identifier.tryParse(JsonHelper.getString(output, "default"))), JsonHelper.getInt(output, "count"));
-
-                outputStack = Items.AIR.getDefaultStack();
-            } else {
-                outputStack.setCount(JsonHelper.getInt(output, "count"));
             }
         } else {
             outputStack = getItemStack(output);
@@ -135,7 +132,7 @@ public class AlloyForgeRecipeSerializer implements RecipeSerializer<AlloyForgeRe
                 throw new JsonSyntaxException("Invalid override range token: " + overrideString);
             }
 
-            JsonObject overrideOutputJson = entry.getValue().getAsJsonObject();
+            final var overrideOutputJson = entry.getValue().getAsJsonObject();
 
             if(overrideOutputJson.has("id")){
                 overridesBuilder.put(overrideRange, new Pair<>(getItemStack(overrideOutputJson), -1));
@@ -144,16 +141,14 @@ public class AlloyForgeRecipeSerializer implements RecipeSerializer<AlloyForgeRe
             }
         }
 
-        AlloyForgeRecipe recipe = new AlloyForgeRecipe(id, ingredientToCount, outputStack, minForgeTier, requiredFuel, ImmutableMap.of());
+        final var recipe = new AlloyForgeRecipe(id, ingredientToCount, outputStack, minForgeTier, requiredFuel, ImmutableMap.of());
 
         if(outputStackTag != null){
             AlloyForgeRecipe.PENDING_RECIPES.put(recipe, new AlloyForgeRecipe.RecipeFinisher(outputStackTag, overridesBuilder.build()));
         } else {
-            ImmutableMap.Builder<AlloyForgeRecipe.OverrideRange, ItemStack> builder = ImmutableMap.builder();
+            final var builder = ImmutableMap.<AlloyForgeRecipe.OverrideRange, ItemStack>builder();
 
-            for(Map.Entry<AlloyForgeRecipe.OverrideRange, Pair<ItemStack, Integer>> entry : overridesBuilder.build().entrySet()){
-                builder.put(entry.getKey(), entry.getValue().getLeft());
-            }
+            overridesBuilder.build().forEach((key, value) -> builder.put(key, value.getLeft()));
 
             recipe.setTierOverrides(builder.build());
         }
