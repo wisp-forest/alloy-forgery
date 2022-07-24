@@ -52,6 +52,10 @@ public class AlloyForgeRecipe implements Recipe<Inventory> {
         this.tierOverrides = overrides;
     }
 
+    public void setTierOverrides(ImmutableMap<OverrideRange, ItemStack> overrides){
+        this.tierOverrides = overrides;
+    }
+
     public void finishRecipe(RecipeFinisher finisher){
         Optional<RegistryEntryList.Named<Item>> itemEntryList = Registry.ITEM.getEntryList(finisher.pair.getLeft());
 

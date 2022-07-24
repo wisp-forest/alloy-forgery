@@ -19,6 +19,7 @@ import net.minecraft.util.registry.Registry;
 import org.apache.commons.lang3.mutable.MutableInt;
 
 import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class AlloyForgeRecipeSerializer implements RecipeSerializer<AlloyForgeRecipe> {
@@ -137,7 +138,7 @@ public class AlloyForgeRecipeSerializer implements RecipeSerializer<AlloyForgeRe
             JsonObject overrideOutputJson = entry.getValue().getAsJsonObject();
 
             if(overrideOutputJson.has("id")){
-                overridesBuilder.put(overrideRange, new Pair<>(getItemStack(entry.getValue().getAsJsonObject()), -1));
+                overridesBuilder.put(overrideRange, new Pair<>(getItemStack(overrideOutputJson), -1));
             } else {
                 overridesBuilder.put(overrideRange, new Pair<>(Items.AIR.getDefaultStack(), JsonHelper.getInt(overrideOutputJson, "count")));
             }
@@ -147,6 +148,14 @@ public class AlloyForgeRecipeSerializer implements RecipeSerializer<AlloyForgeRe
 
         if(outputStackTag != null){
             AlloyForgeRecipe.PENDING_RECIPES.put(recipe, new AlloyForgeRecipe.RecipeFinisher(outputStackTag, overridesBuilder.build()));
+        } else {
+            ImmutableMap.Builder<AlloyForgeRecipe.OverrideRange, ItemStack> builder = ImmutableMap.builder();
+
+            for(Map.Entry<AlloyForgeRecipe.OverrideRange, Pair<ItemStack, Integer>> entry : overridesBuilder.build().entrySet()){
+                ImmutableMap.builder().put(entry.getKey(), entry.getValue().getLeft());
+            }
+
+            recipe.setTierOverrides(builder.build());
         }
 
         return recipe;
