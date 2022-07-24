@@ -41,7 +41,7 @@ public class AlloyForgeRecipeSerializer implements RecipeSerializer<AlloyForgeRe
                 throw new JsonSyntaxException("Alloy Forge Recipes only allow for item or tag inputs!");
             }
 
-            ingredientDataToCount.putIfAbsent(recipeInput, new MutableInt(1))
+            ingredientDataToCount.computeIfAbsent(recipeInput, stringStringPair -> new MutableInt(1))
                     .add(object.keySet().contains("count") ? object.get("count").getAsInt() : 1);
         }
 
