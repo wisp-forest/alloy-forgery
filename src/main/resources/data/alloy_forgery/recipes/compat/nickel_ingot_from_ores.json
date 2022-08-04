@@ -3,33 +3,31 @@
     {
       "condition": "fabric:item_tags_populated",
       "values": [
-        "c:coal",
-        "c:raw_iron_ores",
-        "c:steel_ingots"
+        "c:nickel_ores",
+        "c:nickel_ingots"
       ]
     }
   ],
   "type": "alloy_forgery:forging",
   "inputs": [
     {
-      "tag": "c:raw_iron_ores"
-    },
-	  {
-      "tag": "c:coal"
+      "tag": "c:nickel_ores"
     }
   ],
   "output": {
     "priority": [
-      "techreborn:steel_ingot",
-      "indrev:steel_ingot",
-      "modern_industrialization:steel_ingot"
+      "techreborn:nickel_ingot",
+      "modern_industrialization:nickel_ingot"
     ],
-    "default": "c:steel_ingots",
+    "default": "c:nickel_ingots",
     "count": 2
   },
   "overrides": {
-    "2+": {
+    "2": {
       "count": 3
+    },
+    "3+": {
+      "count": 4
     }
   },
   "min_forge_tier": 1,

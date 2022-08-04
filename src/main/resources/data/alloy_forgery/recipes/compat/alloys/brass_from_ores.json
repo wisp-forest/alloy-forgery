@@ -3,33 +3,36 @@
     {
       "condition": "fabric:item_tags_populated",
       "values": [
-        "c:coal",
-        "c:raw_iron_ores",
-        "c:steel_ingots"
+        "c:copper_ores",
+        "c:zinc_ores",
+        "c:brass_ingots"
       ]
     }
   ],
   "type": "alloy_forgery:forging",
   "inputs": [
     {
-      "tag": "c:raw_iron_ores"
+      "tag": "c:copper_ores",
+      "count": 2
     },
-	  {
-      "tag": "c:coal"
+    {
+      "tag": "c:zinc_ores"
     }
   ],
   "output": {
     "priority": [
-      "techreborn:steel_ingot",
-      "indrev:steel_ingot",
-      "modern_industrialization:steel_ingot"
+      "create:brass_ingot",
+      "techreborn:brass_ingot"
     ],
-    "default": "c:steel_ingots",
-    "count": 2
+    "default": "c:brass_ingots",
+    "count": 3
   },
   "overrides": {
     "2+": {
-      "count": 3
+      "count": 4
+    },
+    "3+": {
+      "count": 5
     }
   },
   "min_forge_tier": 1,
