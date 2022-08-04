@@ -1,0 +1,33 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:item_tags_populated",
+      "values": [
+        "c:coal",
+        "c:iron_ingots",
+        "c:steel_ingots"
+      ]
+    }
+  ],
+  "type": "alloy_forgery:forging",
+  "inputs": [
+    {
+      "tag": "c:iron_ingots"
+    },
+	  {
+      "tag": "c:coal"
+    }
+  ],
+  "output": {
+    "priority": [
+      "mythicmetals:steel_ingot",
+      "techreborn:steel_ingot",
+      "indrev:steel_ingot",
+      "modern_industrialization:steel_ingot"
+    ],
+    "default": "c:steel_ingots",
+    "count": 2
+  },
+  "min_forge_tier": 1,
+  "fuel_per_tick": 5
+}

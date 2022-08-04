@@ -21,13 +21,13 @@
       "modern_industrialization:titanium_ingot"
     ],
     "default": "c:titanium_ingots",
-    "count": 3
+    "count": 2
   },
   "overrides": {
     "2+": {
-      "count": 4
+      "count": 3
     }
   },
-  "min_forge_tier": 1,
-  "fuel_per_tick": 5
+  "min_forge_tier": 2,
+  "fuel_per_tick": 10
 }

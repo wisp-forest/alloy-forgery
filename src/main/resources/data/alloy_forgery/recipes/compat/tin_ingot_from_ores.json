@@ -3,31 +3,33 @@
     {
       "condition": "fabric:item_tags_populated",
       "values": [
-        "c:titanium_ores",
-        "c:titanium_ingots"
+        "c:tin_ores",
+        "c:tin_ingots"
       ]
     }
   ],
   "type": "alloy_forgery:forging",
   "inputs": [
     {
-      "tag": "c:titanium_ores"
+      "tag": "c:tin_ores"
     }
   ],
   "output": {
     "priority": [
-      "techreborn:titanium_ingot",
-      "modern_industrialization:titanium_ingot"
+      "mythicmetals:tin_ingot",
+      "techreborn:tin_ingot",
+      "indrev:tin_ingot",
+      "modern_industrialization:tin_ingot"
     ],
-    "default": "c:titanium_ingots",
-    "count": 3
+    "default": "c:tin_ingots",
+    "count": 2
   },
   "overrides": {
     "2": {
-      "count": 4
+      "count": 3
     },
     "3+": {
-      "count": 5
+      "count": 4
     }
   },
   "min_forge_tier": 1,

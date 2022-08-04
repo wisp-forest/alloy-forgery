@@ -22,14 +22,14 @@
       "modern_industrialization:silver_ingot"
     ],
     "default": "c:silver_ingots",
-    "count": 3
+    "count": 2
   },
   "overrides": {
     "2": {
-      "count": 4
+      "count": 3
     },
     "3+": {
-      "count": 5
+      "count": 4
     }
   },
   "min_forge_tier": 1,

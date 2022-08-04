@@ -11,8 +11,7 @@
   "type": "alloy_forgery:forging",
   "inputs": [
     {
-      "tag": "c:raw_platinum_ores",
-      "count": 2
+      "tag": "c:platinum_ores"
     }
   ],
   "output": {
@@ -21,13 +20,13 @@
       "modern_industrialization:platinum_ingot"
     ],
     "default": "c:platinum_ingots",
-    "count": 3
+    "count": 2
   },
   "overrides": {
-    "2+": {
-      "count": 4
+    "3+": {
+      "count": 3
     }
   },
-  "min_forge_tier": 1,
-  "fuel_per_tick": 5
+  "min_forge_tier": 2,
+  "fuel_per_tick": 10
 }
