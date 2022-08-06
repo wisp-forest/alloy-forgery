@@ -34,7 +34,6 @@ import wraith.alloyforgery.AlloyForgery;
 import wraith.alloyforgery.forges.ForgeDefinition;
 import wraith.alloyforgery.forges.ForgeFuelRegistry;
 import wraith.alloyforgery.forges.ForgeRegistry;
-import wraith.alloyforgery.forges.UnifiedInventoryView;
 import wraith.alloyforgery.recipe.AlloyForgeRecipe;
 
 import java.util.ArrayList;
@@ -51,7 +50,6 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
     public static final int INVENTORY_SIZE = 12;
     private final DefaultedList<ItemStack> items = DefaultedList.ofSize(INVENTORY_SIZE, ItemStack.EMPTY);
 
-    private final UnifiedInventoryView unifiedView;
 
     private final FluidHolder fluidHolder = new FluidHolder();
 
@@ -72,8 +70,6 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
         facing = state.get(ForgeControllerBlock.FACING);
 
         multiblockPositions = generateMultiblockPositions(pos.toImmutable(), state.get(ForgeControllerBlock.FACING));
-
-        unifiedView = new UnifiedInventoryView(this, 0, 9);
     }
 
     private final PropertyDelegate properties = new PropertyDelegate() {
@@ -99,7 +95,6 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
     @Override
     public void readNbt(NbtCompound nbt) {
         Inventories.readNbt(nbt, items);
-        unifiedView.markDirty();
 
         this.currentSmeltTime = nbt.getInt("CurrentSmeltTime");
         this.fuel = nbt.getInt("Fuel");
@@ -123,18 +118,8 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
     }
 
     @Override
-    public void markDirty() {
-        unifiedView.markDirty();
-        super.markDirty();
-    }
-
-    @Override
     public DefaultedList<ItemStack> getItems() {
         return items;
-    }
-
-    public UnifiedInventoryView asUnifiedView() {
-        return this.unifiedView;
     }
 
     public ItemStack getFuelStack() {
@@ -202,7 +187,7 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
             this.world.setBlockState(pos, currentBlockState.with(ForgeControllerBlock.LIT, false));
         }
 
-        if (!this.unifiedView.isUnifiedInvEmpty()) {
+        if (!this.isEmpty()) {
             final var recipeOptional = world.getRecipeManager().getFirstMatch(AlloyForgeRecipe.Type.INSTANCE, this, world);
 
             if (recipeOptional.isEmpty()) {
@@ -237,7 +222,7 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
                         AlloyForgery.FORGE_PARTICLES.spawn(world, Vec3d.of(pos), facing);
                     }
                 } else {
-                    recipe.consumeNeededIngredients(this);
+                    recipe.craft(this);
 
                     if (outputStack.isEmpty()) {
                         this.setStack(10, recipeOutput);
@@ -246,7 +231,6 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
                     }
 
                     this.currentSmeltTime = 0;
-                    this.unifiedView.markDirty();
                 }
             }
         } else {

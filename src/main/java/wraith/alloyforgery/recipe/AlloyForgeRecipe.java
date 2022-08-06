@@ -1,6 +1,9 @@
 package wraith.alloyforgery.recipe;
 
 import com.google.common.collect.ImmutableMap;
+import it.unimi.dsi.fastutil.ints.Int2IntArrayMap;
+import it.unimi.dsi.fastutil.ints.Int2IntLinkedOpenHashMap;
+import it.unimi.dsi.fastutil.ints.Int2IntMap;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -14,7 +17,6 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.Pair;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.registry.Registry;
-import net.minecraft.util.registry.RegistryEntryList;
 import net.minecraft.world.World;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -23,11 +25,16 @@ import wraith.alloyforgery.AlloyForgery;
 import wraith.alloyforgery.block.ForgeControllerBlockEntity;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class AlloyForgeRecipe implements Recipe<Inventory> {
 
     private static final Logger LOGGER = LogManager.getLogger(AlloyForgeRecipe.class);
+
+    private static final List<Integer> slotIndexs = IntStream.rangeClosed(0, 9).boxed().toList();
 
     public static final Map<AlloyForgeRecipe, RecipeFinisher> PENDING_RECIPES = new HashMap<>();
 
@@ -94,37 +101,51 @@ public class AlloyForgeRecipe implements Recipe<Inventory> {
 
     @Override
     public boolean matches(Inventory inventory, World world) {
-        int matchedIngredients = 0;
-        final var unifiedView = ((ForgeControllerBlockEntity) inventory).asUnifiedView();
+        return tryBind(inventory) != null;
+    }
 
-        //Confirm that the there is enough items for this recipe to even work
-        if (unifiedView.getUnifiedInventory().size() != inputs.size())
-            return false;
+    public Int2IntMap tryBind(Inventory inventory){
+        Queue<Integer> indices = new ConcurrentLinkedQueue<>(slotIndexs);
 
-        final var localInputs = new ArrayList<>(inputs.entrySet());
+        Int2IntMap boundSlots = new Int2IntLinkedOpenHashMap();
 
-        for (Map.Entry<Item, Integer> invEntry : unifiedView.getUnifiedInventory().entrySet()) {
-            boolean isValidIngredient = false;
+        for (Map.Entry<Ingredient, Integer> ingredientsEntry : this.inputs.entrySet()) {
+            int remaining = ingredientsEntry.getValue();
 
-            for (int i = 0; i < localInputs.size(); i++) {
-                Map.Entry<Ingredient, Integer> inputEntry = localInputs.get(i);
+            for(int index : indices){
+                ItemStack stack = inventory.getStack(index);
 
-                //First test if we have enough Items based on the Ingredients needed amount for the recipe and then test if the item is am ingredient
-                if ((invEntry.getValue() - inputEntry.getValue() >= 0) && inputEntry.getKey().test(invEntry.getKey().getDefaultStack())) {
-                    isValidIngredient = true;
-                    matchedIngredients++;
+                if(ingredientsEntry.getKey().test(stack)){
+                    boundSlots.put(index, Math.min(stack.getCount(), remaining));
 
-                    localInputs.remove(i);
-                    break;
+                    remaining -= stack.getCount();
+
+                    indices.remove(index);
+
+                    if(remaining <= 0) break;
                 }
             }
 
-            if (!isValidIngredient) {
-                return false;
+            if(remaining > 0){
+                return null;
             }
         }
 
-        return matchedIngredients == inputs.size();
+        finalLoopCheck : for(int index : indices){
+            ItemStack stack = inventory.getStack(index);
+
+            if(stack.isEmpty()) continue;
+
+            for(Ingredient ingredient : this.inputs.keySet()){
+                if(ingredient.test(stack)) {
+                    continue finalLoopCheck;
+                }
+            }
+
+            return null;
+        }
+
+        return boundSlots;
     }
 
     @Override
@@ -146,22 +167,9 @@ public class AlloyForgeRecipe implements Recipe<Inventory> {
 
     @Override
     public ItemStack craft(Inventory inventory) {
+        tryBind(inventory).forEach(inventory::removeStack);
+
         return ItemStack.EMPTY;
-    }
-
-    /**
-     * Method to reduce the Items within the Unified Inventory based of the recipe ingredient requirements
-     */
-    public void consumeNeededIngredients(Inventory inventory) {
-        final var unifiedView = ((ForgeControllerBlockEntity) inventory).asUnifiedView();
-
-        for (final var item : new HashSet<>(unifiedView.getUnifiedInventory().keySet())) {
-            inputs.forEach((input, inputCount) -> {
-                if (input.test(item.getDefaultStack())) {
-                    unifiedView.removeItems(item, inputCount);
-                }
-            });
-        }
     }
 
     @Override
