@@ -25,7 +25,6 @@
   },
   "overrides": {
     "3+": {
-      "id": "mythicmetals:iridium_ingot",
       "count": 3
     }
   },
