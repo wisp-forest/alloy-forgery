@@ -1,0 +1,35 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:item_tags_populated",
+      "values": [
+        "c:bauxite_ores",
+        "c:aluminum_ingots"
+      ]
+    }
+  ],
+  "type": "alloy_forgery:forging",
+  "inputs": [
+    {
+      "tag": "c:bauxite_ores"
+    }
+  ],
+  "output": {
+    "priority": [
+      "techreborn:aluminum_ingot",
+      "modern_industrialization:aluminum_ingot"
+    ],
+    "default": "c:aluminum_ingots",
+    "count": 3
+  },
+  "overrides": {
+    "2": {
+      "count": 4
+    },
+    "3+": {
+      "count": 5
+    }
+  },
+  "min_forge_tier": 1,
+  "fuel_per_tick": 5
+}

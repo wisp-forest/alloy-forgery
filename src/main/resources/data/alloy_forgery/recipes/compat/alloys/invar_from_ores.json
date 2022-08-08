@@ -1,0 +1,40 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:item_tags_populated",
+      "values": [
+        "c:iron_ores",
+        "c:nickel_ores",
+        "c:invar_ingots"
+      ]
+    }
+  ],
+  "type": "alloy_forgery:forging",
+  "inputs": [
+    {
+      "tag": "c:iron_ores",
+      "count": 2
+    },
+    {
+      "tag": "c:nickel_ores"
+    }
+  ],
+  "output": {
+    "priority": [
+      "techreborn:invar_ingot",
+      "modern_industrialization:invar_ingot"
+    ],
+    "default": "c:invar_ingots",
+    "count": 3
+  },
+  "overrides": {
+    "2+": {
+      "count": 4
+    },
+    "3+": {
+      "count": 5
+    }
+  },
+  "min_forge_tier": 1,
+  "fuel_per_tick": 5
+}

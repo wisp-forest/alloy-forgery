@@ -1,0 +1,35 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:item_tags_populated",
+      "values": [
+        "c:nickel_ores",
+        "c:nickel_ingots"
+      ]
+    }
+  ],
+  "type": "alloy_forgery:forging",
+  "inputs": [
+    {
+      "tag": "c:nickel_ores"
+    }
+  ],
+  "output": {
+    "priority": [
+      "techreborn:nickel_ingot",
+      "modern_industrialization:nickel_ingot"
+    ],
+    "default": "c:nickel_ingots",
+    "count": 2
+  },
+  "overrides": {
+    "2": {
+      "count": 3
+    },
+    "3+": {
+      "count": 4
+    }
+  },
+  "min_forge_tier": 1,
+  "fuel_per_tick": 5
+}

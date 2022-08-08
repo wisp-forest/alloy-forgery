@@ -1,0 +1,37 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:item_tags_populated",
+      "values": [
+        "c:gold_ores",
+        "c:silver_ores",
+        "c:electrum_ingots"
+      ]
+    }
+  ],
+  "type": "alloy_forgery:forging",
+  "inputs": [
+    {
+      "tag": "c:gold_ores"
+    },
+	  {
+      "tag": "c:silver_ores"
+    }
+  ],
+  "output": {
+    "priority": [
+      "techreborn:electrum_ingot",
+      "indrev:electrum_ingot",
+      "modern_industrialization:electrum_ingot"
+    ],
+    "default": "c:electrum_ingots",
+    "count": 2
+  },
+  "overrides": {
+    "3+": {
+      "count": 3
+    }
+  },
+  "min_forge_tier": 2,
+  "fuel_per_tick": 10
+}

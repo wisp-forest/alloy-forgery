@@ -9,7 +9,8 @@
     "HopperBlockEntityMixin",
     "HopperHelperMixin",
     "RecipeManagerMixin",
-    "SpriteAtlasTextureDataAccessor"
+    "SpriteAtlasTextureDataAccessor",
+    "DataPackContentsMixin"
   ],
   "client": [
     "SpriteAtlasTextureMixin"

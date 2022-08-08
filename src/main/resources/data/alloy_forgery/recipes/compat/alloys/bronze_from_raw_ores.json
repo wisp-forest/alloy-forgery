@@ -1,0 +1,29 @@
+{
+  "type": "alloy_forgery:forging",
+  "inputs": [
+    {
+      "tag": "c:raw_copper_ores",
+      "count": 2
+    },
+	  {
+      "tag": "c:raw_tin_ores"
+    }
+  ],
+  "output": {
+    "priority": [
+      "mythicmetals:bronze_ingot",
+      "techreborn:bronze_ingot",
+      "indrev:bronze_ingot",
+      "modern_industrialization:bronze_ingot"
+    ],
+    "default": "c:bronze_ingot",
+    "count": 2
+  },
+  "overrides": {
+    "2+": {
+      "count": 3
+    }
+  },
+  "min_forge_tier": 1,
+  "fuel_per_tick": 5
+}

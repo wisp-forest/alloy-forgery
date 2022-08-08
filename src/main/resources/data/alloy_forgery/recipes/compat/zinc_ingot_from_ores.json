@@ -1,0 +1,34 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:item_tags_populated",
+      "values": [
+        "c:zinc_ores",
+        "c:zinc_ingots"
+      ]
+    }
+  ],
+  "type": "alloy_forgery:forging",
+  "inputs": [
+    {
+      "tag": "c:zinc_ores"
+    }
+  ],
+  "output": {
+    "priority": [
+      "techreborn:zinc_ingot"
+    ],
+    "default": "c:zinc_ingots",
+    "count": 3
+  },
+  "overrides": {
+    "2": {
+      "count": 4
+    },
+    "3+": {
+      "count": 5
+    }
+  },
+  "min_forge_tier": 1,
+  "fuel_per_tick": 5
+}
