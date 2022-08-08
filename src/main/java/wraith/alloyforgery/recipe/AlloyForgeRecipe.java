@@ -1,7 +1,6 @@
 package wraith.alloyforgery.recipe;
 
 import com.google.common.collect.ImmutableMap;
-import it.unimi.dsi.fastutil.ints.Int2IntArrayMap;
 import it.unimi.dsi.fastutil.ints.Int2IntLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.ints.Int2IntMap;
 import net.minecraft.inventory.Inventory;
@@ -18,30 +17,26 @@ import net.minecraft.util.Pair;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.jetbrains.annotations.Nullable;
 import wraith.alloyforgery.AlloyForgery;
-import wraith.alloyforgery.block.ForgeControllerBlockEntity;
 
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
+import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class AlloyForgeRecipe implements Recipe<Inventory> {
 
-    private static final Logger LOGGER = LogManager.getLogger(AlloyForgeRecipe.class);
+    private static final List<Integer> INPUT_SLOT_INDICES = IntStream.rangeClosed(0, 9).boxed().toList();
 
-    private static final List<Integer> slotIndexs = IntStream.rangeClosed(0, 9).boxed().toList();
-
-    public static final Map<AlloyForgeRecipe, RecipeFinisher> PENDING_RECIPES = new HashMap<>();
+    public static final Map<AlloyForgeRecipe, PendingRecipeData> PENDING_RECIPES = new HashMap<>();
 
     private final Identifier id;
 
     private final Map<Ingredient, Integer> inputs;
-
     private ItemStack output;
 
     private final int minForgeTier;
@@ -59,39 +54,33 @@ public class AlloyForgeRecipe implements Recipe<Inventory> {
         this.tierOverrides = overrides;
     }
 
-    public void setTierOverrides(ImmutableMap<OverrideRange, ItemStack> overrides) {
-        this.tierOverrides = overrides;
-    }
-
-    public void finishRecipe(RecipeFinisher finisher) {
-        if(finisher.pair != null) {
-            final var itemEntryList = Registry.ITEM.getEntryList(finisher.pair.getLeft());
+    public void finishRecipe(PendingRecipeData pendingData) {
+        if (pendingData.defaultTag() != null) {
+            final var itemEntryList = Registry.ITEM.getEntryList(pendingData.defaultTag().getLeft());
 
             itemEntryList.ifPresentOrElse(registryEntries -> {
                 this.output = registryEntries.get(0).value().getDefaultStack();
-
-                this.output.setCount(finisher.pair.getRight());
+                this.output.setCount(pendingData.defaultTag().getRight());
 
             }, () -> {
-                throw new InvaildRecipeTagException("[AlloyForgeRecipe]: A Recipe with a Default tag was found to be empty and was loaded!!!!");
+                throw new InvalidTagException("Default tag " + pendingData.defaultTag().getLeft().id() + " of recipe " + this.id + " must not be empty");
             });
         }
 
-        final var mapBuilder = ImmutableMap.<OverrideRange, ItemStack>builder();
+        final var overrides = ImmutableMap.<OverrideRange, ItemStack>builder();
 
-        finisher.unfinishedTierOverrides.forEach((key, pair) -> {
-            if (pair.getRight() != -1) {
-                ItemStack stack = output.copy();
+        pendingData.unfinishedTierOverrides().forEach((range, override) -> {
+            if (override.isCountOnly()) {
+                ItemStack stack = this.output.copy();
+                stack.setCount(override.count());
 
-                stack.setCount(pair.getRight());
-
-                mapBuilder.put(key, stack);
+                overrides.put(range, stack);
             } else {
-                mapBuilder.put(key, pair.getLeft());
+                overrides.put(range, override.stack());
             }
         });
 
-        tierOverrides = mapBuilder.build();
+        this.tierOverrides = overrides.build();
     }
 
     @Override
@@ -104,41 +93,38 @@ public class AlloyForgeRecipe implements Recipe<Inventory> {
         return tryBind(inventory) != null;
     }
 
-    public Int2IntMap tryBind(Inventory inventory){
-        Queue<Integer> indices = new ConcurrentLinkedQueue<>(slotIndexs);
+    public Int2IntMap tryBind(Inventory inventory) {
+        var indices = new ConcurrentLinkedQueue<>(INPUT_SLOT_INDICES);
+        var boundSlots = new Int2IntLinkedOpenHashMap();
 
-        Int2IntMap boundSlots = new Int2IntLinkedOpenHashMap();
+        for (var ingredient : this.inputs.entrySet()) {
+            int remaining = ingredient.getValue();
 
-        for (Map.Entry<Ingredient, Integer> ingredientsEntry : this.inputs.entrySet()) {
-            int remaining = ingredientsEntry.getValue();
+            for (int index : indices) {
+                var stack = inventory.getStack(index);
 
-            for(int index : indices){
-                ItemStack stack = inventory.getStack(index);
-
-                if(ingredientsEntry.getKey().test(stack)){
+                if (ingredient.getKey().test(stack)) {
                     boundSlots.put(index, Math.min(stack.getCount(), remaining));
-
-                    remaining -= stack.getCount();
-
                     indices.remove(index);
 
-                    if(remaining <= 0) break;
+                    remaining -= stack.getCount();
+                    if (remaining <= 0) break;
                 }
             }
 
-            if(remaining > 0){
+            if (remaining > 0) {
                 return null;
             }
         }
 
-        finalLoopCheck : for(int index : indices){
-            ItemStack stack = inventory.getStack(index);
+        verification:
+        for (int index : indices) {
+            var stack = inventory.getStack(index);
+            if (stack.isEmpty()) continue;
 
-            if(stack.isEmpty()) continue;
-
-            for(Ingredient ingredient : this.inputs.keySet()){
-                if(ingredient.test(stack)) {
-                    continue finalLoopCheck;
+            for (var ingredient : this.inputs.keySet()) {
+                if (ingredient.test(stack)) {
+                    continue verification;
                 }
             }
 
@@ -180,7 +166,7 @@ public class AlloyForgeRecipe implements Recipe<Inventory> {
     @Override
     @Deprecated
     public ItemStack getOutput() {
-        return output.copy();
+        return this.output.copy();
     }
 
     public ItemStack getOutput(int forgeTier) {
@@ -189,7 +175,7 @@ public class AlloyForgeRecipe implements Recipe<Inventory> {
         if (stack.getItem() == Items.AIR) {
             int stackCount = stack.getCount();
 
-            stack = output.copy();
+            stack = this.output.copy();
 
             stack.setCount(stackCount);
         }
@@ -260,18 +246,31 @@ public class AlloyForgeRecipe implements Recipe<Inventory> {
     }
 
     public static class Type implements RecipeType<AlloyForgeRecipe> {
-        private Type() {
-        }
+        private Type() {}
 
         public static final Identifier ID = AlloyForgery.id("forging");
         public static final Type INSTANCE = new Type();
     }
 
-    public static record RecipeFinisher(@Nullable Pair<TagKey<Item>, Integer> pair,
-                                        ImmutableMap<OverrideRange, Pair<ItemStack, Integer>> unfinishedTierOverrides) {}
+    public record PendingRecipeData(@Nullable Pair<TagKey<Item>, Integer> defaultTag,
+                                    ImmutableMap<OverrideRange, PendingOverride> unfinishedTierOverrides) {
+        public record PendingOverride(@Nullable ItemStack stack, int count) {
+            public boolean isCountOnly() {
+                return this.stack == null;
+            }
 
-    public static class InvaildRecipeTagException extends RuntimeException {
-        public InvaildRecipeTagException(String message) {
+            public static PendingOverride onlyCount(int count) {
+                return new PendingOverride(null, count);
+            }
+
+            public static PendingOverride ofStack(ItemStack stack) {
+                return new PendingOverride(stack, -1);
+            }
+        }
+    }
+
+    public static class InvalidTagException extends RuntimeException {
+        public InvalidTagException(String message) {
             super(message);
         }
     }
