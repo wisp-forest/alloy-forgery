@@ -2,28 +2,12 @@
   "type": "alloy_forgery:forging",
   "inputs": [
     {
-      "item": "minecraft:gold_ingot"
+      "item": "minecraft:gold_ingot",
+      "count": 4
     },
     {
-      "item": "minecraft:gold_ingot"
-    },
-    {
-      "item": "minecraft:gold_ingot"
-    },
-    {
-      "item": "minecraft:gold_ingot"
-    },
-    {
-      "item": "minecraft:netherite_scrap"
-    },
-    {
-      "item": "minecraft:netherite_scrap"
-    },
-    {
-      "item": "minecraft:netherite_scrap"
-    },
-    {
-      "item": "minecraft:netherite_scrap"
+      "item": "minecraft:netherite_scrap",
+      "count": 4
     }
   ],
   "output": {

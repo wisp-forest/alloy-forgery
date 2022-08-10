@@ -12,7 +12,7 @@
   "type": "alloy_forgery:forging",
   "inputs": [
     {
-      "tag": "c:iron_ores",
+      "tag": "minecraft:iron_ores",
       "count": 2
     },
     {
