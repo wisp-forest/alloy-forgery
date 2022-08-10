@@ -28,7 +28,10 @@
       "wraith.alloyforgery.AlloyForgery"
     ],
     "rei_client": [
-      "wraith.alloyforgery.compat.rei.AlloyForgeryPlugin"
+      "wraith.alloyforgery.compat.rei.AlloyForgeryClientPlugin"
+    ],
+    "rei_common": [
+      "wraith.alloyforgery.compat.rei.AlloyForgeryCommonPlugin"
     ]
   },
   "mixins": [

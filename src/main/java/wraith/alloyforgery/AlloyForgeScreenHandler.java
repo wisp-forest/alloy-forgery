@@ -76,4 +76,8 @@ public class AlloyForgeScreenHandler extends ScreenHandler {
     public boolean canUse(PlayerEntity player) {
         return this.controllerInventory.canPlayerUse(player);
     }
+
+    public Inventory getControllerInventory(){
+        return this.controllerInventory;
+    }
 }

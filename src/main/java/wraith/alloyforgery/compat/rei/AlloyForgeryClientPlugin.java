@@ -10,7 +10,7 @@ import wraith.alloyforgery.client.AlloyForgeScreen;
 import wraith.alloyforgery.forges.ForgeRegistry;
 import wraith.alloyforgery.recipe.AlloyForgeRecipe;
 
-public class AlloyForgeryPlugin implements REIClientPlugin {
+public class AlloyForgeryClientPlugin implements REIClientPlugin {
 
     @Override
     public void registerCategories(CategoryRegistry registry) {
