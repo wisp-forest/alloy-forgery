@@ -2,7 +2,7 @@
   "type": "alloy_forgery:forging",
   "inputs": [
     {
-      "item": "c:raw_gold_ores",
+      "tag": "c:raw_gold_ores",
       "count": 2
     }
   ],
