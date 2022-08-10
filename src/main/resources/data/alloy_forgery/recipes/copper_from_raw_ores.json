@@ -2,10 +2,8 @@
   "type": "alloy_forgery:forging",
   "inputs": [
     {
-      "item": "minecraft:raw_copper"
-    },
-	{
-      "item": "minecraft:raw_copper"
+      "tag": "c:raw_copper_ores",
+      "count": 2
     }
   ],
   "output": {
