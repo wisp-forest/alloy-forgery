@@ -3,7 +3,7 @@
     {
       "condition": "fabric:item_tags_populated",
       "values": [
-        "c:zinc_ores",
+        "c:raw_zinc_ores",
         "c:zinc_ingots"
       ]
     }
@@ -19,7 +19,7 @@
     "priority": [
       "techreborn:zinc_ingot"
     ],
-    "default": "c:tin_ingots",
+    "default": "c:zinc_ingots",
     "count": 3
   },
   "overrides": {

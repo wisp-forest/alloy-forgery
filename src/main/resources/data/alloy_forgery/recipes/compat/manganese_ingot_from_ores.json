@@ -3,30 +3,30 @@
     {
       "condition": "fabric:item_tags_populated",
       "values": [
-        "c:raw_tin_ores",
-        "c:tin_ingots"
+        "c:manganese_ores",
+        "c:manganese_ingots"
       ]
     }
   ],
   "type": "alloy_forgery:forging",
   "inputs": [
     {
-      "tag": "c:raw_tin_ores",
-      "count": 2
+      "tag": "c:manganese_ores"
     }
   ],
   "output": {
     "priority": [
-      "mythicmetals:tin_ingot",
-      "techreborn:tin_ingot",
-      "indrev:tin_ingot",
-      "modern_industrialization:tin_ingot"
+      "mythicmetals:manganese_ingot",
+      "modern_industrialization:manganese_ingot"
     ],
-    "default": "c:tin_ingots",
-    "count": 3
+    "default": "c:manganese_ingots",
+    "count": 2
   },
   "overrides": {
-    "2+": {
+    "2": {
+      "count": 3
+    },
+    "3+": {
       "count": 4
     }
   },

@@ -3,25 +3,23 @@
     {
       "condition": "fabric:item_tags_populated",
       "values": [
-        "c:raw_tungsten_ores",
-        "c:tungsten_ingots"
+        "c:raw_orichalcum_ores",
+        "c:orichalcum_ingots"
       ]
     }
   ],
   "type": "alloy_forgery:forging",
   "inputs": [
     {
-      "tag": "c:raw_tungsten_ores",
+      "tag": "c:raw_orichalcum_ores",
       "count": 2
     }
   ],
   "output": {
     "priority": [
-      "techreborn:tungsten_ingot",
-      "indrev:tungsten_ingot",
-      "modern_industrialization:tungsten_ingot"
+      "mythicmetals:orichalcum_ingot"
     ],
-    "default": "c:tungsten_ingots",
+    "default": "c:orichalcum_ingots",
     "count": 2
   },
   "overrides": {
@@ -30,5 +28,5 @@
     }
   },
   "min_forge_tier": 2,
-  "fuel_per_tick": 15
+  "fuel_per_tick": 10
 }

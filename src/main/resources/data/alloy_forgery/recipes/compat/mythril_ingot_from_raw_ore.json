@@ -24,7 +24,6 @@
   },
   "overrides": {
     "3+": {
-      "id": "mythicmetals:mythril_ingot",
       "count": 3
     }
   },

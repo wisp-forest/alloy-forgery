@@ -3,7 +3,7 @@
     {
       "condition": "fabric:item_tags_populated",
       "values": [
-        "c:platinum_ores",
+        "c:raw_platinum_ores",
         "c:platinum_ingots"
       ]
     }

@@ -3,7 +3,7 @@
     {
       "condition": "fabric:item_tags_populated",
       "values": [
-        "c:titanium_ores",
+        "c:raw_titanium_ores",
         "c:titanium_ingots"
       ]
     }

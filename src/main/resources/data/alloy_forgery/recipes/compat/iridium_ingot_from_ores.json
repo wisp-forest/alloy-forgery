@@ -3,23 +3,23 @@
     {
       "condition": "fabric:item_tags_populated",
       "values": [
-        "c:iridiun_ores",
-        "c:iridiun_ingots"
+        "c:iridium_ores",
+        "c:iridium_ingots"
       ]
     }
   ],
   "type": "alloy_forgery:forging",
   "inputs": [
     {
-      "tag": "c:iridiun_ores"
+      "tag": "c:iridium_ores"
     }
   ],
   "output": {
     "priority": [
-      "techreborn:iridiun_ingot",
-      "modern_industrialization:iridiun_ingot"
+      "techreborn:iridium_ingot",
+      "modern_industrialization:iridium_ingot"
     ],
-    "default": "c:iridiun_ingots",
+    "default": "c:iridium_ingots",
     "count": 2
   },
   "overrides": {

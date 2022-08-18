@@ -3,7 +3,7 @@
     {
       "condition": "fabric:item_tags_populated",
       "values": [
-        "c:silver_ores",
+        "c:raw_silver_ores",
         "c:silver_ingots"
       ]
     }

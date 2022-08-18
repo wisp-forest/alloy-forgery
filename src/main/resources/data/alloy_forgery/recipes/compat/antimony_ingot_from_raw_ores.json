@@ -3,7 +3,7 @@
     {
       "condition": "fabric:item_tags_populated",
       "values": [
-        "c:antimony_ores",
+        "c:raw_antimony_ores",
         "c:antimony_ingots"
       ]
     }

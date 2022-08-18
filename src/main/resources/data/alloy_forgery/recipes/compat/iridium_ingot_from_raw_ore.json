@@ -17,8 +17,8 @@
   ],
   "output": {
     "priority": [
-      "techreborn:iridiun_ingot",
-      "modern_industrialization:iridiun_ingot"
+      "techreborn:iridium_ingot",
+      "modern_industrialization:iridium_ingot"
     ],
     "default": "c:iridium_ingots",
     "count": 2
