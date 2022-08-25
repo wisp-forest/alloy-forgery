@@ -5,12 +5,13 @@
   "plugin": "wraith.alloyforgery.mixin.AlloyForgeryMixinPlugin",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
+    "DataPackContentsMixin",
     "DefaultedRegistryMixin",
+    "HopperBlockEntityAccessor",
     "HopperBlockEntityMixin",
     "HopperHelperMixin",
     "RecipeManagerMixin",
-    "SpriteAtlasTextureDataAccessor",
-    "DataPackContentsMixin"
+    "SpriteAtlasTextureDataAccessor"
   ],
   "client": [
     "SpriteAtlasTextureMixin"

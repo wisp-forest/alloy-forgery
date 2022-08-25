@@ -1,6 +1,7 @@
 package wraith.alloyforgery.recipe;
 
 import com.google.common.collect.ImmutableMap;
+import io.wispforest.owo.util.RecipeRemainderStorage;
 import it.unimi.dsi.fastutil.ints.Int2IntLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.ints.Int2IntMap;
 import net.minecraft.inventory.Inventory;
@@ -20,15 +21,14 @@ import net.minecraft.world.World;
 import wraith.alloyforgery.AlloyForgery;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class AlloyForgeRecipe implements Recipe<Inventory> {
+
+    private static final Map<Item, ItemStack> GLOBAL_RECIPE_REMAINDER = new HashMap<>();
 
     private static final List<Integer> INPUT_SLOT_INDICES = IntStream.rangeClosed(0, 9).boxed().toList();
 
@@ -81,6 +81,10 @@ public class AlloyForgeRecipe implements Recipe<Inventory> {
         });
 
         this.tierOverrides = overrides.build();
+    }
+
+    public static void addRemainders(Map<Item, ItemStack> remainders){
+        GLOBAL_RECIPE_REMAINDER.putAll(remainders);
     }
 
     @Override
@@ -156,6 +160,35 @@ public class AlloyForgeRecipe implements Recipe<Inventory> {
         tryBind(inventory).forEach(inventory::removeStack);
 
         return ItemStack.EMPTY;
+    }
+
+    @Nullable
+    public DefaultedList<ItemStack> attemptToGetRemainders(Inventory inventory) {
+        final var remainders = DefaultedList.ofSize(inventory.size(), ItemStack.EMPTY);
+
+        final var owoRemainders = RecipeRemainderStorage.has(this.getId()) ? RecipeRemainderStorage.get(this.getId()) : Map.<Item, ItemStack>of();
+
+        if(owoRemainders.isEmpty() && GLOBAL_RECIPE_REMAINDER.isEmpty()) return null;
+
+        var setAnyRemainders = false;
+
+        for (int i : tryBind(inventory).keySet()) {
+            var item = inventory.getStack(i).getItem();
+
+            if (!owoRemainders.isEmpty()) {
+                if (!owoRemainders.containsKey(item)) continue;
+
+                remainders.set(i, owoRemainders.get(item).copy());
+
+                setAnyRemainders = true;
+            } else if(GLOBAL_RECIPE_REMAINDER.containsKey(item)){
+                remainders.set(i, GLOBAL_RECIPE_REMAINDER.get(item).copy());
+
+                setAnyRemainders = true;
+            }
+        }
+
+        return setAnyRemainders ? remainders : null;
     }
 
     @Override

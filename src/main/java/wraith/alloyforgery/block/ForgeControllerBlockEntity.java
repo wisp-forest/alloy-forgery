@@ -13,6 +13,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.block.entity.HopperBlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.fluid.Fluids;
@@ -23,17 +24,22 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.screen.PropertyDelegate;
 import net.minecraft.screen.ScreenHandler;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
+import net.minecraft.util.ItemScatterer;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import wraith.alloyforgery.AlloyForgeScreenHandler;
 import wraith.alloyforgery.AlloyForgery;
 import wraith.alloyforgery.forges.ForgeDefinition;
 import wraith.alloyforgery.forges.ForgeFuelRegistry;
 import wraith.alloyforgery.forges.ForgeRegistry;
+import wraith.alloyforgery.mixin.HopperBlockEntityAccessor;
 import wraith.alloyforgery.recipe.AlloyForgeRecipe;
 
 import java.util.ArrayList;
@@ -222,7 +228,11 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
                         AlloyForgery.FORGE_PARTICLES.spawn(world, Vec3d.of(pos), facing);
                     }
                 } else {
+                    var remainderList = recipe.attemptToGetRemainders(this);
+
                     recipe.craft(this);
+
+                    if(remainderList != null) this.handleForgingRemainders(remainderList);
 
                     if (outputStack.isEmpty()) {
                         this.setStack(10, recipeOutput);
@@ -236,6 +246,97 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
         } else {
             this.currentSmeltTime = 0;
         }
+    }
+
+    public void handleForgingRemainders(DefaultedList<ItemStack> remainderList) {
+        for (int i = 0; i < remainderList.size(); ++i) {
+            var inputStack = this.getStack(i);
+            var remainderStack = remainderList.get(i);
+
+            if (!remainderStack.isEmpty()) {
+                if (inputStack.isEmpty()) {
+                    this.setStack(i, remainderStack);
+                } else if (ItemStack.areItemsEqualIgnoreDamage(inputStack, remainderStack) && ItemStack.areNbtEqual(inputStack, remainderStack)) {
+                    remainderStack.increment(inputStack.getCount());
+
+                    if (remainderStack.getCount() > remainderStack.getMaxCount()) {
+                        int excess = remainderStack.getCount() - remainderStack.getMaxCount();
+                        remainderStack.decrement(excess);
+
+                        var insertStack = remainderStack.copy();
+                        insertStack.setCount(excess);
+
+                        if(!attemptToInsertIntoHopper(insertStack)){
+                            var frontForgePos = pos.offset(getCachedState().get(ForgeControllerBlock.FACING));
+
+                            world.playSound(null, frontForgePos.getX(), frontForgePos.getY(), frontForgePos.getZ(), SoundEvents.ENTITY_ITEM_PICKUP, SoundCategory.BLOCKS, 1.0F, 0.2F);
+
+                            ItemScatterer.spawn(world, frontForgePos.getX(), frontForgePos.getY(), frontForgePos.getZ(), insertStack);
+                        }
+                    }
+
+                    this.setStack(i, remainderStack);
+                } else {
+                    if(!attemptToInsertIntoHopper(remainderStack)){
+                        var frontForgePos = pos.offset(getCachedState().get(ForgeControllerBlock.FACING));
+
+                        world.playSound(null, frontForgePos.getX(), frontForgePos.getY(), frontForgePos.getZ(), SoundEvents.ENTITY_ITEM_PICKUP, SoundCategory.BLOCKS, 1.0F, 0.2F);
+
+                        ItemScatterer.spawn(world, frontForgePos.getX(), frontForgePos.getY(), frontForgePos.getZ(), remainderStack);
+                    }
+                }
+            }
+        }
+    }
+
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
+    public boolean attemptToInsertIntoHopper(ItemStack remainderStack){
+        if (remainderStack.isEmpty()) return true;
+
+        HopperBlockEntity blockEntity = null;
+
+        for (int y = 1; y <= 2; y++) {
+            if (world.getBlockEntity(this.pos.down(y)) instanceof HopperBlockEntity hopperBlockEntity) {
+                blockEntity = hopperBlockEntity;
+
+                break;
+            }
+        }
+
+        if (blockEntity != null) {
+            var isHopperEmpty = blockEntity.isEmpty();
+
+            for (int slotIndex = 0; slotIndex < blockEntity.size(); ++slotIndex) {
+                if (remainderStack.isEmpty()) break;
+
+                if (!blockEntity.getStack(slotIndex).isEmpty()) {
+                    final var itemStack = blockEntity.getStack(slotIndex).copy();
+
+                    if (itemStack.isEmpty()) {
+                        blockEntity.setStack(slotIndex, remainderStack);
+                        remainderStack = ItemStack.EMPTY;
+                    } else if (ItemOps.canStack(itemStack, remainderStack)) {
+                        int availableSpace = itemStack.getMaxCount() - itemStack.getCount();
+                        int j = Math.min(itemStack.getCount(), availableSpace);
+                        remainderStack.decrement(j);
+                        itemStack.increment(j);
+                    }
+                } else {
+                    blockEntity.setStack(slotIndex, remainderStack);
+                    break;
+                }
+            }
+
+            if (isHopperEmpty && !((HopperBlockEntityAccessor)blockEntity).alloyForge$isDisabled()) {
+                ((HopperBlockEntityAccessor)blockEntity).alloyForge$setTransferCooldown(8);
+            }
+
+            blockEntity.markDirty();
+
+            return true;
+        }
+
+        return false;
     }
 
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")

@@ -18,6 +18,7 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.registry.Registry;
 import wraith.alloyforgery.block.ForgeControllerBlockEntity;
+import wraith.alloyforgery.data.AlloyForgeryGlobalRemaindersLoader;
 import wraith.alloyforgery.forges.ForgeRegistry;
 import wraith.alloyforgery.forges.FuelDataLoader;
 import wraith.alloyforgery.recipe.AlloyForgeRecipe;
@@ -48,6 +49,8 @@ public class AlloyForgery implements ModInitializer {
 
     @Override
     public void onInitialize() {
+        ResourceManagerHelper.get(ResourceType.SERVER_DATA).registerReloadListener(new AlloyForgeryGlobalRemaindersLoader());
+
         ALLOY_FORGE_SCREEN_HANDLER_TYPE = Registry.register(Registry.SCREEN_HANDLER, id("alloy_forge"), new ScreenHandlerType<>(AlloyForgeScreenHandler::new));
 
         ResourceManagerHelper.get(ResourceType.SERVER_DATA).registerReloadListener(FuelDataLoader.INSTANCE);
