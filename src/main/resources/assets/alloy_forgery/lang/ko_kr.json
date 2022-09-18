@@ -1,0 +1,24 @@
+{
+  "block.alloy_forgery.bricks_forge_controller": "벽돌 용광로 제어 장치",
+  "block.alloy_forgery.stone_bricks_forge_controller": "석재 벽돌 용광로 제어 장치",
+  "block.alloy_forgery.deepslate_bricks_forge_controller": "심층암 벽돌 용광로 제어 장치",
+  "block.alloy_forgery.end_stone_bricks_forge_controller": "엔드 석재 벽돌 용광로 제어 장치",
+  "block.alloy_forgery.polished_blackstone_forge_controller": "윤나는 흑암 용광로 제어 장치",
+  "block.alloy_forgery.prismarine_bricks_forge_controller": "프리즈머린 벽돌 용광로 제어 장치",
+
+  "tooltip.alloy_forgery.forge_tier": "티어: %d",
+  "tooltip.alloy_forgery.fuel_capacity": "연료 용량: %d",
+
+  "container.alloy_forgery.forge_controller": "합금 용광로",
+
+  "container.alloy_forgery.rei.title": "합금 용광로",
+  "container.alloy_forgery.rei.min_tier": "필요 티어: %d",
+  "container.alloy_forgery.rei.fuel_per_tick": "틱당 연료: %d",
+
+  "message.alloy_forgery.invalid_multiblock": "잘못된 멀티블록 구성",
+  "itemGroup.alloy_forgery.alloy_forgery": "Alloy Forgery",
+  "itemGroup.alloy_forgery.alloy_forgery.button.discord": "Discord",
+  "itemGroup.alloy_forgery.alloy_forgery.button.curseforge": "CurseForge",
+  "itemGroup.alloy_forgery.alloy_forgery.button.modrinth": "Modrinth",
+  "itemGroup.alloy_forgery.alloy_forgery.button.github": "GitHub"
+}
