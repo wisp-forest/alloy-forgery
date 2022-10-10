@@ -8,8 +8,6 @@
     "DataPackContentsMixin",
     "DefaultedRegistryMixin",
     "HopperBlockEntityAccessor",
-    "HopperBlockEntityMixin",
-    "HopperHelperMixin",
     "RecipeManagerMixin",
     "SpriteAtlasTextureDataAccessor"
   ],
