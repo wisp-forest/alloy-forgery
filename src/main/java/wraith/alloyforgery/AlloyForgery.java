@@ -9,6 +9,8 @@ import io.wispforest.owo.util.OwoFreezer;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage;
+import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.resource.ResourceType;
@@ -47,6 +49,7 @@ public class AlloyForgery implements ModInitializer {
                 facing.getOffsetX() * 0.65);
     });
 
+    @SuppressWarnings("UnstableApiUsage")
     @Override
     public void onInitialize() {
         ResourceManagerHelper.get(ResourceType.SERVER_DATA).registerReloadListener(new AlloyForgeryGlobalRemaindersLoader());
@@ -62,6 +65,13 @@ public class AlloyForgery implements ModInitializer {
         Registry.register(Registry.RECIPE_SERIALIZER, AlloyForgeRecipe.Type.ID, AlloyForgeRecipeSerializer.INSTANCE);
 
         ALLOY_FORGERY_GROUP.initialize();
+
+        ItemStorage.SIDED.registerFallback((world, pos, state, blockEntity, context) -> {
+            if (context == Direction.DOWN && world.getBlockEntity(pos.up()) instanceof ForgeControllerBlockEntity froge)
+                return InventoryStorage.of(froge, Direction.DOWN);
+
+            return null;
+        });
 
         OwoFreezer.registerFreezeCallback(() -> FluidStorage.SIDED.registerSelf(AlloyForgery.FORGE_CONTROLLER_BLOCK_ENTITY));
     }
