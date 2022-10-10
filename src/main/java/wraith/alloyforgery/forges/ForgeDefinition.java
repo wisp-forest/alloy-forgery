@@ -52,9 +52,7 @@ public record ForgeDefinition(int forgeTier,
         this(forgeTier, speedMultiplier, fuelCapacity, (int) (BASE_MAX_SMELT_TIME / speedMultiplier), material, additionalMaterials);
     }
 
-    @SuppressWarnings("UnstableApiUsage")
     public static void loadAndEnqueue(Identifier id, JsonObject json) {
-
         final int forgeTier = JsonHelper.getInt(json, "tier");
         final float speedMultiplier = JsonHelper.getFloat(json, "speed_multiplier", 1);
         final int fuelCapacity = JsonHelper.getInt(json, "fuel_capacity", 48000);

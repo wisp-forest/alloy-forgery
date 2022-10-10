@@ -1,0 +1,54 @@
+<owo-ui xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/wisp-forest/owo-lib/1.19/owo-ui.xsd">
+    <components>
+        <flow-layout direction="vertical">
+            <children>
+                <flow-layout direction="vertical">
+                    <children>
+                        <texture texture="alloy_forgery:textures/gui/forge_controller.png" region-width="176" region-height="189"/>
+
+                        <texture texture="alloy_forgery:textures/gui/forge_controller.png" u="176" v="20" region-width="22" region-height="48" id="fuel-gauge">
+                            <positioning type="absolute">5,22</positioning>
+                            <visible-area>
+                                <height>0</height>
+                            </visible-area>
+                        </texture>
+
+                        <texture texture="alloy_forgery:textures/gui/forge_controller.png" u="176" v="0" region-width="15" region-height="19" id="progress-gauge">
+                            <positioning type="absolute">147,24</positioning>
+                            <visible-area>
+                                <height>0</height>
+                            </visible-area>
+                        </texture>
+
+                        <flow-layout direction="horizontal" id="lava-bar">
+                            <children>
+                                <sprite atlas="minecraft:textures/atlas/blocks.png" sprite="minecraft:block/lava_still"/>
+                                <sprite atlas="minecraft:textures/atlas/blocks.png" sprite="minecraft:block/lava_still"/>
+                            </children>
+
+                            <positioning type="absolute">63,4</positioning>
+
+                            <sizing>
+                                <vertical method="fixed">10</vertical>
+                                <horizontal method="fixed">0</horizontal>
+                            </sizing>
+                        </flow-layout>
+
+                        <label>
+                            <text translate="true">container.alloy_forgery.forge_controller</text>
+                            <color>#3f3f3f</color>
+                            <positioning type="relative">50,12</positioning>
+                        </label>
+                    </children>
+                </flow-layout>
+            </children>
+
+            <vertical-alignment>center</vertical-alignment>
+            <horizontal-alignment>center</horizontal-alignment>
+
+            <surface>
+                <vanilla-translucent/>
+            </surface>
+        </flow-layout>
+    </components>
+</owo-ui>

@@ -52,10 +52,9 @@ public class AlloyForgery implements ModInitializer {
     @SuppressWarnings("UnstableApiUsage")
     @Override
     public void onInitialize() {
-        ResourceManagerHelper.get(ResourceType.SERVER_DATA).registerReloadListener(new AlloyForgeryGlobalRemaindersLoader());
-
         ALLOY_FORGE_SCREEN_HANDLER_TYPE = Registry.register(Registry.SCREEN_HANDLER, id("alloy_forge"), new ScreenHandlerType<>(AlloyForgeScreenHandler::new));
 
+        ResourceManagerHelper.get(ResourceType.SERVER_DATA).registerReloadListener(new AlloyForgeryGlobalRemaindersLoader());
         ResourceManagerHelper.get(ResourceType.SERVER_DATA).registerReloadListener(FuelDataLoader.INSTANCE);
         ModDataLoader.load(ForgeRegistry.Loader.INSTANCE);
 

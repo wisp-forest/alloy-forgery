@@ -67,8 +67,7 @@ public class ForgeRegistry {
 
         public static final Loader INSTANCE = new Loader();
 
-        private Loader() {
-        }
+        private Loader() {}
 
         @Override
         public String getDataSubdirectory() {

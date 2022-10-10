@@ -7,12 +7,7 @@
   "mixins": [
     "DataPackContentsMixin",
     "DefaultedRegistryMixin",
-    "HopperBlockEntityAccessor",
-    "RecipeManagerMixin",
-    "SpriteAtlasTextureDataAccessor"
-  ],
-  "client": [
-    "SpriteAtlasTextureMixin"
+    "RecipeManagerMixin"
   ],
   "injectors": {
     "defaultRequire": 1

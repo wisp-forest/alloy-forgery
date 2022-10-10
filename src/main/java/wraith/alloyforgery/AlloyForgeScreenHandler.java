@@ -1,6 +1,7 @@
 package wraith.alloyforgery;
 
 import io.wispforest.owo.client.screens.ScreenUtils;
+import io.wispforest.owo.client.screens.SlotGenerator;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
@@ -45,14 +46,10 @@ public class AlloyForgeScreenHandler extends ScreenHandler {
             }
         });
 
-        //Recipe Inputs
-        for (int m = 0; m < 2; m++) {
-            for (int l = 0; l < 5; l++) {
-                this.addSlot(new Slot(controllerInventory, l + m * 5, 44 + l * 18, 43 + m * 18));
-            }
-        }
-
-        ScreenUtils.generatePlayerSlots(8, 107, playerInventory, this::addSlot);
+        SlotGenerator.begin(this::addSlot, 44, 43)
+                .grid(controllerInventory, 0, 5, 2)
+                .moveTo(8, 107)
+                .playerInventory(playerInventory);
     }
 
     @Override
