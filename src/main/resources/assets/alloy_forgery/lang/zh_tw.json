@@ -4,7 +4,7 @@
   "block.alloy_forgery.deepslate_bricks_forge_controller": "深板岩磚冶煉控制器",
   "block.alloy_forgery.end_stone_bricks_forge_controller": "終界石磚冶煉控制器",
   "block.alloy_forgery.polished_blackstone_forge_controller": "拋光黑石冶煉控制器",
-  "block.alloy_forgery.prismarine_bricks_forge_controller": "海晶石磚冶煉控制器",
+  "block.alloy_forgery.prismarine_bricks_forge_controller": "海磷石磚冶煉控制器",
 
   "tooltip.alloy_forgery.forge_tier": "等級：%d",
   "tooltip.alloy_forgery.fuel_capacity": "燃料容量：%d",
@@ -15,7 +15,7 @@
   "container.alloy_forgery.rei.min_tier": "冶煉爐等級要求：%d",
   "container.alloy_forgery.rei.fuel_per_tick": "燃料消耗：%d/tick",
 
-  "message.alloy_forgery.invalid_multiblock": "多方快結構無效",
+  "message.alloy_forgery.invalid_multiblock": "多方塊結構無效",
   "itemGroup.alloy_forgery.alloy_forgery": "合金冶煉爐",
   "itemGroup.alloy_forgery.alloy_forgery.button.discord": "Discord",
   "itemGroup.alloy_forgery.alloy_forgery.button.curseforge": "CurseForge",
