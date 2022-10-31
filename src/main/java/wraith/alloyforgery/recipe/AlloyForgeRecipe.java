@@ -1,7 +1,6 @@
 package wraith.alloyforgery.recipe;
 
 import com.google.common.collect.ImmutableMap;
-import io.wispforest.owo.util.RecipeRemainderStorage;
 import it.unimi.dsi.fastutil.ints.Int2IntLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.ints.Int2IntMap;
 import net.minecraft.inventory.Inventory;
@@ -166,22 +165,24 @@ public class AlloyForgeRecipe implements Recipe<Inventory> {
     public DefaultedList<ItemStack> attemptToGetRemainders(Inventory inventory) {
         final var remainders = DefaultedList.ofSize(inventory.size(), ItemStack.EMPTY);
 
-        final var owoRemainders = RecipeRemainderStorage.has(this.getId()) ? RecipeRemainderStorage.get(this.getId()) : Map.<Item, ItemStack>of();
+        //final var owoRemainders = RecipeRemainderStorage.has(this.getId()) ? RecipeRemainderStorage.get(this.getId()) : Map.<Item, ItemStack>of();
 
-        if(owoRemainders.isEmpty() && GLOBAL_RECIPE_REMAINDER.isEmpty()) return null;
+        if(/*owoRemainders.isEmpty() &&*/ GLOBAL_RECIPE_REMAINDER.isEmpty()) return null;
 
         var setAnyRemainders = false;
 
         for (int i : tryBind(inventory).keySet()) {
             var item = inventory.getStack(i).getItem();
 
-            if (!owoRemainders.isEmpty()) {
-                if (!owoRemainders.containsKey(item)) continue;
+//            if (!owoRemainders.isEmpty()) {
+//                if (!owoRemainders.containsKey(item)) continue;
+//
+//                remainders.set(i, owoRemainders.get(item).copy());
+//
+//                setAnyRemainders = true;
+//            } else
 
-                remainders.set(i, owoRemainders.get(item).copy());
-
-                setAnyRemainders = true;
-            } else if(GLOBAL_RECIPE_REMAINDER.containsKey(item)){
+            if(GLOBAL_RECIPE_REMAINDER.containsKey(item)){
                 remainders.set(i, GLOBAL_RECIPE_REMAINDER.get(item).copy());
 
                 setAnyRemainders = true;

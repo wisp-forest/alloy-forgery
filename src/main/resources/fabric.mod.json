@@ -40,8 +40,8 @@
   "depends": {
     "fabricloader": ">=0.10",
     "fabric": "*",
-    "minecraft": ">=1.19",
-    "owo": ">=0.7.2"
+    "minecraft": ">=1.18.2",
+    "owo": ">0.7.1"
   },
   "suggests": {
     "roughlyenoughitems": ">=8.0.0"

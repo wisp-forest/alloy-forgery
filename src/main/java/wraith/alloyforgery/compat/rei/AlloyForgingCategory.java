@@ -12,6 +12,7 @@ import me.shedaniel.rei.api.common.entry.EntryStack;
 import me.shedaniel.rei.api.common.util.EntryIngredients;
 import me.shedaniel.rei.api.common.util.EntryStacks;
 import net.minecraft.text.Text;
+import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Identifier;
 import org.apache.commons.lang3.mutable.MutableInt;
 import wraith.alloyforgery.AlloyForgery;
@@ -40,7 +41,7 @@ public class AlloyForgingCategory implements DisplayCategory<AlloyForgingDisplay
 
     @Override
     public Text getTitle() {
-        return Text.translatable("container.alloy_forgery.rei.title");
+        return new TranslatableText("container.alloy_forgery.rei.title");
     }
 
     @Override
@@ -64,16 +65,16 @@ public class AlloyForgingCategory implements DisplayCategory<AlloyForgingDisplay
         final var resultSlot = Widgets.createSlot(new Point(origin.x + 113, origin.y + 47));
         widgets.add(resultSlot.entries(display.getOutputEntries().get(0)).disableBackground().markOutput());
 
-        final var tierLabel = Widgets.createLabel(new Point(origin.x + 12, origin.y + 11), Text.translatable("container.alloy_forgery.rei.min_tier", display.minForgeTier));
+        final var tierLabel = Widgets.createLabel(new Point(origin.x + 12, origin.y + 11), new TranslatableText("container.alloy_forgery.rei.min_tier", display.minForgeTier));
         widgets.add(tierLabel.leftAligned().color(0x3f3f3f).noShadow());
-        widgets.add(Widgets.createLabel(new Point(origin.x + 12, origin.y + 24), Text.translatable("container.alloy_forgery.rei.fuel_per_tick", display.requiredFuel)).leftAligned().color(0x3f3f3f).noShadow());
+        widgets.add(Widgets.createLabel(new Point(origin.x + 12, origin.y + 24), new TranslatableText("container.alloy_forgery.rei.fuel_per_tick", display.requiredFuel)).leftAligned().color(0x3f3f3f).noShadow());
 
         final MutableInt overrideIndex = new MutableInt(1);
         final List<AlloyForgeRecipe.OverrideRange> overrides = new ArrayList<>(display.overrides.keySet());
 
         widgets.add(Widgets.createButton(new Rectangle(origin.x + 131, origin.y + 6, 12, 12), Text.of("...")).onClick(button -> {
             int index = overrideIndex.intValue();
-            tierLabel.setMessage(Text.translatable("container.alloy_forgery.rei.min_tier", index == 0 ? display.minForgeTier : overrides.get(index - 1)));
+            tierLabel.setMessage(new TranslatableText("container.alloy_forgery.rei.min_tier", index == 0 ? display.minForgeTier : overrides.get(index - 1)));
 
             resultSlot.clearEntries();
             resultSlot.entries(index == 0 ? display.getOutputEntries().get(0) : EntryIngredients.of(display.overrides.get(overrides.get(index - 1))));

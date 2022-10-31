@@ -27,12 +27,12 @@ import net.minecraft.screen.ScreenHandler;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
+import net.minecraft.text.TranslatableText;
 import net.minecraft.util.ItemScatterer;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import wraith.alloyforgery.AlloyForgeScreenHandler;
 import wraith.alloyforgery.AlloyForgery;
@@ -401,7 +401,7 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
 
     @Override
     public Text getDisplayName() {
-        return Text.translatable("container.alloy_forgery.forge_controller");
+        return new TranslatableText("container.alloy_forgery.forge_controller");
     }
 
     @Nullable
@@ -416,8 +416,8 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
     }
 
     @Override
-    public Iterator<StorageView<FluidVariant>> iterator() {
-        return this.fluidHolder.iterator();
+    public Iterator<? extends StorageView<FluidVariant>> iterator(TransactionContext transaction) {
+        return this.fluidHolder.iterator(transaction);
     }
 
     private class FluidHolder extends SingleVariantStorage<FluidVariant> implements InsertionOnlyStorage<FluidVariant> {
