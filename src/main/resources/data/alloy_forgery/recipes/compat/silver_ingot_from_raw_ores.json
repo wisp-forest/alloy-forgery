@@ -1,0 +1,35 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:item_tags_populated",
+      "values": [
+        "c:raw_silver_ores",
+        "c:silver_ingots"
+      ]
+    }
+  ],
+  "type": "alloy_forgery:forging",
+  "inputs": [
+    {
+      "tag": "c:raw_silver_ores",
+      "count": 2
+    }
+  ],
+  "output": {
+    "priority": [
+      "mythicmetals:silver_ingot",
+      "techreborn:silver_ingot",
+      "indrev:silver_ingot",
+      "modern_industrialization:silver_ingot"
+    ],
+    "default": "c:silver_ingots",
+    "count": 3
+  },
+  "overrides": {
+    "2+": {
+      "count": 4
+    }
+  },
+  "min_forge_tier": 1,
+  "fuel_per_tick": 5
+}

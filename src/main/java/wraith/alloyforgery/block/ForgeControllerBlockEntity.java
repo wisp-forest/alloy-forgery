@@ -13,6 +13,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.block.entity.HopperBlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.fluid.Fluids;
@@ -23,8 +24,11 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.screen.PropertyDelegate;
 import net.minecraft.screen.ScreenHandler;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
+import net.minecraft.util.ItemScatterer;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -35,10 +39,12 @@ import wraith.alloyforgery.AlloyForgery;
 import wraith.alloyforgery.forges.ForgeDefinition;
 import wraith.alloyforgery.forges.ForgeFuelRegistry;
 import wraith.alloyforgery.forges.ForgeRegistry;
-import wraith.alloyforgery.forges.UnifiedInventoryView;
+import wraith.alloyforgery.mixin.HopperBlockEntityAccessor;
 import wraith.alloyforgery.recipe.AlloyForgeRecipe;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 @SuppressWarnings("UnstableApiUsage")
 public class ForgeControllerBlockEntity extends BlockEntity implements ImplementedInventory, SidedInventory, NamedScreenHandlerFactory, InsertionOnlyStorage<FluidVariant> {
@@ -50,7 +56,6 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
     public static final int INVENTORY_SIZE = 12;
     private final DefaultedList<ItemStack> items = DefaultedList.ofSize(INVENTORY_SIZE, ItemStack.EMPTY);
 
-    private final UnifiedInventoryView unifiedView;
 
     private final FluidHolder fluidHolder = new FluidHolder();
 
@@ -58,7 +63,7 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
     private final ImmutableList<BlockPos> multiblockPositions;
     private final Direction facing;
 
-    private int fuel;
+    private float fuel;
     private int currentSmeltTime;
 
     private int smeltProgress;
@@ -71,8 +76,6 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
         facing = state.get(ForgeControllerBlock.FACING);
 
         multiblockPositions = generateMultiblockPositions(pos.toImmutable(), state.get(ForgeControllerBlock.FACING));
-
-        unifiedView = new UnifiedInventoryView(this, 0, 9);
     }
 
     private final PropertyDelegate properties = new PropertyDelegate() {
@@ -86,7 +89,8 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
         }
 
         @Override
-        public void set(int index, int value) {}
+        public void set(int index, int value) {
+        }
 
         @Override
         public int size() {
@@ -97,7 +101,6 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
     @Override
     public void readNbt(NbtCompound nbt) {
         Inventories.readNbt(nbt, items);
-        unifiedView.markDirty();
 
         this.currentSmeltTime = nbt.getInt("CurrentSmeltTime");
         this.fuel = nbt.getInt("Fuel");
@@ -111,7 +114,7 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
     public void writeNbt(NbtCompound nbt) {
         Inventories.writeNbt(nbt, items);
 
-        nbt.putInt("Fuel", fuel);
+        nbt.putInt("Fuel", Math.round(fuel));
         nbt.putInt("CurrentSmeltTime", currentSmeltTime);
 
         final var fluidNbt = new NbtCompound();
@@ -121,18 +124,8 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
     }
 
     @Override
-    public void markDirty() {
-        unifiedView.markDirty();
-        super.markDirty();
-    }
-
-    @Override
     public DefaultedList<ItemStack> getItems() {
         return items;
-    }
-
-    public UnifiedInventoryView asUnifiedView(){
-        return this.unifiedView;
     }
 
     public ItemStack getFuelStack() {
@@ -187,8 +180,7 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
         }
 
         if (this.fluidHolder.amount >= 81) {
-            final long fuelInsertAmount = Math.min((this.fluidHolder.amount / 81) * 24,
-                    ((this.forgeDefinition.fuelCapacity() - this.fuel) / 24) * 24);
+            final float fuelInsertAmount = Math.min((this.fluidHolder.amount / 81f) * 24, ((this.forgeDefinition.fuelCapacity() - this.fuel) / 24) * 24);
 
             this.fuel += fuelInsertAmount;
             this.fluidHolder.amount -= (fuelInsertAmount / 24) * 81;
@@ -201,7 +193,7 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
             this.world.setBlockState(pos, currentBlockState.with(ForgeControllerBlock.LIT, false));
         }
 
-        if(!this.unifiedView.isUnifiedInvEmpty()){
+        if (!this.isEmpty()) {
             final var recipeOptional = world.getRecipeManager().getFirstMatch(AlloyForgeRecipe.Type.INSTANCE, this, world);
 
             if (recipeOptional.isEmpty()) {
@@ -229,14 +221,18 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
                         return;
                     }
 
-                    this.currentSmeltTime += forgeDefinition.speedMultiplier();
+                    this.currentSmeltTime++;
                     this.fuel -= fuelRequirement;
 
                     if (world.random.nextDouble() > 0.75) {
                         AlloyForgery.FORGE_PARTICLES.spawn(world, Vec3d.of(pos), facing);
                     }
                 } else {
-                    recipe.consumeNeededIngredients(this);
+                    var remainderList = recipe.attemptToGetRemainders(this);
+
+                    recipe.craft(this);
+
+                    if(remainderList != null) this.handleForgingRemainders(remainderList);
 
                     if (outputStack.isEmpty()) {
                         this.setStack(10, recipeOutput);
@@ -245,12 +241,102 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
                     }
 
                     this.currentSmeltTime = 0;
-                    this.unifiedView.markDirty();
                 }
             }
-        }else{
+        } else {
             this.currentSmeltTime = 0;
         }
+    }
+
+    public void handleForgingRemainders(DefaultedList<ItemStack> remainderList) {
+        for (int i = 0; i < remainderList.size(); ++i) {
+            var inputStack = this.getStack(i);
+            var remainderStack = remainderList.get(i);
+
+            if (!remainderStack.isEmpty()) {
+                if (inputStack.isEmpty()) {
+                    this.setStack(i, remainderStack);
+                } else if (ItemStack.areItemsEqualIgnoreDamage(inputStack, remainderStack) && ItemStack.areNbtEqual(inputStack, remainderStack)) {
+                    remainderStack.increment(inputStack.getCount());
+
+                    if (remainderStack.getCount() > remainderStack.getMaxCount()) {
+                        int excess = remainderStack.getCount() - remainderStack.getMaxCount();
+                        remainderStack.decrement(excess);
+
+                        var insertStack = remainderStack.copy();
+                        insertStack.setCount(excess);
+
+                        if(!attemptToInsertIntoHopper(insertStack)){
+                            var frontForgePos = pos.offset(getCachedState().get(ForgeControllerBlock.FACING));
+
+                            world.playSound(null, frontForgePos.getX(), frontForgePos.getY(), frontForgePos.getZ(), SoundEvents.ENTITY_ITEM_PICKUP, SoundCategory.BLOCKS, 1.0F, 0.2F);
+
+                            ItemScatterer.spawn(world, frontForgePos.getX(), frontForgePos.getY(), frontForgePos.getZ(), insertStack);
+                        }
+                    }
+
+                    this.setStack(i, remainderStack);
+                } else {
+                    if(!attemptToInsertIntoHopper(remainderStack)){
+                        var frontForgePos = pos.offset(getCachedState().get(ForgeControllerBlock.FACING));
+
+                        world.playSound(null, frontForgePos.getX(), frontForgePos.getY(), frontForgePos.getZ(), SoundEvents.ENTITY_ITEM_PICKUP, SoundCategory.BLOCKS, 1.0F, 0.2F);
+
+                        ItemScatterer.spawn(world, frontForgePos.getX(), frontForgePos.getY(), frontForgePos.getZ(), remainderStack);
+                    }
+                }
+            }
+        }
+    }
+
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
+    public boolean attemptToInsertIntoHopper(ItemStack remainderStack){
+        if (remainderStack.isEmpty()) return true;
+
+        HopperBlockEntity blockEntity = null;
+
+        for (int y = 1; y <= 2; y++) {
+            if (world.getBlockEntity(this.pos.down(y)) instanceof HopperBlockEntity hopperBlockEntity) {
+                blockEntity = hopperBlockEntity;
+
+                break;
+            }
+        }
+
+        if (blockEntity != null) {
+            var isHopperEmpty = blockEntity.isEmpty();
+
+            for (int slotIndex = 0; slotIndex < blockEntity.size(); ++slotIndex) {
+                if (remainderStack.isEmpty()) break;
+
+                if (!blockEntity.getStack(slotIndex).isEmpty()) {
+                    final var itemStack = blockEntity.getStack(slotIndex).copy();
+
+                    if (itemStack.isEmpty()) {
+                        blockEntity.setStack(slotIndex, remainderStack);
+                        remainderStack = ItemStack.EMPTY;
+                    } else if (ItemOps.canStack(itemStack, remainderStack)) {
+                        int availableSpace = itemStack.getMaxCount() - itemStack.getCount();
+                        int j = Math.min(itemStack.getCount(), availableSpace);
+                        remainderStack.decrement(j);
+                        itemStack.increment(j);
+                    }
+                } else {
+                    blockEntity.setStack(slotIndex, remainderStack);
+                    break;
+                }
+            }
+
+            if (isHopperEmpty && !((HopperBlockEntityAccessor)blockEntity).alloyForge$isDisabled()) {
+                ((HopperBlockEntityAccessor)blockEntity).alloyForge$setTransferCooldown(8);
+            }
+
+            blockEntity.markDirty();
+
+            return true;
+        }
+
+        return false;
     }
 
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
@@ -330,7 +416,7 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
     }
 
     @Override
-    public Iterator<StorageView<FluidVariant>> iterator(TransactionContext transaction) {
+    public Iterator<? extends StorageView<FluidVariant>> iterator(TransactionContext transaction) {
         return this.fluidHolder.iterator(transaction);
     }
 

@@ -1,0 +1,32 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:item_tags_populated",
+      "values": [
+        "c:platinum_ores",
+        "c:platinum_ingots"
+      ]
+    }
+  ],
+  "type": "alloy_forgery:forging",
+  "inputs": [
+    {
+      "tag": "c:platinum_ores"
+    }
+  ],
+  "output": {
+    "priority": [
+      "mythicmetals:platinum_ingot",
+      "modern_industrialization:platinum_ingot"
+    ],
+    "default": "c:platinum_ingots",
+    "count": 2
+  },
+  "overrides": {
+    "3+": {
+      "count": 3
+    }
+  },
+  "min_forge_tier": 2,
+  "fuel_per_tick": 10
+}

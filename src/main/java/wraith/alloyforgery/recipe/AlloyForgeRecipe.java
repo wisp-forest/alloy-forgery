@@ -1,36 +1,47 @@
 package wraith.alloyforgery.recipe;
 
 import com.google.common.collect.ImmutableMap;
+import it.unimi.dsi.fastutil.ints.Int2IntLinkedOpenHashMap;
+import it.unimi.dsi.fastutil.ints.Int2IntMap;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.recipe.Ingredient;
 import net.minecraft.recipe.Recipe;
 import net.minecraft.recipe.RecipeSerializer;
 import net.minecraft.recipe.RecipeType;
+import net.minecraft.tag.TagKey;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.Pair;
 import net.minecraft.util.collection.DefaultedList;
+import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
 import wraith.alloyforgery.AlloyForgery;
-import wraith.alloyforgery.block.ForgeControllerBlockEntity;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Map;
+import javax.annotation.Nullable;
+import java.util.*;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class AlloyForgeRecipe implements Recipe<Inventory> {
+
+    private static final Map<Item, ItemStack> GLOBAL_RECIPE_REMAINDER = new HashMap<>();
+
+    private static final List<Integer> INPUT_SLOT_INDICES = IntStream.rangeClosed(0, 9).boxed().toList();
+
+    public static final Map<AlloyForgeRecipe, PendingRecipeData> PENDING_RECIPES = new HashMap<>();
 
     private final Identifier id;
 
     private final Map<Ingredient, Integer> inputs;
-
-    private final ItemStack output;
+    private ItemStack output;
 
     private final int minForgeTier;
     private final int fuelPerTick;
 
-    private final ImmutableMap<OverrideRange, ItemStack> tierOverrides;
+    private ImmutableMap<OverrideRange, ItemStack> tierOverrides;
 
     public AlloyForgeRecipe(Identifier id, Map<Ingredient, Integer> inputs, ItemStack output, int minForgeTier, int fuelPerTick, ImmutableMap<OverrideRange, ItemStack> overrides) {
         this.id = id;
@@ -42,6 +53,39 @@ public class AlloyForgeRecipe implements Recipe<Inventory> {
         this.tierOverrides = overrides;
     }
 
+    public void finishRecipe(PendingRecipeData pendingData) {
+        if (pendingData.defaultTag() != null) {
+            final var itemEntryList = Registry.ITEM.getEntryList(pendingData.defaultTag().getLeft());
+
+            itemEntryList.ifPresentOrElse(registryEntries -> {
+                this.output = registryEntries.get(0).value().getDefaultStack();
+                this.output.setCount(pendingData.defaultTag().getRight());
+
+            }, () -> {
+                throw new InvalidTagException("Default tag " + pendingData.defaultTag().getLeft().id() + " of recipe " + this.id + " must not be empty");
+            });
+        }
+
+        final var overrides = ImmutableMap.<OverrideRange, ItemStack>builder();
+
+        pendingData.unfinishedTierOverrides().forEach((range, override) -> {
+            if (override.isCountOnly()) {
+                ItemStack stack = this.output.copy();
+                stack.setCount(override.count());
+
+                overrides.put(range, stack);
+            } else {
+                overrides.put(range, override.stack());
+            }
+        });
+
+        this.tierOverrides = overrides.build();
+    }
+
+    public static void addRemainders(Map<Item, ItemStack> remainders){
+        GLOBAL_RECIPE_REMAINDER.putAll(remainders);
+    }
+
     @Override
     public boolean isIgnoredInRecipeBook() {
         return true;
@@ -49,37 +93,48 @@ public class AlloyForgeRecipe implements Recipe<Inventory> {
 
     @Override
     public boolean matches(Inventory inventory, World world) {
-        int matchedIngredients = 0;
-        final var unifiedView = ((ForgeControllerBlockEntity) inventory).asUnifiedView();
+        return tryBind(inventory) != null;
+    }
 
-        //Confirm that the there is enough items for this recipe to even work
-        if (unifiedView.getUnifiedInventory().size() != inputs.size())
-            return false;
+    public Int2IntMap tryBind(Inventory inventory) {
+        var indices = new ConcurrentLinkedQueue<>(INPUT_SLOT_INDICES);
+        var boundSlots = new Int2IntLinkedOpenHashMap();
 
-        final var localInputs = new ArrayList<>(inputs.entrySet());
+        for (var ingredient : this.inputs.entrySet()) {
+            int remaining = ingredient.getValue();
 
-        for (Map.Entry<Item, Integer> invEntry : unifiedView.getUnifiedInventory().entrySet()) {
-            boolean isValidIngredient = false;
+            for (int index : indices) {
+                var stack = inventory.getStack(index);
 
-            for (int i = 0; i < localInputs.size(); i++) {
-                Map.Entry<Ingredient, Integer> inputEntry = localInputs.get(i);
+                if (ingredient.getKey().test(stack)) {
+                    boundSlots.put(index, Math.min(stack.getCount(), remaining));
+                    indices.remove(index);
 
-                //First test if we have enough Items based on the Ingredients needed amount for the recipe and then test if the item is am ingredient
-                if ((invEntry.getValue() - inputEntry.getValue() >= 0) && inputEntry.getKey().test(invEntry.getKey().getDefaultStack())) {
-                    isValidIngredient = true;
-                    matchedIngredients++;
-
-                    localInputs.remove(i);
-                    break;
+                    remaining -= stack.getCount();
+                    if (remaining <= 0) break;
                 }
             }
 
-            if (!isValidIngredient) {
-                return false;
+            if (remaining > 0) {
+                return null;
             }
         }
 
-        return matchedIngredients == inputs.size();
+        verification:
+        for (int index : indices) {
+            var stack = inventory.getStack(index);
+            if (stack.isEmpty()) continue;
+
+            for (var ingredient : this.inputs.keySet()) {
+                if (ingredient.test(stack)) {
+                    continue verification;
+                }
+            }
+
+            return null;
+        }
+
+        return boundSlots;
     }
 
     @Override
@@ -101,22 +156,40 @@ public class AlloyForgeRecipe implements Recipe<Inventory> {
 
     @Override
     public ItemStack craft(Inventory inventory) {
+        tryBind(inventory).forEach(inventory::removeStack);
+
         return ItemStack.EMPTY;
     }
 
-    /**
-     * Method to reduce the Items within the Unified Inventory based of the recipe ingredient requirements
-     */
-    public void consumeNeededIngredients(Inventory inventory) {
-        final var unifiedView = ((ForgeControllerBlockEntity) inventory).asUnifiedView();
+    @Nullable
+    public DefaultedList<ItemStack> attemptToGetRemainders(Inventory inventory) {
+        final var remainders = DefaultedList.ofSize(inventory.size(), ItemStack.EMPTY);
 
-        for (final var item : new HashSet<>(unifiedView.getUnifiedInventory().keySet())) {
-            inputs.forEach((input, inputCount) -> {
-                if (input.test(item.getDefaultStack())) {
-                    unifiedView.removeItems(item, inputCount);
-                }
-            });
+        //final var owoRemainders = RecipeRemainderStorage.has(this.getId()) ? RecipeRemainderStorage.get(this.getId()) : Map.<Item, ItemStack>of();
+
+        if(/*owoRemainders.isEmpty() &&*/ GLOBAL_RECIPE_REMAINDER.isEmpty()) return null;
+
+        var setAnyRemainders = false;
+
+        for (int i : tryBind(inventory).keySet()) {
+            var item = inventory.getStack(i).getItem();
+
+//            if (!owoRemainders.isEmpty()) {
+//                if (!owoRemainders.containsKey(item)) continue;
+//
+//                remainders.set(i, owoRemainders.get(item).copy());
+//
+//                setAnyRemainders = true;
+//            } else
+
+            if(GLOBAL_RECIPE_REMAINDER.containsKey(item)){
+                remainders.set(i, GLOBAL_RECIPE_REMAINDER.get(item).copy());
+
+                setAnyRemainders = true;
+            }
         }
+
+        return setAnyRemainders ? remainders : null;
     }
 
     @Override
@@ -127,11 +200,21 @@ public class AlloyForgeRecipe implements Recipe<Inventory> {
     @Override
     @Deprecated
     public ItemStack getOutput() {
-        return output.copy();
+        return this.output.copy();
     }
 
     public ItemStack getOutput(int forgeTier) {
-        return tierOverrides.getOrDefault(tierOverrides.keySet().stream().filter(overrideRange -> overrideRange.test(forgeTier)).findAny().orElse(null), output).copy();
+        ItemStack stack = tierOverrides.getOrDefault(tierOverrides.keySet().stream().filter(overrideRange -> overrideRange.test(forgeTier)).findAny().orElse(null), output).copy();
+
+        if (stack.getItem() == Items.AIR) {
+            int stackCount = stack.getCount();
+
+            stack = this.output.copy();
+
+            stack.setCount(stackCount);
+        }
+
+        return stack;
     }
 
     @Override
@@ -201,5 +284,28 @@ public class AlloyForgeRecipe implements Recipe<Inventory> {
 
         public static final Identifier ID = AlloyForgery.id("forging");
         public static final Type INSTANCE = new Type();
+    }
+
+    public record PendingRecipeData(@Nullable Pair<TagKey<Item>, Integer> defaultTag,
+                                    ImmutableMap<OverrideRange, PendingOverride> unfinishedTierOverrides) {
+        public record PendingOverride(@Nullable ItemStack stack, int count) {
+            public boolean isCountOnly() {
+                return this.stack == null;
+            }
+
+            public static PendingOverride onlyCount(int count) {
+                return new PendingOverride(null, count);
+            }
+
+            public static PendingOverride ofStack(ItemStack stack) {
+                return new PendingOverride(stack, -1);
+            }
+        }
+    }
+
+    public static class InvalidTagException extends RuntimeException {
+        public InvalidTagException(String message) {
+            super(message);
+        }
     }
 }

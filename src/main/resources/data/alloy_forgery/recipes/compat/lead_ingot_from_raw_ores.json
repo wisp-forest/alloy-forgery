@@ -1,0 +1,34 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:item_tags_populated",
+      "values": [
+        "c:raw_lead_ores",
+        "c:lead_ingots"
+      ]
+    }
+  ],
+  "type": "alloy_forgery:forging",
+  "inputs": [
+    {
+      "tag": "c:raw_lead_ores",
+      "count": 2
+    }
+  ],
+  "output": {
+    "priority": [
+      "techreborn:lead_ingot",
+      "indrev:lead_ingot",
+      "modern_industrialization:lead_ingot"
+    ],
+    "default": "c:lead_ingots",
+    "count": 3
+  },
+  "overrides": {
+    "2+": {
+      "count": 4
+    }
+  },
+  "min_forge_tier": 1,
+  "fuel_per_tick": 5
+}

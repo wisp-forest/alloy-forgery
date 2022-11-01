@@ -1,0 +1,35 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:item_tags_populated",
+      "values": [
+        "c:manganese_ores",
+        "c:manganese_ingots"
+      ]
+    }
+  ],
+  "type": "alloy_forgery:forging",
+  "inputs": [
+    {
+      "tag": "c:manganese_ores"
+    }
+  ],
+  "output": {
+    "priority": [
+      "mythicmetals:manganese_ingot",
+      "modern_industrialization:manganese_ingot"
+    ],
+    "default": "c:manganese_ingots",
+    "count": 2
+  },
+  "overrides": {
+    "2": {
+      "count": 3
+    },
+    "3+": {
+      "count": 4
+    }
+  },
+  "min_forge_tier": 1,
+  "fuel_per_tick": 5
+}

@@ -14,6 +14,7 @@ import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.state.property.DirectionProperty;
 import net.minecraft.state.property.Properties;
+import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Formatting;
@@ -58,6 +59,7 @@ public class ForgeControllerBlock extends BlockWithEntity {
                 controller.addFuel(fuelDefinition.fuel());
             } else {
                 if (!controller.verifyMultiblock()) {
+
                     player.sendMessage(new TranslatableText("message.alloy_forgery.invalid_multiblock").formatted(Formatting.GRAY), true);
                     return ActionResult.SUCCESS;
                 }

@@ -1,20 +1,22 @@
 package wraith.alloyforgery.recipe;
 
 import com.google.common.collect.ImmutableMap;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSyntaxException;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.recipe.Ingredient;
 import net.minecraft.recipe.RecipeSerializer;
+import net.minecraft.tag.TagKey;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.JsonHelper;
+import net.minecraft.util.Pair;
+import net.minecraft.util.registry.Registry;
+import org.apache.commons.lang3.mutable.MutableInt;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class AlloyForgeRecipeSerializer implements RecipeSerializer<AlloyForgeRecipe> {
@@ -24,36 +26,85 @@ public class AlloyForgeRecipeSerializer implements RecipeSerializer<AlloyForgeRe
     @Override
     public AlloyForgeRecipe read(Identifier id, JsonObject json) {
 
-        Map<JsonObject, Integer> jsonObjectIntegerMap = new HashMap<>();
+        Map<IngredientData, MutableInt> ingredientDataToCount = new LinkedHashMap<>();
 
-        for(JsonElement entry : JsonHelper.getArray(json, "inputs")) {
-            JsonObject object = entry.getAsJsonObject();
+        for (var entry : JsonHelper.getArray(json, "inputs")) {
+            var object = entry.getAsJsonObject();
 
-            if(jsonObjectIntegerMap.containsKey(object)) {
-                jsonObjectIntegerMap.replace(object, jsonObjectIntegerMap.get(object) + 1);
+            IngredientData inputData;
+
+            if (object.has("item")) {
+                inputData = new IngredientData(object.get("item").getAsString(), false);
+            } else if (object.has("tag")) {
+                inputData = new IngredientData(object.get("tag").getAsString(), true);
             } else {
-                jsonObjectIntegerMap.put(object, 1);
+                throw new JsonSyntaxException("An ingredient entry needs either a tag or an item");
             }
+
+            ingredientDataToCount.computeIfAbsent(inputData, stringStringPair -> new MutableInt(0))
+                    .add(object.keySet().contains("count") ? object.get("count").getAsInt() : 1);
         }
 
-        if (jsonObjectIntegerMap.isEmpty()) throw new JsonSyntaxException("Inputs cannot be empty");
-
-        Map<Ingredient, Integer> ingredientIntegerMap = new HashMap<>();
-
-        for(Map.Entry<JsonObject, Integer> entry : jsonObjectIntegerMap.entrySet()) {
-            ingredientIntegerMap.put(Ingredient.fromJson(entry.getKey()), entry.getValue());
+        if (ingredientDataToCount.isEmpty()) throw new JsonSyntaxException("Inputs cannot be empty");
+        if (ingredientDataToCount.keySet().size() > 10) {
+            throw new JsonSyntaxException("Recipe has more than 10 distinct input ingredients");
         }
 
-        final var outputStack = getItemStack(JsonHelper.getObject(json, "output"));
+        var ingredientToCount = new LinkedHashMap<Ingredient, Integer>();
+        for (var entry : ingredientDataToCount.entrySet()) {
+            final var ingredientData = entry.getKey();
+
+            Ingredient ingredient;
+            Identifier identifier = new Identifier(ingredientData.data());
+
+            ingredient = ingredientData.isTag()
+                    ? Ingredient.fromTag(TagKey.of(Registry.ITEM_KEY, identifier))
+                    : Ingredient.ofItems(JsonHelper.asItem(new JsonPrimitive(ingredientData.data()), identifier.toString()));
+
+            ingredientToCount.put(ingredient, entry.getValue().intValue());
+        }
+
+        if (ingredientToCount.values().stream().mapToInt(integer -> integer).sum() > (10 * 64)) {
+            throw new JsonSyntaxException("Recipe exceeded maximum input item count of " + (10 * 64));
+        }
+
+        final var outputObject = JsonHelper.getObject(json, "output");
+
+        boolean prioritisedOutput = false;
+        ItemStack outputStack = null;
+        Pair<TagKey<Item>, Integer> defaultTag = null;
+
+        if (outputObject.has("priority")) {
+            if (!outputObject.has("default")) {
+                throw new JsonSyntaxException("Priority-based recipes must declare a 'default' tag");
+            }
+
+            prioritisedOutput = true;
+
+            for (var itemElement : JsonHelper.getArray(outputObject, "priority")) {
+                var maybeItem = Registry.ITEM.getOrEmpty(Identifier.tryParse(itemElement.getAsString()));
+
+                if (maybeItem.isPresent()) {
+                    outputStack = maybeItem.get().getDefaultStack();
+                    outputStack.setCount(JsonHelper.getInt(outputObject, "count"));
+                    break;
+                }
+            }
+
+            if (outputStack == null) {
+                defaultTag = new Pair<>(TagKey.of(Registry.ITEM_KEY, new Identifier(JsonHelper.getString(outputObject, "default"))), JsonHelper.getInt(outputObject, "count"));
+            }
+        } else {
+            outputStack = getItemStack(outputObject);
+        }
 
         final int minForgeTier = JsonHelper.getInt(json, "min_forge_tier");
         final int requiredFuel = JsonHelper.getInt(json, "fuel_per_tick");
 
-        final var overridesJson = JsonHelper.getObject(json, "overrides", new JsonObject());
-        final var overridesBuilder = ImmutableMap.<AlloyForgeRecipe.OverrideRange, ItemStack>builder();
+        final var overrides = JsonHelper.getObject(json, "overrides", new JsonObject());
+        final var overridesBuilder = ImmutableMap.<AlloyForgeRecipe.OverrideRange, AlloyForgeRecipe.PendingRecipeData.PendingOverride>builder();
 
-        for (var entry : overridesJson.entrySet()) {
-
+        for (var entry : overrides.entrySet()) {
             final var overrideString = entry.getKey();
             AlloyForgeRecipe.OverrideRange overrideRange = null;
 
@@ -69,10 +120,39 @@ public class AlloyForgeRecipeSerializer implements RecipeSerializer<AlloyForgeRe
                 throw new JsonSyntaxException("Invalid override range token: " + overrideString);
             }
 
-            overridesBuilder.put(overrideRange, getItemStack(entry.getValue().getAsJsonObject()));
+            final var overrideObject = entry.getValue().getAsJsonObject();
+
+            if (overrideObject.has("id")) {
+                overridesBuilder.put(overrideRange, AlloyForgeRecipe.PendingRecipeData.PendingOverride.ofStack(getItemStack(overrideObject)));
+            } else {
+                overridesBuilder.put(overrideRange, AlloyForgeRecipe.PendingRecipeData.PendingOverride.onlyCount(JsonHelper.getInt(overrideObject, "count")));
+            }
         }
 
-        return new AlloyForgeRecipe(id, ingredientIntegerMap, outputStack, minForgeTier, requiredFuel, overridesBuilder.build());
+        var effectiveOverrides = ImmutableMap.<AlloyForgeRecipe.OverrideRange, ItemStack>of();
+        if (!prioritisedOutput) {
+            final var builder = ImmutableMap.<AlloyForgeRecipe.OverrideRange, ItemStack>builder();
+
+            for (var entry : overridesBuilder.build().entrySet()) {
+                if (entry.getValue().isCountOnly()) {
+                    var stack = outputStack.copy();
+                    stack.setCount(entry.getValue().count());
+                    builder.put(entry.getKey(), stack);
+                } else {
+                    builder.put(entry.getKey(), entry.getValue().stack());
+                }
+            }
+
+            effectiveOverrides = builder.build();
+        }
+
+        final var recipe = new AlloyForgeRecipe(id, ingredientToCount, outputStack, minForgeTier, requiredFuel, effectiveOverrides);
+
+        if (prioritisedOutput) {
+            AlloyForgeRecipe.PENDING_RECIPES.put(recipe, new AlloyForgeRecipe.PendingRecipeData(defaultTag, overridesBuilder.build()));
+        }
+
+        return recipe;
     }
 
     private ItemStack getItemStack(JsonObject json) {
@@ -84,9 +164,7 @@ public class AlloyForgeRecipeSerializer implements RecipeSerializer<AlloyForgeRe
 
     @Override
     public AlloyForgeRecipe read(Identifier id, PacketByteBuf buf) {
-
-//        final var inputs = buf.readCollection(value -> new ArrayList<>(), Ingredient::fromPacket);
-        final var inputs = buf.readMap(value -> new HashMap<Ingredient, Integer>(), Ingredient::fromPacket, PacketByteBuf::readVarInt);
+        final var inputs = buf.readMap(value -> new LinkedHashMap<>(), Ingredient::fromPacket, PacketByteBuf::readVarInt);
 
         final var output = buf.readItemStack();
 
@@ -102,7 +180,6 @@ public class AlloyForgeRecipeSerializer implements RecipeSerializer<AlloyForgeRe
     public void write(PacketByteBuf buf, AlloyForgeRecipe recipe) {
         buf.writeMap(recipe.getIngredientsMap(), (buf1, ingredient) -> ingredient.write(buf1), PacketByteBuf::writeVarInt);
 
-        //buf.writeCollection(recipe.getIngredients(), (buf1, ingredient) -> ingredient.write(buf1));
         buf.writeItemStack(recipe.getOutput());
 
         buf.writeVarInt(recipe.getMinForgeTier());
@@ -113,4 +190,6 @@ public class AlloyForgeRecipeSerializer implements RecipeSerializer<AlloyForgeRe
             buf1.writeVarInt(overrideRange.upperBound());
         }, PacketByteBuf::writeItemStack);
     }
+
+    private record IngredientData(String data, boolean isTag) {}
 }

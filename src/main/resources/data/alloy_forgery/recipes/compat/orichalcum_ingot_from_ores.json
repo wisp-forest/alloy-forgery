@@ -1,0 +1,31 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:item_tags_populated",
+      "values": [
+        "c:orichalcum_ores",
+        "c:orichalcum_ingots"
+      ]
+    }
+  ],
+  "type": "alloy_forgery:forging",
+  "inputs": [
+    {
+      "tag": "c:orichalcum_ores"
+    }
+  ],
+  "output": {
+    "priority": [
+      "mythicmetals:orichalcum_ingot"
+    ],
+    "default": "c:orichalcum_ingots",
+    "count": 2
+  },
+  "overrides": {
+    "3+": {
+      "count": 3
+    }
+  },
+  "min_forge_tier": 2,
+  "fuel_per_tick": 10
+}

@@ -1,0 +1,39 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:item_tags_populated",
+      "values": [
+        "c:tin_ores",
+        "c:copper_ores",
+        "c:bronze_ingots"
+      ]
+    }
+  ],
+  "type": "alloy_forgery:forging",
+  "inputs": [
+    {
+      "tag": "minecraft:copper_ores",
+      "count": 2
+    },
+	  {
+      "tag": "c:tin_ores"
+    }
+  ],
+  "output": {
+    "priority": [
+      "mythicmetals:bronze_ingot",
+      "techreborn:bronze_ingot",
+      "indrev:bronze_ingot",
+      "modern_industrialization:bronze_ingot"
+    ],
+    "default": "c:bronze_ingots",
+    "count": 4
+  },
+  "overrides": {
+    "2+": {
+      "count": 5
+    }
+  },
+  "min_forge_tier": 1,
+  "fuel_per_tick": 5
+}

@@ -1,0 +1,32 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:item_tags_populated",
+      "values": [
+        "c:iron_ingots",
+        "c:nickel_ingots",
+        "c:invar_ingots"
+      ]
+    }
+  ],
+  "type": "alloy_forgery:forging",
+  "inputs": [
+    {
+      "tag": "c:iron_ingots",
+      "count": 2
+    },
+    {
+      "tag": "c:nickel_ingots"
+    }
+  ],
+  "output": {
+    "priority": [
+      "techreborn:invar_ingot",
+      "modern_industrialization:invar_ingot"
+    ],
+    "default": "c:invar_ingots",
+    "count": 3
+  },
+  "min_forge_tier": 1,
+  "fuel_per_tick": 5
+}

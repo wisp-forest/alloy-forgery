@@ -13,6 +13,8 @@ import wraith.alloyforgery.AlloyForgery;
 
 public class AlloyForgeScreen extends HandledScreen<AlloyForgeScreenHandler> {
 
+    public static int blockAtlasWidth = 0, blockAtlasHeight = 0;
+
     private static final Identifier TEXTURE = AlloyForgery.id("textures/gui/forge_controller.png");
     private final SpriteIdentifier lavaSpriteId = new SpriteIdentifier(PlayerScreenHandler.BLOCK_ATLAS_TEXTURE, new Identifier("block/lava_still"));
 
@@ -45,11 +47,11 @@ public class AlloyForgeScreen extends HandledScreen<AlloyForgeScreenHandler> {
         final var fullFrames = this.handler.getLavaProgress() / 16;
         for (int i = 0; i < fullFrames; i++) {
             drawTexture(matrices, this.x + 63 + i * 16, this.y + 4, lavaSprite.getX(), lavaSprite.getY() + 2,
-                    16, 10, 1024, 1024);
+                    16, 10, blockAtlasWidth, blockAtlasHeight);
         }
 
         drawTexture(matrices, this.x + 63 + fullFrames * 16, this.y + 4, lavaSprite.getX(), lavaSprite.getY() + 2,
-                (this.handler.getLavaProgress() - fullFrames * 16), 10, 1024, 1024);
+                (this.handler.getLavaProgress() - fullFrames * 16), 10, blockAtlasWidth, blockAtlasHeight);
     }
 
     public int rootX() {

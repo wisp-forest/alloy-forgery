@@ -1,0 +1,32 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:item_tags_populated",
+      "values": [
+        "c:iridium_ores",
+        "c:iridium_ingots"
+      ]
+    }
+  ],
+  "type": "alloy_forgery:forging",
+  "inputs": [
+    {
+      "tag": "c:iridium_ores"
+    }
+  ],
+  "output": {
+    "priority": [
+      "techreborn:iridium_ingot",
+      "modern_industrialization:iridium_ingot"
+    ],
+    "default": "c:iridium_ingots",
+    "count": 2
+  },
+  "overrides": {
+    "3+": {
+      "count": 3
+    }
+  },
+  "min_forge_tier": 2,
+  "fuel_per_tick": 10
+}

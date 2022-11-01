@@ -1,0 +1,40 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:item_tags_populated",
+      "values": [
+        "c:copper_ores",
+        "c:zinc_ores",
+        "c:brass_ingots"
+      ]
+    }
+  ],
+  "type": "alloy_forgery:forging",
+  "inputs": [
+    {
+      "tag": "minecraft:copper_ores",
+      "count": 2
+    },
+    {
+      "tag": "c:zinc_ores"
+    }
+  ],
+  "output": {
+    "priority": [
+      "create:brass_ingot",
+      "techreborn:brass_ingot"
+    ],
+    "default": "c:brass_ingots",
+    "count": 3
+  },
+  "overrides": {
+    "2+": {
+      "count": 4
+    },
+    "3+": {
+      "count": 5
+    }
+  },
+  "min_forge_tier": 1,
+  "fuel_per_tick": 5
+}

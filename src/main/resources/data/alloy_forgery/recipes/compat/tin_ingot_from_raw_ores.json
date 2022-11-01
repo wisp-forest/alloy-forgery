@@ -1,0 +1,35 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:item_tags_populated",
+      "values": [
+        "c:raw_tin_ores",
+        "c:tin_ingots"
+      ]
+    }
+  ],
+  "type": "alloy_forgery:forging",
+  "inputs": [
+    {
+      "tag": "c:raw_tin_ores",
+      "count": 2
+    }
+  ],
+  "output": {
+    "priority": [
+      "mythicmetals:tin_ingot",
+      "techreborn:tin_ingot",
+      "indrev:tin_ingot",
+      "modern_industrialization:tin_ingot"
+    ],
+    "default": "c:tin_ingots",
+    "count": 3
+  },
+  "overrides": {
+    "2+": {
+      "count": 4
+    }
+  },
+  "min_forge_tier": 1,
+  "fuel_per_tick": 5
+}

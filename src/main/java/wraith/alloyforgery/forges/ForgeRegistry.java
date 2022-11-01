@@ -32,7 +32,7 @@ public class ForgeRegistry {
         Registry.register(Registry.BLOCK, controllerBlockRegistryId, controllerBlock);
         Registry.register(Registry.ITEM, controllerBlockRegistryId, new ForgeControllerItem(controllerBlock, new Item.Settings().group(AlloyForgery.ALLOY_FORGERY_GROUP)));
 
-        TagInjector.injectBlocks(MINEABLE_PICKAXE, controllerBlock);
+        TagInjector.inject(Registry.BLOCK, MINEABLE_PICKAXE, controllerBlock);
 
         store(forgeDefinitionId, definition, controllerBlock);
     }
@@ -67,7 +67,8 @@ public class ForgeRegistry {
 
         public static final Loader INSTANCE = new Loader();
 
-        private Loader() {}
+        private Loader() {
+        }
 
         @Override
         public String getDataSubdirectory() {

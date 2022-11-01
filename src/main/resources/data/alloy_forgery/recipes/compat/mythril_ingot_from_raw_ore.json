@@ -1,0 +1,32 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:item_tags_populated",
+      "values": [
+        "c:raw_mythril_ores",
+        "c:mythril_ingots"
+      ]
+    }
+  ],
+  "type": "alloy_forgery:forging",
+  "inputs": [
+    {
+      "tag": "c:raw_mythril_ores",
+      "count": 2
+    }
+  ],
+  "output": {
+    "priority": [
+      "mythicmetals:mythril_ingot"
+    ],
+    "default": "c:mythril_ingots",
+    "count": 2
+  },
+  "overrides": {
+    "3+": {
+      "count": 3
+    }
+  },
+  "min_forge_tier": 2,
+  "fuel_per_tick": 10
+}
