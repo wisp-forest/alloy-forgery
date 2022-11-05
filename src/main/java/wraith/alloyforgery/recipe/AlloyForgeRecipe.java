@@ -28,7 +28,7 @@ import java.util.stream.IntStream;
 
 public class AlloyForgeRecipe implements Recipe<Inventory> {
 
-    private static final Map<Item, ItemStack> GLOBAL_RECIPE_REMAINDER = new HashMap<>();
+    private static final Map<Item, ItemStack> GLOBAL_REMAINDERS = new HashMap<>();
 
     private static final List<Integer> INPUT_SLOT_INDICES = IntStream.rangeClosed(0, 9).boxed().toList();
 
@@ -84,7 +84,7 @@ public class AlloyForgeRecipe implements Recipe<Inventory> {
     }
 
     public static void addRemainders(Map<Item, ItemStack> remainders){
-        GLOBAL_RECIPE_REMAINDER.putAll(remainders);
+        GLOBAL_REMAINDERS.putAll(remainders);
     }
 
     @Override
@@ -157,22 +157,20 @@ public class AlloyForgeRecipe implements Recipe<Inventory> {
 
     @Override
     public ItemStack craft(Inventory inventory) {
-        tryBind(inventory).forEach(inventory::removeStack);
-
+        this.tryBind(inventory).forEach(inventory::removeStack);
         return ItemStack.EMPTY;
     }
 
     @Nullable
-    public DefaultedList<ItemStack> attemptToGetRemainders(Inventory inventory) {
+    public DefaultedList<ItemStack> gatherRemainders(Inventory inventory) {
         final var remainders = DefaultedList.ofSize(inventory.size(), ItemStack.EMPTY);
-
         final var owoRemainders = RecipeRemainderStorage.has(this.getId()) ? RecipeRemainderStorage.get(this.getId()) : Map.<Item, ItemStack>of();
 
-        if(owoRemainders.isEmpty() && GLOBAL_RECIPE_REMAINDER.isEmpty()) return null;
+        if(owoRemainders.isEmpty() && GLOBAL_REMAINDERS.isEmpty()) return null;
 
         var setAnyRemainders = false;
 
-        for (int i : tryBind(inventory).keySet()) {
+        for (int i : this.tryBind(inventory).keySet()) {
             var item = inventory.getStack(i).getItem();
 
             if (!owoRemainders.isEmpty()) {
@@ -181,8 +179,8 @@ public class AlloyForgeRecipe implements Recipe<Inventory> {
                 remainders.set(i, owoRemainders.get(item).copy());
 
                 setAnyRemainders = true;
-            } else if(GLOBAL_RECIPE_REMAINDER.containsKey(item)){
-                remainders.set(i, GLOBAL_RECIPE_REMAINDER.get(item).copy());
+            } else if(GLOBAL_REMAINDERS.containsKey(item)){
+                remainders.set(i, GLOBAL_REMAINDERS.get(item).copy());
 
                 setAnyRemainders = true;
             }
