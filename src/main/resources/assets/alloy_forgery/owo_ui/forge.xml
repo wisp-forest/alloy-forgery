@@ -24,6 +24,8 @@
                             <children>
                                 <sprite atlas="minecraft:textures/atlas/blocks.png" sprite="minecraft:block/lava_still"/>
                                 <sprite atlas="minecraft:textures/atlas/blocks.png" sprite="minecraft:block/lava_still"/>
+                                <sprite atlas="minecraft:textures/atlas/blocks.png" sprite="minecraft:block/lava_still"/>
+                                <sprite atlas="minecraft:textures/atlas/blocks.png" sprite="minecraft:block/lava_still"/>
                             </children>
 
                             <positioning type="absolute">63,4</positioning>
