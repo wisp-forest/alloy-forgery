@@ -27,8 +27,6 @@ public class AlloyForgingCategory implements DisplayCategory<AlloyForgingDisplay
     final Identifier GUI_TEXTURE = AlloyForgery.id("textures/gui/forge_controller.png");
     final Identifier DARK_GUI_TEXTURE = AlloyForgery.id("textures/gui/forge_controller_dark.png");
 
-    public static final CategoryIdentifier<AlloyForgingDisplay> ID = CategoryIdentifier.of(AlloyForgery.id("forging"));
-
     @Override
     public int getDisplayHeight() {
         return 88;
@@ -88,6 +86,6 @@ public class AlloyForgingCategory implements DisplayCategory<AlloyForgingDisplay
 
     @Override
     public CategoryIdentifier<? extends AlloyForgingDisplay> getCategoryIdentifier() {
-        return ID;
+        return AlloyForgeryCommonPlugin.ID;
     }
 }

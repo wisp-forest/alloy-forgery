@@ -17,7 +17,7 @@ public class AlloyForgeryClientPlugin implements REIClientPlugin {
         registry.add(new AlloyForgingCategory());
 
         for (var controller : ForgeRegistry.getControllerBlocks()) {
-            registry.addWorkstations(AlloyForgingCategory.ID, EntryStacks.of(controller));
+            registry.addWorkstations(AlloyForgeryCommonPlugin.ID, EntryStacks.of(controller));
         }
     }
 
@@ -25,7 +25,7 @@ public class AlloyForgeryClientPlugin implements REIClientPlugin {
     public void registerScreens(ScreenRegistry registry) {
         registry.registerClickArea(screen -> {
             return new Rectangle(screen.rootX() + 142, screen.rootY() + 20, 21, 24);
-        }, AlloyForgeScreen.class, AlloyForgingCategory.ID);
+        }, AlloyForgeScreen.class, AlloyForgeryCommonPlugin.ID);
     }
 
     @Override
