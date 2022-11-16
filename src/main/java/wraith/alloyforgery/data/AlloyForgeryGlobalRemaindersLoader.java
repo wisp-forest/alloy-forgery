@@ -33,13 +33,9 @@ public class AlloyForgeryGlobalRemaindersLoader extends JsonDataLoader implement
         prepared.forEach((identifier, jsonElement) -> {
             try {
                 if(jsonElement instanceof JsonObject jsonObject){
-                    if(!jsonObject.has("remainders")){
-                        throw new JsonSyntaxException("The Global Remainders file seems to be missing the needed remainders field.");
-                    }
-
                     var remainders = new HashMap<Item, ItemStack>();
 
-                    for (var remainderEntry : jsonObject.getAsJsonObject("remainders").entrySet()) {
+                    for (var remainderEntry : JsonHelper.getObject(jsonObject, "remainders").entrySet()) {
                         var item = JsonHelper.asItem(new JsonPrimitive(remainderEntry.getKey()), remainderEntry.getKey());
 
                         if (remainderEntry.getValue().isJsonObject()) {
@@ -53,10 +49,10 @@ public class AlloyForgeryGlobalRemaindersLoader extends JsonDataLoader implement
 
                     AlloyForgeRecipe.addRemainders(remainders);
                 } else {
-                    throw new JsonSyntaxException("JsonElement wasn't a JsonObject meaning it is malformed");
+                    throw new JsonSyntaxException("Expected alloy forge remainders definition to be a json object");
                 }
             } catch (IllegalArgumentException | JsonParseException exception) {
-                LOGGER.error("[AlloyForgerRemainders]: Parsing error loading recipe {}", identifier, exception);
+                LOGGER.error("[AlloyForgeRemainders]: Parsing error loading recipe {}", identifier, exception);
             }
         });
     }

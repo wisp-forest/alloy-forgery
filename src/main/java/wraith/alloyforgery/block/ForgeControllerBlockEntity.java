@@ -32,7 +32,6 @@ import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import wraith.alloyforgery.AlloyForgeScreenHandler;
 import wraith.alloyforgery.AlloyForgery;
@@ -154,7 +153,7 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
 
         world.updateComparators(pos, getCachedState().getBlock());
 
-        if (!verifyMultiblock()) {
+        if (!this.verifyMultiblock()) {
             this.currentSmeltTime = 0;
 
             final var currentState = world.getBlockState(pos);
@@ -164,13 +163,13 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
             return;
         }
 
-        if (!getFuelStack().isEmpty()) {
-            final var fuelStack = getFuelStack();
+        if (!this.getFuelStack().isEmpty()) {
+            final var fuelStack = this.getFuelStack();
             final var fuelDefinition = ForgeFuelRegistry.getFuelForItem(fuelStack.getItem());
 
             if (fuelDefinition != ForgeFuelRegistry.ForgeFuelDefinition.EMPTY && canAddFuel(fuelDefinition.fuel())) {
 
-                if (!ItemOps.emptyAwareDecrement(getFuelStack())) {
+                if (!ItemOps.emptyAwareDecrement(this.getFuelStack())) {
                     setStack(11, fuelDefinition.hasReturnType() ? new ItemStack(fuelDefinition.returnType()) : ItemStack.EMPTY);
                 }
 
@@ -193,28 +192,28 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
         }
 
         if (!this.isEmpty()) {
-            final var recipeOptional = world.getRecipeManager().getFirstMatch(AlloyForgeRecipe.Type.INSTANCE, this, world);
+            final var recipeOptional = this.world.getRecipeManager().getFirstMatch(AlloyForgeRecipe.Type.INSTANCE, this, world);
 
             if (recipeOptional.isEmpty()) {
                 this.currentSmeltTime = 0;
             } else {
                 final var recipe = recipeOptional.get();
-                if (recipe.getMinForgeTier() > forgeDefinition.forgeTier()) {
+                if (recipe.getMinForgeTier() > this.forgeDefinition.forgeTier()) {
                     this.currentSmeltTime = 0;
                     return;
                 }
 
                 final var outputStack = this.getStack(10);
-                final var recipeOutput = recipe.getOutput(forgeDefinition.forgeTier());
+                final var recipeOutput = recipe.getOutput(this.forgeDefinition.forgeTier());
 
                 if (!outputStack.isEmpty() && !ItemOps.canStack(outputStack, recipeOutput)) {
                     this.currentSmeltTime = 0;
                     return;
                 }
 
-                if (this.currentSmeltTime < forgeDefinition.maxSmeltTime()) {
+                if (this.currentSmeltTime < this.forgeDefinition.maxSmeltTime()) {
 
-                    final float fuelRequirement = recipe.getFuelPerTick() * forgeDefinition.speedMultiplier();
+                    final float fuelRequirement = recipe.getFuelPerTick() * this.forgeDefinition.speedMultiplier();
                     if (this.fuel - fuelRequirement < 0) {
                         this.currentSmeltTime = 0;
                         return;
@@ -227,7 +226,7 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
                         AlloyForgery.FORGE_PARTICLES.spawn(world, Vec3d.of(pos), facing);
                     }
                 } else {
-                    var remainderList = recipe.attemptToGetRemainders(this);
+                    var remainderList = recipe.gatherRemainders(this);
 
                     recipe.craft(this);
 
@@ -247,7 +246,7 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
         }
     }
 
-    public void handleForgingRemainders(DefaultedList<ItemStack> remainderList) {
+    private void handleForgingRemainders(DefaultedList<ItemStack> remainderList) {
         for (int i = 0; i < remainderList.size(); ++i) {
             var inputStack = this.getStack(i);
             var remainderStack = remainderList.get(i);
@@ -265,22 +264,20 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
                         var insertStack = remainderStack.copy();
                         insertStack.setCount(excess);
 
-                        if(!attemptToInsertIntoHopper(insertStack)){
+                        if(!this.attemptToInsertIntoHopper(insertStack)){
                             var frontForgePos = pos.offset(getCachedState().get(ForgeControllerBlock.FACING));
 
                             world.playSound(null, frontForgePos.getX(), frontForgePos.getY(), frontForgePos.getZ(), SoundEvents.ENTITY_ITEM_PICKUP, SoundCategory.BLOCKS, 1.0F, 0.2F);
-
                             ItemScatterer.spawn(world, frontForgePos.getX(), frontForgePos.getY(), frontForgePos.getZ(), insertStack);
                         }
                     }
 
                     this.setStack(i, remainderStack);
                 } else {
-                    if(!attemptToInsertIntoHopper(remainderStack)){
+                    if(!this.attemptToInsertIntoHopper(remainderStack)){
                         var frontForgePos = pos.offset(getCachedState().get(ForgeControllerBlock.FACING));
 
                         world.playSound(null, frontForgePos.getX(), frontForgePos.getY(), frontForgePos.getZ(), SoundEvents.ENTITY_ITEM_PICKUP, SoundCategory.BLOCKS, 1.0F, 0.2F);
-
                         ItemScatterer.spawn(world, frontForgePos.getX(), frontForgePos.getY(), frontForgePos.getZ(), remainderStack);
                     }
                 }
@@ -289,7 +286,7 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
     }
 
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
-    public boolean attemptToInsertIntoHopper(ItemStack remainderStack){
+    private boolean attemptToInsertIntoHopper(ItemStack remainderStack){
         if (remainderStack.isEmpty()) return true;
 
         HopperBlockEntity blockEntity = null;
@@ -351,7 +348,7 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
         return true;
     }
 
-    public static ImmutableList<BlockPos> generateMultiblockPositions(BlockPos controllerPos, Direction controllerFacing) {
+    private static ImmutableList<BlockPos> generateMultiblockPositions(BlockPos controllerPos, Direction controllerFacing) {
         final List<BlockPos> posses = new ArrayList<>();
         final BlockPos center = controllerPos.offset(controllerFacing.getOpposite());
 
@@ -443,6 +440,11 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
         @Override
         protected boolean canExtract(FluidVariant variant) {
             return false;
+        }
+
+        @Override
+        public Iterator<StorageView<FluidVariant>> iterator() {
+            return InsertionOnlyStorage.super.iterator();
         }
     }
 
