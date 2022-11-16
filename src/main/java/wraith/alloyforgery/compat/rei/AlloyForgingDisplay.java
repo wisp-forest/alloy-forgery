@@ -9,7 +9,6 @@ import me.shedaniel.rei.api.common.util.EntryIngredients;
 import net.fabricmc.fabric.api.util.NbtType;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtHelper;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.recipe.Ingredient;
 import wraith.alloyforgery.recipe.AlloyForgeRecipe;
@@ -74,7 +73,7 @@ public class AlloyForgingDisplay implements Display {
 
     @Override
     public CategoryIdentifier<?> getCategoryIdentifier() {
-        return AlloyForgingCategory.ID;
+        return AlloyForgeryCommonPlugin.ID;
     }
 
     public enum Serializer implements DisplaySerializer<AlloyForgingDisplay> {
