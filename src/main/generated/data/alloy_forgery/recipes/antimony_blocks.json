@@ -1,0 +1,32 @@
+{
+  "type": "alloy_forgery:forging",
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:tags_populated",
+      "values": [
+        "c:antimony_blocks",
+        "c:raw_antimony_blocks"
+      ]
+    }
+  ],
+  "fuel_per_tick": 45,
+  "inputs": [
+    {
+      "count": 2,
+      "tag": "c:raw_antimony_blocks"
+    }
+  ],
+  "min_forge_tier": 1,
+  "output": {
+    "count": 3,
+    "default": "c:antimony_blocks",
+    "priority": [
+      "modern_industrialization:antimony_block"
+    ]
+  },
+  "overrides": {
+    "2": {
+      "count": 4
+    }
+  }
+}

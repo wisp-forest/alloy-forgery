@@ -1,0 +1,41 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_raw_adamantite_ore_block": {
+      "conditions": {
+        "items": [
+          {
+            "tag": "c:raw_gold_blocks"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "c:adamantite_blocks"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:tags_populated",
+      "values": [
+        "c:adamantite_blocks",
+        "c:raw_adamantite_blocks"
+      ]
+    }
+  ],
+  "requirements": [
+    [
+      "has_raw_adamantite_ore_block",
+      "has_the_recipe"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "c:adamantite_blocks"
+    ]
+  }
+}

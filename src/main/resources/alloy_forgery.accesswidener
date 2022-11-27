@@ -1,2 +1,7 @@
-accessWidener v1 named
+accessWidener v2 named
+
 accessible class net/minecraft/block/entity/BlockEntityType$BlockEntityFactory
+
+accessible class net/minecraft/recipe/Ingredient$Entry
+accessible class net/minecraft/recipe/Ingredient$StackEntry
+accessible class net/minecraft/recipe/Ingredient$TagEntry

@@ -1,0 +1,32 @@
+{
+  "type": "alloy_forgery:forging",
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:tags_populated",
+      "values": [
+        "c:osmium_blocks",
+        "c:raw_osmium_blocks"
+      ]
+    }
+  ],
+  "fuel_per_tick": 90,
+  "inputs": [
+    {
+      "count": 2,
+      "tag": "c:raw_osmium_blocks"
+    }
+  ],
+  "min_forge_tier": 2,
+  "output": {
+    "count": 2,
+    "default": "c:osmium_blocks",
+    "priority": [
+      "mythicmetals:osmium_block"
+    ]
+  },
+  "overrides": {
+    "3": {
+      "count": 3
+    }
+  }
+}

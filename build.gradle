@@ -11,23 +11,14 @@ group = project.maven_group
 def ENV = System.getenv()
 
 repositories {
-    maven {
-        name = "TerraformersMC"
-        url = "https://maven.terraformersmc.com/"
-    }
-
+    maven { url 'https://maven.terraformersmc.com/' }
     maven { url 'https://maven.wispforest.io' }
-
     maven { url "https://maven.shedaniel.me/" }
-
     maven {
-        name = "Modrinth"
-        url = "https://api.modrinth.com/maven"
-        content {
-            includeGroup "maven.modrinth"
-        }
+        url 'https://api.modrinth.com/maven'
+        content {includeGroup "maven.modrinth"}
     }
-
+    maven { url 'https://jitpack.io' }
     mavenLocal()
 }
 
@@ -53,6 +44,29 @@ dependencies {
 
 loom {
     accessWidenerPath = file("src/main/resources/alloy_forgery.accesswidener")
+
+    runs {
+
+        datagenClient {
+            inherit client
+            name "Data Generation"
+            vmArg "-Dfabric-api.datagen"
+            vmArg "-Dfabric-api.datagen.output-dir=${file("src/main/generated")}"
+            vmArg "-Dfabric-api.datagen.modid=alloy_forgery"
+
+            runDir "build/datagen"
+        }
+    }
+}
+
+sourceSets {
+    main {
+        resources {
+            srcDirs += [
+                    'src/main/generated'
+            ]
+        }
+    }
 }
 
 processResources {

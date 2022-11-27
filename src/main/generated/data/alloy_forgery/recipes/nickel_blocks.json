@@ -1,0 +1,33 @@
+{
+  "type": "alloy_forgery:forging",
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:tags_populated",
+      "values": [
+        "c:nickel_blocks",
+        "c:raw_nickel_blocks"
+      ]
+    }
+  ],
+  "fuel_per_tick": 45,
+  "inputs": [
+    {
+      "count": 2,
+      "tag": "c:raw_nickel_blocks"
+    }
+  ],
+  "min_forge_tier": 1,
+  "output": {
+    "count": 3,
+    "default": "c:nickel_blocks",
+    "priority": [
+      "techreborn:nickel_block",
+      "modern_industrialization:nickel_block"
+    ]
+  },
+  "overrides": {
+    "2": {
+      "count": 4
+    }
+  }
+}

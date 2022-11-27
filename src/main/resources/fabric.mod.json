@@ -27,6 +27,9 @@
     "main": [
       "wraith.alloyforgery.AlloyForgery"
     ],
+    "fabric-datagen": [
+      "wraith.alloyforgery.data.AlloyForgeryData"
+    ],
     "rei_client": [
       "wraith.alloyforgery.compat.rei.AlloyForgeryClientPlugin"
     ],

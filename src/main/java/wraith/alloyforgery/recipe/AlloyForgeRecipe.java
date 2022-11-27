@@ -285,18 +285,19 @@ public class AlloyForgeRecipe implements Recipe<Inventory> {
 
     public record PendingRecipeData(@Nullable Pair<TagKey<Item>, Integer> defaultTag,
                                     ImmutableMap<OverrideRange, PendingOverride> unfinishedTierOverrides) {
-        public record PendingOverride(@Nullable ItemStack stack, int count) {
-            public boolean isCountOnly() {
-                return this.stack == null;
-            }
+    }
 
-            public static PendingOverride onlyCount(int count) {
-                return new PendingOverride(null, count);
-            }
+    public record PendingOverride(@Nullable ItemStack stack, int count) {
+        public boolean isCountOnly() {
+            return this.stack == null;
+        }
 
-            public static PendingOverride ofStack(ItemStack stack) {
-                return new PendingOverride(stack, -1);
-            }
+        public static PendingOverride onlyCount(int count) {
+            return new PendingOverride(null, count);
+        }
+
+        public static PendingOverride ofStack(ItemStack stack) {
+            return new PendingOverride(stack, stack.getCount());
         }
     }
 

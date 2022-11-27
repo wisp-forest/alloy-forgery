@@ -102,7 +102,7 @@ public class AlloyForgeRecipeSerializer implements RecipeSerializer<AlloyForgeRe
         final int requiredFuel = JsonHelper.getInt(json, "fuel_per_tick");
 
         final var overrides = JsonHelper.getObject(json, "overrides", new JsonObject());
-        final var overridesBuilder = ImmutableMap.<AlloyForgeRecipe.OverrideRange, AlloyForgeRecipe.PendingRecipeData.PendingOverride>builder();
+        final var overridesBuilder = ImmutableMap.<AlloyForgeRecipe.OverrideRange, AlloyForgeRecipe.PendingOverride>builder();
 
         for (var entry : overrides.entrySet()) {
             final var overrideString = entry.getKey();
@@ -116,16 +116,14 @@ public class AlloyForgeRecipeSerializer implements RecipeSerializer<AlloyForgeRe
                 overrideRange = new AlloyForgeRecipe.OverrideRange(Integer.parseInt(overrideString), Integer.parseInt(overrideString));
             }
 
-            if (overrideRange == null) {
-                throw new JsonSyntaxException("Invalid override range token: " + overrideString);
-            }
+            if (overrideRange == null) throw new JsonSyntaxException("Invalid override range token: " + overrideString);
 
             final var overrideObject = entry.getValue().getAsJsonObject();
 
             if (overrideObject.has("id")) {
-                overridesBuilder.put(overrideRange, AlloyForgeRecipe.PendingRecipeData.PendingOverride.ofStack(getItemStack(overrideObject)));
+                overridesBuilder.put(overrideRange, AlloyForgeRecipe.PendingOverride.ofStack(getItemStack(overrideObject)));
             } else {
-                overridesBuilder.put(overrideRange, AlloyForgeRecipe.PendingRecipeData.PendingOverride.onlyCount(JsonHelper.getInt(overrideObject, "count")));
+                overridesBuilder.put(overrideRange, AlloyForgeRecipe.PendingOverride.onlyCount(JsonHelper.getInt(overrideObject, "count")));
             }
         }
 

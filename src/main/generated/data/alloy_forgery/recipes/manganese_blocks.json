@@ -1,0 +1,33 @@
+{
+  "type": "alloy_forgery:forging",
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:tags_populated",
+      "values": [
+        "c:manganese_blocks",
+        "c:raw_manganese_blocks"
+      ]
+    }
+  ],
+  "fuel_per_tick": 45,
+  "inputs": [
+    {
+      "count": 2,
+      "tag": "c:raw_manganese_blocks"
+    }
+  ],
+  "min_forge_tier": 1,
+  "output": {
+    "count": 3,
+    "default": "c:manganese_blocks",
+    "priority": [
+      "mythicmetals:manganese_block",
+      "modern_industrialization:manganese_block"
+    ]
+  },
+  "overrides": {
+    "2": {
+      "count": 4
+    }
+  }
+}

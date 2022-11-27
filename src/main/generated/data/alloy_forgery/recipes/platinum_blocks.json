@@ -1,0 +1,33 @@
+{
+  "type": "alloy_forgery:forging",
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:tags_populated",
+      "values": [
+        "c:platinum_blocks",
+        "c:raw_platinum_blocks"
+      ]
+    }
+  ],
+  "fuel_per_tick": 90,
+  "inputs": [
+    {
+      "count": 2,
+      "tag": "c:raw_platinum_blocks"
+    }
+  ],
+  "min_forge_tier": 2,
+  "output": {
+    "count": 2,
+    "default": "c:platinum_blocks",
+    "priority": [
+      "mythicmetals:platinum_block",
+      "modern_industrialization:platinum_block"
+    ]
+  },
+  "overrides": {
+    "3": {
+      "count": 3
+    }
+  }
+}

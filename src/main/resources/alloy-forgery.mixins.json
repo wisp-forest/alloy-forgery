@@ -8,6 +8,7 @@
     "DataPackContentsMixin",
     "DefaultedRegistryMixin",
     "HopperBlockEntityAccessor",
+    "IngredientAccessor",
     "RecipeManagerMixin"
   ],
   "injectors": {

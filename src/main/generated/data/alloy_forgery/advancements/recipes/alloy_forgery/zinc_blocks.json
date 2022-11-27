@@ -1,0 +1,41 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_raw_zinc_ore_block": {
+      "conditions": {
+        "items": [
+          {
+            "tag": "c:raw_gold_blocks"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "c:zinc_blocks"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:tags_populated",
+      "values": [
+        "c:zinc_blocks",
+        "c:raw_zinc_blocks"
+      ]
+    }
+  ],
+  "requirements": [
+    [
+      "has_raw_zinc_ore_block",
+      "has_the_recipe"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "c:zinc_blocks"
+    ]
+  }
+}

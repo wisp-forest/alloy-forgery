@@ -1,0 +1,34 @@
+{
+  "type": "alloy_forgery:forging",
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:tags_populated",
+      "values": [
+        "c:tungsten_blocks",
+        "c:raw_tungsten_blocks"
+      ]
+    }
+  ],
+  "fuel_per_tick": 135,
+  "inputs": [
+    {
+      "count": 2,
+      "tag": "c:raw_tungsten_blocks"
+    }
+  ],
+  "min_forge_tier": 2,
+  "output": {
+    "count": 2,
+    "default": "c:tungsten_blocks",
+    "priority": [
+      "techreborn:tungsten_block",
+      "indrev:tungsten_block",
+      "modern_industrialization:tungsten_block"
+    ]
+  },
+  "overrides": {
+    "3": {
+      "count": 3
+    }
+  }
+}
