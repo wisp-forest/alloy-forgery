@@ -2,13 +2,16 @@ package wraith.alloyforgery.forges;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import io.wispforest.owo.itemgroup.OwoItemSettings;
 import io.wispforest.owo.moddata.ModDataConsumer;
 import io.wispforest.owo.util.TagInjector;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.Registry;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.Registry;
 import wraith.alloyforgery.AlloyForgery;
+import wraith.alloyforgery.AlloyForgeryItemGroup;
 import wraith.alloyforgery.ForgeControllerItem;
 import wraith.alloyforgery.block.ForgeControllerBlock;
 
@@ -27,12 +30,12 @@ public class ForgeRegistry {
 
     static void registerDefinition(Identifier forgeDefinitionId, ForgeDefinition definition) {
         final var controllerBlock = new ForgeControllerBlock(definition);
-        final var controllerBlockRegistryId = AlloyForgery.id(Registry.BLOCK.getId(definition.material()).getPath() + "_forge_controller");
+        final var controllerBlockRegistryId = AlloyForgery.id(Registries.BLOCK.getId(definition.material()).getPath() + "_forge_controller");
 
-        Registry.register(Registry.BLOCK, controllerBlockRegistryId, controllerBlock);
-        Registry.register(Registry.ITEM, controllerBlockRegistryId, new ForgeControllerItem(controllerBlock, new Item.Settings().group(AlloyForgery.ALLOY_FORGERY_GROUP)));
+        Registry.register(Registries.BLOCK, controllerBlockRegistryId, controllerBlock);
+        Registry.register(Registries.ITEM, controllerBlockRegistryId, new ForgeControllerItem(controllerBlock, new Item.Settings()));
 
-        TagInjector.inject(Registry.BLOCK, MINEABLE_PICKAXE, controllerBlock);
+        TagInjector.inject(Registries.BLOCK, MINEABLE_PICKAXE, controllerBlock);
 
         store(forgeDefinitionId, definition, controllerBlock);
     }

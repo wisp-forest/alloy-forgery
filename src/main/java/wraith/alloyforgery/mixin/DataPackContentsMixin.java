@@ -1,7 +1,7 @@
 package wraith.alloyforgery.mixin;
 
+import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.server.DataPackContents;
-import net.minecraft.util.registry.DynamicRegistryManager;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;

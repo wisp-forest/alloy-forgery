@@ -114,6 +114,9 @@ gradle-app.setting
 # Common working directory
 run/
 
+# datagen cache
+/src/main/generated/.cache/
+
 # Avoid ignoring Gradle wrapper jar file (.jar files are usually ignored)
 !gradle-wrapper.jar
 /remappedSrc/

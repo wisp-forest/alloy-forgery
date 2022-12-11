@@ -1,6 +1,5 @@
 package wraith.alloyforgery;
 
-import io.wispforest.owo.itemgroup.OwoItemGroup;
 import io.wispforest.owo.moddata.ModDataLoader;
 import io.wispforest.owo.particles.ClientParticles;
 import io.wispforest.owo.particles.systems.ParticleSystem;
@@ -13,12 +12,13 @@ import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.particle.ParticleTypes;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.Registry;
 import net.minecraft.resource.ResourceType;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.registry.Registry;
 import wraith.alloyforgery.block.ForgeControllerBlockEntity;
 import wraith.alloyforgery.data.AlloyForgeryGlobalRemaindersLoader;
 import wraith.alloyforgery.forges.ForgeRegistry;
@@ -29,8 +29,6 @@ import wraith.alloyforgery.recipe.AlloyForgeRecipeSerializer;
 public class AlloyForgery implements ModInitializer {
 
     public static final String MOD_ID = "alloy_forgery";
-
-    public static final OwoItemGroup ALLOY_FORGERY_GROUP = new AlloyForgeryItemGroup(id("alloy_forgery"));
 
     public static BlockEntityType<ForgeControllerBlockEntity> FORGE_CONTROLLER_BLOCK_ENTITY = ForgeControllerBlockEntity.Type.INSTANCE;
     public static ScreenHandlerType<AlloyForgeScreenHandler> ALLOY_FORGE_SCREEN_HANDLER_TYPE;
@@ -52,18 +50,18 @@ public class AlloyForgery implements ModInitializer {
     @SuppressWarnings("UnstableApiUsage")
     @Override
     public void onInitialize() {
-        ALLOY_FORGE_SCREEN_HANDLER_TYPE = Registry.register(Registry.SCREEN_HANDLER, id("alloy_forge"), new ScreenHandlerType<>(AlloyForgeScreenHandler::new));
+        ALLOY_FORGE_SCREEN_HANDLER_TYPE = Registry.register(Registries.SCREEN_HANDLER, id("alloy_forge"), new ScreenHandlerType<>(AlloyForgeScreenHandler::new));
 
         ResourceManagerHelper.get(ResourceType.SERVER_DATA).registerReloadListener(new AlloyForgeryGlobalRemaindersLoader());
         ResourceManagerHelper.get(ResourceType.SERVER_DATA).registerReloadListener(FuelDataLoader.INSTANCE);
         ModDataLoader.load(ForgeRegistry.Loader.INSTANCE);
 
-        Registry.register(Registry.BLOCK_ENTITY_TYPE, id("forge_controller"), FORGE_CONTROLLER_BLOCK_ENTITY);
+        Registry.register(Registries.BLOCK_ENTITY_TYPE, id("forge_controller"), FORGE_CONTROLLER_BLOCK_ENTITY);
 
-        Registry.register(Registry.RECIPE_TYPE, AlloyForgeRecipe.Type.ID, AlloyForgeRecipe.Type.INSTANCE);
-        Registry.register(Registry.RECIPE_SERIALIZER, AlloyForgeRecipe.Type.ID, AlloyForgeRecipeSerializer.INSTANCE);
+        Registry.register(Registries.RECIPE_TYPE, AlloyForgeRecipe.Type.ID, AlloyForgeRecipe.Type.INSTANCE);
+        Registry.register(Registries.RECIPE_SERIALIZER, AlloyForgeRecipe.Type.ID, AlloyForgeRecipeSerializer.INSTANCE);
 
-        ALLOY_FORGERY_GROUP.initialize();
+        AlloyForgeryItemGroup.GROUP.initialize();
 
         ItemStorage.SIDED.registerFallback((world, pos, state, blockEntity, context) -> {
             if (context == Direction.DOWN && world.getBlockEntity(pos.up()) instanceof ForgeControllerBlockEntity froge)

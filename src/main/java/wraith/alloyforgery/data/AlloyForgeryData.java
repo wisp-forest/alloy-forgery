@@ -8,7 +8,8 @@ import wraith.alloyforgery.data.providers.AlloyForgeryTagProviders;
 public class AlloyForgeryData implements DataGeneratorEntrypoint {
     @Override
     public void onInitializeDataGenerator(FabricDataGenerator fabricDataGenerator) {
-        fabricDataGenerator.addProvider(new AlloyForgeryRecipeProvider(fabricDataGenerator));
-        fabricDataGenerator.addProvider(new AlloyForgeryTagProviders.Item(fabricDataGenerator));
+        var fortnitusPackus = fabricDataGenerator.createPack();
+        fortnitusPackus.addProvider(AlloyForgeryRecipeProvider::new);
+        fortnitusPackus.addProvider(AlloyForgeryTagProviders.Item::new);
     }
 }

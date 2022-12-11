@@ -12,16 +12,19 @@ import net.minecraft.recipe.Ingredient;
 import net.minecraft.recipe.Recipe;
 import net.minecraft.recipe.RecipeSerializer;
 import net.minecraft.recipe.RecipeType;
-import net.minecraft.tag.TagKey;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.tag.TagKey;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Pair;
 import net.minecraft.util.collection.DefaultedList;
-import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
 import wraith.alloyforgery.AlloyForgery;
 
 import javax.annotation.Nullable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -56,7 +59,7 @@ public class AlloyForgeRecipe implements Recipe<Inventory> {
 
     public void finishRecipe(PendingRecipeData pendingData) {
         if (pendingData.defaultTag() != null) {
-            final var itemEntryList = Registry.ITEM.getEntryList(pendingData.defaultTag().getLeft());
+            final var itemEntryList = Registries.ITEM.getEntryList(pendingData.defaultTag().getLeft());
 
             itemEntryList.ifPresentOrElse(registryEntries -> {
                 this.output = registryEntries.get(0).value().getDefaultStack();
@@ -83,7 +86,7 @@ public class AlloyForgeRecipe implements Recipe<Inventory> {
         this.tierOverrides = overrides.build();
     }
 
-    public static void addRemainders(Map<Item, ItemStack> remainders){
+    public static void addRemainders(Map<Item, ItemStack> remainders) {
         GLOBAL_REMAINDERS.putAll(remainders);
     }
 
@@ -166,7 +169,7 @@ public class AlloyForgeRecipe implements Recipe<Inventory> {
         final var remainders = DefaultedList.ofSize(inventory.size(), ItemStack.EMPTY);
         final var owoRemainders = RecipeRemainderStorage.has(this.getId()) ? RecipeRemainderStorage.get(this.getId()) : Map.<Item, ItemStack>of();
 
-        if(owoRemainders.isEmpty() && GLOBAL_REMAINDERS.isEmpty()) return null;
+        if (owoRemainders.isEmpty() && GLOBAL_REMAINDERS.isEmpty()) return null;
 
         var setAnyRemainders = false;
 
@@ -179,7 +182,7 @@ public class AlloyForgeRecipe implements Recipe<Inventory> {
                 remainders.set(i, owoRemainders.get(item).copy());
 
                 setAnyRemainders = true;
-            } else if(GLOBAL_REMAINDERS.containsKey(item)){
+            } else if (GLOBAL_REMAINDERS.containsKey(item)) {
                 remainders.set(i, GLOBAL_REMAINDERS.get(item).copy());
 
                 setAnyRemainders = true;

@@ -254,7 +254,7 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
             if (!remainderStack.isEmpty()) {
                 if (inputStack.isEmpty()) {
                     this.setStack(i, remainderStack);
-                } else if (ItemStack.areItemsEqualIgnoreDamage(inputStack, remainderStack) && ItemStack.areNbtEqual(inputStack, remainderStack)) {
+                } else if (inputStack.isItemEqual(remainderStack) && ItemStack.areNbtEqual(inputStack, remainderStack)) {
                     remainderStack.increment(inputStack.getCount());
 
                     if (remainderStack.getCount() > remainderStack.getMaxCount()) {

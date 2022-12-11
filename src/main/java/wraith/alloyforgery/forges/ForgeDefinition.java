@@ -6,12 +6,10 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import io.wispforest.owo.registration.ComplexRegistryAction;
 import io.wispforest.owo.registration.RegistryHelper;
-import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage;
 import net.minecraft.block.Block;
+import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.JsonHelper;
-import net.minecraft.util.registry.Registry;
-import wraith.alloyforgery.AlloyForgery;
 
 import java.util.ArrayList;
 
@@ -63,16 +61,16 @@ public record ForgeDefinition(int forgeTier,
         JsonHelper.getArray(json, "additional_materials", new JsonArray()).forEach(jsonElement -> additionalMaterialIds.add(Identifier.tryParse(jsonElement.getAsString())));
 
         final var action = ComplexRegistryAction.Builder.create(() -> {
-            final var mainMaterial = Registry.BLOCK.get(mainMaterialId);
+            final var mainMaterial = Registries.BLOCK.get(mainMaterialId);
             final var additionalMaterialsBuilder = new ImmutableList.Builder<Block>();
-            additionalMaterialIds.forEach(identifier -> additionalMaterialsBuilder.add(Registry.BLOCK.get(identifier)));
+            additionalMaterialIds.forEach(identifier -> additionalMaterialsBuilder.add(Registries.BLOCK.get(identifier)));
 
             final var definition = new ForgeDefinition(forgeTier, speedMultiplier, fuelCapacity, mainMaterial, additionalMaterialsBuilder.build());
 
             ForgeRegistry.registerDefinition(id, definition);
         }).entry(mainMaterialId).entries(additionalMaterialIds).build();
 
-        RegistryHelper.get(Registry.BLOCK).runWhenPresent(action);
+        RegistryHelper.get(Registries.BLOCK).runWhenPresent(action);
     }
 
     public boolean isBlockValid(Block block) {
@@ -80,8 +78,8 @@ public record ForgeDefinition(int forgeTier,
     }
 
     public JsonElement generateRecipe(Identifier id) {
-        String recipe = RECIPE_PATTERN.replace("{material}", Registry.ITEM.getId(material.asItem()).toString());
-        recipe = recipe.replace("{controller}", Registry.ITEM.getId(ForgeRegistry.getControllerBlock(id).get().asItem()).toString());
+        String recipe = RECIPE_PATTERN.replace("{material}", Registries.ITEM.getId(material.asItem()).toString());
+        recipe = recipe.replace("{controller}", Registries.ITEM.getId(ForgeRegistry.getControllerBlock(id).get().asItem()).toString());
 
         return ForgeRegistry.GSON.fromJson(recipe, JsonObject.class);
     }

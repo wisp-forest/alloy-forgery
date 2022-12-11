@@ -1,9 +1,9 @@
 package wraith.alloyforgery.data;
 
 import net.minecraft.item.Item;
-import net.minecraft.tag.TagKey;
+import net.minecraft.registry.RegistryKeys;
+import net.minecraft.registry.tag.TagKey;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.Registry;
 import wraith.alloyforgery.AlloyForgery;
 
 public class AlloyForgeryTags {
@@ -90,15 +90,15 @@ public class AlloyForgeryTags {
         }
 
         private static TagKey<Item> register(Identifier id) {
-            return TagKey.of(Registry.ITEM_KEY, id);
+            return TagKey.of(RegistryKeys.ITEM, id);
         }
     }
 
-    private static Identifier common(String path){
+    private static Identifier common(String path) {
         return new Identifier(COMMON_NAMESPACE, path);
     }
 
-    private static Identifier alloyForgery(String path){
+    private static Identifier alloyForgery(String path) {
         return AlloyForgery.id(path);
     }
 }

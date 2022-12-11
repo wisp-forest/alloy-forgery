@@ -9,11 +9,12 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.recipe.Ingredient;
 import net.minecraft.recipe.RecipeSerializer;
-import net.minecraft.tag.TagKey;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.RegistryKeys;
+import net.minecraft.registry.tag.TagKey;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.JsonHelper;
 import net.minecraft.util.Pair;
-import net.minecraft.util.registry.Registry;
 import org.apache.commons.lang3.mutable.MutableInt;
 
 import java.util.LinkedHashMap;
@@ -58,7 +59,7 @@ public class AlloyForgeRecipeSerializer implements RecipeSerializer<AlloyForgeRe
             Identifier identifier = new Identifier(ingredientData.data());
 
             ingredient = ingredientData.isTag()
-                    ? Ingredient.fromTag(TagKey.of(Registry.ITEM_KEY, identifier))
+                    ? Ingredient.fromTag(TagKey.of(RegistryKeys.ITEM, identifier))
                     : Ingredient.ofItems(JsonHelper.asItem(new JsonPrimitive(ingredientData.data()), identifier.toString()));
 
             ingredientToCount.put(ingredient, entry.getValue().intValue());
@@ -82,7 +83,7 @@ public class AlloyForgeRecipeSerializer implements RecipeSerializer<AlloyForgeRe
             prioritisedOutput = true;
 
             for (var itemElement : JsonHelper.getArray(outputObject, "priority")) {
-                var maybeItem = Registry.ITEM.getOrEmpty(Identifier.tryParse(itemElement.getAsString()));
+                var maybeItem = Registries.ITEM.getOrEmpty(Identifier.tryParse(itemElement.getAsString()));
 
                 if (maybeItem.isPresent()) {
                     outputStack = maybeItem.get().getDefaultStack();
@@ -92,7 +93,7 @@ public class AlloyForgeRecipeSerializer implements RecipeSerializer<AlloyForgeRe
             }
 
             if (outputStack == null) {
-                defaultTag = new Pair<>(TagKey.of(Registry.ITEM_KEY, new Identifier(JsonHelper.getString(outputObject, "default"))), JsonHelper.getInt(outputObject, "count"));
+                defaultTag = new Pair<>(TagKey.of(RegistryKeys.ITEM, new Identifier(JsonHelper.getString(outputObject, "default"))), JsonHelper.getInt(outputObject, "count"));
             }
         } else {
             outputStack = getItemStack(outputObject);

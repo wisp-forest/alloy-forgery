@@ -1,9 +1,8 @@
 package wraith.alloyforgery.data.builders;
 
-import com.google.gson.*;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import com.mojang.logging.LogUtils;
-import io.netty.util.collection.IntObjectHashMap;
-import io.netty.util.collection.IntObjectMap;
 import net.minecraft.advancement.Advancement;
 import net.minecraft.advancement.CriterionMerger;
 import net.minecraft.advancement.criterion.CriterionConditions;
@@ -16,11 +15,10 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.recipe.Ingredient;
 import net.minecraft.recipe.RecipeSerializer;
-import net.minecraft.tag.TagEntry;
-import net.minecraft.tag.TagKey;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.tag.TagKey;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.JsonHelper;
-import net.minecraft.util.registry.Registry;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import wraith.alloyforgery.mixin.IngredientAccessor;
@@ -74,40 +72,40 @@ public class AlloyForgeryRecipeBuilder implements CraftingRecipeJsonBuilder, Rec
 
     //--------------------------------------------------------------------
 
-    public AlloyForgeryRecipeBuilder addPriorityOutput(ItemConvertible ...outputs){
-        return this.addPriorityOutput(Arrays.stream(outputs).map(output -> Registry.ITEM.getId(output.asItem())).toArray(Identifier[]::new));
+    public AlloyForgeryRecipeBuilder addPriorityOutput(ItemConvertible... outputs) {
+        return this.addPriorityOutput(Arrays.stream(outputs).map(output -> Registries.ITEM.getId(output.asItem())).toArray(Identifier[]::new));
     }
 
-    public AlloyForgeryRecipeBuilder addPriorityOutput(Identifier ...outputId){
+    public AlloyForgeryRecipeBuilder addPriorityOutput(Identifier... outputId) {
         priorities.addAll(List.of(outputId));
         return this;
     }
 
-    public AlloyForgeryRecipeBuilder input(TagKey<Item> input, int count){
+    public AlloyForgeryRecipeBuilder input(TagKey<Item> input, int count) {
         this.inputs.put(Ingredient.fromTag(input), count);
         return this;
     }
 
-    public AlloyForgeryRecipeBuilder input(ItemConvertible input, int count){
+    public AlloyForgeryRecipeBuilder input(ItemConvertible input, int count) {
         this.inputs.put(Ingredient.ofItems(input), count);
         return this;
     }
 
-    public AlloyForgeryRecipeBuilder input(ItemStack inputStack){
+    public AlloyForgeryRecipeBuilder input(ItemStack inputStack) {
         this.inputs.put(Ingredient.ofItems(inputStack.getItem()), inputStack.getCount());
         return this;
     }
 
-    public AlloyForgeryRecipeBuilder overrideRange(AlloyForgeRecipe.OverrideRange range, AlloyForgeRecipe.PendingOverride override){
+    public AlloyForgeryRecipeBuilder overrideRange(AlloyForgeRecipe.OverrideRange range, AlloyForgeRecipe.PendingOverride override) {
         this.ranges.put(range, override);
         return this;
     }
 
-    public AlloyForgeryRecipeBuilder overrideRange(int start, int end, int outputCount){
+    public AlloyForgeryRecipeBuilder overrideRange(int start, int end, int outputCount) {
         return this.overrideRange(start, end, null, outputCount);
     }
 
-    public AlloyForgeryRecipeBuilder overrideRange(int start, int end, @Nullable ItemConvertible output, int outputCount){
+    public AlloyForgeryRecipeBuilder overrideRange(int start, int end, @Nullable ItemConvertible output, int outputCount) {
         this.ranges.put(new AlloyForgeRecipe.OverrideRange(start, end),
                 new AlloyForgeRecipe.PendingOverride(output != null ? output.asItem().getDefaultStack() : null, outputCount));
 
@@ -118,23 +116,23 @@ public class AlloyForgeryRecipeBuilder implements CraftingRecipeJsonBuilder, Rec
         return this.overrideRange(index, false, null, outputCount);
     }
 
-    public AlloyForgeryRecipeBuilder overrideRange(int index, boolean includeUpperValues, int outputCount){
+    public AlloyForgeryRecipeBuilder overrideRange(int index, boolean includeUpperValues, int outputCount) {
         return this.overrideRange(index, includeUpperValues, null, outputCount);
     }
 
-    public AlloyForgeryRecipeBuilder overrideRange(int index, boolean includeUpperValues, @Nullable ItemConvertible output, int outputCount){
+    public AlloyForgeryRecipeBuilder overrideRange(int index, boolean includeUpperValues, @Nullable ItemConvertible output, int outputCount) {
         this.ranges.put(new AlloyForgeRecipe.OverrideRange(index, includeUpperValues ? -1 : index),
                 new AlloyForgeRecipe.PendingOverride(output != null ? output.asItem().getDefaultStack() : null, outputCount));
 
         return this;
     }
 
-    public AlloyForgeryRecipeBuilder setMinimumForgeTier(int tier){
+    public AlloyForgeryRecipeBuilder setMinimumForgeTier(int tier) {
         this.minimumTier = tier;
         return this;
     }
 
-    public AlloyForgeryRecipeBuilder setFuelPerTick(int fuelAmount){
+    public AlloyForgeryRecipeBuilder setFuelPerTick(int fuelAmount) {
         this.fuelPerTick = fuelAmount;
         return this;
     }
@@ -188,23 +186,23 @@ public class AlloyForgeryRecipeBuilder implements CraftingRecipeJsonBuilder, Rec
         this.offerTo(exporter, identifier2);
     }
 
-    public void validate(){
+    public void validate() {
         if (this.advancementBuilder.getCriteria().isEmpty()) {
             throw new IllegalStateException("No way of obtaining recipe " + recipeId);
-        } else if(this.inputs.isEmpty()){
+        } else if (this.inputs.isEmpty()) {
             throw new IllegalStateException("Missing inputs meaning such cannot be made " + recipeId);
         }
     }
 
-    private Identifier makeRecipeId(){
+    private Identifier makeRecipeId() {
         Ingredient.Entry firstEntry = ((IngredientAccessor) (Object) this.output).af$getEntries()[0];
 
         Identifier outputId;
 
-        if(firstEntry instanceof Ingredient.TagEntry tagEntry){
+        if (firstEntry instanceof Ingredient.TagEntry tagEntry) {
             outputId = Identifier.tryParse(JsonHelper.getString(tagEntry.toJson(), "tag"));
 
-        } else if(firstEntry instanceof Ingredient.StackEntry stackEntry) {
+        } else if (firstEntry instanceof Ingredient.StackEntry stackEntry) {
             outputId = Identifier.tryParse(JsonHelper.getString(stackEntry.toJson(), "item"));
         } else {
             throw new IllegalStateException("Seems the output is composed of Ingredient Entry not implemented by Alloy Forgery, try manually naming your recipe instead");
@@ -263,18 +261,18 @@ public class AlloyForgeryRecipeBuilder implements CraftingRecipeJsonBuilder, Rec
 
         Identifier outputId;
 
-        if(firstEntry instanceof Ingredient.TagEntry tagEntry){
+        if (firstEntry instanceof Ingredient.TagEntry tagEntry) {
             outputId = Identifier.tryParse(JsonHelper.getString(tagEntry.toJson(), "tag"));
 
             outputJson.addProperty("default", outputId.toString());
 
             outputJson.add("priority", priorityArray);
-        } else if(firstEntry instanceof Ingredient.StackEntry stackEntry) {
+        } else if (firstEntry instanceof Ingredient.StackEntry stackEntry) {
             outputId = Identifier.tryParse(JsonHelper.getString(stackEntry.toJson(), "item"));
 
             outputJson.addProperty("id", outputId.toString());
 
-            if(!priorityArray.isEmpty()){
+            if (!priorityArray.isEmpty()) {
                 LOGGER.warn("[AlloyForgeryRecipeBuilder] Priority-based recipes only work with Tag based Ingredient outputs, such will be ignored. [RecipeId: {}]", this.getRecipeId());
             }
         } else {
@@ -287,14 +285,14 @@ public class AlloyForgeryRecipeBuilder implements CraftingRecipeJsonBuilder, Rec
 
         //--------------------------------------
 
-        if(!this.ranges.isEmpty()){
+        if (!this.ranges.isEmpty()) {
             JsonObject overrideJson = new JsonObject();
 
             this.ranges.forEach((overrideRange, override) -> {
                 JsonObject overrideObject = new JsonObject();
 
-                if(!override.isCountOnly()) {
-                    overrideObject.addProperty("id", Registry.ITEM.getId(override.stack().getItem()).toString());
+                if (!override.isCountOnly()) {
+                    overrideObject.addProperty("id", Registries.ITEM.getId(override.stack().getItem()).toString());
                 }
 
                 overrideObject.addProperty("count", override.count());
@@ -310,7 +308,7 @@ public class AlloyForgeryRecipeBuilder implements CraftingRecipeJsonBuilder, Rec
     }
 
     @Override
-    public Identifier getRecipeId() { return this.recipeId; }
+    public Identifier getRecipeId() {return this.recipeId;}
 
     @Override
     public RecipeSerializer<?> getSerializer() {
