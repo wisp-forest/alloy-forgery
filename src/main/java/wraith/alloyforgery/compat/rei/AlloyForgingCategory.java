@@ -78,7 +78,7 @@ public class AlloyForgingCategory implements DisplayCategory<AlloyForgingDisplay
 
             overrideIndex.increment();
             if (overrideIndex.intValue() - 1 > overrides.size() - 1) overrideIndex.setValue(0);
-        }).tooltipLine(Text.of("Cycle Tier Overrides")).enabled(overrides.size() != 0));
+        }).tooltipLine(Text.translatable("container.alloy_forgery.rei.button")).enabled(overrides.size() != 0));
 
         return widgets;
     }
