@@ -54,7 +54,6 @@ public class AlloyForgeryEmiRecipe implements EmiRecipe {
             tierOverrides.put(entry.getKey(), EmiStack.of(entry.getValue()));
         }
         this.overrides = tierOverrides;
-        System.out.println(overrides);
         this.overridesKeys = overrides.keySet().stream().toList();
 
         this.tierTextWidget = new CustomTextWidget(currentTierText,8,7,0x404040,false);
@@ -135,12 +134,9 @@ public class AlloyForgeryEmiRecipe implements EmiRecipe {
         widgets.addTexture(GUI_TEXTURE,107,14,10,10,208,30);
         widgets.addTexture(GUI_TEXTURE,111,17,16,20,176,0);
         //the input slots themselves
-        System.out.println(this.id);
         for (int i = 0; i < inputs.size(); i++) {
             int x = 7 + i % 5 * 18;
             int y = 35 + i / 5 * 18;
-            System.out.println(x);
-            System.out.println(y);
             widgets.addTexture(GUI_TEXTURE,x,y,18,18,208,0);
             widgets.addSlot(inputs.get(i),x,y).drawBack(false);
         }
