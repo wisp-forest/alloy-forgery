@@ -51,6 +51,8 @@ dependencies {
     include "io.wispforest:owo-sentinel:${project.owo_version}"
 
     modImplementation 'com.ptsmods:devlogin:1.2.1'
+
+    modImplementation "dev.emi:emi:${project.emi_version}"
 }
 
 loom {
