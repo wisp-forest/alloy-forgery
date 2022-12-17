@@ -14,11 +14,14 @@
   "container.alloy_forgery.rei.title": "Alloy Forging",
   "container.alloy_forgery.rei.min_tier": "Required Tier: %d",
   "container.alloy_forgery.rei.fuel_per_tick": "Fuel per tick: %d",
+  "container.alloy_forgery.rei.button": "Cycle Tier Overrides",
 
   "message.alloy_forgery.invalid_multiblock": "Invalid Multiblock Configuration",
   "itemGroup.alloy_forgery.alloy_forgery": "Alloy Forgery",
   "itemGroup.alloy_forgery.alloy_forgery.button.discord": "Discord",
   "itemGroup.alloy_forgery.alloy_forgery.button.curseforge": "CurseForge",
   "itemGroup.alloy_forgery.alloy_forgery.button.modrinth": "Modrinth",
-  "itemGroup.alloy_forgery.alloy_forgery.button.github": "GitHub"
+  "itemGroup.alloy_forgery.alloy_forgery.button.github": "GitHub",
+
+  "emi.category.alloy_forgery.alloy_forge": "Alloy Forging"
 }
