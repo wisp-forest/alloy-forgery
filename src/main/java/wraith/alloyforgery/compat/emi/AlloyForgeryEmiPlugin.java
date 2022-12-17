@@ -27,5 +27,7 @@ public class AlloyForgeryEmiPlugin implements EmiPlugin {
         for (AlloyForgeRecipe recipe : registry.getRecipeManager().listAllOfType(AlloyForgeRecipe.Type.INSTANCE)){
             registry.addRecipe(new AlloyForgeryEmiRecipe(recipe));
         }
+
+        registry.addRecipeHandler(AlloyForgery.ALLOY_FORGE_SCREEN_HANDLER_TYPE, new AlloyForgeryEmiRecipeHandler());
     }
 }
