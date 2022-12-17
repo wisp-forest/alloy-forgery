@@ -9,6 +9,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.Ingredient;
 import net.minecraft.text.OrderedText;
 import net.minecraft.text.Text;
+import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.Nullable;
 import wraith.alloyforgery.AlloyForgery;
@@ -42,7 +43,7 @@ public class AlloyForgeryEmiRecipe implements EmiRecipe {
         this.minForgeTier = recipe.getMinForgeTier();
         this.requiredFuel = recipe.getFuelPerTick();
         //initialize the starting text and stack to show in the plugin
-        this.currentTierText = Text.translatable("container.alloy_forgery.rei.min_tier",minForgeTier).asOrderedText();
+        this.currentTierText = new TranslatableText("container.alloy_forgery.rei.min_tier",minForgeTier).asOrderedText();
         this.currentStack = EmiStack.of(recipe.getOutput());
         //set the outputs list with the initial stack
         this.outputs = List.of(currentStack);
@@ -82,11 +83,11 @@ public class AlloyForgeryEmiRecipe implements EmiRecipe {
         currentIndex++;
         if (currentIndex > overrides.size()) currentIndex = 0;
         if (currentIndex == 0){
-            currentTierText = Text.translatable("container.alloy_forgery.rei.min_tier",minForgeTier).asOrderedText();
+            currentTierText = new TranslatableText("container.alloy_forgery.rei.min_tier",minForgeTier).asOrderedText();
             currentStack = outputs.get(0);
         } else {
             AlloyForgeRecipe.OverrideRange range = overridesKeys.get(currentIndex - 1);
-            currentTierText = Text.translatable("container.alloy_forgery.rei.min_tier",range).asOrderedText();
+            currentTierText = new TranslatableText("container.alloy_forgery.rei.min_tier",range).asOrderedText();
             currentStack = overrides.get(range);
         }
         tierTextWidget.setText(currentTierText);
@@ -128,7 +129,7 @@ public class AlloyForgeryEmiRecipe implements EmiRecipe {
         //the min tier text
         widgets.add(tierTextWidget);
         //the fuel required text
-        widgets.addText(Text.translatable("container.alloy_forgery.rei.fuel_per_tick",requiredFuel).asOrderedText(),8,20,0x404040,false);
+        widgets.addText(new TranslatableText("container.alloy_forgery.rei.fuel_per_tick",requiredFuel).asOrderedText(),8,20,0x404040,false);
         //the ten input slots background
         widgets.addTexture(GUI_TEXTURE,6,34,92,38,42,41);
         widgets.addTexture(GUI_TEXTURE,107,14,10,10,208,30);

@@ -12,6 +12,7 @@ import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
+import net.minecraft.text.TranslatableText;
 
 import java.util.List;
 import java.util.function.BooleanSupplier;
@@ -21,7 +22,7 @@ public class CustomButtonWidget extends Widget {
     private final int x, y;
     private final BooleanSupplier isActive;
     private final ButtonWidget.ClickAction action;
-    private final List<TooltipComponent> tooltipComponent = List.of(TooltipComponent.of(Text.translatable("container.alloy_forgery.rei.button").asOrderedText()));
+    private final List<TooltipComponent> tooltipComponent = List.of(TooltipComponent.of(new TranslatableText("container.alloy_forgery.rei.button").asOrderedText()));
 
     public CustomButtonWidget(int x, int y, BooleanSupplier isActive, ButtonWidget.ClickAction action) {
         this.x = x;
