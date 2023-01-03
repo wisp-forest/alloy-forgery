@@ -6,9 +6,9 @@ import me.shedaniel.rei.api.common.display.Display;
 import me.shedaniel.rei.api.common.display.DisplaySerializer;
 import me.shedaniel.rei.api.common.entry.EntryIngredient;
 import me.shedaniel.rei.api.common.util.EntryIngredients;
-import net.fabricmc.fabric.api.util.NbtType;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.recipe.Ingredient;
 import wraith.alloyforgery.recipe.AlloyForgeRecipe;
@@ -121,14 +121,14 @@ public class AlloyForgingDisplay implements Display {
 
             // We get a list of all the recipe inputs
             List<EntryIngredient> input = new ArrayList<>();
-            tag.getList("inputs", NbtType.LIST).forEach(nbtElement -> input.add(EntryIngredient.read((NbtList) nbtElement)));
+            tag.getList("inputs", NbtElement.LIST_TYPE).forEach(nbtElement -> input.add(EntryIngredient.read((NbtList) nbtElement)));
 
             // We get the single recipe output
-            EntryIngredient output = EntryIngredient.read(tag.getList("output", NbtType.LIST));
+            EntryIngredient output = EntryIngredient.read(tag.getList("output", NbtElement.LIST_TYPE));
 
             // Last thing we grab is the recipes Override Range Values
             ImmutableMap.Builder<AlloyForgeRecipe.OverrideRange, ItemStack> builder = new ImmutableMap.Builder<>();
-            tag.getList("overrides", NbtType.COMPOUND).forEach(nbtElement -> {
+            tag.getList("overrides", NbtElement.COMPOUND_TYPE).forEach(nbtElement -> {
                 NbtCompound overrideTag = (NbtCompound) nbtElement;
 
                 AlloyForgeRecipe.OverrideRange range = new AlloyForgeRecipe.OverrideRange(overrideTag.getInt("lower"), overrideTag.getInt("upper"));
