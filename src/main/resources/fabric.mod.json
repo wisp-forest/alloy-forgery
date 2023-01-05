@@ -46,11 +46,15 @@
   "depends": {
     "fabricloader": ">=0.10",
     "fabric": "*",
-    "minecraft": ">=1.19",
-    "owo": ">=0.7.2"
+    "minecraft": ">=1.20",
+    "owo": ">=0.11.0"
   },
   "suggests": {
-    "roughlyenoughitems": ">=8.0.0"
+    "craft-this-from-that": "*",
+    "mythicmetals": "*"
+  },
+  "recommends": {
+  "roughlyenoughitems": ">=12.0.0"
   },
   "custom": {
     "modmenu": {
