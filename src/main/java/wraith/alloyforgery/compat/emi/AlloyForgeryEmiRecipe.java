@@ -18,7 +18,7 @@ import java.util.*;
 
 public class AlloyForgeryEmiRecipe implements EmiRecipe {
 
-    public AlloyForgeryEmiRecipe(AlloyForgeRecipe recipe){
+    public AlloyForgeryEmiRecipe(AlloyForgeRecipe recipe) {
         this.id = recipe.getId();
 
         //Convert inputs to a list of EMI Ingredients
@@ -38,26 +38,29 @@ public class AlloyForgeryEmiRecipe implements EmiRecipe {
             }
         }
         this.inputs = convertedInputs;
+
         //tier and fuel same way as REI plugin
         this.minForgeTier = recipe.getMinForgeTier();
         this.requiredFuel = recipe.getFuelPerTick();
+
         //initialize the starting text and stack to show in the plugin
-        this.currentTierText = Text.translatable("container.alloy_forgery.rei.min_tier",minForgeTier).asOrderedText();
+        this.currentTierText = Text.translatable("container.alloy_forgery.rei.min_tier", minForgeTier).asOrderedText();
         this.currentStack = EmiStack.of(recipe.getOutput());
+
         //set the outputs list with the initial stack
         this.outputs = List.of(currentStack);
 
-        //re-mapping the overrides to EmiStacks for rendering in slot widget
+        //re-mapping overrides to EmiStacks for rendering in slot widget
         Map<AlloyForgeRecipe.OverrideRange, EmiStack> tierOverrides = new HashMap<>();
-        for (Map.Entry<AlloyForgeRecipe.OverrideRange,ItemStack> entry: recipe.getTierOverrides().entrySet()){
+        for (Map.Entry<AlloyForgeRecipe.OverrideRange, ItemStack> entry : recipe.getTierOverrides().entrySet()) {
             tierOverrides.put(entry.getKey(), EmiStack.of(entry.getValue()));
         }
         this.overrides = tierOverrides;
         this.overridesKeys = overrides.keySet().stream().toList();
 
-        this.tierTextWidget = new CustomTextWidget(currentTierText,8,7,0x404040,false);
-        this.cycleTierWidget = new CustomButtonWidget(127,2,()->!overrides.isEmpty(),((mouseX, mouseY, button) -> cycleStacks()));
-        this.outputWidget = new CustomSlotWidget(currentStack,104,38,this);
+        this.tierTextWidget = new CustomTextWidget(currentTierText, 8, 7, 0x404040, false);
+        this.cycleTierWidget = new CustomButtonWidget(127, 2, () -> !overrides.isEmpty(), ((mouseX, mouseY, button) -> cycleStacks()));
+        this.outputWidget = new CustomSlotWidget(currentStack, 104, 38, this);
 
     }
 
@@ -77,15 +80,41 @@ public class AlloyForgeryEmiRecipe implements EmiRecipe {
     private final CustomButtonWidget cycleTierWidget;
     private final CustomSlotWidget outputWidget;
 
-    private void cycleStacks(){
+    @Override
+    public void addWidgets(WidgetHolder widgets) {
+        //the min tier text
+        widgets.add(tierTextWidget);
+
+        //the fuel required text
+        widgets.addText(Text.translatable("container.alloy_forgery.rei.fuel_per_tick", requiredFuel).asOrderedText(), 8, 20, 0x404040, false);
+
+        //the ten input slots background
+        widgets.addTexture(GUI_TEXTURE, 6, 34, 92, 38, 42, 41);
+        widgets.addTexture(GUI_TEXTURE, 107, 14, 10, 10, 208, 30);
+        widgets.addTexture(GUI_TEXTURE, 111, 17, 16, 20, 176, 0);
+
+        //the input slots themselves
+        for (int i = 0; i < inputs.size(); i++) {
+            int x = 7 + i % 5 * 18;
+            int y = 35 + i / 5 * 18;
+            widgets.addTexture(GUI_TEXTURE, x, y, 18, 18, 208, 0);
+            widgets.addSlot(inputs.get(i), x, y).drawBack(false);
+        }
+
+        //add the tier cycling button
+        widgets.add(cycleTierWidget);
+        widgets.add(outputWidget);
+    }
+
+    private void cycleStacks() {
         currentIndex++;
         if (currentIndex > overrides.size()) currentIndex = 0;
-        if (currentIndex == 0){
-            currentTierText = Text.translatable("container.alloy_forgery.rei.min_tier",minForgeTier).asOrderedText();
+        if (currentIndex == 0) {
+            currentTierText = Text.translatable("container.alloy_forgery.rei.min_tier", minForgeTier).asOrderedText();
             currentStack = outputs.get(0);
         } else {
             AlloyForgeRecipe.OverrideRange range = overridesKeys.get(currentIndex - 1);
-            currentTierText = Text.translatable("container.alloy_forgery.rei.min_tier",range).asOrderedText();
+            currentTierText = Text.translatable("container.alloy_forgery.rei.min_tier", range).asOrderedText();
             currentStack = overrides.get(range);
         }
         tierTextWidget.setText(currentTierText);
@@ -120,27 +149,5 @@ public class AlloyForgeryEmiRecipe implements EmiRecipe {
     @Override
     public int getDisplayHeight() {
         return 78;
-    }
-
-    @Override
-    public void addWidgets(WidgetHolder widgets) {
-        //the min tier text
-        widgets.add(tierTextWidget);
-        //the fuel required text
-        widgets.addText(Text.translatable("container.alloy_forgery.rei.fuel_per_tick",requiredFuel).asOrderedText(),8,20,0x404040,false);
-        //the ten input slots background
-        widgets.addTexture(GUI_TEXTURE,6,34,92,38,42,41);
-        widgets.addTexture(GUI_TEXTURE,107,14,10,10,208,30);
-        widgets.addTexture(GUI_TEXTURE,111,17,16,20,176,0);
-        //the input slots themselves
-        for (int i = 0; i < inputs.size(); i++) {
-            int x = 7 + i % 5 * 18;
-            int y = 35 + i / 5 * 18;
-            widgets.addTexture(GUI_TEXTURE,x,y,18,18,208,0);
-            widgets.addSlot(inputs.get(i),x,y).drawBack(false);
-        }
-        //add the tier cycling button
-        widgets.add(cycleTierWidget);
-        widgets.add(outputWidget);
     }
 }

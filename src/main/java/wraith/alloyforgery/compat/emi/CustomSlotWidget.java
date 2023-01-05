@@ -15,7 +15,7 @@ public class CustomSlotWidget extends SlotWidget {
 
     private EmiIngredient mutableStack;
 
-    public void setMutableStack(EmiIngredient stack){
+    public void setMutableStack(EmiIngredient stack) {
         this.mutableStack = stack;
     }
 

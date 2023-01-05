@@ -13,7 +13,7 @@ public class AlloyForgeryEmiRecipeHandler implements EmiRecipeHandler<AlloyForge
     @Override
     public List<Slot> getInputSources(AlloyForgeScreenHandler handler) {
         List<Slot> slots = new ArrayList<>();
-        for (int i = 0; i < handler.slots.size();i++){
+        for (int i = 0; i < handler.slots.size(); i++) {
             if (i < 2) continue;
             slots.add(handler.slots.get(i));
         }
@@ -23,7 +23,7 @@ public class AlloyForgeryEmiRecipeHandler implements EmiRecipeHandler<AlloyForge
     @Override
     public List<Slot> getCraftingSlots(AlloyForgeScreenHandler handler) {
         List<Slot> slots = new ArrayList<>();
-        for (int i = 2; i < 12; i++){
+        for (int i = 2; i < 12; i++) {
             slots.add(handler.slots.get(i));
         }
         return slots;
