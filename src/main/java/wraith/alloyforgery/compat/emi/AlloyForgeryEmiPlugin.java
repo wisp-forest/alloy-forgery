@@ -21,10 +21,10 @@ public class AlloyForgeryEmiPlugin implements EmiPlugin {
         registry.addCategory(FORGE_CATEGORY);
 
         for (Block controller : ForgeRegistry.getControllerBlocks()) {
-            registry.addWorkstation(FORGE_CATEGORY,EmiStack.of(controller));
+            registry.addWorkstation(FORGE_CATEGORY, EmiStack.of(controller));
         }
 
-        for (AlloyForgeRecipe recipe : registry.getRecipeManager().listAllOfType(AlloyForgeRecipe.Type.INSTANCE)){
+        for (AlloyForgeRecipe recipe : registry.getRecipeManager().listAllOfType(AlloyForgeRecipe.Type.INSTANCE)) {
             registry.addRecipe(new AlloyForgeryEmiRecipe(recipe));
         }
 

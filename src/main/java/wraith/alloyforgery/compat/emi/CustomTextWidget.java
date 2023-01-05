@@ -22,7 +22,7 @@ public class CustomTextWidget extends Widget {
         this.shadow = shadow;
     }
 
-    public void setText(OrderedText text){
+    public void setText(OrderedText text) {
         this.text = text;
     }
 
