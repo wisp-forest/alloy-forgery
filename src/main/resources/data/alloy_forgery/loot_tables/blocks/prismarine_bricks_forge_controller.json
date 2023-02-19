@@ -1,0 +1,13 @@
+{
+  "pools": [
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "alloy_forgery:prismarine_bricks_forge_controller"
+        }
+      ]
+    }
+  ]
+}
