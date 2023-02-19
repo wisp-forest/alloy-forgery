@@ -52,7 +52,8 @@ public class ForgeControllerBlock extends BlockWithEntity {
 
             if (fuelDefinition.hasReturnType() && controller.canAddFuel(fuelDefinition.fuel())) {
                 if (!player.getAbilities().creativeMode) {
-                    player.setStackInHand(hand, new ItemStack(fuelDefinition.returnType()));
+                    player.getStackInHand(hand).decrement(1);
+                    player.getInventory().offerOrDrop(new ItemStack(fuelDefinition.returnType()));
                 }
                 controller.addFuel(fuelDefinition.fuel());
             } else {
