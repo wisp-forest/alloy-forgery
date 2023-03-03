@@ -94,6 +94,9 @@ public class AlloyForgeRecipeSerializer implements RecipeSerializer<AlloyForgeRe
 
             if (outputStack == null) {
                 defaultTag = new Pair<>(TagKey.of(RegistryKeys.ITEM, new Identifier(JsonHelper.getString(outputObject, "default"))), JsonHelper.getInt(outputObject, "count"));
+
+                //This is just used to make sure that anyone who dose access the output before fully finalizing the recipes
+                outputStack = ItemStack.EMPTY;
             }
         } else {
             outputStack = getItemStack(outputObject);
