@@ -1,6 +1,5 @@
 package wraith.alloyforgery.data.providers;
 
-import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricRecipeProvider;
 import net.fabricmc.fabric.api.resource.conditions.v1.DefaultResourceConditions;
@@ -9,7 +8,6 @@ import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import net.minecraft.registry.tag.TagKey;
 import net.minecraft.util.Identifier;
-import wraith.alloyforgery.data.AlloyForgeryTags;
 import wraith.alloyforgery.data.builders.AlloyForgeryRecipeBuilder;
 
 import java.util.function.Consumer;
@@ -121,8 +119,8 @@ public class AlloyForgeryRecipeProvider extends FabricRecipeProvider {
     public static AlloyForgeryRecipeBuilder createOverriddenRawBlockRecipe(String materialType, TagKey<Item> output, TagKey<Item> input, int inputAmount, int outputAmount, int overrideIndex, int overrideAmount, int fuelPerTick){
         return AlloyForgeryRecipeBuilder.create(output, outputAmount)
                 .input(input, inputAmount)
-                .criterion("has_raw_" + materialType + "_ore_block", conditionsFromTag(AlloyForgeryTags.Items.RAW_GOLD_ORE_BLOCKS))
-                .overrideRange(overrideIndex, overrideAmount)
+                .criterion("has_raw_" + materialType + "_ore_block", conditionsFromTag(input))
+                .overrideRange(overrideIndex, true, overrideAmount)
                 .setFuelPerTick(fuelPerTick);
     }
 
@@ -145,8 +143,8 @@ public class AlloyForgeryRecipeProvider extends FabricRecipeProvider {
     public static AlloyForgeryRecipeBuilder createRawBlockRecipe(String materialType, Item output, TagKey<Item> input){
         return AlloyForgeryRecipeBuilder.create(output,3)
                 .input(input, 2)
-                .criterion("has_raw_" + materialType + "_ore_block", conditionsFromTag(AlloyForgeryTags.Items.RAW_GOLD_ORE_BLOCKS))
-                .overrideRange(2, 4)
+                .criterion("has_raw_" + materialType + "_ore_block", conditionsFromTag(input))
+                .overrideRange(2, true, 4)
                 .setFuelPerTick(45);
     }
 
