@@ -13,7 +13,7 @@
     "id": "minecraft:copper_block"
   },
   "overrides": {
-    "2": {
+    "2+": {
       "count": 4
     }
   }

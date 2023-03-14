@@ -23,7 +23,7 @@
     "priority": []
   },
   "overrides": {
-    "3": {
+    "3+": {
       "count": 3
     }
   }
