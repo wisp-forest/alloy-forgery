@@ -14,7 +14,7 @@
   "container.alloy_forgery.rei.title": "Forgia di leghe",
   "container.alloy_forgery.rei.min_tier": "Grado richiesto: %d",
   "container.alloy_forgery.rei.fuel_per_tick": "Carburante per tick: %d",
-  "container.alloy_forgery.rei.button": "Cycle Tier Overrides",
+  "container.alloy_forgery.rei.button": "Scorri tra i gradi",
 
   "message.alloy_forgery.invalid_multiblock": "Configurazione multiblocco non valida",
   "itemGroup.alloy_forgery.alloy_forgery": "Forgia di leghe",
