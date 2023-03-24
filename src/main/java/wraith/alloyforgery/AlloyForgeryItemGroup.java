@@ -21,7 +21,7 @@ public class AlloyForgeryItemGroup {
         if (CONTROLLER_CACHE == null) return null;
         return Icon.of(CONTROLLER_CACHE.get(0));
     }).initializer(group -> {
-        group.tabs.add(new ItemGroupTab(Icon.of(ItemStack.EMPTY), Text.empty(), (enabledFeatures, entries, hasPermissions) -> {
+        group.tabs.add(new ItemGroupTab(Icon.of(ItemStack.EMPTY), Text.empty(), (context, entries) -> {
             if (CONTROLLER_CACHE == null) createControllerCache();
             CONTROLLER_CACHE.forEach(entries::add);
         }, ItemGroupTab.DEFAULT_TEXTURE, true));

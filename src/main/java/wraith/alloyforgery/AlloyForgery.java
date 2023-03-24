@@ -15,6 +15,7 @@ import net.minecraft.particle.ParticleTypes;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.resource.ResourceType;
+import net.minecraft.resource.featuretoggle.FeatureFlags;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Direction;
@@ -50,7 +51,7 @@ public class AlloyForgery implements ModInitializer {
     @SuppressWarnings("UnstableApiUsage")
     @Override
     public void onInitialize() {
-        ALLOY_FORGE_SCREEN_HANDLER_TYPE = Registry.register(Registries.SCREEN_HANDLER, id("alloy_forge"), new ScreenHandlerType<>(AlloyForgeScreenHandler::new));
+        ALLOY_FORGE_SCREEN_HANDLER_TYPE = Registry.register(Registries.SCREEN_HANDLER, id("alloy_forge"), new ScreenHandlerType<>(AlloyForgeScreenHandler::new, FeatureFlags.DEFAULT_ENABLED_FEATURES));
 
         ResourceManagerHelper.get(ResourceType.SERVER_DATA).registerReloadListener(new AlloyForgeryGlobalRemaindersLoader());
         ResourceManagerHelper.get(ResourceType.SERVER_DATA).registerReloadListener(FuelDataLoader.INSTANCE);

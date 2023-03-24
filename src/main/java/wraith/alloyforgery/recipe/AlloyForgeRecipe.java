@@ -12,6 +12,7 @@ import net.minecraft.recipe.Ingredient;
 import net.minecraft.recipe.Recipe;
 import net.minecraft.recipe.RecipeSerializer;
 import net.minecraft.recipe.RecipeType;
+import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.tag.TagKey;
 import net.minecraft.util.Identifier;
@@ -159,7 +160,7 @@ public class AlloyForgeRecipe implements Recipe<Inventory> {
     }
 
     @Override
-    public ItemStack craft(Inventory inventory) {
+    public ItemStack craft(Inventory inventory, DynamicRegistryManager drm) {
         this.tryBind(inventory).forEach(inventory::removeStack);
         return ItemStack.EMPTY;
     }
@@ -198,6 +199,11 @@ public class AlloyForgeRecipe implements Recipe<Inventory> {
     }
 
     @Override
+    @Deprecated
+    public ItemStack getOutput(DynamicRegistryManager drm) {
+        return this.output.copy();
+    }
+
     @Deprecated
     public ItemStack getOutput() {
         return this.output.copy();

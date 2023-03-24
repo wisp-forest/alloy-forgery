@@ -20,7 +20,7 @@ public class CustomSlotWidget extends SlotWidget {
     }
 
     @Override
-    protected EmiIngredient getStack() {
+    public EmiIngredient getStack() {
         return mutableStack;
     }
 }

@@ -228,9 +228,9 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
                 } else {
                     var remainderList = recipe.gatherRemainders(this);
 
-                    recipe.craft(this);
+                    recipe.craft(this, this.world.getRegistryManager());
 
-                    if(remainderList != null) this.handleForgingRemainders(remainderList);
+                    if (remainderList != null) this.handleForgingRemainders(remainderList);
 
                     if (outputStack.isEmpty()) {
                         this.setStack(10, recipeOutput);
@@ -264,7 +264,7 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
                         var insertStack = remainderStack.copy();
                         insertStack.setCount(excess);
 
-                        if(!this.attemptToInsertIntoHopper(insertStack)){
+                        if (!this.attemptToInsertIntoHopper(insertStack)) {
                             var frontForgePos = pos.offset(getCachedState().get(ForgeControllerBlock.FACING));
 
                             world.playSound(null, frontForgePos.getX(), frontForgePos.getY(), frontForgePos.getZ(), SoundEvents.ENTITY_ITEM_PICKUP, SoundCategory.BLOCKS, 1.0F, 0.2F);
@@ -274,7 +274,7 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
 
                     this.setStack(i, remainderStack);
                 } else {
-                    if(!this.attemptToInsertIntoHopper(remainderStack)){
+                    if (!this.attemptToInsertIntoHopper(remainderStack)) {
                         var frontForgePos = pos.offset(getCachedState().get(ForgeControllerBlock.FACING));
 
                         world.playSound(null, frontForgePos.getX(), frontForgePos.getY(), frontForgePos.getZ(), SoundEvents.ENTITY_ITEM_PICKUP, SoundCategory.BLOCKS, 1.0F, 0.2F);
@@ -286,7 +286,7 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
     }
 
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
-    private boolean attemptToInsertIntoHopper(ItemStack remainderStack){
+    private boolean attemptToInsertIntoHopper(ItemStack remainderStack) {
         if (remainderStack.isEmpty()) return true;
 
         HopperBlockEntity blockEntity = null;
@@ -323,8 +323,8 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
                 }
             }
 
-            if (isHopperEmpty && !((HopperBlockEntityAccessor)blockEntity).alloyForge$isDisabled()) {
-                ((HopperBlockEntityAccessor)blockEntity).alloyForge$setTransferCooldown(8);
+            if (isHopperEmpty && !((HopperBlockEntityAccessor) blockEntity).alloyForge$isDisabled()) {
+                ((HopperBlockEntityAccessor) blockEntity).alloyForge$setTransferCooldown(8);
             }
 
             blockEntity.markDirty();
