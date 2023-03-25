@@ -1,0 +1,27 @@
+{
+  "block.alloy_forgery.bricks_forge_controller": "Controllo della forgia di mattoni",
+  "block.alloy_forgery.stone_bricks_forge_controller": "Controllo della forgia di mattoni di pietra",
+  "block.alloy_forgery.deepslate_bricks_forge_controller": "Controllo della forgia di mattoni di ardesia profonda",
+  "block.alloy_forgery.end_stone_bricks_forge_controller": "Controllo della forgia di mattoni di pietra dell'End",
+  "block.alloy_forgery.polished_blackstone_forge_controller": "Controllo della forgia di pietranera levigata",
+  "block.alloy_forgery.prismarine_bricks_forge_controller": "Controllo della forgia di mattoni di prismarino",
+
+  "tooltip.alloy_forgery.forge_tier": "Grado: %d",
+  "tooltip.alloy_forgery.fuel_capacity": "Capacità combustibile: %d",
+
+  "container.alloy_forgery.forge_controller": "Forgia di leghe",
+
+  "container.alloy_forgery.rei.title": "Forgia di leghe",
+  "container.alloy_forgery.rei.min_tier": "Grado richiesto: %d",
+  "container.alloy_forgery.rei.fuel_per_tick": "Carburante per tick: %d",
+  "container.alloy_forgery.rei.button": "Scorri tra i gradi",
+
+  "message.alloy_forgery.invalid_multiblock": "Configurazione multiblocco non valida",
+  "itemGroup.alloy_forgery.alloy_forgery": "Forgia di leghe",
+  "itemGroup.alloy_forgery.alloy_forgery.button.discord": "Discord",
+  "itemGroup.alloy_forgery.alloy_forgery.button.curseforge": "CurseForge",
+  "itemGroup.alloy_forgery.alloy_forgery.button.modrinth": "Modrinth",
+  "itemGroup.alloy_forgery.alloy_forgery.button.github": "GitHub",
+
+  "emi.category.alloy_forgery.alloy_forge": "Forgia di leghe"
+}
