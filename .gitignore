@@ -1,8 +1,9 @@
 # User-specific stuff
 .idea/
 
-bin/
+.vscode/
 .gradle/
+bin/
 build/
 out/
 classes/
