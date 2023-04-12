@@ -1,0 +1,27 @@
+{
+  "block.alloy_forgery.bricks_forge_controller": "Controlador de la forja de ladrillo",
+  "block.alloy_forgery.stone_bricks_forge_controller": "Controlador de la forja de ladrillo de piedra",
+  "block.alloy_forgery.deepslate_bricks_forge_controller": "Controlador de la forja de ladrillo de pizarra profund",
+  "block.alloy_forgery.end_stone_bricks_forge_controller": "Controlador de la forja de ladrillo de piedra del End",
+  "block.alloy_forgery.polished_blackstone_forge_controller": "Controlador de la forja de piedra negra pulida",
+  "block.alloy_forgery.prismarine_bricks_forge_controller": "Controlador de forja de ladrillos de prismarina",
+
+  "tooltip.alloy_forgery.forge_tier": "Grada: %d",
+  "tooltip.alloy_forgery.fuel_capacity": "Capacidad del combustible: %d",
+
+  "container.alloy_forgery.forge_controller": "Forja de aleación",
+
+  "container.alloy_forgery.rei.title": "Forja de aleación",
+  "container.alloy_forgery.rei.min_tier": "Grada mínima: %d",
+  "container.alloy_forgery.rei.fuel_per_tick": "Combustible por tick: %d",
+  "container.alloy_forgery.rei.button": "Desplácese por los grados",
+
+  "message.alloy_forgery.invalid_multiblock": "El configuración de multibloque no es válida",
+  "itemGroup.alloy_forgery.alloy_forgery": "Forja de aleación",
+  "itemGroup.alloy_forgery.alloy_forgery.button.discord": "Discord",
+  "itemGroup.alloy_forgery.alloy_forgery.button.curseforge": "CurseForge",
+  "itemGroup.alloy_forgery.alloy_forgery.button.modrinth": "Modrinth",
+  "itemGroup.alloy_forgery.alloy_forgery.button.github": "GitHub",
+
+  "emi.category.alloy_forgery.alloy_forge": "Forja de aleación"
+}
