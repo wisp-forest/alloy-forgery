@@ -71,7 +71,7 @@ public class AlloyForgeRecipeSerializer implements RecipeSerializer<AlloyForgeRe
         final var outputObject = JsonHelper.getObject(json, "output");
 
         boolean prioritisedOutput = false;
-        ItemStack outputStack = null;
+        ItemStack outputStack = ItemStack.EMPTY;
         Pair<TagKey<Item>, Integer> defaultTag = null;
 
         if (outputObject.has("priority")) {
