@@ -1,0 +1,27 @@
+{
+    "block.alloy_forgery.bricks_forge_controller": "Controlador de forja de Tijolos",
+    "block.alloy_forgery.stone_bricks_forge_controller": "Controlador de forja de Tijolos de Pedra",
+    "block.alloy_forgery.deepslate_bricks_forge_controller": "Controlador de forja de Ardósia",
+    "block.alloy_forgery.end_stone_bricks_forge_controller": "Controlador de forja de Pedra do Fim",
+    "block.alloy_forgery.polished_blackstone_forge_controller": "Controlador de forja de Pedra-Negra Polida",
+    "block.alloy_forgery.prismarine_bricks_forge_controller": "Controlador de forja de Prismarinho",
+  
+    "tooltip.alloy_forgery.forge_tier": "Nível: %d",
+    "tooltip.alloy_forgery.fuel_capacity": "Capacidade de combustível: %d",
+  
+    "container.alloy_forgery.forge_controller": "Forja de liga",
+  
+    "container.alloy_forgery.rei.title": "Forjamento de liga",
+    "container.alloy_forgery.rei.min_tier": "Nível Necessário: %d",
+    "container.alloy_forgery.rei.fuel_per_tick": "Combustível por tick: %d",
+    "container.alloy_forgery.rei.button": "Substituições de nível de ciclo",
+  
+    "message.alloy_forgery.invalid_multiblock": "Configuração multibloco inválida",
+    "itemGroup.alloy_forgery.alloy_forgery": "Forjamento de liga",
+    "itemGroup.alloy_forgery.alloy_forgery.button.discord": "Discord",
+    "itemGroup.alloy_forgery.alloy_forgery.button.curseforge": "CurseForge",
+    "itemGroup.alloy_forgery.alloy_forgery.button.modrinth": "Modrinth",
+    "itemGroup.alloy_forgery.alloy_forgery.button.github": "GitHub",
+  
+    "emi.category.alloy_forgery.alloy_forge": "Forjamento de liga"
+}
