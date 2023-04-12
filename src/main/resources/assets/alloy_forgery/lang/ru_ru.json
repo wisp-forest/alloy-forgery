@@ -1,19 +1,27 @@
 {
-  "block.alloy_forgery.bricks_forge_controller": "Контроллер кузницы из кирпичей",
+  "block.alloy_forgery.bricks_forge_controller": "Контроллер кирпичной кузницы",
   "block.alloy_forgery.stone_bricks_forge_controller": "Контроллер кузницы из каменных кирпичей",
   "block.alloy_forgery.deepslate_bricks_forge_controller": "Контроллер кузницы из глубинносланцевых кирпичей",
   "block.alloy_forgery.end_stone_bricks_forge_controller": "Контроллер кузницы из эндерняковых кирпичей",
   "block.alloy_forgery.polished_blackstone_forge_controller": "Контроллер кузницы из полированного чернита",
+  "block.alloy_forgery.prismarine_bricks_forge_controller": "Контроллер кузницы из призмариновых кирпичей",
 
   "tooltip.alloy_forgery.forge_tier": "Уровень: %d",
-  "tooltip.alloy_forgery.fuel_capacity": "Запас топлива: %d",
+  "tooltip.alloy_forgery.fuel_capacity": "Объём топлива: %d",
 
-  "container.alloy_forgery.forge_controller": "Контроллер кузницы",
+  "container.alloy_forgery.forge_controller": "Сплавная кузница",
 
-  "container.alloy_forgery.rei.title": "Alloy Forgery",
+  "container.alloy_forgery.rei.title": "Ковка сплавов",
   "container.alloy_forgery.rei.min_tier": "Требуемый уровень: %d",
-  "container.alloy_forgery.rei.fuel_per_tick": "Расход топлива в тик: %d",
+  "container.alloy_forgery.rei.fuel_per_tick": "Топливо в такт: %d",
+  "container.alloy_forgery.rei.button": "Переопределяет уровень цикла",
 
-  "message.alloy_forgery.invalid_multiblock": "Есть ошибки в составлении многоблочной структуры",
-  "itemGroup.alloy_forgery.alloy_forgery": "Alloy Forgery"
+  "message.alloy_forgery.invalid_multiblock": "Неверная конфигурация многоблока",
+  "itemGroup.alloy_forgery.alloy_forgery": "Alloy Forgery",
+  "itemGroup.alloy_forgery.alloy_forgery.button.discord": "Discord",
+  "itemGroup.alloy_forgery.alloy_forgery.button.curseforge": "CurseForge",
+  "itemGroup.alloy_forgery.alloy_forgery.button.modrinth": "Modrinth",
+  "itemGroup.alloy_forgery.alloy_forgery.button.github": "GitHub",
+
+  "emi.category.alloy_forgery.alloy_forge": "Ковка сплавов"
 }
