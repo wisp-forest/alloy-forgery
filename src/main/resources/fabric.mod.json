@@ -36,7 +36,7 @@
     "rei_common": [
       "wraith.alloyforgery.compat.rei.AlloyForgeryCommonPlugin"
     ],
-    "emi": [
+    "_emi": [
       "wraith.alloyforgery.compat.emi.AlloyForgeryEmiPlugin"
     ]
   },
