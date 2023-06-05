@@ -90,11 +90,11 @@ public class AlloyForgingDisplay implements Display {
 
             // Store the recipe inputs
             NbtList inputs = new NbtList();
-            inputs.addAll(display.inputs.stream().map(EntryIngredient::save).toList());
+            inputs.addAll(display.inputs.stream().map(EntryIngredient::saveIngredient).toList());
             tag.put("inputs", inputs);
 
             // Store the recipe output
-            tag.put("output", display.output.save());
+            tag.put("output", display.output.saveIngredient());
 
             NbtList overrides = new NbtList();
             display.overrides.forEach((overrideRange, itemStack) -> {
