@@ -41,11 +41,7 @@ public class CustomTextWidget extends Widget {
         int xOff = TextWidget.Alignment.START.offset(CLIENT.textRenderer.getWidth(text));
         int yOff = TextWidget.Alignment.START.offset(CLIENT.textRenderer.fontHeight);
         matrices.translate(xOff, yOff, 300);
-        if (shadow) {
-            context.drawTextWithShadow(CLIENT.textRenderer, text, x, y, color);
-        } else {
-            context.drawTextWithShadow(CLIENT.textRenderer, text, x, y, color);
-        }
+        context.drawText(CLIENT.textRenderer, text, x, y, color, shadow);
         matrices.pop();
     }
 
