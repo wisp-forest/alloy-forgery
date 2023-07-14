@@ -47,6 +47,7 @@ public class AlloyForgingCategory implements DisplayCategory<AlloyForgingDisplay
 
         final var widgets = new ArrayList<Widget>();
         final var texture = REIRuntime.getInstance().isDarkThemeEnabled() ? DARK_GUI_TEXTURE : GUI_TEXTURE;
+        final var textColor = REIRuntime.getInstance().isDarkThemeEnabled() ? 0xafafaf : 0x3f3f3f;
 
         widgets.add(Widgets.createRecipeBase(bounds));
 
@@ -63,8 +64,8 @@ public class AlloyForgingCategory implements DisplayCategory<AlloyForgingDisplay
         widgets.add(resultSlot.entries(display.getOutputEntries().get(0)).disableBackground().markOutput());
 
         final var tierLabel = Widgets.createLabel(new Point(origin.x + 12, origin.y + 11), Text.translatable("container.alloy_forgery.rei.min_tier", display.minForgeTier));
-        widgets.add(tierLabel.leftAligned().color(0x3f3f3f).noShadow());
-        widgets.add(Widgets.createLabel(new Point(origin.x + 12, origin.y + 24), Text.translatable("container.alloy_forgery.rei.fuel_per_tick", display.requiredFuel)).leftAligned().color(0x3f3f3f).noShadow());
+        widgets.add(tierLabel.leftAligned().color(textColor).noShadow());
+        widgets.add(Widgets.createLabel(new Point(origin.x + 12, origin.y + 24), Text.translatable("container.alloy_forgery.rei.fuel_per_tick", display.requiredFuel)).leftAligned().color(textColor).noShadow());
 
         final MutableInt overrideIndex = new MutableInt(1);
         final List<AlloyForgeRecipe.OverrideRange> overrides = new ArrayList<>(display.overrides.keySet());
