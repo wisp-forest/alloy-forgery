@@ -36,7 +36,7 @@
     "rei_common": [
       "wraith.alloyforgery.compat.rei.AlloyForgeryCommonPlugin"
     ],
-    "_emi": [
+    "emi": [
       "wraith.alloyforgery.compat.emi.AlloyForgeryEmiPlugin"
     ]
   },
@@ -54,7 +54,7 @@
     "mythicmetals": "*"
   },
   "recommends": {
-  "roughlyenoughitems": ">=12.0.0"
+    "roughlyenoughitems": ">=12.0.0"
   },
   "custom": {
     "modmenu": {

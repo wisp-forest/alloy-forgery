@@ -23,5 +23,9 @@
   "itemGroup.alloy_forgery.alloy_forgery.button.modrinth": "Modrinth",
   "itemGroup.alloy_forgery.alloy_forgery.button.github": "GitHub",
 
-  "emi.category.alloy_forgery.alloy_forge": "Alloy Forging"
+  "emi.category.alloy_forgery.alloy_forge": "Alloy Forging",
+
+  "tag.item.c.gold_ores": "Gold Ores",
+  "tag.item.c.raw_gold_ore_blocks": "Raw Gold Ore Blocks",
+  "tag.item.c.raw_iron_ore_blocks": "Raw Iron Ore Blocks"
 }
