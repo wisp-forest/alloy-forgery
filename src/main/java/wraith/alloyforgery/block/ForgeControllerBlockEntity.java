@@ -151,14 +151,21 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
         this.fuelProgress = Math.round((this.fuel / (float) forgeDefinition.fuelCapacity()) * 48);
         this.lavaProgress = Math.round((this.fluidHolder.getAmount() / (float) FluidConstants.BUCKET) * 50);
 
+        if (this.getWorld() == null) {
+            return;
+        }
+        var world = this.getWorld();
+
         world.updateComparators(pos, getCachedState().getBlock());
+
+        final var currentBlockState = world.getBlockState(pos);
 
         if (!this.verifyMultiblock()) {
             this.currentSmeltTime = 0;
 
-            final var currentState = world.getBlockState(pos);
-            if (currentState.get(ForgeControllerBlock.LIT))
-                world.setBlockState(pos, currentState.with(ForgeControllerBlock.LIT, false));
+            if (currentBlockState.get(ForgeControllerBlock.LIT)) {
+                world.setBlockState(pos, currentBlockState.with(ForgeControllerBlock.LIT, false));
+            }
 
             return;
         }
@@ -184,64 +191,70 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
             this.fluidHolder.amount -= (fuelInsertAmount / 24) * 81;
         }
 
-        final var currentBlockState = this.world.getBlockState(pos);
         if (this.fuel > 100 && !currentBlockState.get(ForgeControllerBlock.LIT)) {
-            this.world.setBlockState(pos, currentBlockState.with(ForgeControllerBlock.LIT, true));
+            world.setBlockState(pos, currentBlockState.with(ForgeControllerBlock.LIT, true));
         } else if (fuel < 100 && currentBlockState.get(ForgeControllerBlock.LIT)) {
-            this.world.setBlockState(pos, currentBlockState.with(ForgeControllerBlock.LIT, false));
+            world.setBlockState(pos, currentBlockState.with(ForgeControllerBlock.LIT, false));
         }
 
-        if (!this.isEmpty()) {
-            final var recipeOptional = this.world.getRecipeManager().getFirstMatch(AlloyForgeRecipe.Type.INSTANCE, this, world);
+        // Don't handle recipes if the forge is empty
+        if (this.isEmpty()) {
+            this.currentSmeltTime = 0;
+            return;
+        }
 
-            if (recipeOptional.isEmpty()) {
+
+        // TODO - If the forge was empty, but there is no updates in its inventory, then it might constantly check for new recipes
+        // TODO - Perhaps this could be optimized?
+        final var recipeOptional = world.getRecipeManager().getFirstMatch(AlloyForgeRecipe.Type.INSTANCE, this, world);
+
+        if (recipeOptional.isEmpty()) {
+            this.currentSmeltTime = 0;
+            return;
+        }
+
+        final var recipe = recipeOptional.get();
+        if (recipe.getMinForgeTier() > this.forgeDefinition.forgeTier()) {
+            this.currentSmeltTime = 0;
+            return;
+        }
+
+        final var outputStack = this.getStack(10);
+        final var recipeOutput = recipe.getOutput(this.forgeDefinition.forgeTier());
+
+        if (!outputStack.isEmpty() && !ItemOps.canStack(outputStack, recipeOutput)) {
+            this.currentSmeltTime = 0;
+            return;
+        }
+
+        // Process the recipe, or handle remainders once it finishes
+        if (this.currentSmeltTime < this.forgeDefinition.maxSmeltTime()) {
+
+            final float fuelRequirement = recipe.getFuelPerTick() * this.forgeDefinition.speedMultiplier();
+            if (this.fuel - fuelRequirement < 0) {
                 this.currentSmeltTime = 0;
-            } else {
-                final var recipe = recipeOptional.get();
-                if (recipe.getMinForgeTier() > this.forgeDefinition.forgeTier()) {
-                    this.currentSmeltTime = 0;
-                    return;
-                }
+                return;
+            }
 
-                final var outputStack = this.getStack(10);
-                final var recipeOutput = recipe.getOutput(this.forgeDefinition.forgeTier());
+            this.currentSmeltTime++;
+            this.fuel -= fuelRequirement;
 
-                if (!outputStack.isEmpty() && !ItemOps.canStack(outputStack, recipeOutput)) {
-                    this.currentSmeltTime = 0;
-                    return;
-                }
-
-                if (this.currentSmeltTime < this.forgeDefinition.maxSmeltTime()) {
-
-                    final float fuelRequirement = recipe.getFuelPerTick() * this.forgeDefinition.speedMultiplier();
-                    if (this.fuel - fuelRequirement < 0) {
-                        this.currentSmeltTime = 0;
-                        return;
-                    }
-
-                    this.currentSmeltTime++;
-                    this.fuel -= fuelRequirement;
-
-                    if (world.random.nextDouble() > 0.75) {
-                        AlloyForgery.FORGE_PARTICLES.spawn(world, Vec3d.of(pos), facing);
-                    }
-                } else {
-                    var remainderList = recipe.gatherRemainders(this);
-
-                    recipe.craft(this, this.world.getRegistryManager());
-
-                    if (remainderList != null) this.handleForgingRemainders(remainderList);
-
-                    if (outputStack.isEmpty()) {
-                        this.setStack(10, recipeOutput);
-                    } else {
-                        outputStack.increment(recipeOutput.getCount());
-                    }
-
-                    this.currentSmeltTime = 0;
-                }
+            if (world.random.nextDouble() > 0.75) {
+                AlloyForgery.FORGE_PARTICLES.spawn(world, Vec3d.of(pos), facing);
             }
         } else {
+            var remainderList = recipe.gatherRemainders(this);
+
+            recipe.craft(this, world.getRegistryManager());
+
+            if (remainderList != null) this.handleForgingRemainders(remainderList);
+
+            if (outputStack.isEmpty()) {
+                this.setStack(10, recipeOutput);
+            } else {
+                outputStack.increment(recipeOutput.getCount());
+            }
+
             this.currentSmeltTime = 0;
         }
     }
@@ -250,36 +263,39 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
         for (int i = 0; i < remainderList.size(); ++i) {
             var inputStack = this.getStack(i);
             var remainderStack = remainderList.get(i);
+            var world = this.getWorld();
 
-            if (!remainderStack.isEmpty()) {
-                if (inputStack.isEmpty()) {
-                    this.setStack(i, remainderStack);
-                } else if (ItemStack.areItemsEqual(inputStack, remainderStack) && ItemStack.areEqual(inputStack, remainderStack)) {
-                    remainderStack.increment(inputStack.getCount());
+            if (world == null || remainderStack.isEmpty()) {
+                return;
+            }
 
-                    if (remainderStack.getCount() > remainderStack.getMaxCount()) {
-                        int excess = remainderStack.getCount() - remainderStack.getMaxCount();
-                        remainderStack.decrement(excess);
+            if (inputStack.isEmpty()) {
+                this.setStack(i, remainderStack);
+            } else if (ItemStack.areItemsEqual(inputStack, remainderStack) && ItemStack.areEqual(inputStack, remainderStack)) {
+                remainderStack.increment(inputStack.getCount());
 
-                        var insertStack = remainderStack.copy();
-                        insertStack.setCount(excess);
+                if (remainderStack.getCount() > remainderStack.getMaxCount()) {
+                    int excess = remainderStack.getCount() - remainderStack.getMaxCount();
+                    remainderStack.decrement(excess);
 
-                        if (!this.attemptToInsertIntoHopper(insertStack)) {
-                            var frontForgePos = pos.offset(getCachedState().get(ForgeControllerBlock.FACING));
+                    var insertStack = remainderStack.copy();
+                    insertStack.setCount(excess);
 
-                            world.playSound(null, frontForgePos.getX(), frontForgePos.getY(), frontForgePos.getZ(), SoundEvents.ENTITY_ITEM_PICKUP, SoundCategory.BLOCKS, 1.0F, 0.2F);
-                            ItemScatterer.spawn(world, frontForgePos.getX(), frontForgePos.getY(), frontForgePos.getZ(), insertStack);
-                        }
-                    }
-
-                    this.setStack(i, remainderStack);
-                } else {
-                    if (!this.attemptToInsertIntoHopper(remainderStack)) {
+                    if (!this.attemptToInsertIntoHopper(insertStack)) {
                         var frontForgePos = pos.offset(getCachedState().get(ForgeControllerBlock.FACING));
 
                         world.playSound(null, frontForgePos.getX(), frontForgePos.getY(), frontForgePos.getZ(), SoundEvents.ENTITY_ITEM_PICKUP, SoundCategory.BLOCKS, 1.0F, 0.2F);
-                        ItemScatterer.spawn(world, frontForgePos.getX(), frontForgePos.getY(), frontForgePos.getZ(), remainderStack);
+                        ItemScatterer.spawn(world, frontForgePos.getX(), frontForgePos.getY(), frontForgePos.getZ(), insertStack);
                     }
+                }
+
+                this.setStack(i, remainderStack);
+            } else {
+                if (!this.attemptToInsertIntoHopper(remainderStack)) {
+                    var frontForgePos = pos.offset(getCachedState().get(ForgeControllerBlock.FACING));
+
+                    world.playSound(null, frontForgePos.getX(), frontForgePos.getY(), frontForgePos.getZ(), SoundEvents.ENTITY_ITEM_PICKUP, SoundCategory.BLOCKS, 1.0F, 0.2F);
+                    ItemScatterer.spawn(world, frontForgePos.getX(), frontForgePos.getY(), frontForgePos.getZ(), remainderStack);
                 }
             }
         }
@@ -292,47 +308,48 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
         HopperBlockEntity blockEntity = null;
 
         for (int y = 1; y <= 2; y++) {
-            if (world.getBlockEntity(this.pos.down(y)) instanceof HopperBlockEntity hopperBlockEntity) {
+            if (this.world.getBlockEntity(this.pos.down(y)) instanceof HopperBlockEntity hopperBlockEntity) {
                 blockEntity = hopperBlockEntity;
 
                 break;
             }
         }
 
-        if (blockEntity != null) {
-            var isHopperEmpty = blockEntity.isEmpty();
-
-            for (int slotIndex = 0; slotIndex < blockEntity.size(); ++slotIndex) {
-                if (remainderStack.isEmpty()) break;
-
-                if (!blockEntity.getStack(slotIndex).isEmpty()) {
-                    final var itemStack = blockEntity.getStack(slotIndex).copy();
-
-                    if (itemStack.isEmpty()) {
-                        blockEntity.setStack(slotIndex, remainderStack);
-                        remainderStack = ItemStack.EMPTY;
-                    } else if (ItemOps.canStack(itemStack, remainderStack)) {
-                        int availableSpace = itemStack.getMaxCount() - itemStack.getCount();
-                        int j = Math.min(itemStack.getCount(), availableSpace);
-                        remainderStack.decrement(j);
-                        itemStack.increment(j);
-                    }
-                } else {
-                    blockEntity.setStack(slotIndex, remainderStack);
-                    break;
-                }
-            }
-
-            if (isHopperEmpty && !((HopperBlockEntityAccessor) blockEntity).alloyForge$isDisabled()) {
-                ((HopperBlockEntityAccessor) blockEntity).alloyForge$setTransferCooldown(8);
-            }
-
-            blockEntity.markDirty();
-
-            return true;
+        if (blockEntity == null) {
+            return false;
         }
 
-        return false;
+        var isHopperEmpty = blockEntity.isEmpty();
+
+        for (int slotIndex = 0; slotIndex < blockEntity.size(); ++slotIndex) {
+            if (remainderStack.isEmpty()) break;
+
+            if (!blockEntity.getStack(slotIndex).isEmpty()) {
+                final var itemStack = blockEntity.getStack(slotIndex).copy();
+
+                if (itemStack.isEmpty()) {
+                    blockEntity.setStack(slotIndex, remainderStack);
+                    remainderStack = ItemStack.EMPTY;
+                } else if (ItemOps.canStack(itemStack, remainderStack)) {
+                    int availableSpace = itemStack.getMaxCount() - itemStack.getCount();
+                    int j = Math.min(itemStack.getCount(), availableSpace);
+                    remainderStack.decrement(j);
+                    itemStack.increment(j);
+                }
+            } else {
+                blockEntity.setStack(slotIndex, remainderStack);
+                break;
+            }
+        }
+
+        if (isHopperEmpty && !((HopperBlockEntityAccessor) blockEntity).alloyForge$isDisabled()) {
+            ((HopperBlockEntityAccessor) blockEntity).alloyForge$setTransferCooldown(8);
+        }
+
+        blockEntity.markDirty();
+
+        return true;
+
     }
 
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
