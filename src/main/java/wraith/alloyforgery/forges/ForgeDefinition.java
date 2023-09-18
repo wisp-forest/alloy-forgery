@@ -20,7 +20,7 @@ public record ForgeDefinition(int forgeTier,
                               Block material,
                               ImmutableList<Block> additionalMaterials) {
 
-    private static final int BASE_MAX_SMELT_TIME = 200;
+    public static final int BASE_MAX_SMELT_TIME = 200;
     //why kubejs why
     private static final String RECIPE_PATTERN =
             """
