@@ -1,18 +1,17 @@
 package wraith.alloyforgery.recipe.handlers;
 
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.recipe.BlastingRecipe;
-import net.minecraft.recipe.RecipeType;
-import net.minecraft.registry.DynamicRegistryManager;
+import net.minecraft.recipe.*;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.collection.DefaultedList;
-import net.minecraft.world.World;
-import wraith.alloyforgery.block.ForgeControllerBlockEntity;
 import wraith.alloyforgery.forges.ForgeDefinition;
+import wraith.alloyforgery.recipe.AlloyForgeRecipe;
 
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Consumer;
 
 public class BlastFurnaceRecipeHandler extends ForgeRecipeHandler<BlastingRecipe> {
@@ -24,7 +23,9 @@ public class BlastFurnaceRecipeHandler extends ForgeRecipeHandler<BlastingRecipe
         Optional<BlastingRecipe> possibleRecipe = Optional.empty();
 
         for (int i = 0; i < 10; i++) {
-            possibleRecipe = context.world().getRecipeManager().getFirstMatch(RecipeType.BLASTING, emulatedInv.changeIndex(i, context.inventory()), context.world());
+            possibleRecipe = context.world().getRecipeManager()
+                    .getFirstMatch(RecipeType.BLASTING, emulatedInv.changeIndex(i, context.inventory()), context.world())
+                    .filter(BlastFurnaceRecipeHandler::notBlacklisted);
 
             if (possibleRecipe.isPresent()) break;
         }
@@ -117,5 +118,60 @@ public class BlastFurnaceRecipeHandler extends ForgeRecipeHandler<BlastingRecipe
 
         @Override
         public void clear() {}
+    }
+
+    private static final Set<Identifier> BLACKLIST_BLASTING_RECIPES = new HashSet<>();
+
+    public static void initEvents(){
+        ServerLifecycleEvents.SERVER_STARTED.register(server -> {
+            onDatapackload(server.getRecipeManager());
+        });
+
+        ServerLifecycleEvents.END_DATA_PACK_RELOAD.register((server, resourceManager, success) -> {
+            onDatapackload(server.getRecipeManager());
+        });
+    }
+
+    public static void onDatapackload(RecipeManager manager){
+        BLACKLIST_BLASTING_RECIPES.clear();
+
+        List<Recipe<?>> alloyForgeryRecipes = manager.values().stream()
+                .filter(recipe -> recipe.getType() == AlloyForgeRecipe.Type.INSTANCE)
+                .toList();
+
+        for (Recipe<?> recipe : manager.values()) {
+            if(recipe.getType() == RecipeType.BLASTING && !isUniqueRecipe(alloyForgeryRecipes, recipe)){
+                BLACKLIST_BLASTING_RECIPES.add(recipe.getId());
+            }
+        }
+    }
+
+    public static boolean isUniqueRecipe(List<Recipe<?>> alloyForgeryRecipes, Recipe<?> blastFurnaceRecipe){
+        List<Ingredient> ingredients = blastFurnaceRecipe.getIngredients();
+
+        for (Ingredient ingredient : ingredients) {
+            ItemStack[] stacks = ingredient.getMatchingStacks();
+
+            List<Recipe<?>> matchedRecipes = alloyForgeryRecipes.stream()
+                    .filter(recipe1 -> {
+                        for (Ingredient recipe1Ingredient : recipe1.getIngredients()) {
+                            for (ItemStack stack : stacks) {
+                                if(recipe1Ingredient.test(stack)){
+                                    return true;
+                                }
+                            }
+                        }
+
+                        return false;
+                    }).toList();
+
+            if(!matchedRecipes.isEmpty()) return false;
+        }
+
+        return true;
+    }
+
+    public static boolean notBlacklisted(Recipe<?> recipe){
+        return !BLACKLIST_BLASTING_RECIPES.contains(recipe.getId());
     }
 }

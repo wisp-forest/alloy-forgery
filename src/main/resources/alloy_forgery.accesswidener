@@ -5,3 +5,4 @@ accessible class net/minecraft/block/entity/BlockEntityType$BlockEntityFactory
 accessible class net/minecraft/recipe/Ingredient$Entry
 accessible class net/minecraft/recipe/Ingredient$StackEntry
 accessible class net/minecraft/recipe/Ingredient$TagEntry
+accessible field net/minecraft/item/ItemStackSet HASH_STRATEGY Lit/unimi/dsi/fastutil/Hash$Strategy;
