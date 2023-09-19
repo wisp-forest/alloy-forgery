@@ -2,7 +2,7 @@
   "type": "alloy_forgery:forging",
   "inputs": [
     {
-      "tag": "c:gold_ores"
+      "tag": "minecraft:gold_ores"
     }
   ],
   "output": {

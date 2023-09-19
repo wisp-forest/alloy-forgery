@@ -48,7 +48,6 @@ import wraith.alloyforgery.recipe.handlers.ForgeRecipeHandler;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Optional;
 
 @SuppressWarnings("UnstableApiUsage")
 public class ForgeControllerBlockEntity extends BlockEntity implements ImplementedInventory, SidedInventory, NamedScreenHandlerFactory, InsertionOnlyStorage<FluidVariant> {
@@ -160,14 +159,21 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
 
     @Override
     public void markDirty() {
-        if(!this.items.equals(previousItems)){
+        if (!ItemStackComparisonUtil.isEqual(items, previousItems)){
             this.previousItems.clear();
-            this.previousItems.addAll(items);
+            this.previousItems.addAll(items.stream().map(ItemStack::copy).toList());
 
             checkForRecipes = true;
         }
 
         super.markDirty();
+    }
+
+    @Override
+    public void setStack(int slot, ItemStack stack) {
+        ImplementedInventory.super.setStack(slot, stack);
+
+        this.markDirty();
     }
 
     public void tick() {
@@ -202,8 +208,10 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
             }
         }
 
-        if (this.fluidHolder.amount >= 81) {
-            final float fuelInsertAmount = Math.min((this.fluidHolder.amount / 81f) * 24, ((this.forgeDefinition.fuelCapacity() - this.fuel) / 24) * 24);
+        final var emptyFuelSpace = this.forgeDefinition.fuelCapacity() - this.fuel;
+
+        if (this.fluidHolder.amount >= 81 && emptyFuelSpace > 0f) {
+            final float fuelInsertAmount = Math.min((this.fluidHolder.amount / 81f) * 24, ((emptyFuelSpace) / 24) * 24);
 
             this.fuel += fuelInsertAmount;
             this.fluidHolder.amount -= (fuelInsertAmount / 24) * 81;
@@ -216,11 +224,14 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
             this.world.setBlockState(pos, currentBlockState.with(ForgeControllerBlock.LIT, false));
         }
 
-        if (this.isEmpty()) return;
+        // 1: Check if the inventory is full
+        // 2: Prevent crafting when we know that there is not enough fuel to craft at all
+        // 3: Prevent recipe checking if the inventory has not changed
+        if (this.isEmpty() || this.fuel < 5 || !this.checkForRecipes){
+            this.currentSmeltTime = 0;
 
-        if (this.fuel < 5) return; //Prevent crafting when we know that there is not enough fuel to craft at all
-
-        if (!this.checkForRecipes) return;
+            return;
+        }
 
         var recipeContext = new ForgeRecipeHandler.RecipeContext(this.world, this, this.forgeDefinition);
 
@@ -236,7 +247,7 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
             break;
         }
 
-        if(matchedHandler == null){
+        if (matchedHandler == null){
             this.currentSmeltTime = 0;
             this.checkForRecipes = false;
 
@@ -403,7 +414,11 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
 
     @Override
     public boolean canInsert(int slot, ItemStack stack, @Nullable Direction dir) {
-        return slot == 11 ? ForgeFuelRegistry.hasFuel(stack.getItem()) : getStack(slot).isEmpty();
+        if(slot == 11) return ForgeFuelRegistry.hasFuel(stack.getItem());
+
+        var slotStack = getStack(slot);
+
+        return slotStack.isEmpty() || ItemOps.canStack(slotStack, stack);
     }
 
     @Override

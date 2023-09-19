@@ -7,6 +7,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.Recipe;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.world.World;
+import wraith.alloyforgery.block.ItemStackComparisonUtil;
 import wraith.alloyforgery.forges.ForgeDefinition;
 
 import java.util.Optional;
@@ -18,14 +19,16 @@ public abstract class ForgeRecipeHandler<R extends Recipe<Inventory>> {
 
     protected final DefaultedList<ItemStack> previousItems = DefaultedList.of();
 
-    public boolean isRecipePresent(RecipeContext context){
-        if(!previousItems.equals(context.inventory.getItems())) {
+    public final boolean isRecipePresent(RecipeContext context){
+        var items = context.inventory.getItems();
+
+        if(!ItemStackComparisonUtil.isEqual(items, previousItems)) {
             if (lastRecipe.isEmpty() || !lastRecipe.get().matches(context.inventory(), context.world())) {
                 lastRecipe = gatherRecipe(context);
             }
 
             this.previousItems.clear();
-            this.previousItems.addAll(context.inventory.getItems());
+            this.previousItems.addAll(items.stream().map(ItemStack::copy).toList());
         }
 
         return lastRecipe.isPresent();

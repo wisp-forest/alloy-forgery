@@ -15,6 +15,7 @@ import wraith.alloyforgery.client.AlloyForgeScreen;
 import wraith.alloyforgery.forges.ForgeRegistry;
 import wraith.alloyforgery.recipe.AlloyForgeRecipe;
 import wraith.alloyforgery.recipe.AlloyForgeRecipeSerializer;
+import wraith.alloyforgery.recipe.handlers.BlastFurnaceRecipeHandler;
 
 import java.util.List;
 
@@ -45,28 +46,11 @@ public class AlloyForgeryClientPlugin implements REIClientPlugin {
                 .toList();
 
         registry.registerFiller(BlastingRecipe.class, recipe -> {
-            List<Ingredient> ingredients = recipe.getIngredients();
-
-            for (Ingredient ingredient : ingredients) {
-                ItemStack[] stacks = ingredient.getMatchingStacks();
-
-                List<Recipe<?>> matchedRecipes = alloyForgeryRecipes.stream()
-                        .filter(recipe1 -> {
-                            for (Ingredient recipe1Ingredient : recipe1.getIngredients()) {
-                                for (ItemStack stack : stacks) {
-                                    if(recipe1Ingredient.test(stack)){
-                                        return true;
-                                    }
-                                }
-                            }
-
-                            return false;
-                        }).toList();
-
-                if(!matchedRecipes.isEmpty()) return null;
+            if(BlastFurnaceRecipeHandler.isUniqueRecipe(alloyForgeryRecipes, recipe)){
+                return AlloyForgingDisplay.of(recipe);
             }
 
-            return AlloyForgingDisplay.of(recipe);
+            return null;
         });
     }
 }
