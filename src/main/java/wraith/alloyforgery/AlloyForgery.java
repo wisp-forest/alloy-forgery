@@ -26,6 +26,7 @@ import wraith.alloyforgery.forges.ForgeRegistry;
 import wraith.alloyforgery.forges.FuelDataLoader;
 import wraith.alloyforgery.recipe.AlloyForgeRecipe;
 import wraith.alloyforgery.recipe.AlloyForgeRecipeSerializer;
+import wraith.alloyforgery.recipe.handlers.BlastFurnaceRecipeHandler;
 
 public class AlloyForgery implements ModInitializer {
 
@@ -72,6 +73,8 @@ public class AlloyForgery implements ModInitializer {
         });
 
         OwoFreezer.registerFreezeCallback(() -> FluidStorage.SIDED.registerSelf(AlloyForgery.FORGE_CONTROLLER_BLOCK_ENTITY));
+
+        BlastFurnaceRecipeHandler.initEvents();
     }
 
     public static Identifier id(String path) {
