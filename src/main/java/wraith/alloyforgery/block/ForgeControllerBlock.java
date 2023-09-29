@@ -51,7 +51,6 @@ public class ForgeControllerBlock extends BlockWithEntity {
             final var fuelDefinition = ForgeFuelRegistry.getFuelForItem(playerStack.getItem());
             if (!(world.getBlockEntity(pos) instanceof ForgeControllerBlockEntity controller)) return ActionResult.PASS;
 
-            if(FluidStorageUtil.interactWithFluidStorage(controller, player, hand)) return ActionResult.SUCCESS;
 
             if (fuelDefinition.hasReturnType() && controller.canAddFuel(fuelDefinition.fuel())) {
                 if (!player.getAbilities().creativeMode) {
@@ -59,6 +58,8 @@ public class ForgeControllerBlock extends BlockWithEntity {
                     player.getInventory().offerOrDrop(new ItemStack(fuelDefinition.returnType()));
                 }
                 controller.addFuel(fuelDefinition.fuel());
+            } else if (FluidStorageUtil.interactWithFluidStorage(controller, player, hand)) {
+                return ActionResult.SUCCESS;
             } else {
                 if (!controller.verifyMultiblock()) {
                     player.sendMessage(Text.translatable("message.alloy_forgery.invalid_multiblock").formatted(Formatting.GRAY), true);
