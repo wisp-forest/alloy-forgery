@@ -238,23 +238,18 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
         ForgeRecipeHandler<? extends Recipe<Inventory>> matchedHandler = null;
 
         for (ForgeRecipeHandler<? extends Recipe<Inventory>> handler : recipeHandlers) {
-            if(!handler.isRecipePresent(recipeContext) || !handler.isAbleToSmelt(recipeContext)) {
-                continue;
-            }
+            if(!handler.isRecipePresent(recipeContext) || !handler.isAbleToSmelt(recipeContext)) continue;
 
             matchedHandler = handler;
 
             break;
         }
 
-        if (matchedHandler == null){
-            this.currentSmeltTime = 0;
+        if (matchedHandler == null) {
             this.checkForRecipes = false;
 
-            return;
-        }
-
-        if (this.currentSmeltTime < this.forgeDefinition.maxSmeltTime()) {
+            this.currentSmeltTime = 0;
+        } else if (this.currentSmeltTime < this.forgeDefinition.maxSmeltTime()) {
             final float fuelRequirement = matchedHandler.getFuelRequirement(recipeContext);
 
             if (this.fuel - fuelRequirement < 0) {
