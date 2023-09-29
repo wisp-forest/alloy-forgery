@@ -21,11 +21,8 @@ public class AlloyForgeRecipeHandler extends ForgeRecipeHandler<AlloyForgeRecipe
 
     @Override
     public boolean isAbleToSmelt(RecipeContext context) {
-        final var recipe = this.lastRecipe.get();
-
-        if (recipe.getMinForgeTier() > context.forgeDefinition().forgeTier()) return false;
-
-        return super.isAbleToSmelt(context);
+        return this.lastRecipe.get().getMinForgeTier() > context.forgeDefinition().forgeTier()
+                && super.isAbleToSmelt(context);
     }
 
     @Override
