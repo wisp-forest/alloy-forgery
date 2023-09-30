@@ -20,9 +20,9 @@ public class AlloyForgeRecipeHandler extends ForgeRecipeHandler<AlloyForgeRecipe
     }
 
     @Override
-    public boolean isAbleToSmelt(RecipeContext context) {
-        return this.lastRecipe.get().getMinForgeTier() > context.forgeDefinition().forgeTier()
-                && super.isAbleToSmelt(context);
+    public boolean canSmelt(RecipeContext context) {
+        return this.lastRecipe.filter(alloyForgeRecipe -> alloyForgeRecipe.getMinForgeTier() > context.forgeDefinition().forgeTier()
+                && super.canSmelt(context)).isPresent();
     }
 
     @Override
@@ -32,6 +32,11 @@ public class AlloyForgeRecipeHandler extends ForgeRecipeHandler<AlloyForgeRecipe
 
     @Override
     public void craftRecipe(RecipeContext context, Consumer<DefaultedList<ItemStack>> remainderConsumer) {
+        if (this.lastRecipe.isEmpty()) {
+            super.craftRecipe(context, remainderConsumer);
+            return;
+        }
+
         var recipe = this.lastRecipe.get();
 
         var remainderList = recipe.gatherRemainders(context.inventory());

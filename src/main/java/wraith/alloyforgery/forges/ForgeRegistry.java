@@ -2,7 +2,6 @@ package wraith.alloyforgery.forges;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import io.wispforest.owo.itemgroup.OwoItemSettings;
 import io.wispforest.owo.moddata.ModDataConsumer;
 import io.wispforest.owo.util.TagInjector;
 import net.minecraft.block.Block;
@@ -11,7 +10,6 @@ import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.util.Identifier;
 import wraith.alloyforgery.AlloyForgery;
-import wraith.alloyforgery.AlloyForgeryItemGroup;
 import wraith.alloyforgery.ForgeControllerItem;
 import wraith.alloyforgery.block.ForgeControllerBlock;
 

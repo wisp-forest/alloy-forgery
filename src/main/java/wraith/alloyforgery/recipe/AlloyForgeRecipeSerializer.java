@@ -182,7 +182,7 @@ public class AlloyForgeRecipeSerializer implements RecipeSerializer<AlloyForgeRe
     public void write(PacketByteBuf buf, AlloyForgeRecipe recipe) {
         buf.writeMap(recipe.getIngredientsMap(), (buf1, ingredient) -> ingredient.write(buf1), PacketByteBuf::writeVarInt);
 
-        buf.writeItemStack(recipe.getOutput());
+        buf.writeItemStack(recipe.getBaseOutput());
         buf.writeVarInt(recipe.getMinForgeTier());
         buf.writeVarInt(recipe.getFuelPerTick());
 

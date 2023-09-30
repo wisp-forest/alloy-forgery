@@ -4,7 +4,6 @@ import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider;
 import net.minecraft.item.Items;
 import net.minecraft.registry.RegistryWrapper;
-import org.jetbrains.annotations.Nullable;
 import wraith.alloyforgery.data.AlloyForgeryTags;
 
 import java.util.concurrent.CompletableFuture;

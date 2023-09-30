@@ -19,6 +19,7 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.Pair;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.world.World;
+import org.jetbrains.annotations.ApiStatus;
 import wraith.alloyforgery.AlloyForgery;
 
 import javax.annotation.Nullable;
@@ -80,7 +81,9 @@ public class AlloyForgeRecipe implements Recipe<Inventory> {
 
                 overrides.put(range, stack);
             } else {
-                overrides.put(range, override.stack());
+                if (override.stack() != null) {
+                    overrides.put(range, override.stack());
+                }
             }
         });
 
@@ -142,6 +145,7 @@ public class AlloyForgeRecipe implements Recipe<Inventory> {
         return boundSlots;
     }
 
+    @SuppressWarnings("SuspiciousToArrayCall")
     @Override
     public DefaultedList<Ingredient> getIngredients() {
         final var allIngredients = new ArrayList<>();
@@ -168,6 +172,7 @@ public class AlloyForgeRecipe implements Recipe<Inventory> {
     @Nullable
     public DefaultedList<ItemStack> gatherRemainders(Inventory inventory) {
         final var remainders = DefaultedList.ofSize(inventory.size(), ItemStack.EMPTY);
+        //noinspection UnstableApiUsage
         final var owoRemainders = RecipeRemainderStorage.has(this.getId()) ? RecipeRemainderStorage.get(this.getId()) : Map.<Item, ItemStack>of();
 
         if (owoRemainders.isEmpty() && GLOBAL_REMAINDERS.isEmpty()) return null;
@@ -198,19 +203,28 @@ public class AlloyForgeRecipe implements Recipe<Inventory> {
         return false;
     }
 
+    // Do not override
     @Override
+    @ApiStatus.Internal
     @Deprecated
     public ItemStack getOutput(DynamicRegistryManager drm) {
         return this.output.copy();
     }
 
-    @Deprecated
-    public ItemStack getOutput() {
+    /**
+     * Quickly copy the base output for a recipe, skips calculations from {@link #getOutput(int)}
+     */
+    @ApiStatus.Internal
+    public ItemStack getBaseOutput() {
         return this.output.copy();
     }
 
     public ItemStack getOutput(int forgeTier) {
-        ItemStack stack = tierOverrides.getOrDefault(tierOverrides.keySet().stream().filter(overrideRange -> overrideRange.test(forgeTier)).findAny().orElse(null), output).copy();
+        ItemStack stack = tierOverrides.getOrDefault(tierOverrides.keySet().stream()
+                        .filter(overrideRange -> overrideRange.test(forgeTier))
+                        .findAny()
+                        .orElse(null), output)
+                .copy();
 
         if (stack.getItem() == Items.AIR) {
             int stackCount = stack.getCount();
@@ -260,6 +274,7 @@ public class AlloyForgeRecipe implements Recipe<Inventory> {
             return value >= lowerBound && (upperBound == -1 || value <= upperBound);
         }
 
+        // Any attempt to optimize this mess has been unilaterally denied
         @Override
         public String toString() {
             var outString = String.valueOf(lowerBound);
@@ -286,7 +301,8 @@ public class AlloyForgeRecipe implements Recipe<Inventory> {
     }
 
     public static class Type implements RecipeType<AlloyForgeRecipe> {
-        private Type() {}
+        private Type() {
+        }
 
         public static final Identifier ID = AlloyForgery.id("forging");
         public static final Type INSTANCE = new Type();
