@@ -12,6 +12,7 @@ import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.recipe.BlastingRecipe;
 import net.minecraft.recipe.Ingredient;
+import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.util.Identifier;
 import wraith.alloyforgery.recipe.AlloyForgeRecipe;
 import wraith.alloyforgery.recipe.handlers.BlastFurnaceRecipeHandler;
@@ -49,7 +50,7 @@ public class AlloyForgingDisplay implements Display {
 
         return new AlloyForgingDisplay(
                 convertedInputs,
-                EntryIngredients.of(recipe.getOutput()),
+                EntryIngredients.of(recipe.getBaseOutput()),
                 recipe.getMinForgeTier(),
                 recipe.getFuelPerTick(),
                 recipe.getTierOverrides(),
@@ -57,15 +58,9 @@ public class AlloyForgingDisplay implements Display {
     }
 
     public static AlloyForgingDisplay of(BlastingRecipe recipe) {
-//        var overrideOutput = recipe.getOutput(null).copy();
-//
-//        overrideOutput.increment(1);
-//
-//        var overrides = Map.of(new AlloyForgeRecipe.OverrideRange(3), overrideOutput);
-
         return new AlloyForgingDisplay(
                 EntryIngredients.ofIngredients(recipe.getIngredients()),
-                EntryIngredients.of(recipe.getOutput(null).copy()),
+                EntryIngredients.of(recipe.getOutput(DynamicRegistryManager.EMPTY).copy()),
                 1,
                 Math.round(BlastFurnaceRecipeHandler.getFuelPerTick(recipe)),
                 Map.of(),

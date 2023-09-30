@@ -45,7 +45,7 @@ public class AlloyForgeryEmiRecipe implements EmiRecipe {
 
         //initialize the starting text and stack to show in the plugin
         this.currentTierText = Text.translatable("container.alloy_forgery.rei.min_tier", minForgeTier).asOrderedText();
-        this.currentStack = EmiStack.of(recipe.getOutput());
+        this.currentStack = EmiStack.of(recipe.getBaseOutput());
 
         //set the outputs list with the initial stack
         this.outputs = List.of(currentStack);

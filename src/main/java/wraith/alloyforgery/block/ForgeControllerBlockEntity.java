@@ -159,7 +159,7 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
 
     @Override
     public void markDirty() {
-        if (!ItemStackComparisonUtil.isEqual(items, previousItems)){
+        if (ItemStackComparisonUtil.itemsChanged(items, previousItems)) {
             this.previousItems.clear();
             this.previousItems.addAll(items.stream().map(ItemStack::copy).toList());
 
@@ -227,7 +227,7 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
         // 1: Check if the inventory is full
         // 2: Prevent crafting when we know that there is not enough fuel to craft at all
         // 3: Prevent recipe checking if the inventory has not changed
-        if (this.isEmpty() || this.fuel < 5 || !this.checkForRecipes){
+        if (this.isEmpty() || this.fuel < 5 || !this.checkForRecipes) {
             this.currentSmeltTime = 0;
 
             return;
@@ -238,7 +238,7 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
         ForgeRecipeHandler<? extends Recipe<Inventory>> matchedHandler = null;
 
         for (ForgeRecipeHandler<? extends Recipe<Inventory>> handler : recipeHandlers) {
-            if(!handler.isRecipePresent(recipeContext) || !handler.isAbleToSmelt(recipeContext)) continue;
+            if (!handler.isRecipePresent(recipeContext) || !handler.canSmelt(recipeContext)) continue;
 
             matchedHandler = handler;
 
@@ -247,9 +247,11 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
 
         if (matchedHandler == null) {
             this.checkForRecipes = false;
-
             this.currentSmeltTime = 0;
-        } else if (this.currentSmeltTime < this.forgeDefinition.maxSmeltTime()) {
+            return;
+        }
+
+        if (this.currentSmeltTime < this.forgeDefinition.maxSmeltTime()) {
             final float fuelRequirement = matchedHandler.getFuelRequirement(recipeContext);
 
             if (this.fuel - fuelRequirement < 0) {
@@ -298,7 +300,7 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
                 }
 
                 this.setStack(i, remainderStack);
-            } else if(!this.attemptToInsertIntoHopper(remainderStack)){
+            } else if (!this.attemptToInsertIntoHopper(remainderStack)){
                 var frontForgePos = pos.offset(getCachedState().get(ForgeControllerBlock.FACING));
 
                 world.playSound(null, frontForgePos.getX(), frontForgePos.getY(), frontForgePos.getZ(), SoundEvents.ENTITY_ITEM_PICKUP, SoundCategory.BLOCKS, 1.0F, 0.2F);
@@ -409,7 +411,7 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
 
     @Override
     public boolean canInsert(int slot, ItemStack stack, @Nullable Direction dir) {
-        if(slot == 11) return ForgeFuelRegistry.hasFuel(stack.getItem());
+        if (slot == 11) return ForgeFuelRegistry.hasFuel(stack.getItem());
 
         var slotStack = getStack(slot);
 
