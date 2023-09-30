@@ -8,7 +8,10 @@ import net.minecraft.util.collection.DefaultedList;
 import wraith.alloyforgery.forges.ForgeDefinition;
 import wraith.alloyforgery.recipe.AlloyForgeRecipe;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.function.Consumer;
 
 public class BlastFurnaceRecipeHandler extends ForgeRecipeHandler<BlastingRecipe> {
@@ -32,11 +35,8 @@ public class BlastFurnaceRecipeHandler extends ForgeRecipeHandler<BlastingRecipe
 
     @Override
     public ItemStack recipeOutput(RecipeContext context, BlastingRecipe recipe) {
-        var stack = recipe.getOutput(context.world().getRegistryManager()).copy();
-
         //if(context.forgeDefinition().forgeTier() >= 3) stack.increment(1);
-
-        return stack;
+        return recipe.getOutput(context.world().getRegistryManager()).copy();
     }
 
     @Override
@@ -55,7 +55,7 @@ public class BlastFurnaceRecipeHandler extends ForgeRecipeHandler<BlastingRecipe
         super.craftRecipe(context, remainderConsumer);
     }
 
-    public static float getFuelPerTick(BlastingRecipe recipe){
+    public static float getFuelPerTick(BlastingRecipe recipe) {
         return ((recipe.getCookTime() / (float) ForgeDefinition.BASE_MAX_SMELT_TIME) * 10);
     }
 
@@ -63,12 +63,12 @@ public class BlastFurnaceRecipeHandler extends ForgeRecipeHandler<BlastingRecipe
 
     private static final Set<Identifier> BLACKLIST_BLASTING_RECIPES = new HashSet<>();
 
-    public static void initEvents(){
+    public static void initEvents() {
         ServerLifecycleEvents.SERVER_STARTED.register(server -> onDatapackload(server.getRecipeManager()));
         ServerLifecycleEvents.END_DATA_PACK_RELOAD.register((server, manager, success) -> onDatapackload(server.getRecipeManager()));
     }
 
-    public static void onDatapackload(RecipeManager manager){
+    public static void onDatapackload(RecipeManager manager) {
         BLACKLIST_BLASTING_RECIPES.clear();
 
         List<Recipe<?>> alloyForgeryRecipes = manager.values().stream()
@@ -76,13 +76,13 @@ public class BlastFurnaceRecipeHandler extends ForgeRecipeHandler<BlastingRecipe
                 .toList();
 
         for (Recipe<?> recipe : manager.values()) {
-            if(recipe.getType() == RecipeType.BLASTING && !isUniqueRecipe(alloyForgeryRecipes, recipe)){
+            if (recipe.getType() == RecipeType.BLASTING && !isUniqueRecipe(alloyForgeryRecipes, recipe)) {
                 BLACKLIST_BLASTING_RECIPES.add(recipe.getId());
             }
         }
     }
 
-    public static boolean isUniqueRecipe(List<Recipe<?>> alloyForgeryRecipes, Recipe<?> blastFurnaceRecipe){
+    public static boolean isUniqueRecipe(List<Recipe<?>> alloyForgeryRecipes, Recipe<?> blastFurnaceRecipe) {
         List<Ingredient> ingredients = blastFurnaceRecipe.getIngredients();
 
         for (Ingredient ingredient : ingredients) {
@@ -92,7 +92,7 @@ public class BlastFurnaceRecipeHandler extends ForgeRecipeHandler<BlastingRecipe
                     .filter(recipe1 -> {
                         for (Ingredient recipe1Ingredient : recipe1.getIngredients()) {
                             for (ItemStack stack : stacks) {
-                                if(recipe1Ingredient.test(stack)){
+                                if (recipe1Ingredient.test(stack)) {
                                     return true;
                                 }
                             }
@@ -101,13 +101,13 @@ public class BlastFurnaceRecipeHandler extends ForgeRecipeHandler<BlastingRecipe
                         return false;
                     }).toList();
 
-            if(!matchedRecipes.isEmpty()) return false;
+            if (!matchedRecipes.isEmpty()) return false;
         }
 
         return true;
     }
 
-    public static boolean notBlacklisted(Recipe<?> recipe){
+    public static boolean notBlacklisted(Recipe<?> recipe) {
         return !BLACKLIST_BLASTING_RECIPES.contains(recipe.getId());
     }
 }

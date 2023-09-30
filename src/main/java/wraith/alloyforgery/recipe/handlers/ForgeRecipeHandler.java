@@ -19,10 +19,10 @@ public abstract class ForgeRecipeHandler<R extends Recipe<Inventory>> {
 
     protected final DefaultedList<ItemStack> previousItems = DefaultedList.of();
 
-    public final boolean isRecipePresent(RecipeContext context){
+    public final boolean isRecipePresent(RecipeContext context) {
         var items = context.inventory.getItems();
 
-        if(!ItemStackComparisonUtil.isEqual(items, previousItems)) {
+        if (ItemStackComparisonUtil.itemsChanged(items, previousItems)) {
             if (lastRecipe.isEmpty() || !lastRecipe.get().matches(context.inventory(), context.world())) {
                 lastRecipe = gatherRecipe(context);
             }
@@ -36,7 +36,8 @@ public abstract class ForgeRecipeHandler<R extends Recipe<Inventory>> {
 
     public abstract Optional<R> gatherRecipe(RecipeContext context);
 
-    public boolean isAbleToSmelt(RecipeContext context){
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
+    public boolean canSmelt(RecipeContext context) {
         final var outputStack = context.inventory.getStack(10);
 
         return outputStack.isEmpty() || ItemOps.canStack(outputStack, recipeOutput(context, lastRecipe.get()));
@@ -57,5 +58,6 @@ public abstract class ForgeRecipeHandler<R extends Recipe<Inventory>> {
         }
     }
 
-    public record RecipeContext(World world, ImplementedInventory inventory, ForgeDefinition forgeDefinition){}
+    public record RecipeContext(World world, ImplementedInventory inventory, ForgeDefinition forgeDefinition) {
+    }
 }
