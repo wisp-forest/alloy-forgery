@@ -15,6 +15,7 @@ public class BlastFurnaceRecipeAdapter implements RecipeInjector.AddRecipes {
 
     public static final Identifier BLACKLISTED_BLASTING_RECIPES = AlloyForgery.id("blacklisted_blasting_recipes");
 
+    public static final Identifier BLACKLISTED_INCREASED_OUTPUT = AlloyForgery.id("blacklisted_increased_output.json");
 
     @Override
     public void addRecipes(RecipeInjector instance) {
@@ -23,7 +24,7 @@ public class BlastFurnaceRecipeAdapter implements RecipeInjector.AddRecipes {
         List<AlloyForgeRecipe> alloyForgeryRecipes = manager.listAllOfType(AlloyForgeRecipe.Type.INSTANCE);
 
         for (BlastingRecipe recipe : manager.listAllOfType(RecipeType.BLASTING)) {
-            if(!isUniqueRecipe(alloyForgeryRecipes, recipe) || RecipeTagLoader.isWithinTag(BLACKLISTED_BLASTING_RECIPES, recipe)) continue;
+            if(!isUniqueRecipe(alloyForgeryRecipes, recipe) || recipe.isIn(BLACKLISTED_BLASTING_RECIPES)) continue;
 
             var secondaryID = recipe.getId();
             var path = secondaryID.getPath();
@@ -32,14 +33,24 @@ public class BlastFurnaceRecipeAdapter implements RecipeInjector.AddRecipes {
                 path = path.replace("blasting", "forging");
             }
 
-            var id = AlloyForgery.id(path);
+            var mainOutput = recipe.getOutput(null);
 
-            var convertRecipe = new AlloyForgeRecipe(id,
+            var extraOutput = ImmutableMap.<AlloyForgeRecipe.OverrideRange, ItemStack>builder();
+
+            if(!recipe.isIn(BLACKLISTED_INCREASED_OUTPUT)){
+                var increasedOutput = mainOutput.copy();
+
+                increasedOutput.increment(1);
+
+                extraOutput.put(new AlloyForgeRecipe.OverrideRange(2), increasedOutput);
+            }
+
+            var convertRecipe = new AlloyForgeRecipe(AlloyForgery.id(path),
                     Map.of(recipe.getIngredients().get(0), 1),
-                    recipe.getOutput(null),
+                    mainOutput,
                     1,
                     Math.round(getFuelPerTick(recipe)),
-                    ImmutableMap.of()
+                    extraOutput.build()
             ).setSecondaryID(secondaryID);
 
             instance.addRecipe(convertRecipe);
@@ -68,5 +79,4 @@ public class BlastFurnaceRecipeAdapter implements RecipeInjector.AddRecipes {
 
         return matchedRecipes.isEmpty();
     }
-
 }

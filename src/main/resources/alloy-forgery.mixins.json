@@ -9,7 +9,8 @@
     "HopperBlockEntityAccessor",
     "IngredientAccessor",
     "RecipeManagerAccessor",
-    "RecipeManagerMixin"
+    "RecipeManagerMixin",
+    "RecipeMixin"
   ],
   "injectors": {
     "defaultRequire": 1
