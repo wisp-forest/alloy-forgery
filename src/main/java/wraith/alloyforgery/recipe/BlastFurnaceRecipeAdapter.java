@@ -2,20 +2,23 @@ package wraith.alloyforgery.recipe;
 
 import com.google.common.collect.ImmutableMap;
 import net.minecraft.item.ItemStack;
-import net.minecraft.recipe.*;
+import net.minecraft.recipe.BlastingRecipe;
+import net.minecraft.recipe.Recipe;
+import net.minecraft.recipe.RecipeType;
+import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
 import wraith.alloyforgery.AlloyForgery;
-import wraith.alloyforgery.data.RecipeTagLoader;
 import wraith.alloyforgery.forges.ForgeDefinition;
 import wraith.alloyforgery.utils.RecipeInjector;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
 public class BlastFurnaceRecipeAdapter implements RecipeInjector.AddRecipes {
 
     public static final Identifier BLACKLISTED_BLASTING_RECIPES = AlloyForgery.id("blacklisted_blasting_recipes");
-
-    public static final Identifier BLACKLISTED_INCREASED_OUTPUT = AlloyForgery.id("blacklisted_increased_output.json");
+    public static final Identifier BLACKLISTED_INCREASED_OUTPUT = AlloyForgery.id("blacklisted_increased_output");
 
     @Override
     public void addRecipes(RecipeInjector instance) {
@@ -37,7 +40,7 @@ public class BlastFurnaceRecipeAdapter implements RecipeInjector.AddRecipes {
 
             var extraOutput = ImmutableMap.<AlloyForgeRecipe.OverrideRange, ItemStack>builder();
 
-            if(!recipe.isIn(BLACKLISTED_INCREASED_OUTPUT)){
+            if(!recipe.isIn(BLACKLISTED_INCREASED_OUTPUT) && !isDustRecipe(recipe)){
                 var increasedOutput = mainOutput.copy();
 
                 increasedOutput.increment(1);
@@ -78,5 +81,16 @@ public class BlastFurnaceRecipeAdapter implements RecipeInjector.AddRecipes {
                 }).toList();
 
         return matchedRecipes.isEmpty();
+    }
+
+    public static boolean isDustRecipe(Recipe<?> blastRecipe){
+        if(blastRecipe.getId().getPath().contains("dust")) return true;
+
+        var inputIngredient = blastRecipe.getIngredients().get(0);
+
+        return Arrays.stream(inputIngredient.getMatchingStacks())
+                .map(ItemStack::getItem)
+                .map(Registries.ITEM::getId)
+                .anyMatch(id -> id.getPath().contains("dust"));
     }
 }
