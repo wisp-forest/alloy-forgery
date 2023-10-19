@@ -61,6 +61,11 @@
       "links": {
         "modmenu.discord": "http://discord.gg/Pa5wDVm8Xv"
       }
+    },
+    "loom:injected_interfaces": {
+      "net/minecraft/class_1860": [
+        "wraith/alloyforgery/pond/RecipeTagHelper"
+      ]
     }
   }
 }
