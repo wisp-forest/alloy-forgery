@@ -10,12 +10,9 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
-import net.minecraft.recipe.BlastingRecipe;
 import net.minecraft.recipe.Ingredient;
-import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.util.Identifier;
 import wraith.alloyforgery.recipe.AlloyForgeRecipe;
-import wraith.alloyforgery.recipe.handlers.BlastFurnaceRecipeHandler;
 
 import java.util.*;
 
@@ -30,6 +27,18 @@ public class AlloyForgingDisplay implements Display {
     public final Map<AlloyForgeRecipe.OverrideRange, ItemStack> overrides;
 
     public final Optional<Identifier> recipeID;
+
+    private AlloyForgingDisplay(List<EntryIngredient> inputs, EntryIngredient output, int minForgeTier, int requiredFuel, Map<AlloyForgeRecipe.OverrideRange, ItemStack> overrides, Optional<Identifier> recipeID) {
+        this.inputs = inputs;
+        this.output = output;
+
+        this.minForgeTier = minForgeTier;
+        this.requiredFuel = requiredFuel;
+
+        this.overrides = overrides;
+
+        this.recipeID = recipeID;
+    }
 
     public static AlloyForgingDisplay of(AlloyForgeRecipe recipe){
         List<EntryIngredient> convertedInputs = new ArrayList<>();
@@ -54,29 +63,7 @@ public class AlloyForgingDisplay implements Display {
                 recipe.getMinForgeTier(),
                 recipe.getFuelPerTick(),
                 recipe.getTierOverrides(),
-                Optional.of(recipe.getId()));
-    }
-
-    public static AlloyForgingDisplay of(BlastingRecipe recipe) {
-        return new AlloyForgingDisplay(
-                EntryIngredients.ofIngredients(recipe.getIngredients()),
-                EntryIngredients.of(recipe.getOutput(DynamicRegistryManager.EMPTY).copy()),
-                1,
-                Math.round(BlastFurnaceRecipeHandler.getFuelPerTick(recipe)),
-                Map.of(),
-                Optional.of(recipe.getId()));
-    }
-
-    public AlloyForgingDisplay(List<EntryIngredient> inputs, EntryIngredient output, int minForgeTier, int requiredFuel, Map<AlloyForgeRecipe.OverrideRange, ItemStack> overrides, Optional<Identifier> recipeID) {
-        this.inputs = inputs;
-        this.output = output;
-
-        this.minForgeTier = minForgeTier;
-        this.requiredFuel = requiredFuel;
-
-        this.overrides = overrides;
-
-        this.recipeID = recipeID;
+                recipe.secondaryID().or(() -> Optional.of(recipe.getId())));
     }
 
     @Override

@@ -6,3 +6,7 @@ accessible class net/minecraft/recipe/Ingredient$Entry
 accessible class net/minecraft/recipe/Ingredient$StackEntry
 accessible class net/minecraft/recipe/Ingredient$TagEntry
 accessible field net/minecraft/item/ItemStackSet HASH_STRATEGY Lit/unimi/dsi/fastutil/Hash$Strategy;
+
+accessible class net/minecraft/registry/tag/TagGroupLoader$TagDependencies
+
+accessible method net/minecraft/registry/tag/TagGroupLoader$TagDependencies <init> (Ljava/util/List;)V

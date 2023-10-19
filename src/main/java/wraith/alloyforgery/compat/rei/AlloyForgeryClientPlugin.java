@@ -6,14 +6,9 @@ import me.shedaniel.rei.api.client.registry.category.CategoryRegistry;
 import me.shedaniel.rei.api.client.registry.display.DisplayRegistry;
 import me.shedaniel.rei.api.client.registry.screen.ScreenRegistry;
 import me.shedaniel.rei.api.common.util.EntryStacks;
-import net.minecraft.recipe.BlastingRecipe;
-import net.minecraft.recipe.Recipe;
 import wraith.alloyforgery.client.AlloyForgeScreen;
 import wraith.alloyforgery.forges.ForgeRegistry;
 import wraith.alloyforgery.recipe.AlloyForgeRecipe;
-import wraith.alloyforgery.recipe.handlers.BlastFurnaceRecipeHandler;
-
-import java.util.List;
 
 public class AlloyForgeryClientPlugin implements REIClientPlugin {
 
@@ -36,17 +31,5 @@ public class AlloyForgeryClientPlugin implements REIClientPlugin {
     @Override
     public void registerDisplays(DisplayRegistry registry) {
         registry.registerFiller(AlloyForgeRecipe.class, AlloyForgingDisplay::of);
-
-        List<Recipe<?>> alloyForgeryRecipes = registry.getRecipeManager().values().stream()
-                .filter(recipe -> recipe.getType() == AlloyForgeRecipe.Type.INSTANCE)
-                .toList();
-
-        registry.registerFiller(BlastingRecipe.class, recipe -> {
-            if (BlastFurnaceRecipeHandler.isUniqueRecipe(alloyForgeryRecipes, recipe)) {
-                return AlloyForgingDisplay.of(recipe);
-            }
-
-            return null;
-        });
     }
 }
