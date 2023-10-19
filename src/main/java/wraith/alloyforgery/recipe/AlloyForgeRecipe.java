@@ -36,6 +36,7 @@ public class AlloyForgeRecipe implements Recipe<Inventory> {
     public static final Map<AlloyForgeRecipe, PendingRecipeData> PENDING_RECIPES = new HashMap<>();
 
     private final Identifier id;
+    private Optional<Identifier> secondaryID = Optional.empty();
 
     private final Map<Ingredient, Integer> inputs;
     private ItemStack output;
@@ -53,6 +54,16 @@ public class AlloyForgeRecipe implements Recipe<Inventory> {
         this.fuelPerTick = fuelPerTick;
 
         this.tierOverrides = overrides;
+    }
+
+    public AlloyForgeRecipe setSecondaryID(Identifier id){
+        this.secondaryID = Optional.of(id);
+
+        return this;
+    }
+
+    public Optional<Identifier> secondaryID(){
+        return this.secondaryID;
     }
 
     public void finishRecipe(PendingRecipeData pendingData) {

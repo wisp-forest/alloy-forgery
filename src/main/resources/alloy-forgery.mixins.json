@@ -8,6 +8,7 @@
     "DefaultedRegistryMixin",
     "HopperBlockEntityAccessor",
     "IngredientAccessor",
+    "RecipeManagerAccessor",
     "RecipeManagerMixin"
   ],
   "injectors": {

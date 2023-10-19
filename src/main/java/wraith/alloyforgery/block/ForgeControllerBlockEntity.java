@@ -18,11 +18,9 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.inventory.Inventories;
-import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.recipe.Recipe;
 import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.screen.PropertyDelegate;
 import net.minecraft.screen.ScreenHandler;
@@ -41,13 +39,12 @@ import wraith.alloyforgery.forges.ForgeDefinition;
 import wraith.alloyforgery.forges.ForgeFuelRegistry;
 import wraith.alloyforgery.forges.ForgeRegistry;
 import wraith.alloyforgery.mixin.HopperBlockEntityAccessor;
-import wraith.alloyforgery.recipe.handlers.AlloyForgeRecipeHandler;
-import wraith.alloyforgery.recipe.handlers.BlastFurnaceRecipeHandler;
-import wraith.alloyforgery.recipe.handlers.ForgeRecipeHandler;
+import wraith.alloyforgery.recipe.AlloyForgeRecipe;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 
 @SuppressWarnings("UnstableApiUsage")
 public class ForgeControllerBlockEntity extends BlockEntity implements ImplementedInventory, SidedInventory, NamedScreenHandlerFactory, InsertionOnlyStorage<FluidVariant> {
@@ -62,7 +59,7 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
     private final DefaultedList<ItemStack> previousItems = DefaultedList.of();
     private boolean checkForRecipes = true;
 
-    private final List<ForgeRecipeHandler<? extends Recipe<Inventory>>> recipeHandlers;
+    private Optional<AlloyForgeRecipe> recipeCache = Optional.empty();
 
     private final FluidHolder fluidHolder = new FluidHolder();
 
@@ -83,8 +80,6 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
         facing = state.get(ForgeControllerBlock.FACING);
 
         multiblockPositions = generateMultiblockPositions(pos.toImmutable(), state.get(ForgeControllerBlock.FACING));
-
-        recipeHandlers = List.of(new AlloyForgeRecipeHandler(), new BlastFurnaceRecipeHandler());
     }
 
     private final PropertyDelegate properties = new PropertyDelegate() {
@@ -227,32 +222,36 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
         // 1: Check if the inventory is full
         // 2: Prevent crafting when we know that there is not enough fuel to craft at all
         // 3: Prevent recipe checking if the inventory has not changed
-        if (this.isEmpty() || this.fuel < 5 || !this.checkForRecipes) {
+        if(this.isEmpty()){
             this.currentSmeltTime = 0;
 
             return;
         }
 
-        var recipeContext = new ForgeRecipeHandler.RecipeContext(this.world, this, this.forgeDefinition);
+        if (this.fuel < 5 || !this.checkForRecipes) {
+            this.currentSmeltTime = 0;
 
-        ForgeRecipeHandler<? extends Recipe<Inventory>> matchedHandler = null;
-
-        for (ForgeRecipeHandler<? extends Recipe<Inventory>> handler : recipeHandlers) {
-            if (!handler.isRecipePresent(recipeContext) || !handler.canSmelt(recipeContext)) continue;
-
-            matchedHandler = handler;
-
-            break;
+            return;
         }
 
-        if (matchedHandler == null) {
+        //--
+
+        if(recipeCache.isEmpty() || !recipeCache.get().matches(this, this.world)) {
+            recipeCache = this.world.getRecipeManager().getFirstMatch(AlloyForgeRecipe.Type.INSTANCE, this, this.world);
+        }
+
+        if (recipeCache.isEmpty() || !canSmelt(recipeCache.get())) {
             this.checkForRecipes = false;
             this.currentSmeltTime = 0;
             return;
         }
 
+        //--
+
+        var recipe = recipeCache.get();
+
         if (this.currentSmeltTime < this.forgeDefinition.maxSmeltTime()) {
-            final float fuelRequirement = matchedHandler.getFuelRequirement(recipeContext);
+            final float fuelRequirement = recipe.getFuelPerTick() * this.forgeDefinition.speedMultiplier();
 
             if (this.fuel - fuelRequirement < 0) {
                 this.currentSmeltTime = 0;
@@ -266,10 +265,31 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
                 AlloyForgery.FORGE_PARTICLES.spawn(world, Vec3d.of(this.pos), this.facing);
             }
         } else {
-            matchedHandler.craftRecipe(recipeContext, this::handleForgingRemainders);
+            var remainderList = recipe.gatherRemainders(this);
+
+            if (remainderList != null) this.handleForgingRemainders(remainderList);
+
+            recipe.craft(this, this.world.getRegistryManager());
+
+            var outputStack = this.getStack(10);
+            var recipeOutput = recipe.getOutput(this.forgeDefinition.forgeTier());
+
+            if (outputStack.isEmpty()) {
+                this.setStack(10, recipeOutput);
+            } else {
+                outputStack.increment(recipeOutput.getCount());
+            }
 
             this.currentSmeltTime = 0;
         }
+    }
+
+    private boolean canSmelt(AlloyForgeRecipe recipe){
+        final var outputStack = this.getStack(10);
+        final var recipeOutput = recipe.getOutput(this.forgeDefinition.forgeTier());
+
+        return recipe.getMinForgeTier() <= this.forgeDefinition.forgeTier()
+                && (outputStack.isEmpty() || ItemOps.canStack(outputStack, recipeOutput));
     }
 
     private void handleForgingRemainders(DefaultedList<ItemStack> remainderList) {
