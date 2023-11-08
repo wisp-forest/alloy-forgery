@@ -60,11 +60,11 @@ public class BlastFurnaceRecipeAdapter implements RecipeInjector.AddRecipes {
         }
     }
 
-    public static float getFuelPerTick(BlastingRecipe recipe) {
+    private static float getFuelPerTick(BlastingRecipe recipe) {
         return ((recipe.getCookTime() / (float) ForgeDefinition.BASE_MAX_SMELT_TIME) * 10);
     }
 
-    public static boolean isUniqueRecipe(List<AlloyForgeRecipe> alloyForgeryRecipes, Recipe<?> blastRecipe) {
+    private static boolean isUniqueRecipe(List<AlloyForgeRecipe> alloyForgeryRecipes, Recipe<?> blastRecipe) {
         ItemStack[] stacks = blastRecipe.getIngredients().get(0).getMatchingStacks();
 
         List<AlloyForgeRecipe> matchedRecipes = alloyForgeryRecipes.stream()
@@ -83,7 +83,7 @@ public class BlastFurnaceRecipeAdapter implements RecipeInjector.AddRecipes {
         return matchedRecipes.isEmpty();
     }
 
-    public static boolean isDustRecipe(Recipe<?> blastRecipe){
+    private static boolean isDustRecipe(Recipe<?> blastRecipe){
         if(blastRecipe.getId().getPath().contains("dust")) return true;
 
         var inputIngredient = blastRecipe.getIngredients().get(0);
