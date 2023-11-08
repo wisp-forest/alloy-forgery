@@ -307,8 +307,7 @@ public class AlloyForgeRecipe implements Recipe<Inventory> {
     }
 
     public static class Type implements RecipeType<AlloyForgeRecipe> {
-        private Type() {
-        }
+        private Type() {}
 
         public static final Identifier ID = AlloyForgery.id("forging");
         public static final Type INSTANCE = new Type();
