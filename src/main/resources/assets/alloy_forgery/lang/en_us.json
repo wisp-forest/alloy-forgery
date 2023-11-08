@@ -25,7 +25,10 @@
 
   "emi.category.alloy_forgery.alloy_forge": "Alloy Forging",
 
+  "tag.item.c.copper_ores": "Copper Ores",
+  "tag.item.c.iron_ores": "Iron Ores",
   "tag.item.c.gold_ores": "Gold Ores",
-  "tag.item.c.raw_gold_ore_blocks": "Raw Gold Ore Blocks",
-  "tag.item.c.raw_iron_ore_blocks": "Raw Iron Ore Blocks"
+  "tag.item.c.raw_copper_blocks": "Raw Copper Ore Blocks",
+  "tag.item.c.raw_iron_blocks": "Raw Iron Ore Blocks",
+  "tag.item.c.raw_gold_blocks": "Raw Gold Ore Blocks"
 }
