@@ -15,6 +15,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Adapter class that takes advantage of {@link RecipeInjector}
+ * to adapt {@link BlastingRecipe} to {@link AlloyForgeRecipe}
+ */
 public class BlastFurnaceRecipeAdapter implements RecipeInjector.AddRecipes {
 
     public static final Identifier BLACKLISTED_BLASTING_RECIPES = AlloyForgery.id("blacklisted_blasting_recipes");
@@ -64,6 +68,7 @@ public class BlastFurnaceRecipeAdapter implements RecipeInjector.AddRecipes {
         return ((recipe.getCookTime() / (float) ForgeDefinition.BASE_MAX_SMELT_TIME) * 10);
     }
 
+    // Checks if the given blast recipe has unique inputs to prevent overlapping recipes leading to confliction
     private static boolean isUniqueRecipe(List<AlloyForgeRecipe> alloyForgeryRecipes, Recipe<?> blastRecipe) {
         ItemStack[] stacks = blastRecipe.getIngredients().get(0).getMatchingStacks();
 
@@ -83,6 +88,9 @@ public class BlastFurnaceRecipeAdapter implements RecipeInjector.AddRecipes {
         return matchedRecipes.isEmpty();
     }
 
+    // Prevent duplication of dust output leading to infinite resource loops by blacklisting using the given filter
+    // 1. Check if recipe name contains "dust"
+    // 2. Check if any input items have Identifiers containing "dust" within the path
     private static boolean isDustRecipe(Recipe<?> blastRecipe){
         if(blastRecipe.getId().getPath().contains("dust")) return true;
 
