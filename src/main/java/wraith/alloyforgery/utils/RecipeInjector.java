@@ -18,10 +18,21 @@ import wraith.alloyforgery.mixin.RecipeManagerAccessor;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Helper class to safety allow for injecting recipes into the Recipe Manager <b>without
+ * overriding or modifying existing Recipes. </b>
+ * <p/>
+ * Primarily used to either add compatibility for existing recipes by converting to another form
+ * or adding new recipes.
+ */
 public final class RecipeInjector {
 
     private static final Logger LOGGER = LogUtils.getLogger();
 
+    /**
+     * Event called on {@link ServerLifecycleEvents#SERVER_STARTED} or {@link DataPackEvents#BEFORE_SYNC} which adds
+     * new recipes to the RecipeManager before sync to Players
+     */
     public static final Event<AddRecipes> ADD_RECIPES = EventFactory.createArrayBacked(AddRecipes.class, addRecipes -> (instance) -> {
         for (AddRecipes addRecipe : addRecipes) {
             addRecipe.addRecipes(instance);
@@ -30,13 +41,21 @@ public final class RecipeInjector {
 
     private final RecipeManager manager;
 
-    private Map<RecipeType<?>, Map<Identifier, Recipe<?>>> recipes = new HashMap<>();
-    private Map<Identifier, Recipe<?>> recipesById = new HashMap<>();
+    private final Map<RecipeType<?>, Map<Identifier, Recipe<?>>> recipes = new HashMap<>();
+    private final Map<Identifier, Recipe<?>> recipesById = new HashMap<>();
 
     public RecipeInjector(RecipeManager manager){
         this.manager = manager;
     }
 
+    /**
+     * Attempts to register a given recipe for addition to the recipe manager if
+     *  1. Such recipe has a registered {@link RecipeType}
+     *  2. Such is found to not have an existing Identifier within {@link RecipeManager}
+     *
+     * @param recipe The Recipe
+     * @param <T> Type of the given Recipe
+     */
     public <T extends Recipe<C>, C extends Inventory> void addRecipe(T recipe){
         if(Registries.RECIPE_TYPE.getId(recipe.getType()) == null){
             throw new IllegalStateException("Unable to add Recipe for a RecipeType not registered!");
@@ -58,10 +77,16 @@ public final class RecipeInjector {
         recipesById.put(recipe.getId(), recipe);
     }
 
+    /**
+     * @return The current instance of the {@link RecipeManager}
+     */
     public RecipeManager manager(){
         return this.manager;
     }
 
+    /**
+     * Primary Event for adding new Recipes
+     */
     public interface AddRecipes {
         void addRecipes(RecipeInjector instance);
     }

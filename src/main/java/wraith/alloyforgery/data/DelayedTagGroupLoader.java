@@ -54,7 +54,8 @@ public class DelayedTagGroupLoader<T> extends TagGroupLoader<T> {
         return new Pair<>(list, builder.build());
     }
 
-    //Copy to vanilla but checks if this versions registeryGetter is set and uses to Pair version
+    // Copy to vanilla but checks if this versions registeryGetter is set and adjusts
+    // error handling to log the error without throwing the entire tag out
     @Override
     public Map<Identifier, Collection<T>> buildGroup(Map<Identifier, List<TrackedEntry>> tags) {
         if(registryGetter == null) throw new RuntimeException("DelayedTagGroupLoader did not have the required registeryGetter set to resolve! [Type: " + this.dataType + "]");

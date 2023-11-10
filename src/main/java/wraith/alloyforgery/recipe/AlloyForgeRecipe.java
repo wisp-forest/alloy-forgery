@@ -87,10 +87,8 @@ public class AlloyForgeRecipe implements Recipe<Inventory> {
                 stack.setCount(override.count());
 
                 overrides.put(range, stack);
-            } else {
-                if (override.stack() != null) {
-                    overrides.put(range, override.stack());
-                }
+            } else if (override.stack() != null) {
+                overrides.put(range, override.stack());
             }
         });
 

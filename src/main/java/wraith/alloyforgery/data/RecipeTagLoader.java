@@ -17,6 +17,10 @@ import wraith.alloyforgery.AlloyForgery;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * Tag Loader used to load Recipe Based tags with the resolving
+ * process being delayed till Data Pack load has ended
+ */
 public class RecipeTagLoader extends SinglePreparationResourceReloader<Map<Identifier, List<TagGroupLoader.TrackedEntry>>> implements IdentifiableResourceReloadListener, ServerLifecycleEvents.ServerStarted, ServerLifecycleEvents.EndDataPackReload {
 
     private static final Map<Identifier, Set<Identifier>> RESOLVED_ENTRIES = new HashMap<>();
@@ -27,7 +31,7 @@ public class RecipeTagLoader extends SinglePreparationResourceReloader<Map<Ident
 
     @Override
     protected Map<Identifier, List<TagGroupLoader.TrackedEntry>> prepare(ResourceManager manager, Profiler profiler) {
-        return tagGroupLoader.loadTags(manager);
+        return this.tagGroupLoader.loadTags(manager);
     }
 
     @Override
@@ -44,10 +48,20 @@ public class RecipeTagLoader extends SinglePreparationResourceReloader<Map<Ident
 
     //--
 
+    /**
+     * @param tag Identifier for the given Tag
+     * @param entry Recipe Entry to check
+     * @return true if the tag exists and if the given entry exists within the Tag group
+     */
     public static boolean isWithinTag(Identifier tag, Recipe<?> entry){
         return isWithinTag(tag, entry.getId());
     }
 
+    /**
+     * @param tag Identifier for the given Tag
+     * @param recipeID Recipe identifier
+     * @return true if the tag exists and if the given entry exists within the Tag group
+     */
     public static boolean isWithinTag(Identifier tag, Identifier recipeID){
         if(!RESOLVED_ENTRIES.containsKey(tag)) return false;
 
@@ -69,13 +83,17 @@ public class RecipeTagLoader extends SinglePreparationResourceReloader<Map<Ident
     public void endDataPackReload(MinecraftServer server, LifecycledResourceManager resourceManager, boolean success) {
         if(!success) return;
 
-        onServerStarted(server);
+        resolveEntries(server);
 
         AlloyForgery.CHANNEL.serverHandle(server).send(TagPacket.of(RESOLVED_ENTRIES));
     }
 
     @Override
     public void onServerStarted(MinecraftServer server) {
+        resolveEntries(server);
+    }
+
+    public void resolveEntries(MinecraftServer server){
         var recipeManager = server.getRecipeManager();
 
         Map<Identifier, Collection<Recipe<?>>> map = tagGroupLoader.setGetter(recipeManager::get)
@@ -86,6 +104,7 @@ public class RecipeTagLoader extends SinglePreparationResourceReloader<Map<Ident
         map.forEach((id, recipes) -> RESOLVED_ENTRIES.put(id, recipes.stream().map(Recipe::getId).collect(Collectors.toSet())));
     }
 
+    // Packet that acts as a sync packet for the Recipe Based Tag Entries
     public record TagPacket(List<TagEntry> entries){
         public static TagPacket of(Map<Identifier, Set<Identifier>> tagEntries){
             return new TagPacket(tagEntries.entrySet().stream()

@@ -10,7 +10,8 @@
     "IngredientAccessor",
     "RecipeManagerAccessor",
     "RecipeManagerMixin",
-    "RecipeMixin"
+    "RecipeMixin",
+    "PlayerManagerMixin"
   ],
   "injectors": {
     "defaultRequire": 1
