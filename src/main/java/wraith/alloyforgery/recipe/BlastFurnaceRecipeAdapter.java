@@ -1,11 +1,14 @@
 package wraith.alloyforgery.recipe;
 
 import com.google.common.collect.ImmutableMap;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.BlastingRecipe;
 import net.minecraft.recipe.Recipe;
 import net.minecraft.recipe.RecipeType;
 import net.minecraft.registry.Registries;
+import net.minecraft.registry.RegistryKeys;
+import net.minecraft.registry.tag.TagKey;
 import net.minecraft.util.Identifier;
 import wraith.alloyforgery.AlloyForgery;
 import wraith.alloyforgery.forges.ForgeDefinition;
@@ -14,12 +17,15 @@ import wraith.alloyforgery.utils.RecipeInjector;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 /**
  * Adapter class that takes advantage of {@link RecipeInjector}
  * to adapt {@link BlastingRecipe} to {@link AlloyForgeRecipe}
  */
 public class BlastFurnaceRecipeAdapter implements RecipeInjector.AddRecipes {
+
+    private static final TagKey<Item> DUSTS_TAG = TagKey.of(RegistryKeys.ITEM, new Identifier("c", "dusts"));
 
     public static final Identifier BLACKLISTED_BLASTING_RECIPES = AlloyForgery.id("blacklisted_blasting_recipes");
     public static final Identifier BLACKLISTED_INCREASED_OUTPUT = AlloyForgery.id("blacklisted_increased_output");
@@ -90,15 +96,21 @@ public class BlastFurnaceRecipeAdapter implements RecipeInjector.AddRecipes {
 
     // Prevent duplication of dust output leading to infinite resource loops by blacklisting using the given filter
     // 1. Check if recipe name contains "dust"
-    // 2. Check if any input items have Identifiers containing "dust" within the path
+    // 2. Check if the item is within the "c:dusts" tag
+    // 3. Check if any input items have Identifiers containing "dust" within the path
     private static boolean isDustRecipe(Recipe<?> blastRecipe){
         if(blastRecipe.getId().getPath().contains("dust")) return true;
 
         var inputIngredient = blastRecipe.getIngredients().get(0);
 
-        return Arrays.stream(inputIngredient.getMatchingStacks())
-                .map(ItemStack::getItem)
-                .map(Registries.ITEM::getId)
-                .anyMatch(id -> id.getPath().contains("dust"));
+        for (ItemStack stack : inputIngredient.getMatchingStacks()) {
+            if(stack.isIn(DUSTS_TAG)) return true;
+
+            Identifier id = Registries.ITEM.getId(stack.getItem());
+
+            if(id.getPath().contains("dust")) return true;
+        }
+
+        return false;
     }
 }
