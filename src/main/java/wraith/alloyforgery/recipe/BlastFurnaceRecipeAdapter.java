@@ -55,7 +55,7 @@ public class BlastFurnaceRecipeAdapter implements RecipeInjector.AddRecipes {
 
                 increasedOutput.increment(1);
 
-                extraOutput.put(new AlloyForgeRecipe.OverrideRange(2), increasedOutput);
+                extraOutput.put(new AlloyForgeRecipe.OverrideRange(3), increasedOutput);
             }
 
             var convertRecipe = new AlloyForgeRecipe(AlloyForgery.id(path),
