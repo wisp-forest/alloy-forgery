@@ -11,6 +11,7 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.recipe.Ingredient;
+import net.minecraft.util.Identifier;
 import wraith.alloyforgery.recipe.AlloyForgeRecipe;
 
 import java.util.*;
@@ -25,7 +26,21 @@ public class AlloyForgingDisplay implements Display {
 
     public final Map<AlloyForgeRecipe.OverrideRange, ItemStack> overrides;
 
-    public AlloyForgingDisplay(AlloyForgeRecipe recipe) {
+    public final Optional<Identifier> recipeID;
+
+    private AlloyForgingDisplay(List<EntryIngredient> inputs, EntryIngredient output, int minForgeTier, int requiredFuel, Map<AlloyForgeRecipe.OverrideRange, ItemStack> overrides, Optional<Identifier> recipeID) {
+        this.inputs = inputs;
+        this.output = output;
+
+        this.minForgeTier = minForgeTier;
+        this.requiredFuel = requiredFuel;
+
+        this.overrides = overrides;
+
+        this.recipeID = recipeID;
+    }
+
+    public static AlloyForgingDisplay of(AlloyForgeRecipe recipe){
         List<EntryIngredient> convertedInputs = new ArrayList<>();
 
         for (Map.Entry<Ingredient, Integer> entry : recipe.getIngredientsMap().entrySet()) {
@@ -42,23 +57,13 @@ public class AlloyForgingDisplay implements Display {
             }
         }
 
-        this.inputs = convertedInputs;
-        this.output = EntryIngredients.of(recipe.getOutput());
-
-        this.minForgeTier = recipe.getMinForgeTier();
-        this.requiredFuel = recipe.getFuelPerTick();
-
-        this.overrides = recipe.getTierOverrides();
-    }
-
-    public AlloyForgingDisplay(List<EntryIngredient> inputs, EntryIngredient output, int minForgeTier, int requiredFuel, Map<AlloyForgeRecipe.OverrideRange, ItemStack> overrides) {
-        this.inputs = inputs;
-        this.output = output;
-
-        this.minForgeTier = minForgeTier;
-        this.requiredFuel = requiredFuel;
-
-        this.overrides = overrides;
+        return new AlloyForgingDisplay(
+                convertedInputs,
+                EntryIngredients.of(recipe.getBaseOutput()),
+                recipe.getMinForgeTier(),
+                recipe.getFuelPerTick(),
+                recipe.getTierOverrides(),
+                recipe.secondaryID().or(() -> Optional.of(recipe.getId())));
     }
 
     @Override
@@ -74,6 +79,11 @@ public class AlloyForgingDisplay implements Display {
     @Override
     public CategoryIdentifier<?> getCategoryIdentifier() {
         return AlloyForgeryCommonPlugin.ID;
+    }
+
+    @Override
+    public Optional<Identifier> getDisplayLocation() {
+        return recipeID;
     }
 
     public enum Serializer implements DisplaySerializer<AlloyForgingDisplay> {
@@ -108,6 +118,8 @@ public class AlloyForgingDisplay implements Display {
             });
             tag.put("overrides", overrides);
 
+            display.recipeID.ifPresent(id -> tag.putString("recipeID", id.toString()));
+
             return tag;
         }
 
@@ -137,7 +149,9 @@ public class AlloyForgingDisplay implements Display {
                 builder.put(range, stack);
             });
 
-            return new AlloyForgingDisplay(input, output, minForgeTier, requiredFuel, builder.build());
+            var recipeID = tag.contains("recipeID") ? Identifier.tryParse(tag.getString("recipeID")) : null;
+
+            return new AlloyForgingDisplay(input, output, minForgeTier, requiredFuel, builder.build(), Optional.ofNullable(recipeID));
         }
     }
 }

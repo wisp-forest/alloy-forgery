@@ -19,13 +19,11 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.Pair;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.world.World;
+import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.Nullable;
 import wraith.alloyforgery.AlloyForgery;
 
-import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -39,6 +37,12 @@ public class AlloyForgeRecipe implements Recipe<Inventory> {
     public static final Map<AlloyForgeRecipe, PendingRecipeData> PENDING_RECIPES = new HashMap<>();
 
     private final Identifier id;
+
+    /**
+     * Used for Recipes that were adapted to Alloy Forge Recipes instead of created from scratch.
+     * Such serves as a holder for the original Identifier of the Recipe for Item Viewer Mods like REI and EMI
+     */
+    private Optional<Identifier> secondaryID = Optional.empty();
 
     private final Map<Ingredient, Integer> inputs;
     private ItemStack output;
@@ -56,6 +60,16 @@ public class AlloyForgeRecipe implements Recipe<Inventory> {
         this.fuelPerTick = fuelPerTick;
 
         this.tierOverrides = overrides;
+    }
+
+    public AlloyForgeRecipe setSecondaryID(Identifier id){
+        this.secondaryID = Optional.of(id);
+
+        return this;
+    }
+
+    public Optional<Identifier> secondaryID(){
+        return this.secondaryID;
     }
 
     public void finishRecipe(PendingRecipeData pendingData) {
@@ -79,7 +93,7 @@ public class AlloyForgeRecipe implements Recipe<Inventory> {
                 stack.setCount(override.count());
 
                 overrides.put(range, stack);
-            } else {
+            } else if (override.stack() != null) {
                 overrides.put(range, override.stack());
             }
         });
@@ -142,6 +156,7 @@ public class AlloyForgeRecipe implements Recipe<Inventory> {
         return boundSlots;
     }
 
+    @SuppressWarnings("SuspiciousToArrayCall")
     @Override
     public DefaultedList<Ingredient> getIngredients() {
         final var allIngredients = new ArrayList<>();
@@ -168,6 +183,7 @@ public class AlloyForgeRecipe implements Recipe<Inventory> {
     @Nullable
     public DefaultedList<ItemStack> gatherRemainders(Inventory inventory) {
         final var remainders = DefaultedList.ofSize(inventory.size(), ItemStack.EMPTY);
+        //noinspection UnstableApiUsage
         final var owoRemainders = RecipeRemainderStorage.has(this.getId()) ? RecipeRemainderStorage.get(this.getId()) : Map.<Item, ItemStack>of();
 
         if (owoRemainders.isEmpty() && GLOBAL_REMAINDERS.isEmpty()) return null;
@@ -198,19 +214,28 @@ public class AlloyForgeRecipe implements Recipe<Inventory> {
         return false;
     }
 
+    // Do not override
     @Override
+    @ApiStatus.Internal
     @Deprecated
     public ItemStack getOutput(DynamicRegistryManager drm) {
         return this.output.copy();
     }
 
-    @Deprecated
-    public ItemStack getOutput() {
+    /**
+     * Quickly copy the base output for a recipe, skips calculations from {@link #getOutput(int)}
+     */
+    @ApiStatus.Internal
+    public ItemStack getBaseOutput() {
         return this.output.copy();
     }
 
     public ItemStack getOutput(int forgeTier) {
-        ItemStack stack = tierOverrides.getOrDefault(tierOverrides.keySet().stream().filter(overrideRange -> overrideRange.test(forgeTier)).findAny().orElse(null), output).copy();
+        ItemStack stack = tierOverrides.getOrDefault(tierOverrides.keySet().stream()
+                        .filter(overrideRange -> overrideRange.test(forgeTier))
+                        .findAny()
+                        .orElse(null), output)
+                .copy();
 
         if (stack.getItem() == Items.AIR) {
             int stackCount = stack.getCount();
@@ -260,6 +285,7 @@ public class AlloyForgeRecipe implements Recipe<Inventory> {
             return value >= lowerBound && (upperBound == -1 || value <= upperBound);
         }
 
+        // Any attempt to optimize this mess has been unilaterally denied
         @Override
         public String toString() {
             var outString = String.valueOf(lowerBound);

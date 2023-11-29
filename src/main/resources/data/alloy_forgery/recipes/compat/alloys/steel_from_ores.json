@@ -3,7 +3,7 @@
     {
       "condition": "fabric:item_tags_populated",
       "values": [
-        "c:coal",
+        "c:coal_ores",
         "c:iron_ores",
         "c:steel_ingots"
       ]
@@ -12,10 +12,10 @@
   "type": "alloy_forgery:forging",
   "inputs": [
     {
-      "tag": "minecraft:iron_ores"
+      "tag": "c:iron_ores"
     },
 	  {
-      "tag": "c:coal"
+      "tag": "c:coal_ores"
     }
   ],
   "output": {
@@ -25,11 +25,14 @@
       "modern_industrialization:steel_ingot"
     ],
     "default": "c:steel_ingots",
-    "count": 2
+    "count": 3
   },
   "overrides": {
     "2+": {
-      "count": 3
+      "count": 4
+    },
+    "3+": {
+      "count": 5
     }
   },
   "min_forge_tier": 1,

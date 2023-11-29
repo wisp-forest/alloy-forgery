@@ -1,6 +1,7 @@
 package wraith.alloyforgery;
 
 import io.wispforest.owo.moddata.ModDataLoader;
+import io.wispforest.owo.network.OwoNetChannel;
 import io.wispforest.owo.particles.ClientParticles;
 import io.wispforest.owo.particles.systems.ParticleSystem;
 import io.wispforest.owo.particles.systems.ParticleSystemController;
@@ -22,12 +23,17 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import wraith.alloyforgery.block.ForgeControllerBlockEntity;
 import wraith.alloyforgery.data.AlloyForgeryGlobalRemaindersLoader;
+import wraith.alloyforgery.data.RecipeTagLoader;
 import wraith.alloyforgery.forges.ForgeRegistry;
 import wraith.alloyforgery.forges.FuelDataLoader;
 import wraith.alloyforgery.recipe.AlloyForgeRecipe;
 import wraith.alloyforgery.recipe.AlloyForgeRecipeSerializer;
+import wraith.alloyforgery.recipe.BlastFurnaceRecipeAdapter;
+import wraith.alloyforgery.utils.RecipeInjector;
 
 public class AlloyForgery implements ModInitializer {
+
+    public static final OwoNetChannel CHANNEL = OwoNetChannel.create(id("main"));
 
     public static final String MOD_ID = "alloy_forgery";
 
@@ -55,6 +61,18 @@ public class AlloyForgery implements ModInitializer {
 
         ResourceManagerHelper.get(ResourceType.SERVER_DATA).registerReloadListener(new AlloyForgeryGlobalRemaindersLoader());
         ResourceManagerHelper.get(ResourceType.SERVER_DATA).registerReloadListener(FuelDataLoader.INSTANCE);
+
+        var recipeTagLoader = new RecipeTagLoader();
+
+        ResourceManagerHelper.get(ResourceType.SERVER_DATA).registerReloadListener(recipeTagLoader);
+
+        recipeTagLoader.initEvents();
+
+        CHANNEL.registerClientboundDeferred(RecipeTagLoader.TagPacket.class);
+
+        RecipeInjector.initEvents();
+        RecipeInjector.ADD_RECIPES.register(new BlastFurnaceRecipeAdapter());
+
         ModDataLoader.load(ForgeRegistry.Loader.INSTANCE);
 
         Registry.register(Registries.BLOCK_ENTITY_TYPE, id("forge_controller"), FORGE_CONTROLLER_BLOCK_ENTITY);

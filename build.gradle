@@ -1,8 +1,7 @@
 //file:noinspection GradlePackageVersionRange
 plugins {
-    id 'fabric-loom' version '0.12-SNAPSHOT'
+    id 'fabric-loom' version '1.4-SNAPSHOT'
     id 'maven-publish'
-    id 'io.github.juuxel.loom-quiltflower' version '1.7.1'
 }
 
 version = "${project.mod_version}+${project.minecraft_base_version}"
@@ -43,6 +42,13 @@ dependencies {
 
     modCompileOnly "dev.emi:emi-fabric:${emi_version}:api"
     modLocalRuntime "dev.emi:emi-fabric:${emi_version}"
+
+    //modLocalRuntime ("maven.modrinth:spark:1.10.53-fabric")
+
+    modLocalRuntime ("net.fabricmc:fabric-language-kotlin:1.10.10+kotlin.1.9.10")
+    modLocalRuntime ("maven.modrinth:architectury-api:9.1.12+fabric")
+
+    modLocalRuntime ("maven.modrinth:observable:4.4.0+fabric")
 }
 
 loom {

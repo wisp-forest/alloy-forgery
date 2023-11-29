@@ -8,7 +8,10 @@
     "DefaultedRegistryMixin",
     "HopperBlockEntityAccessor",
     "IngredientAccessor",
-    "RecipeManagerMixin"
+    "RecipeManagerAccessor",
+    "RecipeManagerMixin",
+    "RecipeMixin",
+    "PlayerManagerMixin"
   ],
   "injectors": {
     "defaultRequire": 1

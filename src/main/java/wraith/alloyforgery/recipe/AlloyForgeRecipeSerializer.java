@@ -175,14 +175,20 @@ public class AlloyForgeRecipeSerializer implements RecipeSerializer<AlloyForgeRe
 
         final var overrides = buf.readMap(buf1 -> new AlloyForgeRecipe.OverrideRange(buf1.readVarInt(), buf1.readVarInt()), PacketByteBuf::readItemStack);
 
-        return new AlloyForgeRecipe(id, inputs, output, minForgeTier, requiredFuel, ImmutableMap.copyOf(overrides));
+        final var secondaryID = buf.readOptional(PacketByteBuf::readIdentifier);
+
+        var recipe = new AlloyForgeRecipe(id, inputs, output, minForgeTier, requiredFuel, ImmutableMap.copyOf(overrides));
+
+        secondaryID.ifPresent(recipe::setSecondaryID);
+
+        return recipe;
     }
 
     @Override
     public void write(PacketByteBuf buf, AlloyForgeRecipe recipe) {
         buf.writeMap(recipe.getIngredientsMap(), (buf1, ingredient) -> ingredient.write(buf1), PacketByteBuf::writeVarInt);
 
-        buf.writeItemStack(recipe.getOutput());
+        buf.writeItemStack(recipe.getBaseOutput());
         buf.writeVarInt(recipe.getMinForgeTier());
         buf.writeVarInt(recipe.getFuelPerTick());
 
@@ -190,6 +196,8 @@ public class AlloyForgeRecipeSerializer implements RecipeSerializer<AlloyForgeRe
             buf1.writeVarInt(overrideRange.lowerBound());
             buf1.writeVarInt(overrideRange.upperBound());
         }, PacketByteBuf::writeItemStack);
+
+        buf.writeOptional(recipe.secondaryID(), PacketByteBuf::writeIdentifier);
     }
 
     private record IngredientData(String data, boolean isTag) {}
