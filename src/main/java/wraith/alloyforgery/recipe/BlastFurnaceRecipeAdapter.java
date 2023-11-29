@@ -27,8 +27,15 @@ public class BlastFurnaceRecipeAdapter implements RecipeInjector.AddRecipes {
 
     private static final TagKey<Item> DUSTS_TAG = TagKey.of(RegistryKeys.ITEM, new Identifier("c", "dusts"));
 
+    /**
+     * Recipe tag for all {@link RecipeType#BLASTING} recipes to be disallowed for adaption
+     */
     public static final Identifier BLACKLISTED_BLASTING_RECIPES = AlloyForgery.id("blacklisted_blasting_recipes");
-    public static final Identifier BLACKLISTED_INCREASED_OUTPUT = AlloyForgery.id("blacklisted_increased_output");
+
+    /**
+     * Recipe tag for all {@link RecipeType#BLASTING} recipes to be disallowed for output increase at higher tiers
+     */
+    public static final Identifier BLACKLISTED_INCREASED_OUTPUT = AlloyForgery.id("blacklisted_increased_blasting_outputs");
 
     @Override
     public void addRecipes(RecipeInjector instance) {
