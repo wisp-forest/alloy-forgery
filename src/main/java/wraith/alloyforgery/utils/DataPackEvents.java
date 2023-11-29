@@ -9,8 +9,9 @@ import net.minecraft.server.PlayerManager;
 public class DataPackEvents {
 
     /**
-     * Event Similar to {@link ServerLifecycleEvents#SYNC_DATA_PACK_CONTENTS} with the goal as a
-     * method to adjust Data Pack based data before sync after such has loaded
+     * Called before the Minecraft Server is about to sync tags and recipes to players. Similar to
+     * {@link ServerLifecycleEvents#SYNC_DATA_PACK_CONTENTS} as such is but only once at the head
+     * of {@link PlayerManager#onDataPacksReloaded()}
      */
     public static final Event<BeforeSync> BEFORE_SYNC = EventFactory.createArrayBacked(BeforeSync.class, callbacks -> (server) -> {
         for (BeforeSync callback : callbacks) {
@@ -26,7 +27,7 @@ public class DataPackEvents {
          *
          * <p>For example, this event can be used to sync data loaded with custom resource reloaders.
          *
-         * @param server server The server
+         * @param server The server
          */
         void beforeSync(MinecraftServer server);
     }

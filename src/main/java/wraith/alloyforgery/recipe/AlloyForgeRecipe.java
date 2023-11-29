@@ -37,6 +37,11 @@ public class AlloyForgeRecipe implements Recipe<Inventory> {
     public static final Map<AlloyForgeRecipe, PendingRecipeData> PENDING_RECIPES = new HashMap<>();
 
     private final Identifier id;
+
+    /**
+     * Used for Recipes that were adapted to Alloy Forge Recipes instead of created from scratch.
+     * Such serves as a holder for the original Identifier of the Recipe for Item Viewer Mods like REI and EMI
+     */
     private Optional<Identifier> secondaryID = Optional.empty();
 
     private final Map<Ingredient, Integer> inputs;
