@@ -113,6 +113,7 @@ gradle-app.setting
 
 # Common working directory
 run/
+run_server/
 
 # datagen cache
 /src/main/generated/.cache/

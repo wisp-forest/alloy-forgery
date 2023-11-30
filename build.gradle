@@ -65,6 +65,12 @@ loom {
 
             runDir "build/datagen"
         }
+
+        seperateFolderServer {
+            inherit server
+            name "Minecraft Server: Other"
+            runDir "run_server"
+        }
     }
 }
 
