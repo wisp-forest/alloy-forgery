@@ -152,6 +152,10 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
         return currentSmeltTime;
     }
 
+    public ForgeDefinition getForgeDefinition(){
+        return this.forgeDefinition;
+    }
+
     @Override
     public void markDirty() {
         if (ItemStackComparisonUtil.itemsChanged(items, previousItems)) {
@@ -268,10 +272,10 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
 
             if (remainderList != null) this.handleForgingRemainders(remainderList);
 
-            recipe.craft(this, this.world.getRegistryManager());
-
             var outputStack = this.getStack(10);
-            var recipeOutput = recipe.getOutput(this.forgeDefinition.forgeTier());
+            var recipeOutput = recipe.craft(this, this.world.getRegistryManager());
+
+            recipe.consumeIngredients(this);
 
             if (outputStack.isEmpty()) {
                 this.setStack(10, recipeOutput);
