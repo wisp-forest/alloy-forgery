@@ -22,6 +22,7 @@ import net.minecraft.world.World;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 import wraith.alloyforgery.AlloyForgery;
+import wraith.alloyforgery.block.ForgeControllerBlockEntity;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -174,10 +175,17 @@ public class AlloyForgeRecipe implements Recipe<Inventory> {
         return inputs;
     }
 
+    // Attempt to test if the passed inventory is a Controller to try and get the forgeTier
+    // Better to use the getOutput though other means rather than this if not a controller
     @Override
     public ItemStack craft(Inventory inventory, DynamicRegistryManager drm) {
+        return (inventory instanceof ForgeControllerBlockEntity controller)
+                ? getOutput(controller.getForgeDefinition().forgeTier())
+                : getOutput(drm);
+    }
+
+    public void consumeIngredients(Inventory inventory){
         this.tryBind(inventory).forEach(inventory::removeStack);
-        return ItemStack.EMPTY;
     }
 
     @Nullable
