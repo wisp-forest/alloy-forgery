@@ -1,6 +1,7 @@
 package wraith.alloyforgery.compat.emi;
 
-import dev.emi.emi.api.EmiRecipeHandler;
+import dev.emi.emi.api.recipe.handler.EmiRecipeHandler;
+import dev.emi.emi.api.recipe.handler.StandardRecipeHandler;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import net.minecraft.screen.slot.Slot;
 import org.jetbrains.annotations.Nullable;
@@ -9,7 +10,7 @@ import wraith.alloyforgery.AlloyForgeScreenHandler;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AlloyForgeryEmiRecipeHandler implements EmiRecipeHandler<AlloyForgeScreenHandler> {
+public class AlloyForgeryEmiRecipeHandler implements StandardRecipeHandler<AlloyForgeScreenHandler> {
     @Override
     public List<Slot> getInputSources(AlloyForgeScreenHandler handler) {
         List<Slot> slots = new ArrayList<>();
@@ -31,7 +32,7 @@ public class AlloyForgeryEmiRecipeHandler implements EmiRecipeHandler<AlloyForge
 
     @Override
     public @Nullable Slot getOutputSlot(AlloyForgeScreenHandler handler) {
-        return EmiRecipeHandler.super.getOutputSlot(handler);
+        return StandardRecipeHandler.super.getOutputSlot(handler);
     }
 
     @Override

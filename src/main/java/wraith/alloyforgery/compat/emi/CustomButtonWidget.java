@@ -1,7 +1,6 @@
 package wraith.alloyforgery.compat.emi;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import dev.emi.emi.EmiPort;
 import dev.emi.emi.api.widget.Bounds;
 import dev.emi.emi.api.widget.ButtonWidget;
 import dev.emi.emi.api.widget.Widget;
@@ -37,7 +36,6 @@ public class CustomButtonWidget extends Widget {
 
     @Override
     public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-        EmiPort.setPositionTexShader();
         RenderSystem.setShaderTexture(0, AlloyForgeryEmiRecipe.GUI_TEXTURE);
         int v = 68;
         boolean active = this.isActive.getAsBoolean();

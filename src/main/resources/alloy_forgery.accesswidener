@@ -5,8 +5,6 @@ accessible class net/minecraft/block/entity/BlockEntityType$BlockEntityFactory
 accessible class net/minecraft/recipe/Ingredient$Entry
 accessible class net/minecraft/recipe/Ingredient$StackEntry
 accessible class net/minecraft/recipe/Ingredient$TagEntry
-accessible field net/minecraft/item/ItemStackSet HASH_STRATEGY Lit/unimi/dsi/fastutil/Hash$Strategy;
 
-accessible class net/minecraft/registry/tag/TagGroupLoader$TagDependencies
-
-accessible method net/minecraft/registry/tag/TagGroupLoader$TagDependencies <init> (Ljava/util/List;)V
+accessible method net/minecraft/tag/TagGroupLoader addReference (Lcom/google/common/collect/Multimap;Lnet/minecraft/util/Identifier;Lnet/minecraft/util/Identifier;)V
+accessible method net/minecraft/tag/TagGroupLoader resolveAll (Ljava/util/Map;Lcom/google/common/collect/Multimap;Ljava/util/Set;Lnet/minecraft/util/Identifier;Ljava/util/function/BiConsumer;)V

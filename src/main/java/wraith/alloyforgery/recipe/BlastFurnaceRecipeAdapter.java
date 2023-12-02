@@ -6,10 +6,10 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.BlastingRecipe;
 import net.minecraft.recipe.Recipe;
 import net.minecraft.recipe.RecipeType;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.registry.tag.TagKey;
+import net.minecraft.tag.TagKey;
+import net.minecraft.tag.TagKey;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.registry.Registry;
 import wraith.alloyforgery.AlloyForgery;
 import wraith.alloyforgery.forges.ForgeDefinition;
 import wraith.alloyforgery.utils.RecipeInjector;
@@ -25,7 +25,7 @@ import java.util.stream.Stream;
  */
 public class BlastFurnaceRecipeAdapter implements RecipeInjector.AddRecipes {
 
-    private static final TagKey<Item> DUSTS_TAG = TagKey.of(RegistryKeys.ITEM, new Identifier("c", "dusts"));
+    private static final TagKey<Item> DUSTS_TAG = TagKey.of(Registry.ITEM_KEY, new Identifier("c", "dusts"));
 
     /**
      * Recipe tag for all {@link RecipeType#BLASTING} recipes to be disallowed for adaption
@@ -53,7 +53,7 @@ public class BlastFurnaceRecipeAdapter implements RecipeInjector.AddRecipes {
                 path = path.replace("blasting", "forging");
             }
 
-            var mainOutput = recipe.getOutput(null);
+            var mainOutput = recipe.getOutput();
 
             var extraOutput = ImmutableMap.<AlloyForgeRecipe.OverrideRange, ItemStack>builder();
 
@@ -113,7 +113,7 @@ public class BlastFurnaceRecipeAdapter implements RecipeInjector.AddRecipes {
         for (ItemStack stack : inputIngredient.getMatchingStacks()) {
             if(stack.isIn(DUSTS_TAG)) return true;
 
-            Identifier id = Registries.ITEM.getId(stack.getItem());
+            Identifier id = Registry.ITEM.getId(stack.getItem());
 
             if(id.getPath().contains("dust")) return true;
         }

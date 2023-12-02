@@ -9,7 +9,7 @@ import net.minecraft.inventory.Inventory;
 import net.minecraft.recipe.Recipe;
 import net.minecraft.recipe.RecipeManager;
 import net.minecraft.recipe.RecipeType;
-import net.minecraft.registry.Registries;
+import net.minecraft.util.registry.Registry;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.Identifier;
 import org.slf4j.Logger;
@@ -57,7 +57,7 @@ public final class RecipeInjector {
      * @param <T> Type of the given Recipe
      */
     public <T extends Recipe<C>, C extends Inventory> void addRecipe(T recipe){
-        if(Registries.RECIPE_TYPE.getId(recipe.getType()) == null){
+        if(Registry.RECIPE_TYPE.getId(recipe.getType()) == null){
             throw new IllegalStateException("Unable to add Recipe for a RecipeType not registered!");
         }
 

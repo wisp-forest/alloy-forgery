@@ -234,6 +234,7 @@ public class AlloyForgeRecipe implements Recipe<Inventory> {
      */
     @ApiStatus.Internal
     public ItemStack getBaseOutput() {
+        return this.output.copy();
     }
 
     public ItemStack getOutput(int forgeTier) {
