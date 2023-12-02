@@ -49,6 +49,8 @@ dependencies {
     //modLocalRuntime ("maven.modrinth:architectury-api:9.1.12+fabric")
 
     //modLocalRuntime ("maven.modrinth:observable:4.4.0+fabric")
+
+    modLocalRuntime("com.github.emilyploszaj:step-height-entity-attribute:v1.2.0")
 }
 
 loom {

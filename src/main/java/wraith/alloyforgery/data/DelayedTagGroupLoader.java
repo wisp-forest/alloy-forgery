@@ -1,12 +1,10 @@
 package wraith.alloyforgery.data;
 
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Maps;
+import com.google.common.collect.*;
 import com.mojang.logging.LogUtils;
 import net.minecraft.recipe.Recipe;
 import net.minecraft.registry.tag.TagEntry;
 import net.minecraft.registry.tag.TagGroupLoader;
-import net.minecraft.resource.DependencyTracker;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Pair;
 import org.jetbrains.annotations.Nullable;
@@ -67,26 +65,38 @@ public class DelayedTagGroupLoader<T> extends TagGroupLoader<T> {
             @Nullable @Override public Collection<T> tag(Identifier id) { return map.get(id); }
         };
 
-        DependencyTracker<Identifier, TagDependencies> dependencyTracker = new DependencyTracker<>();
+        Multimap<Identifier, Identifier> multimap = HashMultimap.create();
+        tags.forEach(
+                (tagId, entries) -> entries.forEach(entry -> entry.entry().forEachRequiredTagId(referencedTagId -> addReference(multimap, tagId, referencedTagId)))
+        );
+        tags.forEach(
+                (tagId, entries) -> entries.forEach(entry -> entry.entry().forEachOptionalTagId(referencedTagId -> addReference(multimap, tagId, referencedTagId)))
+        );
+        Set<Identifier> set = Sets.newHashSet();
+        tags.keySet()
+                .forEach(
+                        tagId -> resolveAll(
+                                tags,
+                                multimap,
+                                set,
+                                tagId,
+                                (tagId2, entries) -> {
+                                    var pair = this.resolveAll(valueGetter, entries);
 
-        tags.forEach((id, entries) -> dependencyTracker.add(id, new TagDependencies(entries)));
+                                    var missingReferences = pair.getLeft();
 
-        dependencyTracker.traverse((id, dependencies) -> {
-            var pair = this.resolveAll(valueGetter, dependencies.entries());
+                                    if(!missingReferences.isEmpty()){
+                                        LOGGER.error(
+                                                "Couldn't load the given entries within tag {}: {}",
+                                                tagId2,
+                                                missingReferences.stream().map(Objects::toString).collect(Collectors.joining(", "))
+                                        );
+                                    }
 
-            var missingReferences = pair.getLeft();
-
-            if(!missingReferences.isEmpty()){
-                LOGGER.error(
-                        "Couldn't load the given entries within tag {}: {}",
-                        id,
-                        missingReferences.stream().map(Objects::toString).collect(Collectors.joining(", "))
+                                    map.put(tagId2, pair.getRight());
+                                }
+                        )
                 );
-            }
-
-            map.put(id, pair.getRight());
-        });
-
         return map;
     }
 }
