@@ -16,6 +16,7 @@ public class AlloyForgeScreen extends BaseUIModelHandledScreen<FlowLayout, Alloy
 
     private TextureComponent fuelGauge;
     private TextureComponent progressGauge;
+    private TextureComponent invalidCross;
     private FlowLayout lavaBar;
 
     public AlloyForgeScreen(AlloyForgeScreenHandler handler, PlayerInventory inventory, Text title) {
@@ -30,6 +31,7 @@ public class AlloyForgeScreen extends BaseUIModelHandledScreen<FlowLayout, Alloy
     @Override
     protected void build(FlowLayout layout) {
         this.fuelGauge = layout.childById(TextureComponent.class, "fuel-gauge");
+        this.invalidCross = layout.childById(TextureComponent.class, "invalid-cross");
         this.progressGauge = layout.childById(TextureComponent.class, "progress-gauge");
         this.lavaBar = layout.childById(FlowLayout.class, "lava-bar");
     }
@@ -40,6 +42,11 @@ public class AlloyForgeScreen extends BaseUIModelHandledScreen<FlowLayout, Alloy
         this.fuelGauge.visibleArea(PositionedRectangle.of(0, this.fuelGauge.height() - this.handler.getFuelProgress(), this.fuelGauge.fullSize()));
         this.progressGauge.visibleArea(PositionedRectangle.of(0, 0, this.progressGauge.width(), this.handler.getSmeltProgress()));
         this.lavaBar.horizontalSizing(Sizing.fixed(this.handler.getLavaProgress()));
+        if (this.handler.getValidRecipeTier()) {
+            this.invalidCross
+                    .visibleArea(PositionedRectangle.of(0, 0, this.invalidCross.width(), this.invalidCross.height()))
+                    .tooltip(Text.translatable("tooltip.alloy_forgery.invalid_tier", 99));
+        }
     }
 
     public int rootX() {
