@@ -2,6 +2,7 @@ package wraith.alloyforgery.block;
 
 import io.wispforest.owo.particles.ClientParticles;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorageUtil;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
@@ -50,12 +51,15 @@ public class ForgeControllerBlock extends BlockWithEntity {
             final var fuelDefinition = ForgeFuelRegistry.getFuelForItem(playerStack.getItem());
             if (!(world.getBlockEntity(pos) instanceof ForgeControllerBlockEntity controller)) return ActionResult.PASS;
 
+
             if (fuelDefinition.hasReturnType() && controller.canAddFuel(fuelDefinition.fuel())) {
                 if (!player.getAbilities().creativeMode) {
                     player.getStackInHand(hand).decrement(1);
                     player.getInventory().offerOrDrop(new ItemStack(fuelDefinition.returnType()));
                 }
                 controller.addFuel(fuelDefinition.fuel());
+            } else if (FluidStorageUtil.interactWithFluidStorage(controller, player, hand)) {
+                return ActionResult.SUCCESS;
             } else {
                 if (!controller.verifyMultiblock()) {
                     player.sendMessage(Text.translatable("message.alloy_forgery.invalid_multiblock").formatted(Formatting.GRAY), true);

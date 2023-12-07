@@ -478,7 +478,7 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
 
         @Override
         protected long getCapacity(FluidVariant variant) {
-            return FluidConstants.BUCKET;
+            return FluidConstants.BUCKET + 81;
         }
 
         @Override
