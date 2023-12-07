@@ -20,7 +20,7 @@ public class AlloyForgeScreenHandler extends ScreenHandler {
     private final PropertyDelegate propertyDelegate;
 
     public AlloyForgeScreenHandler(int syncId, PlayerInventory inventory) {
-        this(syncId, inventory, new SimpleInventory(ForgeControllerBlockEntity.INVENTORY_SIZE), new ArrayPropertyDelegate(3));
+        this(syncId, inventory, new SimpleInventory(ForgeControllerBlockEntity.INVENTORY_SIZE), new ArrayPropertyDelegate(4));
     }
 
     public AlloyForgeScreenHandler(int syncId, PlayerInventory playerInventory, Inventory inventory, PropertyDelegate propertyDelegate) {
@@ -67,6 +67,10 @@ public class AlloyForgeScreenHandler extends ScreenHandler {
 
     public int getLavaProgress() {
         return propertyDelegate.get(2);
+    }
+
+    public int getRequiredTierData(){
+        return propertyDelegate.get(3);
     }
 
     @Override

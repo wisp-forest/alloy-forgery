@@ -61,6 +61,8 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
 
     private Optional<AlloyForgeRecipe> recipeCache = Optional.empty();
 
+    private int requiredTierToCraft = -1;
+
     private final FluidHolder fluidHolder = new FluidHolder();
 
     private final ForgeDefinition forgeDefinition;
@@ -88,7 +90,8 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
             return switch (index) {
                 case 0 -> smeltProgress;
                 case 1 -> fuelProgress;
-                default -> lavaProgress;
+                case 2 -> lavaProgress;
+                default -> requiredTierToCraft;
             };
         }
 
@@ -98,7 +101,7 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
 
         @Override
         public int size() {
-            return 3;
+            return 4;
         }
     };
 
@@ -243,6 +246,10 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
             this.recipeCache = this.world.getRecipeManager().getFirstMatch(AlloyForgeRecipe.Type.INSTANCE, this, this.world);
         }
 
+        if(this.recipeCache.isEmpty() && this.requiredTierToCraft != -1){
+            this.requiredTierToCraft = -1;
+        }
+
         if (this.recipeCache.isEmpty() || !canSmelt(this.recipeCache.get())) {
             this.checkForRecipes = false;
             this.currentSmeltTime = 0;
@@ -291,8 +298,15 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
         final var outputStack = this.getStack(10);
         final var recipeOutput = recipe.getOutput(this.forgeDefinition.forgeTier());
 
-        return recipe.getMinForgeTier() <= this.forgeDefinition.forgeTier()
-                && (outputStack.isEmpty() || ItemOps.canStack(outputStack, recipeOutput));
+        if(recipe.getMinForgeTier() > this.forgeDefinition.forgeTier()){
+            this.requiredTierToCraft = recipe.getMinForgeTier();
+
+            return false;
+        } else if(requiredTierToCraft != -1){
+            this.requiredTierToCraft = -1;
+        }
+
+        return outputStack.isEmpty() || ItemOps.canStack(outputStack, recipeOutput);
     }
 
     private void handleForgingRemainders(DefaultedList<ItemStack> remainderList) {
