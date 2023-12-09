@@ -69,7 +69,7 @@ public class AlloyForgeScreenHandler extends ScreenHandler {
         return propertyDelegate.get(2);
     }
 
-    public int getRequiredTierData(){
+    public int getRequiredTierData() {
         return propertyDelegate.get(3);
     }
 
@@ -78,16 +78,7 @@ public class AlloyForgeScreenHandler extends ScreenHandler {
         return this.controllerInventory.canPlayerUse(player);
     }
 
-    public Inventory getControllerInventory(){
+    public Inventory getControllerInventory() {
         return this.controllerInventory;
-    }
-
-    /**
-     * TODO: This needs to somehow check for whether the recipe is valid.
-     *       From a glance this can be done with a new property delegate, although a boolean as an int is a bit strange
-     *       Maybe using it as a way to track the tiers is possible? Ideally this should all happen in the lower levels
-     */
-    public boolean getValidRecipeTier() {
-        return false;
     }
 }
