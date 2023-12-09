@@ -11,7 +11,7 @@ import wraith.alloyforgery.mixin.RecipeMixin;
  */
 public interface RecipeTagHelper {
 
-    default boolean isIn(Identifier tag){
+    default boolean isIn(Identifier tag) {
         throw new UnsupportedOperationException("RecipeTagHelper 'isIn' method not implememnted!");
     }
 }

@@ -14,7 +14,6 @@ import org.apache.commons.lang3.mutable.MutableInt;
 import org.jetbrains.annotations.Nullable;
 import wraith.alloyforgery.AlloyForgery;
 import wraith.alloyforgery.recipe.AlloyForgeRecipe;
-
 import java.util.*;
 
 public class AlloyForgeryEmiRecipe implements EmiRecipe {
@@ -31,7 +30,7 @@ public class AlloyForgeryEmiRecipe implements EmiRecipe {
 
     private final Identifier recipeID;
 
-    public AlloyForgeryEmiRecipe(AlloyForgeRecipe recipe){
+    public AlloyForgeryEmiRecipe(AlloyForgeRecipe recipe) {
         //Convert inputs to a list of EMI Ingredients
         List<EmiIngredient> convertedInputs = new ArrayList<>();
         for (Map.Entry<Ingredient, Integer> entry : recipe.getIngredientsMap().entrySet()) {
@@ -110,7 +109,7 @@ public class AlloyForgeryEmiRecipe implements EmiRecipe {
         })));
     }
 
-    private static OrderedText minTierText(Object tierArg){
+    private static OrderedText minTierText(Object tierArg) {
         return Text.translatable("container.alloy_forgery.rei.min_tier", tierArg).asOrderedText();
     }
 

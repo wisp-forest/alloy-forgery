@@ -11,9 +11,7 @@ import net.fabricmc.fabric.api.transfer.v1.storage.base.SingleVariantStorage;
 import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.block.entity.HopperBlockEntity;
+import net.minecraft.block.entity.*;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.fluid.Fluids;
@@ -21,30 +19,20 @@ import net.minecraft.inventory.Inventories;
 import net.minecraft.inventory.SidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.screen.NamedScreenHandlerFactory;
-import net.minecraft.screen.PropertyDelegate;
-import net.minecraft.screen.ScreenHandler;
+import net.minecraft.screen.*;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.ItemScatterer;
 import net.minecraft.util.collection.DefaultedList;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.*;
 import org.jetbrains.annotations.Nullable;
 import wraith.alloyforgery.AlloyForgeScreenHandler;
 import wraith.alloyforgery.AlloyForgery;
-import wraith.alloyforgery.forges.ForgeDefinition;
-import wraith.alloyforgery.forges.ForgeFuelRegistry;
-import wraith.alloyforgery.forges.ForgeRegistry;
+import wraith.alloyforgery.forges.*;
 import wraith.alloyforgery.mixin.HopperBlockEntityAccessor;
 import wraith.alloyforgery.recipe.AlloyForgeRecipe;
-
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @SuppressWarnings("UnstableApiUsage")
 public class ForgeControllerBlockEntity extends BlockEntity implements ImplementedInventory, SidedInventory, NamedScreenHandlerFactory, InsertionOnlyStorage<FluidVariant> {
@@ -155,7 +143,7 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
         return currentSmeltTime;
     }
 
-    public ForgeDefinition getForgeDefinition(){
+    public ForgeDefinition getForgeDefinition() {
         return this.forgeDefinition;
     }
 
@@ -228,7 +216,7 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
         // 1: Check if the inventory is full
         // 2: Prevent crafting when we know that there is not enough fuel to craft at all
         // 3: Prevent recipe checking if the inventory has not changed
-        if(this.isEmpty()){
+        if (this.isEmpty()) {
             this.currentSmeltTime = 0;
 
             return;
@@ -242,11 +230,11 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
 
         //--
 
-        if(this.recipeCache.isEmpty() || !this.recipeCache.get().matches(this, this.world)) {
+        if (this.recipeCache.isEmpty() || !this.recipeCache.get().matches(this, this.world)) {
             this.recipeCache = this.world.getRecipeManager().getFirstMatch(AlloyForgeRecipe.Type.INSTANCE, this, this.world);
         }
 
-        if(this.recipeCache.isEmpty() && this.requiredTierToCraft != -1){
+        if (this.recipeCache.isEmpty() && this.requiredTierToCraft != -1) {
             this.requiredTierToCraft = -1;
         }
 
@@ -294,15 +282,15 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
         }
     }
 
-    private boolean canSmelt(AlloyForgeRecipe recipe){
+    private boolean canSmelt(AlloyForgeRecipe recipe) {
         final var outputStack = this.getStack(10);
         final var recipeOutput = recipe.getOutput(this.forgeDefinition.forgeTier());
 
-        if(recipe.getMinForgeTier() > this.forgeDefinition.forgeTier()){
+        if (recipe.getMinForgeTier() > this.forgeDefinition.forgeTier()) {
             this.requiredTierToCraft = recipe.getMinForgeTier();
 
             return false;
-        } else if(requiredTierToCraft != -1){
+        } else if (requiredTierToCraft != -1) {
             this.requiredTierToCraft = -1;
         }
 
@@ -315,7 +303,7 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
         }
     }
 
-    public void attemptInsertOnIndex(int i, ItemStack itemstack){
+    public void attemptInsertOnIndex(int i, ItemStack itemstack) {
         if (itemstack.isEmpty()) return;
 
         var slotStack = this.getStack(i);

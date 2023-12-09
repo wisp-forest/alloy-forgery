@@ -6,7 +6,6 @@ import me.shedaniel.rei.api.common.transfer.info.simple.SimplePlayerInventoryMen
 import me.shedaniel.rei.api.common.transfer.info.stack.SlotAccessor;
 import net.minecraft.inventory.Inventory;
 import wraith.alloyforgery.AlloyForgeScreenHandler;
-
 import java.util.ArrayList;
 import java.util.List;
 

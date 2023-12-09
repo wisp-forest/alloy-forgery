@@ -9,10 +9,7 @@ import net.minecraft.advancement.criterion.CriterionConditions;
 import net.minecraft.advancement.criterion.RecipeUnlockedCriterion;
 import net.minecraft.data.server.recipe.CraftingRecipeJsonBuilder;
 import net.minecraft.data.server.recipe.RecipeJsonProvider;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemConvertible;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
+import net.minecraft.item.*;
 import net.minecraft.recipe.Ingredient;
 import net.minecraft.recipe.RecipeSerializer;
 import net.minecraft.registry.Registries;
@@ -24,7 +21,6 @@ import org.slf4j.Logger;
 import wraith.alloyforgery.mixin.IngredientAccessor;
 import wraith.alloyforgery.recipe.AlloyForgeRecipe;
 import wraith.alloyforgery.recipe.AlloyForgeRecipeSerializer;
-
 import java.util.*;
 import java.util.function.Consumer;
 
@@ -213,8 +209,10 @@ public class AlloyForgeryRecipeBuilder implements CraftingRecipeJsonBuilder, Rec
 
     //----------------------------------------------------
 
-    @Nullable public Identifier recipeId;
-    @Nullable public Identifier advancementId;
+    @Nullable
+    public Identifier recipeId;
+    @Nullable
+    public Identifier advancementId;
 
     @Override
     public void serialize(JsonObject recipeJson) {
@@ -308,7 +306,9 @@ public class AlloyForgeryRecipeBuilder implements CraftingRecipeJsonBuilder, Rec
     }
 
     @Override
-    public Identifier getRecipeId() {return this.recipeId;}
+    public Identifier getRecipeId() {
+        return this.recipeId;
+    }
 
     @Override
     public RecipeSerializer<?> getSerializer() {

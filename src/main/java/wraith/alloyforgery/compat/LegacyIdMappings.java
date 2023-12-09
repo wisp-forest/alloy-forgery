@@ -2,7 +2,6 @@ package wraith.alloyforgery.compat;
 
 import net.minecraft.util.Identifier;
 import wraith.alloyforgery.AlloyForgery;
-
 import java.util.HashMap;
 import java.util.Map;
 

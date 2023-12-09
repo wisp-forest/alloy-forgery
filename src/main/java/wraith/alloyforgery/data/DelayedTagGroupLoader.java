@@ -3,7 +3,6 @@ package wraith.alloyforgery.data;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.mojang.logging.LogUtils;
-import net.minecraft.recipe.Recipe;
 import net.minecraft.registry.tag.TagEntry;
 import net.minecraft.registry.tag.TagGroupLoader;
 import net.minecraft.resource.DependencyTracker;
@@ -11,14 +10,13 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.Pair;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
-
 import java.util.*;
-import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
  * Version of {@link TagGroupLoader} but with tweaks for delayed use and without entire tags being thrown out
+ *
  * @param <T>
  */
 public class DelayedTagGroupLoader<T> extends TagGroupLoader<T> {
@@ -28,13 +26,13 @@ public class DelayedTagGroupLoader<T> extends TagGroupLoader<T> {
     private Function<Identifier, Optional<? extends T>> registryGetter = null;
     private final String dataType;
 
-    public DelayedTagGroupLoader(String dataType){
+    public DelayedTagGroupLoader(String dataType) {
         super(identifier -> Optional.empty(), dataType);
 
         this.dataType = dataType;
     }
 
-    public DelayedTagGroupLoader<T> setGetter(Function<Identifier, Optional<? extends T>> registryGetter){
+    public DelayedTagGroupLoader<T> setGetter(Function<Identifier, Optional<? extends T>> registryGetter) {
         this.registryGetter = registryGetter;
 
         return this;
@@ -45,7 +43,7 @@ public class DelayedTagGroupLoader<T> extends TagGroupLoader<T> {
         ImmutableSet.Builder<T> builder = ImmutableSet.builder();
         List<TrackedEntry> list = new ArrayList();
 
-        for(TrackedEntry trackedEntry : entries) {
+        for (TrackedEntry trackedEntry : entries) {
             if (!trackedEntry.entry().resolve(valueGetter, builder::add)) {
                 list.add(trackedEntry);
             }
@@ -58,13 +56,23 @@ public class DelayedTagGroupLoader<T> extends TagGroupLoader<T> {
     // error handling to log the error without throwing the entire tag out
     @Override
     public Map<Identifier, Collection<T>> buildGroup(Map<Identifier, List<TrackedEntry>> tags) {
-        if(registryGetter == null) throw new RuntimeException("DelayedTagGroupLoader did not have the required registeryGetter set to resolve! [Type: " + this.dataType + "]");
+        if (registryGetter == null)
+            throw new RuntimeException("DelayedTagGroupLoader did not have the required registeryGetter set to resolve! [Type: " + this.dataType + "]");
 
         final Map<Identifier, Collection<T>> map = Maps.newHashMap();
 
         TagEntry.ValueGetter<T> valueGetter = new TagEntry.ValueGetter<>() {
-            @Nullable @Override public T direct(Identifier id) { return registryGetter.apply(id).orElse(null); }
-            @Nullable @Override public Collection<T> tag(Identifier id) { return map.get(id); }
+            @Nullable
+            @Override
+            public T direct(Identifier id) {
+                return registryGetter.apply(id).orElse(null);
+            }
+
+            @Nullable
+            @Override
+            public Collection<T> tag(Identifier id) {
+                return map.get(id);
+            }
         };
 
         DependencyTracker<Identifier, TagDependencies> dependencyTracker = new DependencyTracker<>();
@@ -76,7 +84,7 @@ public class DelayedTagGroupLoader<T> extends TagGroupLoader<T> {
 
             var missingReferences = pair.getLeft();
 
-            if(!missingReferences.isEmpty()){
+            if (!missingReferences.isEmpty()) {
                 LOGGER.error(
                         "Couldn't load the given entries within tag {}: {}",
                         id,

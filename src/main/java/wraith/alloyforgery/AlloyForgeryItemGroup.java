@@ -8,10 +8,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
 import wraith.alloyforgery.block.ForgeControllerBlock;
 import wraith.alloyforgery.forges.ForgeRegistry;
-
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 public class AlloyForgeryItemGroup {
 

@@ -5,7 +5,6 @@ import dev.emi.emi.api.recipe.handler.StandardRecipeHandler;
 import net.minecraft.screen.slot.Slot;
 import org.jetbrains.annotations.Nullable;
 import wraith.alloyforgery.AlloyForgeScreenHandler;
-
 import java.util.ArrayList;
 import java.util.List;
 

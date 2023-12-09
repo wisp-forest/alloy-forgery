@@ -1,16 +1,13 @@
 package wraith.alloyforgery.compat.emi;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import dev.emi.emi.api.widget.Bounds;
-import dev.emi.emi.api.widget.ButtonWidget;
-import dev.emi.emi.api.widget.Widget;
+import dev.emi.emi.api.widget.*;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
-
 import java.util.List;
 import java.util.function.BooleanSupplier;
 

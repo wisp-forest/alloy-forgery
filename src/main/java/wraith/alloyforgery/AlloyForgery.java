@@ -26,9 +26,7 @@ import wraith.alloyforgery.data.AlloyForgeryGlobalRemaindersLoader;
 import wraith.alloyforgery.data.RecipeTagLoader;
 import wraith.alloyforgery.forges.ForgeRegistry;
 import wraith.alloyforgery.forges.FuelDataLoader;
-import wraith.alloyforgery.recipe.AlloyForgeRecipe;
-import wraith.alloyforgery.recipe.AlloyForgeRecipeSerializer;
-import wraith.alloyforgery.recipe.BlastFurnaceRecipeAdapter;
+import wraith.alloyforgery.recipe.*;
 import wraith.alloyforgery.utils.RecipeInjector;
 
 public class AlloyForgery implements ModInitializer {

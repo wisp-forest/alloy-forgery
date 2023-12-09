@@ -1,7 +1,6 @@
 package wraith.alloyforgery.block;
 
 import net.minecraft.item.ItemStack;
-
 import java.util.List;
 
 public class ItemStackComparisonUtil {

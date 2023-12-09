@@ -14,7 +14,6 @@ import net.minecraft.util.profiler.Profiler;
 import org.slf4j.Logger;
 import wraith.alloyforgery.AlloyForgery;
 import wraith.alloyforgery.recipe.AlloyForgeRecipe;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -32,7 +31,7 @@ public class AlloyForgeryGlobalRemaindersLoader extends JsonDataLoader implement
     protected void apply(Map<Identifier, JsonElement> prepared, ResourceManager manager, Profiler profiler) {
         prepared.forEach((identifier, jsonElement) -> {
             try {
-                if(jsonElement instanceof JsonObject jsonObject){
+                if (jsonElement instanceof JsonObject jsonObject) {
                     var remainders = new HashMap<Item, ItemStack>();
 
                     for (var remainderEntry : JsonHelper.getObject(jsonObject, "remainders").entrySet()) {

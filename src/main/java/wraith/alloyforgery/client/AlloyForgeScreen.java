@@ -12,7 +12,6 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.text.Text;
 import wraith.alloyforgery.AlloyForgeScreenHandler;
 import wraith.alloyforgery.AlloyForgery;
-
 import java.util.List;
 
 public class AlloyForgeScreen extends BaseUIModelHandledScreen<FlowLayout, AlloyForgeScreenHandler> {
@@ -48,11 +47,11 @@ public class AlloyForgeScreen extends BaseUIModelHandledScreen<FlowLayout, Alloy
 
         int requiredTier = this.handler.getRequiredTierData();
 
-        if(requiredTier <= -1) {
+        if (requiredTier <= -1) {
             this.invalidCross
                     .visibleArea(PositionedRectangle.of(0, 0, 0, 0))
                     .tooltip(List.<TooltipComponent>of());
-        } else{
+        } else {
             this.invalidCross
                     .resetVisibleArea()
                     .tooltip(Text.translatable("tooltip.alloy_forgery.invalid_tier", requiredTier));

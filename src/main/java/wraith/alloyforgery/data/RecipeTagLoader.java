@@ -6,14 +6,11 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
 import net.minecraft.recipe.Recipe;
 import net.minecraft.registry.tag.TagGroupLoader;
-import net.minecraft.resource.LifecycledResourceManager;
-import net.minecraft.resource.ResourceManager;
-import net.minecraft.resource.SinglePreparationResourceReloader;
+import net.minecraft.resource.*;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.profiler.Profiler;
 import wraith.alloyforgery.AlloyForgery;
-
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -49,21 +46,21 @@ public class RecipeTagLoader extends SinglePreparationResourceReloader<Map<Ident
     //--
 
     /**
-     * @param tag Identifier for the given Tag
+     * @param tag   Identifier for the given Tag
      * @param entry Recipe Entry to check
      * @return true if the tag exists and if the given entry exists within the Tag group
      */
-    public static boolean isWithinTag(Identifier tag, Recipe<?> entry){
+    public static boolean isWithinTag(Identifier tag, Recipe<?> entry) {
         return isWithinTag(tag, entry.getId());
     }
 
     /**
-     * @param tag Identifier for the given Tag
+     * @param tag      Identifier for the given Tag
      * @param recipeID Recipe identifier
      * @return true if the tag exists and if the given entry exists within the Tag group
      */
-    public static boolean isWithinTag(Identifier tag, Identifier recipeID){
-        if(!RESOLVED_ENTRIES.containsKey(tag)) return false;
+    public static boolean isWithinTag(Identifier tag, Identifier recipeID) {
+        if (!RESOLVED_ENTRIES.containsKey(tag)) return false;
 
         return RESOLVED_ENTRIES.get(tag).contains(recipeID);
     }
@@ -81,7 +78,7 @@ public class RecipeTagLoader extends SinglePreparationResourceReloader<Map<Ident
 
     @Override
     public void endDataPackReload(MinecraftServer server, LifecycledResourceManager resourceManager, boolean success) {
-        if(!success) return;
+        if (!success) return;
 
         resolveEntries(server);
 
@@ -93,7 +90,7 @@ public class RecipeTagLoader extends SinglePreparationResourceReloader<Map<Ident
         resolveEntries(server);
     }
 
-    public void resolveEntries(MinecraftServer server){
+    public void resolveEntries(MinecraftServer server) {
         var recipeManager = server.getRecipeManager();
 
         Map<Identifier, Collection<Recipe<?>>> map = tagGroupLoader.setGetter(recipeManager::get)
@@ -105,14 +102,14 @@ public class RecipeTagLoader extends SinglePreparationResourceReloader<Map<Ident
     }
 
     // Packet that acts as a sync packet for the Recipe Based Tag Entries
-    public record TagPacket(List<TagEntry> entries){
-        public static TagPacket of(Map<Identifier, Set<Identifier>> tagEntries){
+    public record TagPacket(List<TagEntry> entries) {
+        public static TagPacket of(Map<Identifier, Set<Identifier>> tagEntries) {
             return new TagPacket(tagEntries.entrySet().stream()
                     .map(entry -> new TagEntry(entry.getKey(), List.copyOf(entry.getValue())))
                     .toList());
         }
 
-        public static void handlePacket(TagPacket packet, ClientAccess access){
+        public static void handlePacket(TagPacket packet, ClientAccess access) {
             RESOLVED_ENTRIES.clear();
 
             RESOLVED_ENTRIES.putAll(
@@ -121,7 +118,10 @@ public class RecipeTagLoader extends SinglePreparationResourceReloader<Map<Ident
         }
     }
 
-    public record TagEntry(Identifier id, List<Identifier> entries){};
+    public record TagEntry(Identifier id, List<Identifier> entries) {
+    }
+
+    ;
 
     //--
 }

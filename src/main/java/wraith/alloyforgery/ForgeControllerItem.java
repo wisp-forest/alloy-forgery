@@ -9,7 +9,6 @@ import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import wraith.alloyforgery.block.ForgeControllerBlock;
 import wraith.alloyforgery.forges.ForgeDefinition;
-
 import java.util.List;
 
 public class ForgeControllerItem extends BlockItem {

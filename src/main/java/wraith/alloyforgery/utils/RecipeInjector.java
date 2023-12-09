@@ -6,15 +6,12 @@ import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.minecraft.inventory.Inventory;
-import net.minecraft.recipe.Recipe;
-import net.minecraft.recipe.RecipeManager;
-import net.minecraft.recipe.RecipeType;
+import net.minecraft.recipe.*;
 import net.minecraft.registry.Registries;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.Identifier;
 import org.slf4j.Logger;
 import wraith.alloyforgery.mixin.RecipeManagerAccessor;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -44,20 +41,20 @@ public final class RecipeInjector {
     private final Map<RecipeType<?>, Map<Identifier, Recipe<?>>> recipes = new HashMap<>();
     private final Map<Identifier, Recipe<?>> recipesById = new HashMap<>();
 
-    public RecipeInjector(RecipeManager manager){
+    public RecipeInjector(RecipeManager manager) {
         this.manager = manager;
     }
 
     /**
      * Attempts to register a given recipe for addition to the recipe manager if
-     *  1. Such recipe has a registered {@link RecipeType}
-     *  2. Such is found to not have an existing Identifier within {@link RecipeManager}
+     * 1. Such recipe has a registered {@link RecipeType}
+     * 2. Such is found to not have an existing Identifier within {@link RecipeManager}
      *
      * @param recipe The Recipe
-     * @param <T> Type of the given Recipe
+     * @param <T>    Type of the given Recipe
      */
-    public <T extends Recipe<C>, C extends Inventory> void addRecipe(T recipe){
-        if(Registries.RECIPE_TYPE.getId(recipe.getType()) == null){
+    public <T extends Recipe<C>, C extends Inventory> void addRecipe(T recipe) {
+        if (Registries.RECIPE_TYPE.getId(recipe.getType()) == null) {
             throw new IllegalStateException("Unable to add Recipe for a RecipeType not registered!");
         }
 
@@ -67,7 +64,7 @@ public final class RecipeInjector {
                 .stream()
                 .anyMatch(recipe1 -> recipe1.getId().equals(recipe.getId()));
 
-        if(bl){
+        if (bl) {
             LOGGER.error("[RecipeInjector]: Unable to add a given recipe due to being the same Identifier with the given Type. [ID: {}]", recipe.getId());
 
             return;
@@ -80,7 +77,7 @@ public final class RecipeInjector {
     /**
      * @return The current instance of the {@link RecipeManager}
      */
-    public RecipeManager manager(){
+    public RecipeManager manager() {
         return this.manager;
     }
 
@@ -93,13 +90,13 @@ public final class RecipeInjector {
 
     //--
 
-    public static void initEvents(){
+    public static void initEvents() {
         ServerLifecycleEvents.SERVER_STARTED.register(RecipeInjector::injectRecipes);
 
         DataPackEvents.BEFORE_SYNC.register(RecipeInjector::injectRecipes);
     }
 
-    public static void injectRecipes(MinecraftServer server){
+    public static void injectRecipes(MinecraftServer server) {
         var manager = server.getRecipeManager();
         var injector = new RecipeInjector(server.getRecipeManager());
 

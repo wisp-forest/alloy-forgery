@@ -9,7 +9,6 @@ import net.minecraft.item.Items;
 import net.minecraft.registry.tag.TagKey;
 import net.minecraft.util.Identifier;
 import wraith.alloyforgery.data.builders.AlloyForgeryRecipeBuilder;
-
 import java.util.function.Consumer;
 
 import static wraith.alloyforgery.data.AlloyForgeryTags.Items.*;
@@ -116,7 +115,7 @@ public class AlloyForgeryRecipeProvider extends FabricRecipeProvider {
 
     //-------------------------------------------
 
-    public static AlloyForgeryRecipeBuilder createOverriddenRawBlockRecipe(String materialType, TagKey<Item> output, TagKey<Item> input, int inputAmount, int outputAmount, int overrideIndex, int overrideAmount, int fuelPerTick){
+    public static AlloyForgeryRecipeBuilder createOverriddenRawBlockRecipe(String materialType, TagKey<Item> output, TagKey<Item> input, int inputAmount, int outputAmount, int overrideIndex, int overrideAmount, int fuelPerTick) {
         return AlloyForgeryRecipeBuilder.create(output, outputAmount)
                 .input(input, inputAmount)
                 .criterion("has_raw_" + materialType + "_ore_block", conditionsFromTag(input))
@@ -124,24 +123,24 @@ public class AlloyForgeryRecipeProvider extends FabricRecipeProvider {
                 .setFuelPerTick(fuelPerTick);
     }
 
-    public static AlloyForgeryRecipeBuilder createStandardRawBlockRecipe(String materialType, TagKey<Item> output, TagKey<Item> input){
+    public static AlloyForgeryRecipeBuilder createStandardRawBlockRecipe(String materialType, TagKey<Item> output, TagKey<Item> input) {
         return createOverriddenRawBlockRecipe(materialType, output, input, 2, 3, 2, 4, 45);
     }
 
-    public static AlloyForgeryRecipeBuilder createAdvancedRawBlockRecipe(String materialType, TagKey<Item> output, TagKey<Item> input){
+    public static AlloyForgeryRecipeBuilder createAdvancedRawBlockRecipe(String materialType, TagKey<Item> output, TagKey<Item> input) {
         return createOverriddenRawBlockRecipe(materialType, output, input, 2, 2, 3, 3, 90)
                 .setMinimumForgeTier(2);
     }
 
-    public static AlloyForgeryRecipeBuilder createExtremeRawBlockRecipe(String materialType, TagKey<Item> output, TagKey<Item> input){
+    public static AlloyForgeryRecipeBuilder createExtremeRawBlockRecipe(String materialType, TagKey<Item> output, TagKey<Item> input) {
         return createOverriddenRawBlockRecipe(materialType, output, input, 2, 2, 3, 3, 135)
                 .setMinimumForgeTier(2);
     }
 
     //-------------------------------------------
 
-    public static AlloyForgeryRecipeBuilder createRawBlockRecipe(String materialType, Item output, TagKey<Item> input){
-        return AlloyForgeryRecipeBuilder.create(output,3)
+    public static AlloyForgeryRecipeBuilder createRawBlockRecipe(String materialType, Item output, TagKey<Item> input) {
+        return AlloyForgeryRecipeBuilder.create(output, 3)
                 .input(input, 2)
                 .criterion("has_raw_" + materialType + "_ore_block", conditionsFromTag(input))
                 .overrideRange(2, true, 4)
@@ -150,7 +149,7 @@ public class AlloyForgeryRecipeProvider extends FabricRecipeProvider {
 
     //-------------------------------------------
 
-    public void exportWithTagConditions(AFRBuilderMethod builder, String materialType, TagKey<Item> input, TagKey<Item> output, Identifier ...priorities){
+    public void exportWithTagConditions(AFRBuilderMethod builder, String materialType, TagKey<Item> input, TagKey<Item> output, Identifier... priorities) {
         builder.build(materialType, output, input)
                 .addPriorityOutput(priorities)
                 .offerTo(this.withConditions(this.exporter, DefaultResourceConditions.tagsPopulated(output, input)));

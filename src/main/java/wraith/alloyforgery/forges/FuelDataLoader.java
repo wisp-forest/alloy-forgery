@@ -9,7 +9,6 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.JsonHelper;
 import net.minecraft.util.profiler.Profiler;
 import wraith.alloyforgery.AlloyForgery;
-
 import java.util.Map;
 
 public class FuelDataLoader extends JsonDataLoader implements IdentifiableResourceReloadListener {

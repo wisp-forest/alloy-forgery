@@ -12,7 +12,6 @@ import net.minecraft.util.Identifier;
 import wraith.alloyforgery.AlloyForgery;
 import wraith.alloyforgery.ForgeControllerItem;
 import wraith.alloyforgery.block.ForgeControllerBlock;
-
 import java.util.*;
 
 public class ForgeRegistry {
@@ -68,7 +67,8 @@ public class ForgeRegistry {
 
         public static final Loader INSTANCE = new Loader();
 
-        private Loader() {}
+        private Loader() {
+        }
 
         @Override
         public String getDataSubdirectory() {

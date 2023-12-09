@@ -1,9 +1,7 @@
 package wraith.alloyforgery.recipe;
 
 import com.google.common.collect.ImmutableMap;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.JsonSyntaxException;
+import com.google.gson.*;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketByteBuf;
@@ -12,11 +10,8 @@ import net.minecraft.recipe.RecipeSerializer;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.tag.TagKey;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.JsonHelper;
-import net.minecraft.util.Pair;
+import net.minecraft.util.*;
 import org.apache.commons.lang3.mutable.MutableInt;
-
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -200,5 +195,6 @@ public class AlloyForgeRecipeSerializer implements RecipeSerializer<AlloyForgeRe
         buf.writeOptional(recipe.secondaryID(), PacketByteBuf::writeIdentifier);
     }
 
-    private record IngredientData(String data, boolean isTag) {}
+    private record IngredientData(String data, boolean isTag) {
+    }
 }

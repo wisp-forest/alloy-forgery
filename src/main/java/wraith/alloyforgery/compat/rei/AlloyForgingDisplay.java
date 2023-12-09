@@ -7,13 +7,10 @@ import me.shedaniel.rei.api.common.display.DisplaySerializer;
 import me.shedaniel.rei.api.common.entry.EntryIngredient;
 import me.shedaniel.rei.api.common.util.EntryIngredients;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtElement;
-import net.minecraft.nbt.NbtList;
+import net.minecraft.nbt.*;
 import net.minecraft.recipe.Ingredient;
 import net.minecraft.util.Identifier;
 import wraith.alloyforgery.recipe.AlloyForgeRecipe;
-
 import java.util.*;
 
 public class AlloyForgingDisplay implements Display {
@@ -40,7 +37,7 @@ public class AlloyForgingDisplay implements Display {
         this.recipeID = recipeID;
     }
 
-    public static AlloyForgingDisplay of(AlloyForgeRecipe recipe){
+    public static AlloyForgingDisplay of(AlloyForgeRecipe recipe) {
         List<EntryIngredient> convertedInputs = new ArrayList<>();
 
         for (Map.Entry<Ingredient, Integer> entry : recipe.getIngredientsMap().entrySet()) {

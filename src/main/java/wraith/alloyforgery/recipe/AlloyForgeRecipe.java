@@ -5,13 +5,8 @@ import io.wispforest.owo.util.RecipeRemainderStorage;
 import it.unimi.dsi.fastutil.ints.Int2IntLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.ints.Int2IntMap;
 import net.minecraft.inventory.Inventory;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.recipe.Ingredient;
-import net.minecraft.recipe.Recipe;
-import net.minecraft.recipe.RecipeSerializer;
-import net.minecraft.recipe.RecipeType;
+import net.minecraft.item.*;
+import net.minecraft.recipe.*;
 import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.tag.TagKey;
@@ -23,7 +18,6 @@ import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 import wraith.alloyforgery.AlloyForgery;
 import wraith.alloyforgery.block.ForgeControllerBlockEntity;
-
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.stream.Collectors;
@@ -63,13 +57,13 @@ public class AlloyForgeRecipe implements Recipe<Inventory> {
         this.tierOverrides = overrides;
     }
 
-    public AlloyForgeRecipe setSecondaryID(Identifier id){
+    public AlloyForgeRecipe setSecondaryID(Identifier id) {
         this.secondaryID = Optional.of(id);
 
         return this;
     }
 
-    public Optional<Identifier> secondaryID(){
+    public Optional<Identifier> secondaryID() {
         return this.secondaryID;
     }
 
@@ -184,7 +178,7 @@ public class AlloyForgeRecipe implements Recipe<Inventory> {
                 : getOutput(drm);
     }
 
-    public void consumeIngredients(Inventory inventory){
+    public void consumeIngredients(Inventory inventory) {
         this.tryBind(inventory).forEach(inventory::removeStack);
     }
 
@@ -320,7 +314,8 @@ public class AlloyForgeRecipe implements Recipe<Inventory> {
     }
 
     public static class Type implements RecipeType<AlloyForgeRecipe> {
-        private Type() {}
+        private Type() {
+        }
 
         public static final Identifier ID = AlloyForgery.id("forging");
         public static final Type INSTANCE = new Type();

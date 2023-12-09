@@ -9,7 +9,7 @@ import wraith.alloyforgery.pond.RecipeTagHelper;
 @Mixin(Recipe.class)
 public interface RecipeMixin extends RecipeTagHelper {
     @Override
-    default boolean isIn(Identifier tag){
+    default boolean isIn(Identifier tag) {
         return RecipeTagLoader.isWithinTag(tag, (Recipe<?>) this);
     }
 }

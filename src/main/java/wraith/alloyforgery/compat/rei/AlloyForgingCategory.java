@@ -17,7 +17,6 @@ import org.apache.commons.lang3.mutable.MutableInt;
 import wraith.alloyforgery.AlloyForgery;
 import wraith.alloyforgery.forges.ForgeRegistry;
 import wraith.alloyforgery.recipe.AlloyForgeRecipe;
-
 import java.util.ArrayList;
 import java.util.List;
 

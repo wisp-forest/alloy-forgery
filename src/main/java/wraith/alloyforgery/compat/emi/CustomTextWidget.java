@@ -1,8 +1,6 @@
 package wraith.alloyforgery.compat.emi;
 
-import dev.emi.emi.api.widget.Bounds;
-import dev.emi.emi.api.widget.TextWidget;
-import dev.emi.emi.api.widget.Widget;
+import dev.emi.emi.api.widget.*;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.text.OrderedText;
