@@ -20,6 +20,13 @@
                             </visible-area>
                         </texture>
 
+                        <texture texture="alloy_forgery:textures/gui/forge_controller.png" u="241" v="1" region-width="14" region-height="14" id="invalid-cross">
+                            <positioning type="absolute">147,25</positioning>
+                            <visible-area>
+                                <height>0</height>
+                            </visible-area>
+                        </texture>
+
                         <flow-layout direction="horizontal" id="lava-bar">
                             <children>
                                 <sprite atlas="minecraft:textures/atlas/blocks.png" sprite="minecraft:block/lava_still"/>

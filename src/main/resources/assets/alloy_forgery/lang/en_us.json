@@ -8,6 +8,7 @@
 
   "tooltip.alloy_forgery.forge_tier": "Tier: %d",
   "tooltip.alloy_forgery.fuel_capacity": "Fuel Capacity: %d",
+  "tooltip.alloy_forgery.invalid_tier": "This recipe requires a Forge Controller of Tier %d",
 
   "container.alloy_forgery.forge_controller": "Alloy Forge",
 

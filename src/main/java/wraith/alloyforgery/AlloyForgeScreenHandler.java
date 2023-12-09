@@ -20,7 +20,7 @@ public class AlloyForgeScreenHandler extends ScreenHandler {
     private final PropertyDelegate propertyDelegate;
 
     public AlloyForgeScreenHandler(int syncId, PlayerInventory inventory) {
-        this(syncId, inventory, new SimpleInventory(ForgeControllerBlockEntity.INVENTORY_SIZE), new ArrayPropertyDelegate(3));
+        this(syncId, inventory, new SimpleInventory(ForgeControllerBlockEntity.INVENTORY_SIZE), new ArrayPropertyDelegate(4));
     }
 
     public AlloyForgeScreenHandler(int syncId, PlayerInventory playerInventory, Inventory inventory, PropertyDelegate propertyDelegate) {
@@ -69,12 +69,16 @@ public class AlloyForgeScreenHandler extends ScreenHandler {
         return propertyDelegate.get(2);
     }
 
+    public int getRequiredTierData() {
+        return propertyDelegate.get(3);
+    }
+
     @Override
     public boolean canUse(PlayerEntity player) {
         return this.controllerInventory.canPlayerUse(player);
     }
 
-    public Inventory getControllerInventory(){
+    public Inventory getControllerInventory() {
         return this.controllerInventory;
     }
 }
