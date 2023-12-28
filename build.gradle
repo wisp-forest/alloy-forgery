@@ -30,20 +30,27 @@ dependencies {
     // Fabric API. This is technically optional, but you probably want it anyway.
     modImplementation ("net.fabricmc.fabric-api:fabric-api:${project.fabric_version}")
 
-    modCompileOnly ("me.shedaniel:RoughlyEnoughItems-api-fabric:${project.rei_version}") {
-        exclude(module: "cloth-config-fabric")
-    }
+    modCompileOnly ("me.shedaniel:RoughlyEnoughItems-api-fabric:$rei_version")
+    modCompileOnly ("me.shedaniel:RoughlyEnoughItems-default-plugin:$rei_version")
     modCompileOnly ("me.shedaniel.cloth:basic-math:0.6.1")
-    modCompileOnly ("dev.architectury:architectury-fabric:11.0.8")
 
-    modLocalRuntime ("me.shedaniel:RoughlyEnoughItems-fabric:${project.rei_version}") {
-        exclude(module: "cloth-config-fabric")
-        exclude(module: "architectury-fabric")
-    }
-    modLocalRuntime ("me.shedaniel.cloth:cloth-config-fabric:13.0.114") {
-        exclude(module: "fabric-api")
-        exclude(module: "architectury-fabric")
-    }
+    modLocalRuntime ("me.shedaniel:RoughlyEnoughItems-fabric:${project.rei_version}")
+
+//    modCompileOnly ("me.shedaniel:RoughlyEnoughItems-api-fabric:${project.rei_version}") {
+//        exclude(module: "cloth-config-fabric")
+//    }
+//    modCompileOnly ("me.shedaniel.cloth:basic-math:0.6.1")
+//    modCompileOnly ("dev.architectury:architectury-fabric:11.0.8")
+//
+//    modLocalRuntime ("me.shedaniel:RoughlyEnoughItems-fabric:${project.rei_version}") {
+//        exclude(module: "cloth-config-fabric")
+//        exclude(module: "architectury-fabric")
+//    }
+//    modLocalRuntime ("me.shedaniel.cloth:cloth-config-fabric:13.0.114") {
+//        exclude(module: "fabric-api")
+//        exclude(module: "architectury-fabric")
+//    }
+
     //modLocalRuntime ("dev.architectury:architectury-fabric:11.0.8") { exclude(module: "fabric-api") }
 
     //modLocalRuntime "dev.architectury:architectury-fabric:${project.arch_version}"

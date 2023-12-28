@@ -1,26 +1,29 @@
 package wraith.alloyforgery.recipe;
 
 import io.wispforest.owo.serialization.Endec;
-import io.wispforest.owo.serialization.format.json.JsonDeserializer;
-import io.wispforest.owo.serialization.format.json.JsonEndec;
-import io.wispforest.owo.serialization.format.json.JsonSerializer;
+import io.wispforest.owo.serialization.format.edm.EdmDeserializer;
+import io.wispforest.owo.serialization.format.edm.EdmElement;
+import io.wispforest.owo.serialization.format.edm.EdmEndec;
+import io.wispforest.owo.serialization.format.edm.EdmSerializer;
 import net.minecraft.recipe.Ingredient;
 import wraith.alloyforgery.utils.EndecUtils;
 
+import java.util.Map;
+
 public record CountedIngredient(Ingredient ingredient, int count) {
-    public static Endec<CountedIngredient> ENDEC = JsonEndec.INSTANCE.xmap(element -> {
-        var object = element.getAsJsonObject();
+    public static Endec<CountedIngredient> ENDEC = EdmEndec.INSTANCE.xmap(element -> {
+        var object = element.<Map<String, EdmElement<?>>>cast();
 
         return new CountedIngredient(
-                EndecUtils.INGREDIENT.decode(new JsonDeserializer(element)),
-                object.keySet().contains("count") ? object.get("count").getAsInt() : 1
+                EndecUtils.INGREDIENT.decode(new EdmDeserializer(element)),
+                object.containsKey("count") ? object.get("count").<Number>cast().intValue() : 1
         );
     }, countedIngredient -> {
-        var element = EndecUtils.INGREDIENT.encodeFully(JsonSerializer::of, countedIngredient.ingredient());
+        var element = (EdmElement<Map<String, EdmElement<?>>>) EndecUtils.INGREDIENT.encodeFully(EdmSerializer::new, countedIngredient.ingredient());
 
         var count = countedIngredient.count();
 
-        if (count > 1) element.getAsJsonObject().addProperty("count", count);
+        if (count > 1) element.value().put("count", EdmElement.wrapInt(count));
 
         return element;
     });
