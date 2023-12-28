@@ -5,6 +5,7 @@ import dev.emi.emi.api.EmiRegistry;
 import dev.emi.emi.api.recipe.EmiRecipeCategory;
 import dev.emi.emi.api.stack.EmiStack;
 import net.minecraft.block.Block;
+import net.minecraft.recipe.RecipeEntry;
 import net.minecraft.util.Identifier;
 import wraith.alloyforgery.AlloyForgery;
 import wraith.alloyforgery.forges.ForgeRegistry;
@@ -23,8 +24,8 @@ public class AlloyForgeryEmiPlugin implements EmiPlugin {
             registry.addWorkstation(FORGE_CATEGORY, EmiStack.of(controller));
         }
 
-        for (AlloyForgeRecipe recipe : registry.getRecipeManager().listAllOfType(AlloyForgeRecipe.Type.INSTANCE)) {
-            registry.addRecipe(new AlloyForgeryEmiRecipe(recipe));
+        for (RecipeEntry<AlloyForgeRecipe> recipeEntry : registry.getRecipeManager().listAllOfType(AlloyForgeRecipe.Type.INSTANCE)) {
+            registry.addRecipe(new AlloyForgeryEmiRecipe(recipeEntry));
         }
 
         registry.addRecipeHandler(AlloyForgery.ALLOY_FORGE_SCREEN_HANDLER_TYPE, new AlloyForgeryEmiRecipeHandler());

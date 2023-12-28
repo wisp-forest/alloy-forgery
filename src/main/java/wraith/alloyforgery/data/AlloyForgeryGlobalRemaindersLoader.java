@@ -2,6 +2,8 @@ package wraith.alloyforgery.data;
 
 import com.google.gson.*;
 import com.mojang.logging.LogUtils;
+import io.wispforest.owo.serialization.Endec;
+import io.wispforest.owo.serialization.format.json.JsonDeserializer;
 import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -19,6 +21,8 @@ import java.util.Map;
 
 public class AlloyForgeryGlobalRemaindersLoader extends JsonDataLoader implements IdentifiableResourceReloadListener {
 
+    private static final Endec<ItemStack> RECIPE_RESULT_ENDEC = Endec.ofCodec(ItemStack.RECIPE_RESULT_CODEC);
+
     private static final Logger LOGGER = LogUtils.getLogger();
 
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
@@ -35,13 +39,13 @@ public class AlloyForgeryGlobalRemaindersLoader extends JsonDataLoader implement
                     var remainders = new HashMap<Item, ItemStack>();
 
                     for (var remainderEntry : JsonHelper.getObject(jsonObject, "remainders").entrySet()) {
-                        var item = JsonHelper.asItem(new JsonPrimitive(remainderEntry.getKey()), remainderEntry.getKey());
+                        var item = JsonHelper.asItem(new JsonPrimitive(remainderEntry.getKey()), remainderEntry.getKey()).value();
 
                         if (remainderEntry.getValue().isJsonObject()) {
-                            var remainderStack = ShapedRecipe.outputFromJson(remainderEntry.getValue().getAsJsonObject());
+                            var remainderStack = RECIPE_RESULT_ENDEC.decodeFully(JsonDeserializer::of, remainderEntry.getValue().getAsJsonObject());
                             remainders.put(item, remainderStack);
                         } else {
-                            var remainderItem = JsonHelper.asItem(remainderEntry.getValue(), "item");
+                            var remainderItem = JsonHelper.asItem(remainderEntry.getValue(), "item").value();
                             remainders.put(item, new ItemStack(remainderItem));
                         }
                     }

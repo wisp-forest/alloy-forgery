@@ -36,9 +36,9 @@ public class ForgeFuelRegistry {
 
         public static ForgeFuelDefinition fromJson(JsonObject json) {
             final int fuel = json.get("fuel").getAsInt();
-            final Item returnType = JsonHelper.getItem(json, "return_item", null);
+            final var returnType = JsonHelper.getItem(json, "return_item", null);
 
-            return new ForgeFuelDefinition(fuel, returnType);
+            return new ForgeFuelDefinition(fuel, returnType != null ? returnType.value() : null);
         }
 
     }

@@ -9,6 +9,7 @@ import me.shedaniel.rei.api.common.util.EntryIngredients;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.*;
 import net.minecraft.recipe.Ingredient;
+import net.minecraft.recipe.RecipeEntry;
 import net.minecraft.util.Identifier;
 import wraith.alloyforgery.recipe.AlloyForgeRecipe;
 import java.util.*;
@@ -37,8 +38,10 @@ public class AlloyForgingDisplay implements Display {
         this.recipeID = recipeID;
     }
 
-    public static AlloyForgingDisplay of(AlloyForgeRecipe recipe) {
+    public static AlloyForgingDisplay of(RecipeEntry<AlloyForgeRecipe> recipeEntry) {
         List<EntryIngredient> convertedInputs = new ArrayList<>();
+
+        var recipe = recipeEntry.value();
 
         for (Map.Entry<Ingredient, Integer> entry : recipe.getIngredientsMap().entrySet()) {
             for (int i = entry.getValue(); i > 0; ) {
@@ -56,11 +59,11 @@ public class AlloyForgingDisplay implements Display {
 
         return new AlloyForgingDisplay(
                 convertedInputs,
-                EntryIngredients.of(recipe.getBaseOutput()),
+                EntryIngredients.of(recipe.getBaseResult()),
                 recipe.getMinForgeTier(),
                 recipe.getFuelPerTick(),
                 recipe.getTierOverrides(),
-                recipe.secondaryID().or(() -> Optional.of(recipe.getId())));
+                recipe.secondaryID().or(() -> Optional.of(recipeEntry.id())));
     }
 
     @Override

@@ -38,8 +38,8 @@ public final class RecipeInjector {
 
     private final RecipeManager manager;
 
-    private final Map<RecipeType<?>, Map<Identifier, Recipe<?>>> recipes = new HashMap<>();
-    private final Map<Identifier, Recipe<?>> recipesById = new HashMap<>();
+    private final Map<RecipeType<?>, Map<Identifier, RecipeEntry<Recipe<?>>>> recipes = new HashMap<>();
+    private final Map<Identifier, RecipeEntry<Recipe<?>>> recipesById = new HashMap<>();
 
     public RecipeInjector(RecipeManager manager) {
         this.manager = manager;
@@ -53,7 +53,7 @@ public final class RecipeInjector {
      * @param recipe The Recipe
      * @param <T>    Type of the given Recipe
      */
-    public <T extends Recipe<C>, C extends Inventory> void addRecipe(T recipe) {
+    public <T extends Recipe<C>, C extends Inventory> void addRecipe(Identifier id, T recipe) {
         if (Registries.RECIPE_TYPE.getId(recipe.getType()) == null) {
             throw new IllegalStateException("Unable to add Recipe for a RecipeType not registered!");
         }
@@ -62,16 +62,16 @@ public final class RecipeInjector {
 
         var bl = manager.listAllOfType(type)
                 .stream()
-                .anyMatch(recipe1 -> recipe1.getId().equals(recipe.getId()));
+                .anyMatch(recipeEntry -> id.equals(recipeEntry.id()));
 
         if (bl) {
-            LOGGER.error("[RecipeInjector]: Unable to add a given recipe due to being the same Identifier with the given Type. [ID: {}]", recipe.getId());
+            LOGGER.error("[RecipeInjector]: Unable to add a given recipe due to being the same Identifier with the given Type. [ID: {}]", id);
 
             return;
         }
 
-        recipes.computeIfAbsent(recipe.getType(), t -> new HashMap<>()).put(recipe.getId(), recipe);
-        recipesById.put(recipe.getId(), recipe);
+        recipes.computeIfAbsent(recipe.getType(), t -> new HashMap<>()).put(id, new RecipeEntry<>(id, recipe));
+        recipesById.put(id, new RecipeEntry<>(id, recipe));
     }
 
     /**

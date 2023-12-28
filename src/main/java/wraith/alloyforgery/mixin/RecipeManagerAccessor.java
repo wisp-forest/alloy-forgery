@@ -9,14 +9,14 @@ import java.util.Map;
 @Mixin(RecipeManager.class)
 public interface RecipeManagerAccessor {
     @Accessor("recipes")
-    Map<RecipeType<?>, Map<Identifier, Recipe<?>>> af$getRecipes();
+    Map<RecipeType<?>, Map<Identifier, RecipeEntry<Recipe<?>>>> af$getRecipes();
 
     @Accessor("recipes")
-    void af$setRecipes(Map<RecipeType<?>, Map<Identifier, Recipe<?>>> recipes);
+    void af$setRecipes(Map<RecipeType<?>, Map<Identifier, RecipeEntry<Recipe<?>>>> recipes);
 
     @Accessor("recipesById")
-    Map<Identifier, Recipe<?>> af$getRecipesById();
+    Map<Identifier, RecipeEntry<Recipe<?>>> af$getRecipesById();
 
     @Accessor("recipesById")
-    void af$setRecipesById(Map<Identifier, Recipe<?>> recipesById);
+    void af$setRecipesById(Map<Identifier, RecipeEntry<Recipe<?>>> recipesById);
 }

@@ -32,6 +32,6 @@ public class AlloyForgeryClientPlugin implements REIClientPlugin {
 
     @Override
     public void registerDisplays(DisplayRegistry registry) {
-        registry.registerFiller(AlloyForgeRecipe.class, AlloyForgingDisplay::of);
+        registry.registerRecipeFiller(AlloyForgeRecipe.class, AlloyForgeRecipe.Type.INSTANCE, AlloyForgingDisplay::of);
     }
 }

@@ -9,10 +9,12 @@ import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.tag.TagKey;
 import net.minecraft.util.Identifier;
 import wraith.alloyforgery.AlloyForgery;
+import wraith.alloyforgery.data.RecipeTagLoader;
 import wraith.alloyforgery.forges.ForgeDefinition;
 import wraith.alloyforgery.utils.RecipeInjector;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Adapter class that takes advantage of {@link RecipeInjector}
@@ -36,23 +38,25 @@ public class BlastFurnaceRecipeAdapter implements RecipeInjector.AddRecipes {
     public void addRecipes(RecipeInjector instance) {
         var manager = instance.manager();
 
-        List<AlloyForgeRecipe> alloyForgeryRecipes = manager.listAllOfType(AlloyForgeRecipe.Type.INSTANCE);
+        List<RecipeEntry<AlloyForgeRecipe>> alloyForgeryRecipes = manager.listAllOfType(AlloyForgeRecipe.Type.INSTANCE);
 
-        for (BlastingRecipe recipe : manager.listAllOfType(RecipeType.BLASTING)) {
-            if (!isUniqueRecipe(alloyForgeryRecipes, recipe) || recipe.isIn(BLACKLISTED_BLASTING_RECIPES)) continue;
+        for (RecipeEntry<BlastingRecipe> recipeEntry : manager.listAllOfType(RecipeType.BLASTING)) {
+            var recipe = recipeEntry.value();
 
-            var secondaryID = recipe.getId();
+            if (!isUniqueRecipe(alloyForgeryRecipes, recipe) || RecipeTagLoader.isWithinTag(BLACKLISTED_BLASTING_RECIPES, recipeEntry)) continue;
+
+            var secondaryID = recipeEntry.id();
             var path = secondaryID.getPath();
 
             if (path.contains("blasting")) {
                 path = path.replace("blasting", "forging");
             }
 
-            var mainOutput = recipe.getOutput(null);
+            var mainOutput = recipe.getResult(null);
 
             var extraOutput = ImmutableMap.<AlloyForgeRecipe.OverrideRange, ItemStack>builder();
 
-            if (!recipe.isIn(BLACKLISTED_INCREASED_OUTPUT) && !isDustRecipe(recipe)) {
+            if (!RecipeTagLoader.isWithinTag(BLACKLISTED_INCREASED_OUTPUT, recipeEntry) && !isDustRecipe(recipeEntry)) {
                 var increasedOutput = mainOutput.copy();
 
                 increasedOutput.increment(1);
@@ -60,28 +64,32 @@ public class BlastFurnaceRecipeAdapter implements RecipeInjector.AddRecipes {
                 extraOutput.put(new AlloyForgeRecipe.OverrideRange(3), increasedOutput);
             }
 
-            var convertRecipe = new AlloyForgeRecipe(AlloyForgery.id(path),
+            var recipeId = AlloyForgery.id(path);
+
+            var convertRecipe = new AlloyForgeRecipe(
                     Map.of(recipe.getIngredients().get(0), 1),
                     mainOutput,
                     1,
                     Math.round(getFuelPerTick(recipe)),
-                    extraOutput.build()
-            ).setSecondaryID(secondaryID);
+                    extraOutput.build(),
+                    Optional.of(secondaryID));
 
-            instance.addRecipe(convertRecipe);
+            instance.addRecipe(recipeId, convertRecipe);
         }
     }
 
     private static float getFuelPerTick(BlastingRecipe recipe) {
-        return ((recipe.getCookTime() / (float) ForgeDefinition.BASE_MAX_SMELT_TIME) * 10);
+        return ((recipe.getCookingTime() / (float) ForgeDefinition.BASE_MAX_SMELT_TIME) * 10);
     }
 
     // Checks if the given blast recipe has unique inputs to prevent overlapping recipes leading to confliction
-    private static boolean isUniqueRecipe(List<AlloyForgeRecipe> alloyForgeryRecipes, Recipe<?> blastRecipe) {
+    private static boolean isUniqueRecipe(List<RecipeEntry<AlloyForgeRecipe>> alloyForgeryRecipes, Recipe<?> blastRecipe) {
         ItemStack[] stacks = blastRecipe.getIngredients().get(0).getMatchingStacks();
 
-        List<AlloyForgeRecipe> matchedRecipes = alloyForgeryRecipes.stream()
-                .filter(recipe -> {
+        List<RecipeEntry<AlloyForgeRecipe>> matchedRecipes = alloyForgeryRecipes.stream()
+                .filter(recipeEntry -> {
+                    var recipe = recipeEntry.value();
+
                     if (recipe.getIngredientsMap().size() > 1) return false;
 
                     for (ItemStack stack : stacks) {
@@ -100,8 +108,10 @@ public class BlastFurnaceRecipeAdapter implements RecipeInjector.AddRecipes {
     // 1. Check if recipe name contains "dust"
     // 2. Check if the item is within the "c:dusts" tag
     // 3. Check if any input items have Identifiers containing "dust" within the path
-    private static boolean isDustRecipe(Recipe<?> blastRecipe) {
-        if (blastRecipe.getId().getPath().contains("dust")) return true;
+    private static boolean isDustRecipe(RecipeEntry<BlastingRecipe> blastingRecipeEntry) {
+        if (blastingRecipeEntry.id().getPath().contains("dust")) return true;
+
+        var blastRecipe = blastingRecipeEntry.value();
 
         var inputIngredient = blastRecipe.getIngredients().get(0);
 

@@ -7,6 +7,7 @@ import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.widget.WidgetHolder;
 import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.Ingredient;
+import net.minecraft.recipe.RecipeEntry;
 import net.minecraft.text.OrderedText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
@@ -30,7 +31,9 @@ public class AlloyForgeryEmiRecipe implements EmiRecipe {
 
     private final Identifier recipeID;
 
-    public AlloyForgeryEmiRecipe(AlloyForgeRecipe recipe) {
+    public AlloyForgeryEmiRecipe(RecipeEntry<AlloyForgeRecipe> recipeEntry) {
+        var recipe = recipeEntry.value();
+
         //Convert inputs to a list of EMI Ingredients
         List<EmiIngredient> convertedInputs = new ArrayList<>();
         for (Map.Entry<Ingredient, Integer> entry : recipe.getIngredientsMap().entrySet()) {
@@ -49,14 +52,14 @@ public class AlloyForgeryEmiRecipe implements EmiRecipe {
         }
 
         this.inputs = convertedInputs;
-        this.output = EmiStack.of(recipe.getBaseOutput());
+        this.output = EmiStack.of(recipe.getBaseResult());
 
         this.minForgeTier = recipe.getMinForgeTier();
         this.requiredFuel = recipe.getFuelPerTick();
 
         this.overrides = recipe.getTierOverrides();
 
-        this.recipeID = recipe.secondaryID().orElse(recipe.getId());
+        this.recipeID = recipe.secondaryID().orElse(recipeEntry.id());
     }
 
     @Override

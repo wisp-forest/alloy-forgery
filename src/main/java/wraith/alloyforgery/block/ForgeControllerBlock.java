@@ -1,6 +1,10 @@
 package wraith.alloyforgery.block;
 
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.wispforest.owo.particles.ClientParticles;
+import io.wispforest.owo.serialization.StructEndec;
+import io.wispforest.owo.serialization.endec.StructEndecBuilder;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorageUtil;
 import net.minecraft.block.*;
@@ -22,6 +26,7 @@ import org.jetbrains.annotations.Nullable;
 import wraith.alloyforgery.AlloyForgery;
 import wraith.alloyforgery.forges.ForgeDefinition;
 import wraith.alloyforgery.forges.ForgeFuelRegistry;
+import wraith.alloyforgery.utils.EndecUtils;
 
 public class ForgeControllerBlock extends BlockWithEntity {
 
@@ -34,6 +39,14 @@ public class ForgeControllerBlock extends BlockWithEntity {
         super(FabricBlockSettings.copyOf(Blocks.BLACKSTONE));
         this.forgeDefinition = forgeDefinition;
         this.setDefaultState(this.getStateManager().getDefaultState().with(LIT, false));
+    }
+
+    @Override
+    protected MapCodec<? extends BlockWithEntity> getCodec() {
+        return StructEndecBuilder.of(
+                ForgeDefinition.FORGE_DEFINITION.fieldOf("forge_definition", s -> forgeDefinition),
+                ForgeControllerBlock::new
+        ).mapCodec();
     }
 
     @Override
@@ -115,7 +128,7 @@ public class ForgeControllerBlock extends BlockWithEntity {
     @Nullable
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
-        return world.isClient ? null : checkType(type, AlloyForgery.FORGE_CONTROLLER_BLOCK_ENTITY, (world1, pos, state1, blockEntity) -> blockEntity.tick());
+        return world.isClient ? null : validateTicker(type, AlloyForgery.FORGE_CONTROLLER_BLOCK_ENTITY, (world1, pos, state1, blockEntity) -> blockEntity.tick());
     }
 
     @Nullable

@@ -1,6 +1,9 @@
 package wraith.alloyforgery.recipe;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.gson.JsonSyntaxException;
+import io.wispforest.owo.serialization.Endec;
+import io.wispforest.owo.serialization.endec.StructEndecBuilder;
 import io.wispforest.owo.util.RecipeRemainderStorage;
 import it.unimi.dsi.fastutil.ints.Int2IntLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.ints.Int2IntMap;
@@ -31,7 +34,7 @@ public class AlloyForgeRecipe implements Recipe<Inventory> {
 
     public static final Map<AlloyForgeRecipe, PendingRecipeData> PENDING_RECIPES = new HashMap<>();
 
-    private final Identifier id;
+    public final Optional<RawAlloyForgeRecipe> rawRecipeData;
 
     /**
      * Used for Recipes that were adapted to Alloy Forge Recipes instead of created from scratch.
@@ -47,20 +50,21 @@ public class AlloyForgeRecipe implements Recipe<Inventory> {
 
     private ImmutableMap<OverrideRange, ItemStack> tierOverrides;
 
-    public AlloyForgeRecipe(Identifier id, Map<Ingredient, Integer> inputs, ItemStack output, int minForgeTier, int fuelPerTick, ImmutableMap<OverrideRange, ItemStack> overrides) {
-        this.id = id;
+    public AlloyForgeRecipe(Optional<RawAlloyForgeRecipe> rawRecipeData, Map<Ingredient, Integer> inputs, ItemStack output, int minForgeTier, int fuelPerTick, Map<OverrideRange, ItemStack> overrides) {
+        this.rawRecipeData = rawRecipeData;
+
         this.inputs = inputs;
         this.output = output;
         this.minForgeTier = minForgeTier;
         this.fuelPerTick = fuelPerTick;
 
-        this.tierOverrides = overrides;
+        this.tierOverrides = ImmutableMap.copyOf(overrides);
     }
 
-    public AlloyForgeRecipe setSecondaryID(Identifier id) {
-        this.secondaryID = Optional.of(id);
+    public AlloyForgeRecipe(Map<Ingredient, Integer> inputs, ItemStack output, int minForgeTier, int fuelPerTick, Map<OverrideRange, ItemStack> overrides, Optional<Identifier> secondaryID) {
+        this(Optional.empty(), inputs, output, minForgeTier, fuelPerTick, overrides);
 
-        return this;
+        this.secondaryID = secondaryID;
     }
 
     public Optional<Identifier> secondaryID() {
@@ -76,7 +80,7 @@ public class AlloyForgeRecipe implements Recipe<Inventory> {
                 this.output.setCount(pendingData.defaultTag().getRight());
 
             }, () -> {
-                throw new InvalidTagException("Default tag " + pendingData.defaultTag().getLeft().id() + " of recipe " + this.id + " must not be empty");
+                throw new InvalidTagException("Default tag " + pendingData.defaultTag().getLeft().id() + " of recipe " + /*this.id +*/ " must not be empty");
             });
         }
 
@@ -174,8 +178,8 @@ public class AlloyForgeRecipe implements Recipe<Inventory> {
     @Override
     public ItemStack craft(Inventory inventory, DynamicRegistryManager drm) {
         return (inventory instanceof ForgeControllerBlockEntity controller)
-                ? getOutput(controller.getForgeDefinition().forgeTier())
-                : getOutput(drm);
+                ? getResult(controller.getForgeDefinition().forgeTier())
+                : getResult(drm);
     }
 
     public void consumeIngredients(Inventory inventory) {
@@ -183,16 +187,17 @@ public class AlloyForgeRecipe implements Recipe<Inventory> {
     }
 
     @Nullable
-    public DefaultedList<ItemStack> gatherRemainders(Inventory inventory) {
+    public static DefaultedList<ItemStack> gatherRemainders(RecipeEntry<AlloyForgeRecipe> recipeEntry, Inventory inventory) {
+        final var recipe = recipeEntry.value();
         final var remainders = DefaultedList.ofSize(inventory.size(), ItemStack.EMPTY);
         //noinspection UnstableApiUsage
-        final var owoRemainders = RecipeRemainderStorage.has(this.getId()) ? RecipeRemainderStorage.get(this.getId()) : Map.<Item, ItemStack>of();
+        final var owoRemainders = RecipeRemainderStorage.has(recipeEntry.id()) ? RecipeRemainderStorage.get(recipeEntry.id()) : Map.<Item, ItemStack>of();
 
         if (owoRemainders.isEmpty() && GLOBAL_REMAINDERS.isEmpty()) return null;
 
         var setAnyRemainders = false;
 
-        for (int i : this.tryBind(inventory).keySet()) {
+        for (int i : recipe.tryBind(inventory).keySet()) {
             var item = inventory.getStack(i).getItem();
 
             if (!owoRemainders.isEmpty()) {
@@ -220,19 +225,19 @@ public class AlloyForgeRecipe implements Recipe<Inventory> {
     @Override
     @ApiStatus.Internal
     @Deprecated
-    public ItemStack getOutput(DynamicRegistryManager drm) {
+    public ItemStack getResult(DynamicRegistryManager drm) {
         return this.output.copy();
     }
 
     /**
-     * Quickly copy the base output for a recipe, skips calculations from {@link #getOutput(int)}
+     * Quickly copy the base output for a recipe, skips calculations from {@link #getResult(int)}
      */
     @ApiStatus.Internal
-    public ItemStack getBaseOutput() {
+    public ItemStack getBaseResult() {
         return this.output.copy();
     }
 
-    public ItemStack getOutput(int forgeTier) {
+    public ItemStack getResult(int forgeTier) {
         ItemStack stack = tierOverrides.getOrDefault(tierOverrides.keySet().stream()
                         .filter(overrideRange -> overrideRange.test(forgeTier))
                         .findAny()
@@ -248,11 +253,6 @@ public class AlloyForgeRecipe implements Recipe<Inventory> {
         }
 
         return stack;
-    }
-
-    @Override
-    public Identifier getId() {
-        return id;
     }
 
     @Override
@@ -279,12 +279,34 @@ public class AlloyForgeRecipe implements Recipe<Inventory> {
 
     public record OverrideRange(int lowerBound, int upperBound) {
 
+        public static Endec<OverrideRange> OVERRIDE_RANGE = StructEndecBuilder.of(
+                Endec.INT.fieldOf("lowerBound", AlloyForgeRecipe.OverrideRange::lowerBound),
+                Endec.INT.fieldOf("upperBound", AlloyForgeRecipe.OverrideRange::upperBound),
+                AlloyForgeRecipe.OverrideRange::new
+        );
+
         public OverrideRange(int lowerBound) {
             this(lowerBound, -1);
         }
 
         public boolean test(int value) {
             return value >= lowerBound && (upperBound == -1 || value <= upperBound);
+        }
+
+        public static AlloyForgeRecipe.OverrideRange fromString(String s){
+            AlloyForgeRecipe.OverrideRange overrideRange;
+
+            if (s.matches("\\d+\\+")) {
+                overrideRange = new AlloyForgeRecipe.OverrideRange(Integer.parseInt(s.substring(0, s.length() - 1)));
+            } else if (s.matches("\\d+ to \\d+")) {
+                overrideRange = new AlloyForgeRecipe.OverrideRange(Integer.parseInt(s.substring(0, s.indexOf(" "))), Integer.parseInt(s.substring(s.lastIndexOf(" ") + 1, s.length())));
+            } else if (s.matches("\\d+")) {
+                overrideRange = new AlloyForgeRecipe.OverrideRange(Integer.parseInt(s), Integer.parseInt(s));
+            } else {
+                throw new JsonSyntaxException("Invalid override range token: " + s);
+            }
+
+            return overrideRange;
         }
 
         // Any attempt to optimize this mess has been unilaterally denied
@@ -322,20 +344,24 @@ public class AlloyForgeRecipe implements Recipe<Inventory> {
     }
 
     public record PendingRecipeData(@Nullable Pair<TagKey<Item>, Integer> defaultTag,
-                                    ImmutableMap<OverrideRange, PendingOverride> unfinishedTierOverrides) {
+                                    Map<OverrideRange, PendingOverride> unfinishedTierOverrides) {
     }
 
-    public record PendingOverride(@Nullable ItemStack stack, int count) {
+    public record PendingOverride(@Nullable Item item, int count) {
         public boolean isCountOnly() {
-            return this.stack == null;
+            return this.item == null;
         }
 
         public static PendingOverride onlyCount(int count) {
             return new PendingOverride(null, count);
         }
 
-        public static PendingOverride ofStack(ItemStack stack) {
-            return new PendingOverride(stack, stack.getCount());
+        public static PendingOverride ofItem(Item item, int count) {
+            return new PendingOverride(item, count);
+        }
+
+        public ItemStack stack(){
+            return new ItemStack(item, count);
         }
     }
 

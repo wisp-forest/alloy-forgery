@@ -3,26 +3,25 @@ package wraith.alloyforgery.data.providers;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricRecipeProvider;
 import net.fabricmc.fabric.api.resource.conditions.v1.DefaultResourceConditions;
-import net.minecraft.data.server.recipe.RecipeJsonProvider;
+import net.minecraft.data.server.recipe.RecipeExporter;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import net.minecraft.registry.tag.TagKey;
 import net.minecraft.util.Identifier;
 import wraith.alloyforgery.data.builders.AlloyForgeryRecipeBuilder;
-import java.util.function.Consumer;
 
 import static wraith.alloyforgery.data.AlloyForgeryTags.Items.*;
 
 public class AlloyForgeryRecipeProvider extends FabricRecipeProvider {
 
-    public Consumer<RecipeJsonProvider> exporter;
+    public RecipeExporter exporter;
 
     public AlloyForgeryRecipeProvider(FabricDataOutput output) {
         super(output);
     }
 
     @Override
-    public void generate(Consumer<RecipeJsonProvider> exporter) {
+    public void generate(RecipeExporter exporter) {
         this.exporter = exporter;
 
         createRawBlockRecipe("copper", Items.COPPER_BLOCK, RAW_COPPER_ORE_BLOCKS)

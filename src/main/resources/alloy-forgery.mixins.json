@@ -10,7 +10,7 @@
     "IngredientAccessor",
     "RecipeManagerAccessor",
     "RecipeManagerMixin",
-    "RecipeMixin",
+    "RecipeEntryMixin",
     "PlayerManagerMixin"
   ],
   "injectors": {

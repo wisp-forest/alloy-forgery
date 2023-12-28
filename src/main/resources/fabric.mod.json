@@ -63,7 +63,7 @@
       }
     },
     "loom:injected_interfaces": {
-      "net/minecraft/class_1860": [
+      "net/minecraft/class_8786": [
         "wraith/alloyforgery/pond/RecipeTagHelper"
       ]
     }

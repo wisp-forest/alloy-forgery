@@ -3,6 +3,8 @@ package wraith.alloyforgery.forges;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import io.wispforest.owo.moddata.ModDataConsumer;
+import io.wispforest.owo.serialization.Endec;
+import io.wispforest.owo.serialization.endec.BuiltInEndecs;
 import io.wispforest.owo.util.TagInjector;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
@@ -15,6 +17,19 @@ import wraith.alloyforgery.block.ForgeControllerBlock;
 import java.util.*;
 
 public class ForgeRegistry {
+
+    public static Endec<ForgeDefinition> FORGE_DEFINITION = BuiltInEndecs.IDENTIFIER.xmap(
+            identifier -> {
+                return getForgeDefinition(identifier)
+                        .orElseThrow(() -> new IllegalStateException("Unable to locate ForgerDefinition with Identifier: [ID: " + identifier + "]"));
+            }, forgeDefinition -> {
+                for (var entry : getForgeEntries()) {
+                    if(entry.getValue() == forgeDefinition) return entry.getKey();
+                }
+
+                throw new IllegalStateException();
+            }
+    );
 
     public static final Gson GSON = new Gson();
     private static final Identifier MINEABLE_PICKAXE = new Identifier("mineable/pickaxe");
@@ -43,6 +58,10 @@ public class ForgeRegistry {
 
     public static Optional<Block> getControllerBlock(Identifier id) {
         return FORGE_DEFINITION_REGISTRY.containsKey(id) ? Optional.of(CONTROLLER_BLOCK_REGISTRY.get(id)) : Optional.empty();
+    }
+
+    public static Set<Map.Entry<Identifier, ForgeDefinition>> getForgeEntries(){
+        return FORGE_DEFINITION_REGISTRY.entrySet();
     }
 
     public static Set<Identifier> getForgeIds() {

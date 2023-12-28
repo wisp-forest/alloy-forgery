@@ -19,6 +19,7 @@ import net.minecraft.inventory.Inventories;
 import net.minecraft.inventory.SidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.recipe.RecipeEntry;
 import net.minecraft.screen.*;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
@@ -47,7 +48,7 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
     private final DefaultedList<ItemStack> previousItems = DefaultedList.of();
     private boolean checkForRecipes = true;
 
-    private Optional<AlloyForgeRecipe> recipeCache = Optional.empty();
+    private Optional<RecipeEntry<AlloyForgeRecipe>> recipeCache = Optional.empty();
 
     private int requiredTierToCraft = -1;
 
@@ -230,7 +231,7 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
 
         //--
 
-        if (this.recipeCache.isEmpty() || !this.recipeCache.get().matches(this, this.world)) {
+        if (this.recipeCache.isEmpty() || !this.recipeCache.get().value().matches(this, this.world)) {
             this.recipeCache = this.world.getRecipeManager().getFirstMatch(AlloyForgeRecipe.Type.INSTANCE, this, this.world);
         }
 
@@ -238,7 +239,7 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
             this.requiredTierToCraft = -1;
         }
 
-        if (this.recipeCache.isEmpty() || !canSmelt(this.recipeCache.get())) {
+        if (this.recipeCache.isEmpty() || !canSmelt(this.recipeCache.get().value())) {
             this.checkForRecipes = false;
             this.currentSmeltTime = 0;
             return;
@@ -246,7 +247,7 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
 
         //--
 
-        var recipe = recipeCache.get();
+        var recipe = recipeCache.get().value();
 
         if (this.currentSmeltTime < this.forgeDefinition.maxSmeltTime()) {
             final float fuelRequirement = recipe.getFuelPerTick() * this.forgeDefinition.speedMultiplier();
@@ -263,7 +264,7 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
                 AlloyForgery.FORGE_PARTICLES.spawn(this.world, Vec3d.of(this.pos), this.facing);
             }
         } else {
-            var remainderList = recipe.gatherRemainders(this);
+            var remainderList = AlloyForgeRecipe.gatherRemainders(recipeCache.get(), this);
 
             if (remainderList != null) this.handleForgingRemainders(remainderList);
 
@@ -284,7 +285,7 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
 
     private boolean canSmelt(AlloyForgeRecipe recipe) {
         final var outputStack = this.getStack(10);
-        final var recipeOutput = recipe.getOutput(this.forgeDefinition.forgeTier());
+        final var recipeOutput = recipe.getResult(this.forgeDefinition.forgeTier());
 
         if (recipe.getMinForgeTier() > this.forgeDefinition.forgeTier()) {
             this.requiredTierToCraft = recipe.getMinForgeTier();

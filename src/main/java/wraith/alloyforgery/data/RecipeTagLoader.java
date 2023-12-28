@@ -5,6 +5,7 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
 import net.minecraft.recipe.Recipe;
+import net.minecraft.recipe.RecipeEntry;
 import net.minecraft.registry.tag.TagGroupLoader;
 import net.minecraft.resource.*;
 import net.minecraft.server.MinecraftServer;
@@ -24,7 +25,7 @@ public class RecipeTagLoader extends SinglePreparationResourceReloader<Map<Ident
 
     private static final Map<Identifier, List<TagGroupLoader.TrackedEntry>> RAW_TAG_DATA = new HashMap<>();
 
-    private final DelayedTagGroupLoader<Recipe<?>> tagGroupLoader = new DelayedTagGroupLoader<>("tags/recipes");
+    private final DelayedTagGroupLoader<RecipeEntry<Recipe<?>>> tagGroupLoader = new DelayedTagGroupLoader<>("tags/recipes");
 
     @Override
     protected Map<Identifier, List<TagGroupLoader.TrackedEntry>> prepare(ResourceManager manager, Profiler profiler) {
@@ -50,8 +51,8 @@ public class RecipeTagLoader extends SinglePreparationResourceReloader<Map<Ident
      * @param entry Recipe Entry to check
      * @return true if the tag exists and if the given entry exists within the Tag group
      */
-    public static boolean isWithinTag(Identifier tag, Recipe<?> entry) {
-        return isWithinTag(tag, entry.getId());
+    public static boolean isWithinTag(Identifier tag, RecipeEntry<?> entry) {
+        return isWithinTag(tag, entry.id());
     }
 
     /**
@@ -93,12 +94,14 @@ public class RecipeTagLoader extends SinglePreparationResourceReloader<Map<Ident
     public void resolveEntries(MinecraftServer server) {
         var recipeManager = server.getRecipeManager();
 
-        Map<Identifier, Collection<Recipe<?>>> map = tagGroupLoader.setGetter(recipeManager::get)
+        Map<Identifier, Collection<RecipeEntry<Recipe<?>>>> map = tagGroupLoader.setGetter(identifier -> {
+                    return Optional.ofNullable((RecipeEntry<Recipe<?>>) recipeManager.get(identifier).orElse(null));
+                })
                 .buildGroup(RAW_TAG_DATA);
 
         RESOLVED_ENTRIES.clear();
 
-        map.forEach((id, recipes) -> RESOLVED_ENTRIES.put(id, recipes.stream().map(Recipe::getId).collect(Collectors.toSet())));
+        map.forEach((id, recipes) -> RESOLVED_ENTRIES.put(id, recipes.stream().map(RecipeEntry::id).collect(Collectors.toSet())));
     }
 
     // Packet that acts as a sync packet for the Recipe Based Tag Entries
