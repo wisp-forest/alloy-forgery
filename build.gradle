@@ -40,18 +40,18 @@ dependencies {
 //        exclude(module: "cloth-config-fabric")
 //    }
 //    modCompileOnly ("me.shedaniel.cloth:basic-math:0.6.1")
-//    modCompileOnly ("dev.architectury:architectury-fabric:11.0.8")
+//    modCompileOnly ("dev.architectury:architectury-fabric:11.0.9")
 //
 //    modLocalRuntime ("me.shedaniel:RoughlyEnoughItems-fabric:${project.rei_version}") {
 //        exclude(module: "cloth-config-fabric")
 //        exclude(module: "architectury-fabric")
 //    }
-//    modLocalRuntime ("me.shedaniel.cloth:cloth-config-fabric:13.0.114") {
+//    modLocalRuntime ("me.shedaniel.cloth:cloth-config-fabric:13.0.121") {
 //        exclude(module: "fabric-api")
 //        exclude(module: "architectury-fabric")
 //    }
 
-    //modLocalRuntime ("dev.architectury:architectury-fabric:11.0.8") { exclude(module: "fabric-api") }
+    //modLocalRuntime ("dev.architectury:architectury-fabric:11.0.9") { exclude(module: "fabric-api") }
 
     //modLocalRuntime "dev.architectury:architectury-fabric:${project.arch_version}"
 
@@ -63,10 +63,10 @@ dependencies {
     modCompileOnly "dev.emi:emi-fabric:${emi_version}:api"
     modLocalRuntime "dev.emi:emi-fabric:${emi_version}"
 
-    //modLocalRuntime ("maven.modrinth:spark:1.10.53-fabric")
+    //modLocalRuntime ("maven.modrinth:spark:1.10.58-fabric")
 
-    modLocalRuntime ("net.fabricmc:fabric-language-kotlin:1.10.10+kotlin.1.9.10")
-    modLocalRuntime ("maven.modrinth:architectury-api:9.1.12+fabric")
+    modLocalRuntime ("net.fabricmc:fabric-language-kotlin:1.10.17+kotlin.1.9.22")
+    modLocalRuntime ("maven.modrinth:architectury-api:11.0.9+fabric")
 
     modLocalRuntime ("maven.modrinth:observable:4.4.0+fabric")
 }
