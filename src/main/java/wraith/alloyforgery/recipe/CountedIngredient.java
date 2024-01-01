@@ -15,11 +15,11 @@ public record CountedIngredient(Ingredient ingredient, int count) {
         var object = element.<Map<String, EdmElement<?>>>cast();
 
         return new CountedIngredient(
-                EndecUtils.INGREDIENT.decode(new EdmDeserializer(element)),
+                EndecUtils.INGREDIENT.decode(EdmDeserializer.of(element)),
                 object.containsKey("count") ? object.get("count").<Number>cast().intValue() : 1
         );
     }, countedIngredient -> {
-        var element = (EdmElement<Map<String, EdmElement<?>>>) EndecUtils.INGREDIENT.encodeFully(EdmSerializer::new, countedIngredient.ingredient());
+        var element = (EdmElement<Map<String, EdmElement<?>>>) EndecUtils.INGREDIENT.encodeFully(EdmSerializer::of, countedIngredient.ingredient());
 
         var count = countedIngredient.count();
 
