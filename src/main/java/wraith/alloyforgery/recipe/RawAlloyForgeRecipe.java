@@ -43,9 +43,14 @@ public record RawAlloyForgeRecipe(Map<Ingredient, Integer> inputs, OutputData ou
     });
 
     public static Endec<AlloyForgeRecipe.PendingOverride> PENDING_OVERRIDE = StructEndecBuilder.of(
-            BuiltInEndecs.ofRegistry(Registries.ITEM).optionalFieldOf("id", AlloyForgeRecipe.PendingOverride::item, () -> null),
+            BuiltInEndecs.ofRegistry(Registries.ITEM).optionalFieldOf("item", AlloyForgeRecipe.PendingOverride::item, () -> null),
+            BuiltInEndecs.ofRegistry(Registries.ITEM).optionalFieldOf("id", orderride -> null, () -> null), //TODO: REMOVE LATER
             Endec.INT.fieldOf("count", AlloyForgeRecipe.PendingOverride::count),
-            AlloyForgeRecipe.PendingOverride::new
+            (item, item2, count) -> {
+                if(item == null) item = item2;
+
+                return new AlloyForgeRecipe.PendingOverride(item, count);
+            }
     );
 
     public static StructEndec<RawAlloyForgeRecipe> ENDEC = StructEndecBuilder.of(

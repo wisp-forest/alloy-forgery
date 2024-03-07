@@ -23,6 +23,7 @@ import wraith.alloyforgery.AlloyForgery;
 import wraith.alloyforgery.block.ForgeControllerBlockEntity;
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -71,16 +72,15 @@ public class AlloyForgeRecipe implements Recipe<Inventory> {
         return this.secondaryID;
     }
 
-    public void finishRecipe(PendingRecipeData pendingData) {
+    public void finishRecipe(PendingRecipeData pendingData, Function<AlloyForgeRecipe, Identifier> lookup) {
         if (pendingData.defaultTag() != null) {
             final var itemEntryList = Registries.ITEM.getEntryList(pendingData.defaultTag().getLeft());
 
             itemEntryList.ifPresentOrElse(registryEntries -> {
                 this.output = registryEntries.get(0).value().getDefaultStack();
                 this.output.setCount(pendingData.defaultTag().getRight());
-
             }, () -> {
-                throw new InvalidTagException("Default tag " + pendingData.defaultTag().getLeft().id() + " of recipe " + /*this.id +*/ " must not be empty");
+                throw new InvalidTagException("Default tag " + pendingData.defaultTag().getLeft().id() + " of recipe " + lookup.apply(this) + " must not be empty");
             });
         }
 

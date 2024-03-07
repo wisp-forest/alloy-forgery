@@ -174,7 +174,7 @@ public class AlloyForgeryRecipeBuilder implements CraftingRecipeJsonBuilder {
 
         var recipe = new RawAlloyForgeRecipe(
                 inputs,
-                new OutputData(this.outputCount, this.outputItem.asItem(), this.priorities, this.outputTag),
+                new OutputData(this.outputCount, this.outputItem != null ? this.outputItem.asItem() : null, this.priorities.isEmpty() ? null : this.priorities, this.outputTag),
                 minimumTier,
                 fuelPerTick,
                 ranges

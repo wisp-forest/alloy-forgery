@@ -52,7 +52,9 @@ public class BlastFurnaceRecipeAdapter implements RecipeInjector.AddRecipes {
                 path = path.replace("blasting", "forging");
             }
 
-            var mainOutput = recipe.getResult(null);
+            var mainOutput = recipe.getResult(null).copy();
+
+            mainOutput.setCount(2);
 
             var extraOutput = ImmutableMap.<AlloyForgeRecipe.OverrideRange, ItemStack>builder();
 
@@ -67,7 +69,7 @@ public class BlastFurnaceRecipeAdapter implements RecipeInjector.AddRecipes {
             var recipeId = AlloyForgery.id(path);
 
             var convertRecipe = new AlloyForgeRecipe(
-                    Map.of(recipe.getIngredients().get(0), 1),
+                    Map.of(recipe.getIngredients().get(0), 2),
                     mainOutput,
                     1,
                     Math.round(getFuelPerTick(recipe)),
