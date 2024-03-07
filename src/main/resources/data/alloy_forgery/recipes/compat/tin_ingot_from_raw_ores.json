@@ -22,7 +22,7 @@
       "indrev:tin_ingot",
       "modern_industrialization:tin_ingot"
     ],
-    "default": "c:tin_ingots",
+    "tag": "c:tin_ingots",
     "count": 3
   },
   "overrides": {

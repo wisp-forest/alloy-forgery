@@ -1,5 +1,4 @@
 {
-  "type": "alloy_forgery:forging",
   "fabric:load_conditions": [
     {
       "condition": "fabric:tags_populated",
@@ -9,6 +8,7 @@
       ]
     }
   ],
+  "type": "alloy_forgery:forging",
   "fuel_per_tick": 45,
   "inputs": [
     {
@@ -19,13 +19,13 @@
   "min_forge_tier": 1,
   "output": {
     "count": 3,
-    "default": "c:silver_blocks",
     "priority": [
       "mythicmetals:silver_block",
       "techreborn:silver_block",
       "indrev:silver_block",
       "modern_industrialization:silver_block"
-    ]
+    ],
+    "tag": "c:silver_blocks"
   },
   "overrides": {
     "2+": {

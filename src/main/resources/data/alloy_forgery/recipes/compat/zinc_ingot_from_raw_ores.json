@@ -19,7 +19,7 @@
     "priority": [
       "techreborn:zinc_ingot"
     ],
-    "default": "c:zinc_ingots",
+    "tag": "c:zinc_ingots",
     "count": 3
   },
   "overrides": {

@@ -20,7 +20,7 @@
       "techreborn:iridium_ingot",
       "modern_industrialization:iridium_ingot"
     ],
-    "default": "c:iridium_ingots",
+    "tag": "c:iridium_ingots",
     "count": 2
   },
   "overrides": {

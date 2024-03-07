@@ -1,5 +1,4 @@
 {
-  "type": "alloy_forgery:forging",
   "fabric:load_conditions": [
     {
       "condition": "fabric:tags_populated",
@@ -9,6 +8,7 @@
       ]
     }
   ],
+  "type": "alloy_forgery:forging",
   "fuel_per_tick": 90,
   "inputs": [
     {
@@ -19,10 +19,10 @@
   "min_forge_tier": 2,
   "output": {
     "count": 2,
-    "default": "c:orichalcum_blocks",
     "priority": [
       "mythicmetals:orichalcum_block"
-    ]
+    ],
+    "tag": "c:orichalcum_blocks"
   },
   "overrides": {
     "3+": {

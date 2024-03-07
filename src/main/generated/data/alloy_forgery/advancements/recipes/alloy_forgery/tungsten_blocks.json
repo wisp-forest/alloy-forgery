@@ -1,4 +1,13 @@
 {
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:tags_populated",
+      "values": [
+        "c:tungsten_blocks",
+        "c:raw_tungsten_blocks"
+      ]
+    }
+  ],
   "parent": "minecraft:recipes/root",
   "criteria": {
     "has_raw_tungsten_ore_block": {
@@ -18,19 +27,10 @@
       "trigger": "minecraft:recipe_unlocked"
     }
   },
-  "fabric:load_conditions": [
-    {
-      "condition": "fabric:tags_populated",
-      "values": [
-        "c:tungsten_blocks",
-        "c:raw_tungsten_blocks"
-      ]
-    }
-  ],
   "requirements": [
     [
-      "has_raw_tungsten_ore_block",
-      "has_the_recipe"
+      "has_the_recipe",
+      "has_raw_tungsten_ore_block"
     ]
   ],
   "rewards": {

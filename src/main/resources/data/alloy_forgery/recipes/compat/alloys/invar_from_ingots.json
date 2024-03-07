@@ -24,7 +24,7 @@
       "techreborn:invar_ingot",
       "modern_industrialization:invar_ingot"
     ],
-    "default": "c:invar_ingots",
+    "tag": "c:invar_ingots",
     "count": 3
   },
   "min_forge_tier": 1,

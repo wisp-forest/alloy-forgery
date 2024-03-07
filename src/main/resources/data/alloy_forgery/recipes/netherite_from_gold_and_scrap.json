@@ -11,7 +11,7 @@
     }
   ],
   "output": {
-    "id": "minecraft:netherite_ingot",
+    "item": "minecraft:netherite_ingot",
     "count": 2
   },
   "min_forge_tier": 3,

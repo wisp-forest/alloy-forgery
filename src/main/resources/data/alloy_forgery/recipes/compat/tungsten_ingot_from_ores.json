@@ -20,7 +20,7 @@
       "indrev:tungsten_ingot",
       "modern_industrialization:tungsten_ingot"
     ],
-    "default": "c:tungsten_ingots",
+    "tag": "c:tungsten_ingots",
     "count": 2
   },
   "overrides": {

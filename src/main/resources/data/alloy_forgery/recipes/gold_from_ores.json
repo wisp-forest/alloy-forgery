@@ -6,16 +6,16 @@
     }
   ],
   "output": {
-    "id": "minecraft:gold_ingot",
+    "item": "minecraft:gold_ingot",
     "count": 2
   },
   "overrides": {
     "2": {
-      "id": "minecraft:gold_ingot",
+      "item": "minecraft:gold_ingot",
       "count": 3
     },
     "3+": {
-      "id": "minecraft:gold_ingot",
+      "item": "minecraft:gold_ingot",
       "count": 4
     }
   },

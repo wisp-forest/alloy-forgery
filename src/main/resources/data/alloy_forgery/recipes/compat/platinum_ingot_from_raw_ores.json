@@ -20,7 +20,7 @@
       "mythicmetals:platinum_ingot",
       "modern_industrialization:platinum_ingot"
     ],
-    "default": "c:platinum_ingots",
+    "tag": "c:platinum_ingots",
     "count": 2
   },
   "overrides": {

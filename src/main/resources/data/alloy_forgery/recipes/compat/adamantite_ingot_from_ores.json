@@ -18,7 +18,7 @@
     "priority": [
       "mythicmetals:adamantite_ingot"
     ],
-    "default": "c:adamantite_ingots",
+    "tag": "c:adamantite_ingots",
     "count": 2
   },
   "overrides": {

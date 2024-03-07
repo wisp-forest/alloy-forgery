@@ -24,7 +24,7 @@
       "indrev:electrum_ingot",
       "modern_industrialization:electrum_ingot"
     ],
-    "default": "c:electrum_ingots",
+    "tag": "c:electrum_ingots",
     "count": 2
   },
   "overrides": {

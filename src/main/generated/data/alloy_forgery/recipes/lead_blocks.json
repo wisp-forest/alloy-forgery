@@ -1,5 +1,4 @@
 {
-  "type": "alloy_forgery:forging",
   "fabric:load_conditions": [
     {
       "condition": "fabric:tags_populated",
@@ -9,6 +8,7 @@
       ]
     }
   ],
+  "type": "alloy_forgery:forging",
   "fuel_per_tick": 45,
   "inputs": [
     {
@@ -19,12 +19,12 @@
   "min_forge_tier": 1,
   "output": {
     "count": 3,
-    "default": "c:lead_blocks",
     "priority": [
       "techreborn:lead_block",
       "indrev:lead_block",
       "modern_industrialization:lead_block"
-    ]
+    ],
+    "tag": "c:lead_blocks"
   },
   "overrides": {
     "2+": {

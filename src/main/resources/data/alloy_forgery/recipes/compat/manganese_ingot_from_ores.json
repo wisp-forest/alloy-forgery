@@ -19,7 +19,7 @@
       "mythicmetals:manganese_ingot",
       "modern_industrialization:manganese_ingot"
     ],
-    "default": "c:manganese_ingots",
+    "tag": "c:manganese_ingots",
     "count": 2
   },
   "overrides": {

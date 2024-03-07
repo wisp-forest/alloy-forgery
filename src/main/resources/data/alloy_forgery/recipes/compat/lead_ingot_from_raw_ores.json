@@ -21,7 +21,7 @@
       "indrev:lead_ingot",
       "modern_industrialization:lead_ingot"
     ],
-    "default": "c:lead_ingots",
+    "tag": "c:lead_ingots",
     "count": 3
   },
   "overrides": {

@@ -10,7 +10,7 @@
   "min_forge_tier": 1,
   "output": {
     "count": 3,
-    "id": "minecraft:iron_block"
+    "item": "minecraft:iron_block"
   },
   "overrides": {
     "2+": {

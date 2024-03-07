@@ -22,7 +22,7 @@
       "indrev:silver_ingot",
       "modern_industrialization:silver_ingot"
     ],
-    "default": "c:silver_ingots",
+    "tag": "c:silver_ingots",
     "count": 3
   },
   "overrides": {

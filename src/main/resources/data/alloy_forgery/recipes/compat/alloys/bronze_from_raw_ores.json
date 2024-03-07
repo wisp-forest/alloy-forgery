@@ -26,7 +26,7 @@
       "indrev:bronze_ingot",
       "modern_industrialization:bronze_ingot"
     ],
-    "default": "c:bronze_ingots",
+    "tag": "c:bronze_ingots",
     "count": 2
   },
   "overrides": {

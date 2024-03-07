@@ -10,7 +10,7 @@
   "min_forge_tier": 1,
   "output": {
     "count": 3,
-    "id": "minecraft:gold_block"
+    "item": "minecraft:gold_block"
   },
   "overrides": {
     "2+": {

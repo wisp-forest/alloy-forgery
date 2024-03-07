@@ -24,7 +24,7 @@
       "indrev:steel_ingot",
       "modern_industrialization:steel_ingot"
     ],
-    "default": "c:steel_ingots",
+    "tag": "c:steel_ingots",
     "count": 2
   },
   "overrides": {

@@ -18,7 +18,7 @@
     "priority": [
       "mythicmetals:palladium_ingot"
     ],
-    "default": "c:palladium_ingots",
+    "tag": "c:palladium_ingots",
     "count": 2
   },
   "overrides": {

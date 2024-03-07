@@ -24,7 +24,7 @@
       "create:brass_ingot",
       "techreborn:brass_ingot"
     ],
-    "default": "c:brass_ingots",
+    "tag": "c:brass_ingots",
     "count": 3
   },
   "overrides": {

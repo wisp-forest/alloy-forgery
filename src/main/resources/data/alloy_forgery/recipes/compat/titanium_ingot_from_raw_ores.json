@@ -20,7 +20,7 @@
       "techreborn:titanium_ingot",
       "modern_industrialization:titanium_ingot"
     ],
-    "default": "c:titanium_ingots",
+    "tag": "c:titanium_ingots",
     "count": 2
   },
   "overrides": {

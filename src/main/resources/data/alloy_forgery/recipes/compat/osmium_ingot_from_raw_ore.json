@@ -19,7 +19,7 @@
     "priority": [
       "mythicmetals:osmium_ingot"
     ],
-    "default": "c:osmium_ingots",
+    "tag": "c:osmium_ingots",
     "count": 2
   },
   "overrides": {

@@ -19,7 +19,7 @@
     "priority": [
       "mythicmetals:mythril_ingot"
     ],
-    "default": "c:mythril_ingots",
+    "tag": "c:mythril_ingots",
     "count": 2
   },
   "overrides": {
