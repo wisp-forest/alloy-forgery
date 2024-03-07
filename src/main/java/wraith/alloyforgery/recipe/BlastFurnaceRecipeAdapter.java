@@ -36,6 +36,8 @@ public class BlastFurnaceRecipeAdapter implements RecipeInjector.AddRecipes {
 
     @Override
     public void addRecipes(RecipeInjector instance) {
+        if(!AlloyForgery.CONFIG.allowBlastingFurnaceAdaption()) return;
+
         var manager = instance.manager();
 
         List<RecipeEntry<AlloyForgeRecipe>> alloyForgeryRecipes = manager.listAllOfType(AlloyForgeRecipe.Type.INSTANCE);
@@ -54,14 +56,14 @@ public class BlastFurnaceRecipeAdapter implements RecipeInjector.AddRecipes {
 
             var mainOutput = recipe.getResult(null).copy();
 
-            mainOutput.setCount(2);
+            mainOutput.setCount(AlloyForgery.CONFIG.baseInputAmount());
 
             var extraOutput = ImmutableMap.<AlloyForgeRecipe.OverrideRange, ItemStack>builder();
 
-            if (!RecipeTagLoader.isWithinTag(BLACKLISTED_INCREASED_OUTPUT, recipeEntry) && !isDustRecipe(recipeEntry)) {
+            if (AlloyForgery.CONFIG.allowHigherTierOutput() && !RecipeTagLoader.isWithinTag(BLACKLISTED_INCREASED_OUTPUT, recipeEntry) && !isDustRecipe(recipeEntry)) {
                 var increasedOutput = mainOutput.copy();
 
-                increasedOutput.increment(1);
+                increasedOutput.increment(AlloyForgery.CONFIG.higherTierOutputIncrease());
 
                 extraOutput.put(new AlloyForgeRecipe.OverrideRange(3), increasedOutput);
             }
@@ -69,7 +71,7 @@ public class BlastFurnaceRecipeAdapter implements RecipeInjector.AddRecipes {
             var recipeId = AlloyForgery.id(path);
 
             var convertRecipe = new AlloyForgeRecipe(
-                    Map.of(recipe.getIngredients().get(0), 2),
+                    Map.of(recipe.getIngredients().get(0), AlloyForgery.CONFIG.baseInputAmount()),
                     mainOutput,
                     1,
                     Math.round(getFuelPerTick(recipe)),

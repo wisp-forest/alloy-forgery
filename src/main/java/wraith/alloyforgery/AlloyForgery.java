@@ -22,6 +22,7 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import wraith.alloyforgery.block.ForgeControllerBlockEntity;
+import wraith.alloyforgery.compat.AlloyForgeryConfig;
 import wraith.alloyforgery.data.AlloyForgeryGlobalRemaindersLoader;
 import wraith.alloyforgery.data.RecipeTagLoader;
 import wraith.alloyforgery.forges.ForgeRegistry;
@@ -34,6 +35,8 @@ public class AlloyForgery implements ModInitializer {
     public static final OwoNetChannel CHANNEL = OwoNetChannel.create(id("main"));
 
     public static final String MOD_ID = "alloy_forgery";
+
+    public static final AlloyForgeryConfig CONFIG = AlloyForgeryConfig.createAndLoad();
 
     public static BlockEntityType<ForgeControllerBlockEntity> FORGE_CONTROLLER_BLOCK_ENTITY = ForgeControllerBlockEntity.Type.INSTANCE;
     public static ScreenHandlerType<AlloyForgeScreenHandler> ALLOY_FORGE_SCREEN_HANDLER_TYPE;
@@ -89,6 +92,8 @@ public class AlloyForgery implements ModInitializer {
 
         OwoFreezer.registerFreezeCallback(() -> FluidStorage.SIDED.registerSelf(AlloyForgery.FORGE_CONTROLLER_BLOCK_ENTITY));
     }
+
+
 
     public static Identifier id(String path) {
         return new Identifier(MOD_ID, path);

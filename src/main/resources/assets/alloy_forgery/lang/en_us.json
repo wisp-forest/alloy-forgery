@@ -31,5 +31,20 @@
   "tag.item.c.gold_ores": "Gold Ores",
   "tag.item.c.raw_copper_blocks": "Raw Copper Ore Blocks",
   "tag.item.c.raw_iron_blocks": "Raw Iron Ore Blocks",
-  "tag.item.c.raw_gold_blocks": "Raw Gold Ore Blocks"
+  "tag.item.c.raw_gold_blocks": "Raw Gold Ore Blocks",
+
+  "text.config.alloy_forgery.title": "Alloy Forgery Config",
+  "text.config.alloy_forgery.section.blasting_adaption": "Blasting Adaption",
+
+  "text.config.alloy_forgery.option.allowHigherTierOutput": "Allow Higher Tier Output",
+  "text.config.alloy_forgery.option.allowHigherTierOutput.tooltip": "Toggle for turning on or off the Higher Tier Output of Blasting Adaption for all Recipes",
+
+  "text.config.alloy_forgery.option.allowBlastingFurnaceAdaption": "Allow Blasting Furnace Recipe Adaption",
+  "text.config.alloy_forgery.option.allowBlastingFurnaceAdaption.tooltip": "Toggle for turning on or off the Blasting Adaption for all Blasting Recipes",
+
+  "text.config.alloy_forgery.option.baseInputAmount": "Base Input Amount",
+  "text.config.alloy_forgery.option.baseInputAmount.tooltip": "Adjusts the base input count for adapted recipes",
+
+  "text.config.alloy_forgery.option.higherTierOutputIncrease": "Addition Tier Output Amount",
+  "text.config.alloy_forgery.option.higherTierOutputAmount.tooltip": "Adjusts the additional amount increased when reaching tier 3"
 }
