@@ -13,6 +13,7 @@ public class AlloyForgeryConfig extends ConfigWrapper<wraith.alloyforgery.compat
 
     public final Keys keys = new Keys();
 
+    private final Option<java.lang.Boolean> strictRecipeChecks = this.optionForKey(this.keys.strictRecipeChecks);
     private final Option<java.lang.Boolean> allowHigherTierOutput = this.optionForKey(this.keys.allowHigherTierOutput);
     private final Option<java.lang.Boolean> allowBlastingFurnaceAdaption = this.optionForKey(this.keys.allowBlastingFurnaceAdaption);
     private final Option<java.lang.Integer> baseInputAmount = this.optionForKey(this.keys.baseInputAmount);
@@ -36,6 +37,14 @@ public class AlloyForgeryConfig extends ConfigWrapper<wraith.alloyforgery.compat
         var wrapper = new AlloyForgeryConfig(janksonBuilder);
         wrapper.load();
         return wrapper;
+    }
+
+    public boolean strictRecipeChecks() {
+        return strictRecipeChecks.value();
+    }
+
+    public void strictRecipeChecks(boolean value) {
+        strictRecipeChecks.set(value);
     }
 
     public boolean allowHigherTierOutput() {
@@ -72,6 +81,7 @@ public class AlloyForgeryConfig extends ConfigWrapper<wraith.alloyforgery.compat
 
 
     public static class Keys {
+        public final Option.Key strictRecipeChecks = new Option.Key("strictRecipeChecks");
         public final Option.Key allowHigherTierOutput = new Option.Key("allowHigherTierOutput");
         public final Option.Key allowBlastingFurnaceAdaption = new Option.Key("allowBlastingFurnaceAdaption");
         public final Option.Key baseInputAmount = new Option.Key("baseInputAmount");

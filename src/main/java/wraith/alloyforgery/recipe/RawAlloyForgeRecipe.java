@@ -1,38 +1,91 @@
 package wraith.alloyforgery.recipe;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonSyntaxException;
+import com.mojang.serialization.JsonOps;
 import io.wispforest.owo.serialization.Endec;
 import io.wispforest.owo.serialization.StructEndec;
 import io.wispforest.owo.serialization.endec.BuiltInEndecs;
 import io.wispforest.owo.serialization.endec.StructEndecBuilder;
+import it.unimi.dsi.fastutil.Hash;
+import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenCustomHashMap;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.Ingredient;
 import net.minecraft.registry.Registries;
 import net.minecraft.util.Pair;
+import net.minecraft.util.Util;
 import org.apache.commons.lang3.mutable.MutableInt;
+import wraith.alloyforgery.AlloyForgery;
 
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 public record RawAlloyForgeRecipe(Map<Ingredient, Integer> inputs, OutputData outputData,
                                   int minForgeTier, int requiredFuel,
                                   Map<AlloyForgeRecipe.OverrideRange, AlloyForgeRecipe.PendingOverride> overrideData) {
 
-    public static Endec<Map<Ingredient, Integer>> INPUTS = CountedIngredient.ENDEC.listOf().xmap(list -> {
-        Map<Ingredient, MutableInt> unprocessedData = new LinkedHashMap<>();
+    private static final List<AlloyForgeRecipe> ingredientInputFormatIssues = new ArrayList<>();
 
-        for (CountedIngredient countedIngredient : list) {
-            var countObj = unprocessedData.computeIfAbsent(
-                    countedIngredient.ingredient(),
-                    key -> new MutableInt(0));
+    private static final Hash.Strategy<Ingredient> INGREDIENT_STRATEGY = new Hash.Strategy<>() {
+        @Override
+        public int hashCode(Ingredient o) {
+            String stringData;
 
-            countObj.add(countedIngredient.count());
+            if(o == null) return 0;
+
+            try {
+                stringData = Util.getResult(Ingredient.ALLOW_EMPTY_CODEC.encodeStart(JsonOps.INSTANCE, o), IllegalStateException::new).toString();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+
+            return stringData.hashCode();
         }
 
-        Map<Ingredient, Integer> data = new LinkedHashMap<>();
+        @Override
+        public boolean equals(Ingredient a, Ingredient b) {
+            if(a == null || b == null) return false;
+
+            String stringDataA;
+            String stringDataB;
+
+            try {
+                stringDataA = Util.getResult(Ingredient.ALLOW_EMPTY_CODEC.encodeStart(JsonOps.INSTANCE, a), IllegalStateException::new).toString();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+
+            try {
+                stringDataB = Util.getResult(Ingredient.ALLOW_EMPTY_CODEC.encodeStart(JsonOps.INSTANCE, b), IllegalStateException::new).toString();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+
+            return stringDataA.equals(stringDataB);
+        }
+    };
+
+    public static Endec<Map<Ingredient, Integer>> INPUTS = CountedIngredient.ENDEC.listOf().xmap(list -> {
+        var unprocessedData = new Object2ObjectLinkedOpenCustomHashMap<Ingredient, MutableInt>(INGREDIENT_STRATEGY);
+
+        for (CountedIngredient countedIngredient : list) {
+            var ingredient = countedIngredient.ingredient();
+
+            if(unprocessedData.containsKey(ingredient) && (AlloyForgery.CONFIG.strictRecipeChecks() || FabricLoader.getInstance().isDevelopmentEnvironment())) {
+                var jsonData = Ingredient.ALLOW_EMPTY_CODEC.encodeStart(JsonOps.INSTANCE, ingredient)
+                        .result()
+                        .map(JsonElement::toString)
+                        .orElse("Error Unknown");
+
+                throw new IllegalStateException("Duplicate Ingredient Entry! Merge all ingredients of [" + jsonData + "] into a single entry and add a count!");
+            }
+
+            unprocessedData.computeIfAbsent(ingredient, key -> new MutableInt(0))
+                    .add(countedIngredient.count());
+        }
+
+        var data = new LinkedHashMap<Ingredient, Integer>();
 
         unprocessedData.forEach((ingredient, mutableInt) -> data.put(ingredient, mutableInt.getValue()));
 
