@@ -1,12 +1,33 @@
 package wraith.alloyforgery.forges;
 
-import com.google.gson.JsonObject;
+import io.wispforest.endec.Endec;
+import io.wispforest.endec.StructEndec;
+import io.wispforest.endec.annotations.NullableComponent;
+import io.wispforest.endec.impl.StructEndecBuilder;
+import io.wispforest.owo.serialization.endec.MinecraftEndecs;
+import it.unimi.dsi.fastutil.Pair;
 import net.minecraft.item.Item;
-import net.minecraft.util.JsonHelper;
+import net.minecraft.registry.Registries;
+import wraith.alloyforgery.AlloyForgery;
+import wraith.alloyforgery.utils.data.EndecableDataLoader;
+
 import java.util.HashMap;
 import java.util.Map;
 
 public class ForgeFuelRegistry {
+
+    public static final StructEndec<Pair<Item, ForgeFuelDefinition>> FUEL_ENTRY = StructEndecBuilder.of(
+            MinecraftEndecs.ofRegistry(Registries.ITEM).fieldOf("item", Pair::first),
+            ForgeFuelDefinition.ENDEC.flatFieldOf(Pair::second),
+            Pair::of
+    );
+
+    public static final EndecableDataLoader FUEL_DATA_LOADER = EndecableDataLoader.of(
+            AlloyForgery.id("forge_fuel_loader"),
+            "alloy_forge_fuels",
+            "fuels",
+            ForgeFuelRegistry.FUEL_ENTRY.listOf(),
+            (id, fuelEntries) -> fuelEntries.forEach(fuelEntry -> ForgeFuelRegistry.register(fuelEntry.first(), fuelEntry.second())));
 
     private static final Map<Item, ForgeFuelDefinition> REGISTRY = new HashMap<>();
 
@@ -26,21 +47,18 @@ public class ForgeFuelRegistry {
         REGISTRY.put(item, fuel);
     }
 
-    public record ForgeFuelDefinition(int fuel, Item returnType) {
+    public record ForgeFuelDefinition(int fuel, @NullableComponent Item returnType) {
 
         public static final ForgeFuelDefinition EMPTY = new ForgeFuelDefinition(0, null);
+
+        public static StructEndec<ForgeFuelDefinition> ENDEC = StructEndecBuilder.of(
+                Endec.INT.fieldOf("fuel", ForgeFuelDefinition::fuel),
+                MinecraftEndecs.ofRegistry(Registries.ITEM).optionalFieldOf("return_item", ForgeFuelDefinition::returnType, () -> null),
+                ForgeFuelDefinition::new
+        );
 
         public boolean hasReturnType() {
             return returnType != null;
         }
-
-        public static ForgeFuelDefinition fromJson(JsonObject json) {
-            final int fuel = json.get("fuel").getAsInt();
-            final var returnType = JsonHelper.getItem(json, "return_item", null);
-
-            return new ForgeFuelDefinition(fuel, returnType != null ? returnType.value() : null);
-        }
-
     }
-
 }

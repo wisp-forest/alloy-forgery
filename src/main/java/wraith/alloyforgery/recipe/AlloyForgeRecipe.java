@@ -181,7 +181,7 @@ public class AlloyForgeRecipe implements Recipe<AlloyForgeRecipeInput> {
     @Override
     public ItemStack craft(AlloyForgeRecipeInput input, RegistryWrapper.WrapperLookup lookup) {
         return (input.inventory() instanceof ForgeControllerBlockEntity controller)
-                ? getResult(controller.getForgeDefinition().forgeTier())
+                ? getResult(controller.forgeTier().value())
                 : getResult(lookup);
     }
 

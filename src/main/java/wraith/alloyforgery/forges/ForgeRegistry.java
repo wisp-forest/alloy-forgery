@@ -11,6 +11,7 @@ import net.minecraft.item.Item;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.util.Identifier;
+import org.jetbrains.annotations.Nullable;
 import wraith.alloyforgery.AlloyForgery;
 import wraith.alloyforgery.ForgeControllerItem;
 import wraith.alloyforgery.block.ForgeControllerBlock;
@@ -34,7 +35,9 @@ public class ForgeRegistry {
     public static final Gson GSON = new Gson();
     private static final Identifier MINEABLE_PICKAXE = Identifier.of("mineable/pickaxe");
 
-    private static final Map<Identifier, ForgeDefinition> FORGE_DEFINITION_REGISTRY = new HashMap<>();
+    private static final Map<Identifier, ForgeDefinition> ID_TO_FORGE_DEFINITION = new HashMap<>();
+    private static final Map<ForgeDefinition, Identifier> FORGE_DEFINITION_TO_ID = new HashMap<>();
+
     private static final Map<Identifier, Block> CONTROLLER_BLOCK_REGISTRY = new HashMap<>();
 
     static void registerDefinition(Identifier forgeDefinitionId, ForgeDefinition definition) {
@@ -50,19 +53,23 @@ public class ForgeRegistry {
     }
 
     public static Optional<ForgeDefinition> getForgeDefinition(Identifier id) {
-        return FORGE_DEFINITION_REGISTRY.containsKey(id) ? Optional.of(FORGE_DEFINITION_REGISTRY.get(id)) : Optional.empty();
+        return ID_TO_FORGE_DEFINITION.containsKey(id) ? Optional.of(ID_TO_FORGE_DEFINITION.get(id)) : Optional.empty();
     }
 
     public static Optional<Block> getControllerBlock(Identifier id) {
-        return FORGE_DEFINITION_REGISTRY.containsKey(id) ? Optional.of(CONTROLLER_BLOCK_REGISTRY.get(id)) : Optional.empty();
+        return ID_TO_FORGE_DEFINITION.containsKey(id) ? Optional.of(CONTROLLER_BLOCK_REGISTRY.get(id)) : Optional.empty();
+    }
+
+    public static Optional<Identifier> getId(ForgeDefinition definition) {
+        return FORGE_DEFINITION_TO_ID.containsKey(definition) ? Optional.of(FORGE_DEFINITION_TO_ID.get(definition)) : Optional.empty();
     }
 
     public static Set<Map.Entry<Identifier, ForgeDefinition>> getForgeEntries(){
-        return FORGE_DEFINITION_REGISTRY.entrySet();
+        return ID_TO_FORGE_DEFINITION.entrySet();
     }
 
     public static Set<Identifier> getForgeIds() {
-        return FORGE_DEFINITION_REGISTRY.keySet();
+        return ID_TO_FORGE_DEFINITION.keySet();
     }
 
     public static List<Block> getControllerBlocks() {
@@ -70,27 +77,9 @@ public class ForgeRegistry {
     }
 
     private static void store(Identifier id, ForgeDefinition definition, ForgeControllerBlock block) {
-        FORGE_DEFINITION_REGISTRY.put(id, definition);
+        FORGE_DEFINITION_TO_ID.put(definition, id);
+        ID_TO_FORGE_DEFINITION.put(id, definition);
         CONTROLLER_BLOCK_REGISTRY.put(id, block);
         AlloyForgery.FORGE_CONTROLLER_BLOCK_ENTITY.addSupportedBlock(block);
     }
-
-    public static final class Loader implements ModDataConsumer {
-
-        public static final Loader INSTANCE = new Loader();
-
-        private Loader() {
-        }
-
-        @Override
-        public String getDataSubdirectory() {
-            return "alloy_forges";
-        }
-
-        @Override
-        public void acceptParsedFile(Identifier id, JsonObject object) {
-            ForgeDefinition.loadAndEnqueue(id, object);
-        }
-    }
-
 }

@@ -2,7 +2,7 @@
     <components>
         <flow-layout direction="vertical">
             <children>
-                <flow-layout direction="vertical">
+                <flow-layout direction="vertical" id="main-layout">
                     <children>
                         <texture texture="alloy_forgery:textures/gui/forge_controller.png" region-width="176" region-height="189"/>
 
@@ -48,6 +48,27 @@
                             <color>#3f3f3f</color>
                             <positioning type="relative">50,12</positioning>
                         </label>
+                        <flow-layout direction="horizontal">
+                            <sizing>
+                                <vertical method="content"/>
+                                <horizontal method="fixed">26</horizontal>
+                            </sizing>
+                            <children>
+                                <button id="slot-toggle-btn">
+                                    <text/>
+                                    <tooltip-text translate="true">tooltip.alloy_forgery.slot_toggle_disable</tooltip-text>
+                                    <sizing>
+                                        <vertical method="fixed">14</vertical>
+                                        <horizontal method="fixed">14</horizontal>
+                                    </sizing>
+                                    <renderer>
+                                        <vanilla/>
+                                    </renderer>
+                                </button>
+                            </children>
+                            <horizontal-alignment>center</horizontal-alignment>
+                            <positioning type="absolute">140,75</positioning>
+                        </flow-layout>
                     </children>
                 </flow-layout>
             </children>

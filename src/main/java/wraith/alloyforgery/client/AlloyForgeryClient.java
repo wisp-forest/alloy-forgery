@@ -4,15 +4,16 @@ import net.fabricmc.api.*;
 import net.minecraft.client.gui.screen.ingame.HandledScreens;
 import wraith.alloyforgery.AlloyForgery;
 import wraith.alloyforgery.data.RecipeTagLoader;
+import wraith.alloyforgery.networking.AlloyForgeNetworking;
 
 @Environment(EnvType.CLIENT)
 public class AlloyForgeryClient implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
-        HandledScreens.register(AlloyForgery.ALLOY_FORGE_SCREEN_HANDLER_TYPE, AlloyForgeScreen::new);
+        AlloyForgeNetworking.initClient();
 
-        AlloyForgery.CHANNEL.registerClientbound(RecipeTagLoader.TagPacket.class, RecipeTagLoader.TagPacket::handlePacket);
+        HandledScreens.register(AlloyForgery.ALLOY_FORGE_SCREEN_HANDLER_TYPE, AlloyForgeScreen::new);
     }
 
 }

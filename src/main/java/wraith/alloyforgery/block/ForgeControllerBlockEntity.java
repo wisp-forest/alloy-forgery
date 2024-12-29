@@ -5,6 +5,7 @@ import io.wispforest.owo.ops.ItemOps;
 import io.wispforest.owo.serialization.format.nbt.NbtDeserializer;
 import io.wispforest.owo.serialization.format.nbt.NbtSerializer;
 import io.wispforest.owo.util.ImplementedInventory;
+import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.StorageView;
@@ -25,6 +26,7 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.recipe.RecipeEntry;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.screen.*;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
@@ -34,30 +36,37 @@ import net.minecraft.util.math.*;
 import org.jetbrains.annotations.Nullable;
 import wraith.alloyforgery.AlloyForgeScreenHandler;
 import wraith.alloyforgery.AlloyForgery;
+import wraith.alloyforgery.client.BlockEntityLocation;
 import wraith.alloyforgery.forges.ForgeDefinition;
 import wraith.alloyforgery.forges.ForgeFuelRegistry;
+import wraith.alloyforgery.forges.ForgeTier;
+import wraith.alloyforgery.forges.ForgeTierRegistry;
 import wraith.alloyforgery.mixin.HopperBlockEntityAccessor;
 import wraith.alloyforgery.recipe.AlloyForgeRecipe;
 import wraith.alloyforgery.recipe.AlloyForgeRecipeInput;
 import wraith.alloyforgery.utils.EndecUtils;
+import wraith.alloyforgery.utils.ExtObservable;
+
 import java.util.*;
 
 @SuppressWarnings("UnstableApiUsage")
-public class ForgeControllerBlockEntity extends BlockEntity implements ImplementedInventory, SidedInventory, NamedScreenHandlerFactory, InsertionOnlyStorage<FluidVariant> {
+public class ForgeControllerBlockEntity extends BlockEntity implements ImplementedInventory, SidedInventory, ExtendedScreenHandlerFactory<BlockEntityLocation>, InsertionOnlyStorage<FluidVariant> {
 
     private static final int[] DOWN_SLOTS = new int[]{10, 11};
-    private static final int[] RIGHT_SLOTS = new int[]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+    private static final Integer[] RIGHT_SLOTS = new Integer[]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
     private static final int[] LEFT_SLOTS = new int[]{11};
 
     public static final int INVENTORY_SIZE = 12;
     private final DefaultedList<ItemStack> items = DefaultedList.ofSize(INVENTORY_SIZE, ItemStack.EMPTY);
+
+    public final ExtObservable<Set<Integer>> disabledSlots = ExtObservable.of(new HashSet<>());
 
     private final DefaultedList<ItemStack> previousItems = DefaultedList.of();
     private boolean checkForRecipes = true;
 
     private Optional<RecipeEntry<AlloyForgeRecipe>> recipeCache = Optional.empty();
 
-    private int requiredTierToCraft = -1;
+    public final ExtObservable<Integer> requiredTierToCraft = ExtObservable.of(-1);
 
     private final FluidHolder fluidHolder = new FluidHolder();
 
@@ -68,9 +77,9 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
     private float fuel;
     private int currentSmeltTime;
 
-    private int smeltProgress;
-    private int fuelProgress;
-    private int lavaProgress;
+    public final ExtObservable<Integer> smeltProgress = ExtObservable.of(0);
+    public final ExtObservable<Integer> fuelProgress = ExtObservable.of(0);
+    public final ExtObservable<Integer> lavaProgress = ExtObservable.of(0);
 
     public ForgeControllerBlockEntity(BlockPos pos, BlockState state) {
         super(AlloyForgery.FORGE_CONTROLLER_BLOCK_ENTITY, pos, state);
@@ -80,25 +89,20 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
         multiblockPositions = generateMultiblockPositions(pos.toImmutable(), state.get(ForgeControllerBlock.FACING));
     }
 
-    private final PropertyDelegate properties = new PropertyDelegate() {
-        @Override
-        public int get(int index) {
-            return switch (index) {
-                case 0 -> smeltProgress;
-                case 1 -> fuelProgress;
-                case 2 -> lavaProgress;
-                default -> requiredTierToCraft;
-            };
-        }
+    public ForgeTier forgeTier() {
+        if (this.world == null) return ForgeTier.DEFAULT;
 
-        @Override
-        public void set(int index, int value) {}
+        var tier = ForgeTierRegistry.getForgeRegistry(this.world.isClient()).getForgeTier(this.forgeDefinition);
 
-        @Override
-        public int size() {
-            return 4;
-        }
-    };
+        if (tier == null) return ForgeTier.DEFAULT;
+
+        return tier;
+    }
+
+    @Override
+    public BlockEntityLocation getScreenOpeningData(ServerPlayerEntity player) {
+        return BlockEntityLocation.of(this);
+    }
 
     @Override
     protected void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
@@ -135,7 +139,7 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
     }
 
     public boolean canAddFuel(int fuel) {
-        return this.fuel + fuel <= forgeDefinition.fuelCapacity();
+        return this.fuel + fuel <= forgeTier().fuelCapacity();
     }
 
     public void addFuel(int fuel) {
@@ -143,7 +147,7 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
     }
 
     public int getSmeltProgress() {
-        return smeltProgress;
+        return smeltProgress.get();
     }
 
     public int getCurrentSmeltTime() {
@@ -152,6 +156,16 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
 
     public ForgeDefinition getForgeDefinition() {
         return this.forgeDefinition;
+    }
+
+    public void disableSlot(int index) {
+        this.disabledSlots.get().add(index);
+        this.disabledSlots.markDirty();
+    }
+
+    public void enableSlot(int index) {
+        this.disabledSlots.get().remove(index);
+        this.disabledSlots.markDirty();
     }
 
     @Override
@@ -174,9 +188,9 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
     }
 
     public void tick() {
-        this.smeltProgress = Math.round((this.currentSmeltTime / (float) forgeDefinition.maxSmeltTime()) * 19);
-        this.fuelProgress = Math.round((this.fuel / (float) forgeDefinition.fuelCapacity()) * 48);
-        this.lavaProgress = Math.round((this.fluidHolder.getAmount() / (float) FluidConstants.BUCKET) * 50);
+        this.smeltProgress.set(Math.round((this.currentSmeltTime / (float) forgeTier().maxSmeltTime()) * 19));
+        this.fuelProgress.set(Math.round((this.fuel / (float) forgeTier().fuelCapacity()) * 48));
+        this.lavaProgress.set(Math.round((this.fluidHolder.getAmount() / (float) FluidConstants.BUCKET) * 50));
 
         world.updateComparators(pos, getCachedState().getBlock());
 
@@ -204,7 +218,16 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
             }
         }
 
-        final var emptyFuelSpace = this.forgeDefinition.fuelCapacity() - this.fuel;
+        // Failsafe just incase something was within the disabled slot and was disabled
+        for (var i : this.disabledSlots.get()) {
+            var stack = this.getStack(i);
+
+            if (!stack.isEmpty()) insertIntoHopperOrScatterAtFront(stack);
+
+            this.setStack(i, ItemStack.EMPTY);
+        }
+
+        final var emptyFuelSpace = this.forgeTier().fuelCapacity() - this.fuel;
 
         if (this.fluidHolder.amount >= 81 && emptyFuelSpace > 0f) {
             final float fuelInsertAmount = Math.min((this.fluidHolder.amount / 81f) * 24, ((emptyFuelSpace) / 24) * 24);
@@ -243,8 +266,8 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
             this.recipeCache = this.world.getRecipeManager().getFirstMatch(AlloyForgeRecipe.Type.INSTANCE, recipeInput, this.world);
         }
 
-        if (this.recipeCache.isEmpty() && this.requiredTierToCraft != -1) {
-            this.requiredTierToCraft = -1;
+        if (this.recipeCache.isEmpty() && this.requiredTierToCraft.get() != -1) {
+            this.requiredTierToCraft.set( -1);
         }
 
         if (this.recipeCache.isEmpty() || !canSmelt(this.recipeCache.get().value())) {
@@ -257,8 +280,8 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
 
         var recipe = recipeCache.get().value();
 
-        if (this.currentSmeltTime < this.forgeDefinition.maxSmeltTime()) {
-            final float fuelRequirement = recipe.getFuelPerTick() * this.forgeDefinition.speedMultiplier();
+        if (this.currentSmeltTime < this.forgeTier().maxSmeltTime()) {
+            final float fuelRequirement = recipe.getFuelPerTick() * this.forgeTier().speedMultiplier();
 
             if (this.fuel - fuelRequirement < 0) {
                 this.currentSmeltTime = 0;
@@ -293,14 +316,14 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
 
     private boolean canSmelt(AlloyForgeRecipe recipe) {
         final var outputStack = this.getStack(10);
-        final var recipeOutput = recipe.getResult(this.forgeDefinition.forgeTier());
+        final var recipeOutput = recipe.getResult(this.forgeTier().value());
 
-        if (recipe.getMinForgeTier() > this.forgeDefinition.forgeTier()) {
-            this.requiredTierToCraft = recipe.getMinForgeTier();
+        if (recipe.getMinForgeTier() > this.forgeTier().value()) {
+            this.requiredTierToCraft.set(recipe.getMinForgeTier());
 
             return false;
-        } else if (requiredTierToCraft != -1) {
-            this.requiredTierToCraft = -1;
+        } else if (requiredTierToCraft.get() != -1) {
+            this.requiredTierToCraft.set(-1);
         }
 
         return outputStack.isEmpty() || ItemOps.canStack(outputStack, recipeOutput);
@@ -329,20 +352,21 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
                 var insertStack = itemstack.copy();
                 insertStack.setCount(excess);
 
-                if (!this.attemptToInsertIntoHopper(insertStack)) {
-                    var frontForgePos = pos.offset(getCachedState().get(ForgeControllerBlock.FACING));
-
-                    world.playSound(null, frontForgePos.getX(), frontForgePos.getY(), frontForgePos.getZ(), SoundEvents.ENTITY_ITEM_PICKUP, SoundCategory.BLOCKS, 1.0F, 0.2F);
-                    ItemScatterer.spawn(world, frontForgePos.getX(), frontForgePos.getY(), frontForgePos.getZ(), insertStack);
-                }
+                insertIntoHopperOrScatterAtFront(insertStack);
             }
 
             this.setStack(i, itemstack);
-        } else if (!this.attemptToInsertIntoHopper(itemstack)) {
+        } else {
+            insertIntoHopperOrScatterAtFront(itemstack);
+        }
+    }
+
+    private void insertIntoHopperOrScatterAtFront(ItemStack stack) {
+        if (!this.attemptToInsertIntoHopper(stack)) {
             var frontForgePos = pos.offset(getCachedState().get(ForgeControllerBlock.FACING));
 
             world.playSound(null, frontForgePos.getX(), frontForgePos.getY(), frontForgePos.getZ(), SoundEvents.ENTITY_ITEM_PICKUP, SoundCategory.BLOCKS, 1.0F, 0.2F);
-            ItemScatterer.spawn(world, frontForgePos.getX(), frontForgePos.getY(), frontForgePos.getZ(), itemstack);
+            ItemScatterer.spawn(world, frontForgePos.getX(), frontForgePos.getY(), frontForgePos.getZ(), stack);
         }
     }
 
@@ -440,7 +464,9 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
         } else if (side == facing.rotateYClockwise()) {
             return LEFT_SLOTS;
         } else if (side == facing.rotateYCounterclockwise() && this.currentSmeltTime == 0) {
-            return RIGHT_SLOTS;
+            return Arrays.stream(RIGHT_SLOTS)
+                    .filter(i -> !this.disabledSlots.get().contains(i))
+                    .mapToInt(value -> value).toArray();
         } else {
             return new int[0];
         }
@@ -449,6 +475,7 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
     @Override
     public boolean canInsert(int slot, ItemStack stack, @Nullable Direction dir) {
         if (slot == 11) return ForgeFuelRegistry.hasFuel(stack.getItem());
+        if (this.disabledSlots.get().contains(slot)) return false;
 
         var slotStack = getStack(slot);
 
@@ -468,7 +495,7 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
     @Nullable
     @Override
     public ScreenHandler createMenu(int syncId, PlayerInventory inv, PlayerEntity player) {
-        return new AlloyForgeScreenHandler(syncId, inv, this, properties);
+        return new AlloyForgeScreenHandler(syncId, inv, this);
     }
 
     @Override

@@ -8,6 +8,9 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
 import wraith.alloyforgery.block.ForgeControllerBlock;
 import wraith.alloyforgery.forges.ForgeRegistry;
+import wraith.alloyforgery.forges.ForgeTier;
+import wraith.alloyforgery.forges.ForgeTierRegistry;
+
 import java.util.*;
 
 public class AlloyForgeryItemGroup {
@@ -31,7 +34,15 @@ public class AlloyForgeryItemGroup {
 
     private static void createControllerCache() {
         final var blockList = new ArrayList<>(ForgeRegistry.getControllerBlocks());
-        blockList.sort(Comparator.comparingInt(value -> ((ForgeControllerBlock) value).forgeDefinition.forgeTier()));
+        final var tierRegistry = ForgeTierRegistry.getForgeRegistry(true);
+
+        blockList.sort(Comparator.comparingInt(value -> {
+            var tier = tierRegistry.getForgeTier(((ForgeControllerBlock) value).forgeDefinition);
+
+            if (tier == null) tier = ForgeTier.DEFAULT;
+
+            return tier.value();
+        }));
 
         CONTROLLER_CACHE = new ArrayList<>(blockList.size());
         blockList.forEach(block -> CONTROLLER_CACHE.add(block.asItem().getDefaultStack()));

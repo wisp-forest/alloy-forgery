@@ -13,6 +13,7 @@ import net.minecraft.util.Identifier;
 import wraith.alloyforgery.AlloyForgery;
 import wraith.alloyforgery.data.RecipeTagLoader;
 import wraith.alloyforgery.forges.ForgeDefinition;
+import wraith.alloyforgery.forges.ForgeTier;
 import wraith.alloyforgery.utils.RecipeInjector;
 import java.util.*;
 
@@ -89,7 +90,7 @@ public class BlastFurnaceRecipeAdapter implements RecipeInjector.AddRecipes {
     }
 
     private static float getFuelPerTick(BlastingRecipe recipe) {
-        return ((recipe.getCookingTime() / (float) ForgeDefinition.BASE_MAX_SMELT_TIME) * 10);
+        return ((recipe.getCookingTime() / (float) ForgeTier.BASE_MAX_SMELT_TIME) * 10);
     }
 
     // Checks if the given blast recipe has unique inputs to prevent overlapping recipes leading to confliction

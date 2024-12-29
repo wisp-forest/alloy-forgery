@@ -34,7 +34,7 @@ public class ForgeControllerBlock extends BlockWithEntity {
     public final ForgeDefinition forgeDefinition;
 
     public ForgeControllerBlock(ForgeDefinition forgeDefinition) {
-        super(FabricBlockSettings.copyOf(Blocks.BLACKSTONE));
+        super(Settings.copy(Blocks.BLACKSTONE));
         this.forgeDefinition = forgeDefinition;
         this.setDefaultState(this.getStateManager().getDefaultState().with(LIT, false));
     }

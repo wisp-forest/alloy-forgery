@@ -10,6 +10,12 @@
   "tooltip.alloy_forgery.fuel_capacity": "Fuel Capacity: %d",
   "tooltip.alloy_forgery.invalid_tier": "This recipe requires a Forge Controller of Tier %d",
 
+  "tooltip.alloy_forgery.slot_toggle_enable": "Disable Slot toggling",
+  "tooltip.alloy_forgery.slot_toggle_disable": "Enable Slot toggling",
+
+  "tooltip.alloy_forgery.enabled_slot": "Click to disable slot",
+  "tooltip.alloy_forgery.disabled_slot": "Click to enable slot",
+
   "container.alloy_forgery.forge_controller": "Alloy Forge",
 
   "container.alloy_forgery.rei.title": "Alloy Forging",
