@@ -1,14 +1,20 @@
 {
   "block.alloy_forgery.bricks_forge_controller": "Контроллер кирпичной кузницы",
-  "block.alloy_forgery.stone_bricks_forge_controller": "Контроллер кузницы из каменных кирпичей",
-  "block.alloy_forgery.deepslate_bricks_forge_controller": "Контроллер кузницы из глубинносланцевых кирпичей",
-  "block.alloy_forgery.end_stone_bricks_forge_controller": "Контроллер кузницы из эндерняковых кирпичей",
+  "block.alloy_forgery.stone_bricks_forge_controller": "Контроллер кузницы из каменного кирпича",
+  "block.alloy_forgery.deepslate_bricks_forge_controller": "Контроллер кузницы из глубинносланцевого кирпича",
+  "block.alloy_forgery.end_stone_bricks_forge_controller": "Контроллер кузницы из эндернякового кирпича",
   "block.alloy_forgery.polished_blackstone_forge_controller": "Контроллер кузницы из полированного чернита",
-  "block.alloy_forgery.prismarine_bricks_forge_controller": "Контроллер кузницы из призмариновых кирпичей",
+  "block.alloy_forgery.prismarine_bricks_forge_controller": "Контроллер кузницы из призмаринового кирпича",
 
   "tooltip.alloy_forgery.forge_tier": "Уровень: %d",
   "tooltip.alloy_forgery.fuel_capacity": "Запас топлива: %d",
   "tooltip.alloy_forgery.invalid_tier": "Для этого рецепта требуется контроллер кузницы уровня %d",
+
+  "tooltip.alloy_forgery.slot_toggle_enable": "Отключить переключение слота",
+  "tooltip.alloy_forgery.slot_toggle_disable": "Включить переключение слота",
+
+  "tooltip.alloy_forgery.enabled_slot": "Нажмите, чтобы отключить слот",
+  "tooltip.alloy_forgery.disabled_slot": "Нажмите, чтобы включить слот",
 
   "container.alloy_forgery.forge_controller": "Кузница сплавов",
 
@@ -18,7 +24,7 @@
   "container.alloy_forgery.rei.button": "Прокрутить переопределения уровня",
 
   "message.alloy_forgery.invalid_multiblock": "Недопустимое составление многоблочной структуры",
-  "itemGroup.alloy_forgery.alloy_forgery": "Ковка из сплава",
+  "itemGroup.alloy_forgery.alloy_forgery": "Ковка из Сплава",
   "itemGroup.alloy_forgery.alloy_forgery.button.discord": "Discord",
   "itemGroup.alloy_forgery.alloy_forgery.button.curseforge": "CurseForge",
   "itemGroup.alloy_forgery.alloy_forgery.button.modrinth": "Modrinth",
