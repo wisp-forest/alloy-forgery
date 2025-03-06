@@ -4,7 +4,6 @@ import com.mojang.serialization.MapCodec;
 import io.wispforest.endec.impl.StructEndecBuilder;
 import io.wispforest.owo.particles.ClientParticles;
 import io.wispforest.owo.serialization.CodecUtils;
-import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorageUtil;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.*;
@@ -24,7 +23,7 @@ import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import wraith.alloyforgery.AlloyForgery;
 import wraith.alloyforgery.forges.ForgeDefinition;
-import wraith.alloyforgery.forges.ForgeFuelRegistry;
+import wraith.alloyforgery.forges.ForgeFuelDataLoader;
 
 public class ForgeControllerBlock extends BlockWithEntity {
 
@@ -42,17 +41,18 @@ public class ForgeControllerBlock extends BlockWithEntity {
     @Override
     protected MapCodec<? extends BlockWithEntity> getCodec() {
         return CodecUtils.toMapCodec(
-                StructEndecBuilder.of(
-                        ForgeDefinition.FORGE_DEFINITION.fieldOf("forge_definition", s -> forgeDefinition),
-                        ForgeControllerBlock::new
-                ));
+            StructEndecBuilder.of(
+                ForgeDefinition.FORGE_DEFINITION.fieldOf("forge_definition", s -> forgeDefinition),
+                ForgeControllerBlock::new
+            ));
     }
 
     @Override
     protected ItemActionResult onUseWithItem(ItemStack playerStack, BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
         if (!world.isClient) {
-            final var fuelDefinition = ForgeFuelRegistry.getFuelForItem(playerStack.getItem());
-            if (!(world.getBlockEntity(pos) instanceof ForgeControllerBlockEntity controller)) return ItemActionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+            final var fuelDefinition = ForgeFuelDataLoader.getFuelForItem(playerStack.getItem());
+            if (!(world.getBlockEntity(pos) instanceof ForgeControllerBlockEntity controller))
+                return ItemActionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
 
             if (fuelDefinition.hasReturnType() && controller.canAddFuel(fuelDefinition.fuel())) {
                 if (!player.getAbilities().creativeMode) {

@@ -7,7 +7,6 @@ import io.wispforest.owo.moddata.ModDataConsumer;
 import io.wispforest.owo.moddata.ModDataLoader;
 import net.minecraft.util.Identifier;
 import org.slf4j.Logger;
-
 import java.util.function.BiConsumer;
 
 public class EndecableModDataLoader implements ModDataConsumer {
@@ -31,9 +30,9 @@ public class EndecableModDataLoader implements ModDataConsumer {
 
     public static <T> EndecableModDataLoader of(Identifier id, String dataType, String fieldName, Endec<T> endec, BiConsumer<Identifier, T> consumer) {
         return new EndecableModDataLoader(id, dataType,
-                EndecedHandler.of(fieldName, endec, consumer, entryId -> {
-                    LOGGER.warn("A given entry within the [{}] Data Loader was found to be missing any data! [EntryId: {}]", id, entryId);
-                }));
+            EndecedHandler.of(fieldName, endec, consumer, entryId -> {
+                LOGGER.warn("A given entry within the [{}] Data Loader was found to be missing any data! [EntryId: {}]", id, entryId);
+            }));
     }
 
     public void load() {

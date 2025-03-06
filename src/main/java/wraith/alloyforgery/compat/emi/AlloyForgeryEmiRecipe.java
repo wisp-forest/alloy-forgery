@@ -41,11 +41,11 @@ public class AlloyForgeryEmiRecipe implements EmiRecipe {
                 int stackCount = Math.min(i, 64);
 
                 convertedInputs.add(
-                        EmiIngredient.of(Arrays.stream(entry.getKey().getMatchingStacks())
-                                .map(ItemStack::copy)
-                                .peek(stack -> stack.setCount(stackCount))
-                                .map(EmiStack::of)
-                                .toList()));
+                    EmiIngredient.of(Arrays.stream(entry.getKey().getMatchingStacks())
+                        .map(ItemStack::copy)
+                        .peek(stack -> stack.setCount(stackCount))
+                        .map(EmiStack::of)
+                        .toList()));
 
                 i -= stackCount;
             }

@@ -1,9 +1,9 @@
 package wraith.alloyforgery.compat.emi;
 
-import dev.emi.emi.api.widget.*;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.text.OrderedText;
+import dev.emi.emi.api.widget.*;
 
 public class CustomTextWidget extends Widget {
     private static final MinecraftClient CLIENT = MinecraftClient.getInstance();

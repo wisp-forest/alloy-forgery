@@ -51,22 +51,22 @@ public class AlloyForgingDisplay implements Display {
                 int stackCount = Math.min(i, 64);
 
                 convertedInputs.add(
-                        EntryIngredients.ofItemStacks(Arrays.stream(entry.getKey().getMatchingStacks())
-                                .map(ItemStack::copy)
-                                .peek(stack -> stack.setCount(stackCount))
-                                .toList()));
+                    EntryIngredients.ofItemStacks(Arrays.stream(entry.getKey().getMatchingStacks())
+                        .map(ItemStack::copy)
+                        .peek(stack -> stack.setCount(stackCount))
+                        .toList()));
 
                 i -= stackCount;
             }
         }
 
         return new AlloyForgingDisplay(
-                convertedInputs,
-                EntryIngredients.of(recipe.getBaseResult()),
-                recipe.getMinForgeTier(),
-                recipe.getFuelPerTick(),
-                recipe.getTierOverrides(),
-                recipe.secondaryID().or(() -> Optional.of(recipeEntry.id())));
+            convertedInputs,
+            EntryIngredients.of(recipe.getBaseResult()),
+            recipe.getMinForgeTier(),
+            recipe.getFuelPerTick(),
+            recipe.getTierOverrides(),
+            recipe.secondaryID().or(() -> Optional.of(recipeEntry.id())));
     }
 
     @Override

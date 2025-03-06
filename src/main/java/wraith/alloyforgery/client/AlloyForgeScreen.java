@@ -22,7 +22,6 @@ import wraith.alloyforgery.AlloyForgery;
 import wraith.alloyforgery.networking.AlloyForgeNetworking;
 import wraith.alloyforgery.networking.DisableSlotToggle;
 import wraith.alloyforgery.utils.ForgeInputSlot;
-
 import java.util.List;
 
 public class AlloyForgeScreen extends BaseUIModelHandledScreen<FlowLayout, AlloyForgeScreenHandler> {
@@ -56,20 +55,20 @@ public class AlloyForgeScreen extends BaseUIModelHandledScreen<FlowLayout, Alloy
         this.lavaBar = layout.childById(FlowLayout.class, "lava-bar");
 
         layout.childById(ButtonComponent.class, "slot-toggle-btn")
-                .onPress(btn -> {
-                    this.allowSlotToggling = !allowSlotToggling;
+            .onPress(btn -> {
+                this.allowSlotToggling = !allowSlotToggling;
 
-                    btn.tooltip(Text.translatable("tooltip.alloy_forgery.slot_toggle_" + (this.allowSlotToggling ? "enable" : "disable")));
-                })
-                .renderer((context, button, delta) -> {
-                    ButtonComponent.Renderer.VANILLA.draw(context, button, delta);
+                btn.tooltip(Text.translatable("tooltip.alloy_forgery.slot_toggle_" + (this.allowSlotToggling ? "enable" : "disable")));
+            })
+            .renderer((context, button, delta) -> {
+                ButtonComponent.Renderer.VANILLA.draw(context, button, delta);
 
-                    context.push().translate(-0.75, -0.75, 0);
+                context.push().translate(-0.75, -0.75, 0);
 
-                    context.drawCenteredTextWithShadow(MinecraftClient.getInstance().textRenderer, "⏻", button.x() + 8, button.y() + 4, 0xFFFFFFFF);
+                context.drawCenteredTextWithShadow(MinecraftClient.getInstance().textRenderer, "⏻", button.x() + 8, button.y() + 4, 0xFFFFFFFF);
 
-                    context.pop();
-                });
+                context.pop();
+            });
     }
 
     @Override
@@ -83,19 +82,19 @@ public class AlloyForgeScreen extends BaseUIModelHandledScreen<FlowLayout, Alloy
 
         if (requiredTier <= -1) {
             this.invalidCross
-                    .visibleArea(PositionedRectangle.of(0, 0, 0, 0))
-                    .tooltip(List.<TooltipComponent>of());
+                .visibleArea(PositionedRectangle.of(0, 0, 0, 0))
+                .tooltip(List.<TooltipComponent>of());
         } else {
             this.invalidCross
-                    .resetVisibleArea()
-                    .tooltip(Text.translatable("tooltip.alloy_forgery.invalid_tier", requiredTier));
+                .resetVisibleArea()
+                .tooltip(Text.translatable("tooltip.alloy_forgery.invalid_tier", requiredTier));
         }
 
         if (this.allowSlotToggling
-                && this.focusedSlot instanceof ForgeInputSlot
-                && this.handler.getCursorStack().isEmpty()
-                && !this.focusedSlot.hasStack()
-                && !this.handler.player().isSpectator()) {
+            && this.focusedSlot instanceof ForgeInputSlot
+            && this.handler.getCursorStack().isEmpty()
+            && !this.focusedSlot.hasStack()
+            && !this.handler.player().isSpectator()) {
 
             if (this.handler.isSlotDisabled(this.focusedSlot)) {
                 context.drawTooltip(this.textRenderer, DISABLED_SLOT_TEXT, mouseX, mouseY);
@@ -109,7 +108,7 @@ public class AlloyForgeScreen extends BaseUIModelHandledScreen<FlowLayout, Alloy
     protected void onMouseClick(Slot slot, int slotId, int button, SlotActionType actionType) {
         var player = this.handler.player();
 
-        if(allowSlotToggling) {
+        if (allowSlotToggling) {
             if (slot instanceof ForgeInputSlot && !slot.hasStack() && !player.isSpectator()) {
                 switch (actionType) {
                     case PICKUP:

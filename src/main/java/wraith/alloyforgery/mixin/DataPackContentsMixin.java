@@ -15,8 +15,12 @@ import java.util.HashMap;
 @Mixin(DataPackContents.class)
 public abstract class DataPackContentsMixin {
 
-    @Shadow @Final private RecipeManager recipeManager;
-    @Shadow @Final private ReloadableRegistries.Lookup reloadableRegistries;
+    @Shadow
+    @Final
+    private RecipeManager recipeManager;
+    @Shadow
+    @Final
+    private ReloadableRegistries.Lookup reloadableRegistries;
 
     @Inject(method = "refresh", at = @At("TAIL"))
     private void alloy_forgery$onRefresh(CallbackInfo ci) {

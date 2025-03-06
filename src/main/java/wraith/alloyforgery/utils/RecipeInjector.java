@@ -62,8 +62,8 @@ public final class RecipeInjector {
         var type = (RecipeType<R>) recipe.getType();
 
         var bl = manager.listAllOfType(type)
-                .stream()
-                .anyMatch(recipeEntry -> id.equals(recipeEntry.id()));
+            .stream()
+            .anyMatch(recipeEntry -> id.equals(recipeEntry.id()));
 
         if (bl) {
             LOGGER.error("[RecipeInjector]: Unable to add a given recipe due to being the same Identifier with the given Type. [ID: {}]", id);

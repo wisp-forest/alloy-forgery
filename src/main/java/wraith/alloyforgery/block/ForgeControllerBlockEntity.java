@@ -25,7 +25,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.recipe.RecipeEntry;
 import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.screen.*;
+import net.minecraft.screen.ScreenHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
@@ -37,16 +37,12 @@ import org.jetbrains.annotations.Nullable;
 import wraith.alloyforgery.AlloyForgeScreenHandler;
 import wraith.alloyforgery.AlloyForgery;
 import wraith.alloyforgery.client.BlockEntityLocation;
-import wraith.alloyforgery.forges.ForgeDefinition;
-import wraith.alloyforgery.forges.ForgeFuelRegistry;
-import wraith.alloyforgery.forges.ForgeTier;
-import wraith.alloyforgery.forges.ForgeTierRegistry;
+import wraith.alloyforgery.forges.*;
 import wraith.alloyforgery.mixin.HopperBlockEntityAccessor;
 import wraith.alloyforgery.recipe.AlloyForgeRecipe;
 import wraith.alloyforgery.recipe.AlloyForgeRecipeInput;
 import wraith.alloyforgery.utils.EndecUtils;
 import wraith.alloyforgery.utils.ExtObservable;
-
 import java.util.*;
 
 @SuppressWarnings("UnstableApiUsage")
@@ -92,7 +88,7 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
     public ForgeTier forgeTier() {
         if (this.world == null) return ForgeTier.DEFAULT;
 
-        var tier = ForgeTierRegistry.getForgeRegistry(this.world.isClient()).getForgeTier(this.forgeDefinition);
+        var tier = ForgeTierDataLoader.getForgeRegistry(this.world.isClient()).getForgeTier(this.forgeDefinition);
 
         if (tier == null) return ForgeTier.DEFAULT;
 
@@ -207,9 +203,9 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
 
         if (!this.getFuelStack().isEmpty()) {
             final var fuelStack = this.getFuelStack();
-            final var fuelDefinition = ForgeFuelRegistry.getFuelForItem(fuelStack.getItem());
+            final var fuelDefinition = ForgeFuelDataLoader.getFuelForItem(fuelStack.getItem());
 
-            if (fuelDefinition != ForgeFuelRegistry.ForgeFuelDefinition.EMPTY && canAddFuel(fuelDefinition.fuel())) {
+            if (fuelDefinition != ForgeFuelDataLoader.ForgeFuelDefinition.EMPTY && canAddFuel(fuelDefinition.fuel())) {
                 this.getFuelStack().decrement(1);
 
                 attemptInsertOnIndex(11, fuelDefinition.hasReturnType() ? new ItemStack(fuelDefinition.returnType()) : ItemStack.EMPTY);
@@ -267,7 +263,7 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
         }
 
         if (this.recipeCache.isEmpty() && this.requiredTierToCraft.get() != -1) {
-            this.requiredTierToCraft.set( -1);
+            this.requiredTierToCraft.set(-1);
         }
 
         if (this.recipeCache.isEmpty() || !canSmelt(this.recipeCache.get().value())) {
@@ -465,8 +461,8 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
             return LEFT_SLOTS;
         } else if (side == facing.rotateYCounterclockwise() && this.currentSmeltTime == 0) {
             return Arrays.stream(RIGHT_SLOTS)
-                    .filter(i -> !this.disabledSlots.get().contains(i))
-                    .mapToInt(value -> value).toArray();
+                .filter(i -> !this.disabledSlots.get().contains(i))
+                .mapToInt(value -> value).toArray();
         } else {
             return new int[0];
         }
@@ -474,7 +470,7 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
 
     @Override
     public boolean canInsert(int slot, ItemStack stack, @Nullable Direction dir) {
-        if (slot == 11) return ForgeFuelRegistry.hasFuel(stack.getItem());
+        if (slot == 11) return ForgeFuelDataLoader.hasFuel(stack.getItem());
         if (this.disabledSlots.get().contains(slot)) return false;
 
         var slotStack = getStack(slot);
@@ -484,7 +480,7 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
 
     @Override
     public boolean canExtract(int slot, ItemStack stack, Direction dir) {
-        return slot == 10 || (slot == 11 && !ForgeFuelRegistry.hasFuel(stack.getItem()));
+        return slot == 10 || (slot == 11 && !ForgeFuelDataLoader.hasFuel(stack.getItem()));
     }
 
     @Override

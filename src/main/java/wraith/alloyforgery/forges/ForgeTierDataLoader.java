@@ -12,30 +12,27 @@ import wraith.alloyforgery.AlloyForgery;
 import wraith.alloyforgery.networking.AlloyForgeNetworking;
 import wraith.alloyforgery.networking.TierDataSync;
 import wraith.alloyforgery.utils.data.EndecableDataLoader;
+import java.util.*;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+public class ForgeTierDataLoader {
 
-public class ForgeTierRegistry {
-
-    private static final ForgeTierRegistry SERVER = new ForgeTierRegistry();
-    private static final ForgeTierRegistry CLIENT = new ForgeTierRegistry();
+    private static final ForgeTierDataLoader SERVER = new ForgeTierDataLoader();
+    private static final ForgeTierDataLoader CLIENT = new ForgeTierDataLoader();
 
     private static final EndecableDataLoader TIER_DATA_LOADER = EndecableDataLoader.of(
-            AlloyForgery.id("forge_tier"),
-            "alloy_forge/tier",
-            ForgeTier.ENDEC,
-            (identifier, forgeTier) -> {
-                SERVER.idToForgeTier.put(identifier, forgeTier);
-                SERVER.forgeTierToId.put(forgeTier, identifier);
-            });
+        AlloyForgery.id("forge_tier"),
+        "alloy_forge/tier",
+        ForgeTier.ENDEC,
+        (identifier, forgeTier) -> {
+            SERVER.idToForgeTier.put(identifier, forgeTier);
+            SERVER.forgeTierToId.put(forgeTier, identifier);
+        });
 
     private static final EndecableDataLoader TIER_BINDING_LOADER = EndecableDataLoader.of(
-            AlloyForgery.id("tier_binding"),
-            "alloy_forge/tier_binding",
-            Endec.map(Identifier::toString, Identifier::tryParse, MinecraftEndecs.IDENTIFIER),
-            (identifier, map) -> map.forEach(SERVER.forgeDefinitionToTier::putIfAbsent)
+        AlloyForgery.id("tier_binding"),
+        "alloy_forge/tier_binding",
+        Endec.map(Identifier::toString, Identifier::tryParse, MinecraftEndecs.IDENTIFIER),
+        (identifier, map) -> map.forEach(SERVER.forgeDefinitionToTier::putIfAbsent)
     ).addDependencies(TIER_DATA_LOADER.getFabricId());
 
     public static void initDataLoaders() {
@@ -52,7 +49,7 @@ public class ForgeTierRegistry {
 
     private final Map<Identifier, Identifier> forgeDefinitionToTier = new HashMap<>();
 
-    public static ForgeTierRegistry getForgeRegistry(boolean isClientSide) {
+    public static ForgeTierDataLoader getForgeRegistry(boolean isClientSide) {
         return (isClientSide) ? CLIENT : SERVER;
     }
 
@@ -69,9 +66,9 @@ public class ForgeTierRegistry {
     @Nullable
     public ForgeTier getForgeTier(ForgeDefinition forgeDefinition) {
         return forgeDefinition.id()
-                .map(forgeDefinitionToTier()::get)
-                .map(idToForgeTier()::get)
-                .orElse(null);
+            .map(forgeDefinitionToTier()::get)
+            .map(idToForgeTier()::get)
+            .orElse(null);
     }
 
     public Map<Identifier, ForgeTier> idToForgeTier() {

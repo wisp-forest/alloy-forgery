@@ -1,9 +1,7 @@
 package wraith.alloyforgery.forges;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 import io.wispforest.endec.Endec;
-import io.wispforest.owo.moddata.ModDataConsumer;
 import io.wispforest.owo.serialization.endec.MinecraftEndecs;
 import io.wispforest.owo.util.TagInjector;
 import net.minecraft.block.Block;
@@ -11,7 +9,6 @@ import net.minecraft.item.Item;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.util.Identifier;
-import org.jetbrains.annotations.Nullable;
 import wraith.alloyforgery.AlloyForgery;
 import wraith.alloyforgery.ForgeControllerItem;
 import wraith.alloyforgery.block.ForgeControllerBlock;
@@ -20,16 +17,16 @@ import java.util.*;
 public class ForgeRegistry {
 
     public static Endec<ForgeDefinition> FORGE_DEFINITION = MinecraftEndecs.IDENTIFIER.xmap(
-            identifier -> {
-                return getForgeDefinition(identifier)
-                        .orElseThrow(() -> new IllegalStateException("Unable to locate ForgerDefinition with Identifier: [ID: " + identifier + "]"));
-            }, forgeDefinition -> {
-                for (var entry : getForgeEntries()) {
-                    if(entry.getValue() == forgeDefinition) return entry.getKey();
-                }
-
-                throw new IllegalStateException();
+        identifier -> {
+            return getForgeDefinition(identifier)
+                .orElseThrow(() -> new IllegalStateException("Unable to locate ForgerDefinition with Identifier: [ID: " + identifier + "]"));
+        }, forgeDefinition -> {
+            for (var entry : getForgeEntries()) {
+                if (entry.getValue() == forgeDefinition) return entry.getKey();
             }
+
+            throw new IllegalStateException();
+        }
     );
 
     public static final Gson GSON = new Gson();
@@ -64,7 +61,7 @@ public class ForgeRegistry {
         return FORGE_DEFINITION_TO_ID.containsKey(definition) ? Optional.of(FORGE_DEFINITION_TO_ID.get(definition)) : Optional.empty();
     }
 
-    public static Set<Map.Entry<Identifier, ForgeDefinition>> getForgeEntries(){
+    public static Set<Map.Entry<Identifier, ForgeDefinition>> getForgeEntries() {
         return ID_TO_FORGE_DEFINITION.entrySet();
     }
 

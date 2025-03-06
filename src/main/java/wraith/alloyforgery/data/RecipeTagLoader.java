@@ -13,7 +13,6 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.profiler.Profiler;
 import wraith.alloyforgery.AlloyForgery;
 import wraith.alloyforgery.networking.AlloyForgeNetworking;
-
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -97,9 +96,9 @@ public class RecipeTagLoader extends SinglePreparationResourceReloader<Map<Ident
         var recipeManager = server.getRecipeManager();
 
         Map<Identifier, Collection<RecipeEntry<Recipe<?>>>> map = tagGroupLoader.setGetter(identifier -> {
-                    return Optional.ofNullable((RecipeEntry<Recipe<?>>) recipeManager.get(identifier).orElse(null));
-                })
-                .buildGroup(RAW_TAG_DATA);
+                return Optional.ofNullable((RecipeEntry<Recipe<?>>) recipeManager.get(identifier).orElse(null));
+            })
+            .buildGroup(RAW_TAG_DATA);
 
         RESOLVED_ENTRIES.clear();
 
@@ -110,15 +109,15 @@ public class RecipeTagLoader extends SinglePreparationResourceReloader<Map<Ident
     public record TagPacket(List<TagEntry> entries) {
         public static TagPacket of(Map<Identifier, Set<Identifier>> tagEntries) {
             return new TagPacket(tagEntries.entrySet().stream()
-                    .map(entry -> new TagEntry(entry.getKey(), List.copyOf(entry.getValue())))
-                    .toList());
+                .map(entry -> new TagEntry(entry.getKey(), List.copyOf(entry.getValue())))
+                .toList());
         }
 
         public static void handlePacket(TagPacket packet, ClientAccess access) {
             RESOLVED_ENTRIES.clear();
 
             RESOLVED_ENTRIES.putAll(
-                    packet.entries.stream().collect(Collectors.toMap(TagEntry::id, e -> new HashSet<>(e.entries())))
+                packet.entries.stream().collect(Collectors.toMap(TagEntry::id, e -> new HashSet<>(e.entries())))
             );
         }
     }

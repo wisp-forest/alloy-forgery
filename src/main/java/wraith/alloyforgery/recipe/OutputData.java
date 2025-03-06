@@ -25,24 +25,24 @@ public record OutputData(Integer count, ComponentChanges components, @Nullable I
 
     @Deprecated(forRemoval = true)
     private static final Endec<OutputData> OLD_FORMAT_ENDEC = StructEndecBuilder.of(
-            Endec.INT.fieldOf("count", OutputData::count),
-            MinecraftEndecs.ofRegistry(Registries.ITEM).optionalFieldOf("id", OutputData::outputItem, () -> null),
-            MinecraftEndecs.IDENTIFIER.listOf().optionalFieldOf("priority", OutputData::items, () -> null),
-            MinecraftEndecs.unprefixedTagKey(RegistryKeys.ITEM).optionalFieldOf("default", OutputData::defaultTag, () -> null),
-            OutputData::new
+        Endec.INT.fieldOf("count", OutputData::count),
+        MinecraftEndecs.ofRegistry(Registries.ITEM).optionalFieldOf("id", OutputData::outputItem, () -> null),
+        MinecraftEndecs.IDENTIFIER.listOf().optionalFieldOf("priority", OutputData::items, () -> null),
+        MinecraftEndecs.unprefixedTagKey(RegistryKeys.ITEM).optionalFieldOf("default", OutputData::defaultTag, () -> null),
+        OutputData::new
     );
 
     private static final Endec<OutputData> NEW_FORMAT_ENDEC = StructEndecBuilder.of(
-            Endec.INT.fieldOf("count", OutputData::count),
-            CodecUtils.toEndec(ComponentChanges.CODEC).optionalFieldOf("components", OutputData::components, ComponentChanges.EMPTY),
-            MinecraftEndecs.ofRegistry(Registries.ITEM).optionalFieldOf("item", OutputData::outputItem, () -> null),
-            MinecraftEndecs.IDENTIFIER.listOf().optionalFieldOf("priority", OutputData::items, () -> null),
-            MinecraftEndecs.unprefixedTagKey(RegistryKeys.ITEM).optionalFieldOf("tag", OutputData::defaultTag, () -> null),
-            OutputData::new
+        Endec.INT.fieldOf("count", OutputData::count),
+        CodecUtils.toEndec(ComponentChanges.CODEC).optionalFieldOf("components", OutputData::components, ComponentChanges.EMPTY),
+        MinecraftEndecs.ofRegistry(Registries.ITEM).optionalFieldOf("item", OutputData::outputItem, () -> null),
+        MinecraftEndecs.IDENTIFIER.listOf().optionalFieldOf("priority", OutputData::items, () -> null),
+        MinecraftEndecs.unprefixedTagKey(RegistryKeys.ITEM).optionalFieldOf("tag", OutputData::defaultTag, () -> null),
+        OutputData::new
     );
 
     public static final Endec<OutputData> ENDEC = NEW_FORMAT_ENDEC.catchErrors((ctx, deserializer, e) -> {
-        if(!(e instanceof InvalidOutputDataException)) throw new RuntimeException(e);
+        if (!(e instanceof InvalidOutputDataException)) throw new RuntimeException(e);
 
         var data = OLD_FORMAT_ENDEC.decode(ctx, deserializer);
 
@@ -54,7 +54,7 @@ public record OutputData(Integer count, ComponentChanges components, @Nullable I
     public OutputData {
         if (items != null && defaultTag == null) {
             throw new InvalidOutputDataException("Priority-based recipes must declare a 'default' tag");
-        } else if(outputItem == null && defaultTag == null){
+        } else if (outputItem == null && defaultTag == null) {
             throw new InvalidOutputDataException("No output for the given recipe was found!");
         }
     }

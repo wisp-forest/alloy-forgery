@@ -1,34 +1,24 @@
 package wraith.alloyforgery;
 
 import io.wispforest.endec.Endec;
-import io.wispforest.owo.client.screens.ScreenInternals;
-import io.wispforest.owo.client.screens.ScreenUtils;
-import io.wispforest.owo.client.screens.SlotGenerator;
-import io.wispforest.owo.client.screens.SyncedProperty;
+import io.wispforest.owo.client.screens.*;
 import io.wispforest.owo.util.EventStream;
-import io.wispforest.owo.util.pond.OwoScreenHandlerExtension;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.network.PacketByteBuf;
-import net.minecraft.screen.*;
+import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.server.network.ServerPlayerEntity;
-import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.jetbrains.annotations.Nullable;
 import wraith.alloyforgery.block.ForgeControllerBlockEntity;
-import wraith.alloyforgery.forges.ForgeFuelRegistry;
+import wraith.alloyforgery.forges.ForgeFuelDataLoader;
 import wraith.alloyforgery.utils.ExtObservable;
 import wraith.alloyforgery.utils.ForgeInputSlot;
-
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 
 public class AlloyForgeScreenHandler extends ScreenHandler {
@@ -64,20 +54,26 @@ public class AlloyForgeScreenHandler extends ScreenHandler {
 
         //Fuel Slot
         this.addSlot(new Slot(controllerInventory, 11, 8, 74) {
-            @Override public boolean canInsert(ItemStack stack) { return ForgeFuelRegistry.hasFuel(stack.getItem()); }
+            @Override
+            public boolean canInsert(ItemStack stack) {
+                return ForgeFuelDataLoader.hasFuel(stack.getItem());
+            }
         });
 
         //Recipe Output
         this.addSlot(new Slot(controllerInventory, 10, 145, 50) {
-            @Override public boolean canInsert(ItemStack stack) { return false; }
+            @Override
+            public boolean canInsert(ItemStack stack) {
+                return false;
+            }
         });
 
         SlotGenerator.begin(this::addSlot, 44, 43)
-                .slotFactory((inventory, index, x, y) -> new ForgeInputSlot(inventory, index, x, y, this))
-                .grid(controllerInventory, 0, 5, 2)
-                .defaultSlotFactory()
-                .moveTo(8, 107)
-                .playerInventory(playerInventory);
+            .slotFactory((inventory, index, x, y) -> new ForgeInputSlot(inventory, index, x, y, this))
+            .grid(controllerInventory, 0, 5, 2)
+            .defaultSlotFactory()
+            .moveTo(8, 107)
+            .playerInventory(playerInventory);
     }
 
     //--
@@ -88,24 +84,24 @@ public class AlloyForgeScreenHandler extends ScreenHandler {
         var type = createParameterizedType(Set.class, elementType);
 
         return (SyncedProperty<Set<T>>) (Object) createProperty(
-                Set.class,
-                (Endec<Set>) this.endecBuilder().get(type),
-                provider,
-                observableProviderFunc.andThen(listExtObservable -> (ExtObservable<Set>) (Object) listExtObservable),
-                set -> new HashSet<>(set),
-                new HashSet<>());
+            Set.class,
+            (Endec<Set>) this.endecBuilder().get(type),
+            provider,
+            observableProviderFunc.andThen(listExtObservable -> (ExtObservable<Set>) (Object) listExtObservable),
+            set -> new HashSet<>(set),
+            new HashSet<>());
     }
 
     public <P, T> SyncedProperty<List<T>> createListProperty(Class<T> elementType, @Nullable P provider, Function<P, ExtObservable<List<T>>> observableProviderFunc) {
         var type = createParameterizedType(List.class, elementType);
 
         return (SyncedProperty<List<T>>) (Object) createProperty(
-                List.class,
-                (Endec<List>) this.endecBuilder().get(type),
-                provider,
-                observableProviderFunc.andThen(listExtObservable -> (ExtObservable<List>) (Object) listExtObservable),
-                list -> new ArrayList<>(list),
-                new ArrayList<>());
+            List.class,
+            (Endec<List>) this.endecBuilder().get(type),
+            provider,
+            observableProviderFunc.andThen(listExtObservable -> (ExtObservable<List>) (Object) listExtObservable),
+            list -> new ArrayList<>(list),
+            new ArrayList<>());
     }
 
     private static ParameterizedType createParameterizedType(Type rawType, Type ...typeArgs) {
@@ -128,8 +124,8 @@ public class AlloyForgeScreenHandler extends ScreenHandler {
 
     public <P, T> SyncedProperty<T> createProperty(Class<T> clazz, Endec<T> endec, @Nullable P provider, Function<P, ExtObservable<T>> observableProviderFunc, Function<T, T> cloneFunc, T initial) {
         return (provider != null && this.isServer)
-                ? createProperty(clazz, endec, observableProviderFunc.apply(provider), cloneFunc)
-                : createProperty(clazz, endec, initial);
+            ? createProperty(clazz, endec, observableProviderFunc.apply(provider), cloneFunc)
+            : createProperty(clazz, endec, initial);
     }
 
     public <T> SyncedProperty<T> createProperty(Class<T> clazz, ExtObservable<T> initial, Function<T, T> cloneFunc) {

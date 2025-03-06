@@ -1,19 +1,14 @@
 package wraith.alloyforgery.utils.data;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonSyntaxException;
+import com.google.gson.*;
 import com.mojang.logging.LogUtils;
 import io.wispforest.endec.Endec;
-import io.wispforest.endec.impl.StructEndecBuilder;
 import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
 import net.minecraft.resource.JsonDataLoader;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.profiler.Profiler;
 import org.slf4j.Logger;
-
 import java.util.*;
 import java.util.function.BiConsumer;
 
@@ -42,12 +37,12 @@ public class EndecableDataLoader extends JsonDataLoader implements IdentifiableR
 
     public static <T> EndecableDataLoader of(Identifier id, String dataType, String fieldName, Endec<T> endec, BiConsumer<Identifier, T> consumer) {
         return new EndecableDataLoader(id, dataType,
-                EndecedHandler.of(fieldName, endec, consumer, entryId -> {
-                    LOGGER.warn("A given entry within the [{}] Data Loader was found to be missing any data! [EntryId: {}]", id, entryId);
-                }));
+            EndecedHandler.of(fieldName, endec, consumer, entryId -> {
+                LOGGER.warn("A given entry within the [{}] Data Loader was found to be missing any data! [EntryId: {}]", id, entryId);
+            }));
     }
 
-    public EndecableDataLoader addDependencies(Identifier ...dependencies) {
+    public EndecableDataLoader addDependencies(Identifier... dependencies) {
         this.dependencies.addAll(Set.of(dependencies));
 
         return this;
@@ -58,7 +53,7 @@ public class EndecableDataLoader extends JsonDataLoader implements IdentifiableR
         prepared.forEach((identifier, jsonElement) -> {
             try {
                 handler.handle(identifier, jsonElement);
-            } catch (JsonSyntaxException e){
+            } catch (JsonSyntaxException e) {
                 LOGGER.error("An error has occurred during [{}] stage:", id, e);
             }
         });

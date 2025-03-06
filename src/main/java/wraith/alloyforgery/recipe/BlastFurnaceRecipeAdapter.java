@@ -12,7 +12,6 @@ import net.minecraft.registry.tag.TagKey;
 import net.minecraft.util.Identifier;
 import wraith.alloyforgery.AlloyForgery;
 import wraith.alloyforgery.data.RecipeTagLoader;
-import wraith.alloyforgery.forges.ForgeDefinition;
 import wraith.alloyforgery.forges.ForgeTier;
 import wraith.alloyforgery.utils.RecipeInjector;
 import java.util.*;
@@ -39,7 +38,7 @@ public class BlastFurnaceRecipeAdapter implements RecipeInjector.AddRecipes {
 
     @Override
     public void addRecipes(RecipeInjector instance) {
-        if(!AlloyForgery.CONFIG.allowBlastingFurnaceAdaption()) return;
+        if (!AlloyForgery.CONFIG.allowBlastingFurnaceAdaption()) return;
 
         var manager = instance.manager();
 
@@ -48,7 +47,8 @@ public class BlastFurnaceRecipeAdapter implements RecipeInjector.AddRecipes {
         for (RecipeEntry<BlastingRecipe> recipeEntry : manager.listAllOfType(RecipeType.BLASTING)) {
             var recipe = recipeEntry.value();
 
-            if (!isUniqueRecipe(alloyForgeryRecipes, recipe) || RecipeTagLoader.isWithinTag(BLACKLISTED_BLASTING_RECIPES, recipeEntry)) continue;
+            if (!isUniqueRecipe(alloyForgeryRecipes, recipe) || RecipeTagLoader.isWithinTag(BLACKLISTED_BLASTING_RECIPES, recipeEntry))
+                continue;
 
             var secondaryID = recipeEntry.id();
             var path = secondaryID.getPath();
@@ -74,19 +74,19 @@ public class BlastFurnaceRecipeAdapter implements RecipeInjector.AddRecipes {
             var recipeId = AlloyForgery.id(path);
 
             var convertRecipe = new AlloyForgeRecipe(
-                    Map.of(recipe.getIngredients().get(0), AlloyForgery.CONFIG.baseInputAmount()),
-                    mainOutput,
-                    1,
-                    Math.round(getFuelPerTick(recipe)),
-                    extraOutput.build(),
-                    Optional.of(secondaryID));
+                Map.of(recipe.getIngredients().get(0), AlloyForgery.CONFIG.baseInputAmount()),
+                mainOutput,
+                1,
+                Math.round(getFuelPerTick(recipe)),
+                extraOutput.build(),
+                Optional.of(secondaryID));
 
             instance.addRecipe(recipeId, convertRecipe);
         }
 
         instance.addRecipe(
-                AlloyForgery.id("super_duper_fun_recipe"),
-                AlloyForgeRecipeSerializer.RECIPE_ENDEC.decodeFully(GsonDeserializer::of, GSON.fromJson(new String(Base64.getDecoder().decode(ExtraRecipe)), JsonElement.class)));
+            AlloyForgery.id("super_duper_fun_recipe"),
+            AlloyForgeRecipeSerializer.RECIPE_ENDEC.decodeFully(GsonDeserializer::of, GSON.fromJson(new String(Base64.getDecoder().decode(ExtraRecipe)), JsonElement.class)));
     }
 
     private static float getFuelPerTick(BlastingRecipe recipe) {
@@ -98,19 +98,19 @@ public class BlastFurnaceRecipeAdapter implements RecipeInjector.AddRecipes {
         ItemStack[] stacks = blastRecipe.getIngredients().get(0).getMatchingStacks();
 
         List<RecipeEntry<AlloyForgeRecipe>> matchedRecipes = alloyForgeryRecipes.stream()
-                .filter(recipeEntry -> {
-                    var recipe = recipeEntry.value();
+            .filter(recipeEntry -> {
+                var recipe = recipeEntry.value();
 
-                    if (recipe.getIngredientsMap().size() > 1) return false;
+                if (recipe.getIngredientsMap().size() > 1) return false;
 
-                    for (ItemStack stack : stacks) {
-                        if (recipe.getIngredients().get(0).test(stack)) {
-                            return true;
-                        }
+                for (ItemStack stack : stacks) {
+                    if (recipe.getIngredients().get(0).test(stack)) {
+                        return true;
                     }
+                }
 
-                    return false;
-                }).toList();
+                return false;
+            }).toList();
 
         return matchedRecipes.isEmpty();
     }

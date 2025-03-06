@@ -7,7 +7,6 @@ import io.wispforest.endec.Endec;
 import io.wispforest.endec.StructEndec;
 import io.wispforest.endec.format.gson.GsonEndec;
 import io.wispforest.endec.impl.StructEndecBuilder;
-import io.wispforest.owo.moddata.ModDataLoader;
 import io.wispforest.owo.registration.ComplexRegistryAction;
 import io.wispforest.owo.registration.RegistryHelper;
 import io.wispforest.owo.serialization.endec.MinecraftEndecs;
@@ -19,10 +18,7 @@ import net.minecraft.util.JsonHelper;
 import wraith.alloyforgery.AlloyForgery;
 import wraith.alloyforgery.utils.RecipeInjector;
 import wraith.alloyforgery.utils.data.EndecableModDataLoader;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 public record ForgeDefinition(Block material, ImmutableList<Block> additionalMaterials, boolean blockEntity) {
 
@@ -31,13 +27,13 @@ public record ForgeDefinition(Block material, ImmutableList<Block> additionalMat
     }
 
     public static Endec<ForgeDefinition> FORGE_DEFINITION = MinecraftEndecs.IDENTIFIER.xmap(
-            identifier -> {
-                return ForgeRegistry.getForgeDefinition(identifier)
-                        .orElseThrow(() -> new IllegalStateException("Unable to locate ForgerDefinition with Identifier: [ID: " + identifier + "]"));
-            }, forgeDefinition -> {
-                return forgeDefinition.id()
-                        .orElseThrow(() -> new IllegalStateException("A Given forge Definition was not found within the ForgeRegistry!"));
-            }
+        identifier -> {
+            return ForgeRegistry.getForgeDefinition(identifier)
+                .orElseThrow(() -> new IllegalStateException("Unable to locate ForgerDefinition with Identifier: [ID: " + identifier + "]"));
+        }, forgeDefinition -> {
+            return forgeDefinition.id()
+                .orElseThrow(() -> new IllegalStateException("A Given forge Definition was not found within the ForgeRegistry!"));
+        }
     );
 
     public Optional<Identifier> id() {
@@ -79,30 +75,31 @@ public record ForgeDefinition(Block material, ImmutableList<Block> additionalMat
         return block == material || this.additionalMaterials.contains(block);
     }
 
+    // TODO - kill
     //why kubejs why
     private static final String RECIPE_PATTERN =
-            """
-                    {
-                        "type": "minecraft:crafting_shaped",
-                        "pattern": [
-                            "###",
-                            "#B#",
-                            "###"
-                        ],
-                        "key": {
-                            "#": {
-                                "item": "{material}"
-                            },
-                            "B": {
-                                "item": "minecraft:blast_furnace"
-                            }
-                        },
-                        "result": {
-                            "id": "{controller}",
-                            "count": 1
-                        }
+        """
+            {
+                "type": "minecraft:crafting_shaped",
+                "pattern": [
+                    "###",
+                    "#B#",
+                    "###"
+                ],
+                "key": {
+                    "#": {
+                        "item": "{material}"
+                    },
+                    "B": {
+                        "item": "minecraft:blast_furnace"
                     }
-                    """;
+                },
+                "result": {
+                    "id": "{controller}",
+                    "count": 1
+                }
+            }
+            """;
 
     public JsonElement generateRecipe(Identifier id) {
         String recipe = RECIPE_PATTERN.replace("{material}", Registries.ITEM.getId(material.asItem()).toString());
@@ -113,17 +110,17 @@ public record ForgeDefinition(Block material, ImmutableList<Block> additionalMat
 
     public static void initLoaders() {
         EndecableModDataLoader.of(
-                AlloyForgery.id("old_forge_definition_loader"),
-                "alloy_forges",
-                GsonEndec.INSTANCE.xmap(JsonElement::getAsJsonObject, jsonObject -> jsonObject),
-                ForgeDefinition::loadAndEnqueue
+            AlloyForgery.id("old_forge_definition_loader"),
+            "alloy_forges",
+            GsonEndec.INSTANCE.xmap(JsonElement::getAsJsonObject, jsonObject -> jsonObject),
+            ForgeDefinition::loadAndEnqueue
         ).load();
 
         EndecableModDataLoader.of(
-                AlloyForgery.id("forge_definition_loader"),
-                "alloy_forge/forge",
-                RawForgeDefinition.ENDEC,
-                ForgeDefinition::loadAndEnqueue
+            AlloyForgery.id("forge_definition_loader"),
+            "alloy_forge/forge",
+            RawForgeDefinition.ENDEC,
+            ForgeDefinition::loadAndEnqueue
         ).load();
 
         RecipeInjector.ADD_RECIPES.register(instance -> {
@@ -131,10 +128,10 @@ public record ForgeDefinition(Block material, ImmutableList<Block> additionalMat
                 var id = forgeEntry.getKey();
 
                 var recipe = RecipeSerializer.SHAPED.codec()
-                        .codec()
-                        .decode(JsonOps.INSTANCE, forgeEntry.getValue().generateRecipe(id))
-                        .getOrThrow(string -> new IllegalStateException("Unable to generate recipe for given ForgeDefinition [" + id + "]: " + string))
-                        .getFirst();
+                    .codec()
+                    .decode(JsonOps.INSTANCE, forgeEntry.getValue().generateRecipe(id))
+                    .getOrThrow(string -> new IllegalStateException("Unable to generate recipe for given ForgeDefinition [" + id + "]: " + string))
+                    .getFirst();
 
                 instance.addRecipe(id.withSuffixedPath("_recipe"), recipe);
             }
@@ -143,10 +140,10 @@ public record ForgeDefinition(Block material, ImmutableList<Block> additionalMat
 
     private record RawForgeDefinition(Identifier materialId, List<Identifier> additionalMaterialIds, boolean isBlockEntity) {
         public static final StructEndec<RawForgeDefinition> ENDEC = StructEndecBuilder.of(
-                MinecraftEndecs.IDENTIFIER.fieldOf("material", RawForgeDefinition::materialId),
-                MinecraftEndecs.IDENTIFIER.listOf().optionalFieldOf("additional_materials", RawForgeDefinition::additionalMaterialIds, List.of()),
-                Endec.BOOLEAN.optionalFieldOf("is_block_entity", RawForgeDefinition::isBlockEntity, false),
-                RawForgeDefinition::new
+            MinecraftEndecs.IDENTIFIER.fieldOf("material", RawForgeDefinition::materialId),
+            MinecraftEndecs.IDENTIFIER.listOf().optionalFieldOf("additional_materials", RawForgeDefinition::additionalMaterialIds, List.of()),
+            Endec.BOOLEAN.optionalFieldOf("is_block_entity", RawForgeDefinition::isBlockEntity, false),
+            RawForgeDefinition::new
         );
 
         public List<Identifier> blockIds() {
@@ -159,8 +156,8 @@ public record ForgeDefinition(Block material, ImmutableList<Block> additionalMat
     @Override
     public String toString() {
         return "ForgeDefinition{" +
-                "material=" + material +
-                ", additionalMaterials=" + additionalMaterials +
-                '}';
+            "material=" + material +
+            ", additionalMaterials=" + additionalMaterials +
+            '}';
     }
 }

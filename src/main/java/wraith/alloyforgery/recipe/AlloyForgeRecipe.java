@@ -90,7 +90,7 @@ public class AlloyForgeRecipe implements Recipe<AlloyForgeRecipeInput> {
                 ItemStack stack = this.output.copy();
                 stack.setCount(override.count());
 
-                if(!override.components().isEmpty()) {
+                if (!override.components().isEmpty()) {
                     stack.applyChanges(override.components());
                 }
 
@@ -181,8 +181,8 @@ public class AlloyForgeRecipe implements Recipe<AlloyForgeRecipeInput> {
     @Override
     public ItemStack craft(AlloyForgeRecipeInput input, RegistryWrapper.WrapperLookup lookup) {
         return (input.inventory() instanceof ForgeControllerBlockEntity controller)
-                ? getResult(controller.forgeTier().value())
-                : getResult(lookup);
+            ? getResult(controller.forgeTier().value())
+            : getResult(lookup);
     }
 
     public void consumeIngredients(AlloyForgeRecipeInput input) {
@@ -243,10 +243,10 @@ public class AlloyForgeRecipe implements Recipe<AlloyForgeRecipeInput> {
 
     public ItemStack getResult(int forgeTier) {
         ItemStack stack = tierOverrides.getOrDefault(tierOverrides.keySet().stream()
-                        .filter(overrideRange -> overrideRange.test(forgeTier))
-                        .findAny()
-                        .orElse(null), output)
-                .copy();
+                .filter(overrideRange -> overrideRange.test(forgeTier))
+                .findAny()
+                .orElse(null), output)
+            .copy();
 
         if (stack.getItem() == Items.AIR) {
             int stackCount = stack.getCount();
@@ -284,9 +284,9 @@ public class AlloyForgeRecipe implements Recipe<AlloyForgeRecipeInput> {
     public record OverrideRange(int lowerBound, int upperBound) {
 
         public static Endec<OverrideRange> OVERRIDE_RANGE = StructEndecBuilder.of(
-                Endec.INT.fieldOf("lowerBound", AlloyForgeRecipe.OverrideRange::lowerBound),
-                Endec.INT.fieldOf("upperBound", AlloyForgeRecipe.OverrideRange::upperBound),
-                AlloyForgeRecipe.OverrideRange::new
+            Endec.INT.fieldOf("lowerBound", AlloyForgeRecipe.OverrideRange::lowerBound),
+            Endec.INT.fieldOf("upperBound", AlloyForgeRecipe.OverrideRange::upperBound),
+            AlloyForgeRecipe.OverrideRange::new
         );
 
         public OverrideRange(int lowerBound) {
@@ -297,7 +297,7 @@ public class AlloyForgeRecipe implements Recipe<AlloyForgeRecipeInput> {
             return value >= lowerBound && (upperBound == -1 || value <= upperBound);
         }
 
-        public static AlloyForgeRecipe.OverrideRange fromString(String s){
+        public static AlloyForgeRecipe.OverrideRange fromString(String s) {
             AlloyForgeRecipe.OverrideRange overrideRange;
 
             if (s.matches("\\d+\\+")) {
@@ -362,7 +362,7 @@ public class AlloyForgeRecipe implements Recipe<AlloyForgeRecipeInput> {
             return new PendingOverride(item, count, ComponentChanges.EMPTY);
         }
 
-        public ItemStack stack(){
+        public ItemStack stack() {
             var stack = new ItemStack(item, count);
 
             stack.applyChanges(components);

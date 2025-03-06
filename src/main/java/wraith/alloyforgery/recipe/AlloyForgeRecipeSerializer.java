@@ -25,17 +25,17 @@ public class AlloyForgeRecipeSerializer extends EndecRecipeSerializer<AlloyForge
     };
 
     public static final Endec<AlloyForgeRecipe> ENDEC = Endec.ifAttr(SerializationAttributes.HUMAN_READABLE, RECIPE_ENDEC)
-            .orElse(
-                    StructEndecBuilder.of(
-                            Endec.map(EndecUtils.INGREDIENT, Endec.INT).fieldOf("inputs", AlloyForgeRecipe::getIngredientsMap),
-                            MinecraftEndecs.ITEM_STACK.fieldOf("result", AlloyForgeRecipe::getBaseResult),
-                            Endec.INT.fieldOf("min_forge_tier", AlloyForgeRecipe::getMinForgeTier),
-                            Endec.INT.fieldOf("fuel_per_tick", AlloyForgeRecipe::getFuelPerTick),
-                            Endec.map(AlloyForgeRecipe.OverrideRange.OVERRIDE_RANGE, MinecraftEndecs.ITEM_STACK).fieldOf("overrides", AlloyForgeRecipe::getTierOverrides),
-                            MinecraftEndecs.IDENTIFIER.optionalOf().fieldOf("secondary_id", AlloyForgeRecipe::secondaryID),
-                            AlloyForgeRecipe::new
-                    )
-            );
+        .orElse(
+            StructEndecBuilder.of(
+                Endec.map(EndecUtils.INGREDIENT, Endec.INT).fieldOf("inputs", AlloyForgeRecipe::getIngredientsMap),
+                MinecraftEndecs.ITEM_STACK.fieldOf("result", AlloyForgeRecipe::getBaseResult),
+                Endec.INT.fieldOf("min_forge_tier", AlloyForgeRecipe::getMinForgeTier),
+                Endec.INT.fieldOf("fuel_per_tick", AlloyForgeRecipe::getFuelPerTick),
+                Endec.map(AlloyForgeRecipe.OverrideRange.OVERRIDE_RANGE, MinecraftEndecs.ITEM_STACK).fieldOf("overrides", AlloyForgeRecipe::getTierOverrides),
+                MinecraftEndecs.IDENTIFIER.optionalOf().fieldOf("secondary_id", AlloyForgeRecipe::secondaryID),
+                AlloyForgeRecipe::new
+            )
+        );
 
     public static final AlloyForgeRecipeSerializer INSTANCE = new AlloyForgeRecipeSerializer(RECIPE_ENDEC, ENDEC);
 

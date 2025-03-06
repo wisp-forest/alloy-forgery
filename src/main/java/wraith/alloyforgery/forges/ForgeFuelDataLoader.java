@@ -10,24 +10,23 @@ import net.minecraft.item.Item;
 import net.minecraft.registry.Registries;
 import wraith.alloyforgery.AlloyForgery;
 import wraith.alloyforgery.utils.data.EndecableDataLoader;
-
 import java.util.HashMap;
 import java.util.Map;
 
-public class ForgeFuelRegistry {
+public class ForgeFuelDataLoader {
 
     public static final StructEndec<Pair<Item, ForgeFuelDefinition>> FUEL_ENTRY = StructEndecBuilder.of(
-            MinecraftEndecs.ofRegistry(Registries.ITEM).fieldOf("item", Pair::first),
-            ForgeFuelDefinition.ENDEC.flatFieldOf(Pair::second),
-            Pair::of
+        MinecraftEndecs.ofRegistry(Registries.ITEM).fieldOf("item", Pair::first),
+        ForgeFuelDefinition.ENDEC.flatFieldOf(Pair::second),
+        Pair::of
     );
 
     public static final EndecableDataLoader FUEL_DATA_LOADER = EndecableDataLoader.of(
-            AlloyForgery.id("forge_fuel_loader"),
-            "alloy_forge_fuels",
-            "fuels",
-            ForgeFuelRegistry.FUEL_ENTRY.listOf(),
-            (id, fuelEntries) -> fuelEntries.forEach(fuelEntry -> ForgeFuelRegistry.register(fuelEntry.first(), fuelEntry.second())));
+        AlloyForgery.id("forge_fuel_loader"),
+        "alloy_forge_fuels",
+        "fuels",
+        ForgeFuelDataLoader.FUEL_ENTRY.listOf(),
+        (id, fuelEntries) -> fuelEntries.forEach(fuelEntry -> ForgeFuelDataLoader.register(fuelEntry.first(), fuelEntry.second())));
 
     private static final Map<Item, ForgeFuelDefinition> REGISTRY = new HashMap<>();
 
@@ -52,9 +51,9 @@ public class ForgeFuelRegistry {
         public static final ForgeFuelDefinition EMPTY = new ForgeFuelDefinition(0, null);
 
         public static StructEndec<ForgeFuelDefinition> ENDEC = StructEndecBuilder.of(
-                Endec.INT.fieldOf("fuel", ForgeFuelDefinition::fuel),
-                MinecraftEndecs.ofRegistry(Registries.ITEM).optionalFieldOf("return_item", ForgeFuelDefinition::returnType, () -> null),
-                ForgeFuelDefinition::new
+            Endec.INT.fieldOf("fuel", ForgeFuelDefinition::fuel),
+            MinecraftEndecs.ofRegistry(Registries.ITEM).optionalFieldOf("return_item", ForgeFuelDefinition::returnType, () -> null),
+            ForgeFuelDefinition::new
         );
 
         public boolean hasReturnType() {

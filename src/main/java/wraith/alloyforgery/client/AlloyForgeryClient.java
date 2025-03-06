@@ -3,7 +3,6 @@ package wraith.alloyforgery.client;
 import net.fabricmc.api.*;
 import net.minecraft.client.gui.screen.ingame.HandledScreens;
 import wraith.alloyforgery.AlloyForgery;
-import wraith.alloyforgery.data.RecipeTagLoader;
 import wraith.alloyforgery.networking.AlloyForgeNetworking;
 
 @Environment(EnvType.CLIENT)

@@ -16,7 +16,6 @@ import net.minecraft.particle.ParticleTypes;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.resource.ResourceType;
-import net.minecraft.resource.featuretoggle.FeatureFlags;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Direction;
@@ -26,9 +25,7 @@ import wraith.alloyforgery.client.BlockEntityLocation;
 import wraith.alloyforgery.compat.AlloyForgeryConfig;
 import wraith.alloyforgery.data.AlloyForgeryGlobalRemaindersLoader;
 import wraith.alloyforgery.data.RecipeTagLoader;
-import wraith.alloyforgery.forges.ForgeDefinition;
-import wraith.alloyforgery.forges.ForgeFuelRegistry;
-import wraith.alloyforgery.forges.ForgeTierRegistry;
+import wraith.alloyforgery.forges.*;
 import wraith.alloyforgery.networking.AlloyForgeNetworking;
 import wraith.alloyforgery.recipe.*;
 import wraith.alloyforgery.utils.RecipeInjector;
@@ -46,14 +43,14 @@ public class AlloyForgery implements ModInitializer {
     public static final ParticleSystem<Direction> FORGE_PARTICLES = CONTROLLER.register(Direction.class, (world, pos, facing) -> {
         final Vec3d particleSide = pos.add(0.5 + facing.getOffsetX() * 0.515, 0.25, 0.5 + facing.getOffsetZ() * 0.515);
         ClientParticles.spawnPrecise(ParticleTypes.FLAME, world, particleSide,
-                facing.getOffsetZ() * 0.65,
-                0.175,
-                facing.getOffsetX() * 0.65);
+            facing.getOffsetZ() * 0.65,
+            0.175,
+            facing.getOffsetX() * 0.65);
 
         ClientParticles.spawnPrecise(ParticleTypes.SMOKE, world, particleSide,
-                facing.getOffsetZ() * 0.65,
-                0.175,
-                facing.getOffsetX() * 0.65);
+            facing.getOffsetZ() * 0.65,
+            0.175,
+            facing.getOffsetX() * 0.65);
     });
 
     @SuppressWarnings("UnstableApiUsage")
@@ -62,13 +59,13 @@ public class AlloyForgery implements ModInitializer {
         AlloyForgeNetworking.init();
 
         ALLOY_FORGE_SCREEN_HANDLER_TYPE = Registry.register(Registries.SCREEN_HANDLER, id("alloy_forge"), new ExtendedScreenHandlerType<>(
-                (syncId, inventory, location) -> new AlloyForgeScreenHandler(syncId, inventory, location.get(inventory.player, FORGE_CONTROLLER_BLOCK_ENTITY)),
-                CodecUtils.toPacketCodec(BlockEntityLocation.ENDEC)));
+            (syncId, inventory, location) -> new AlloyForgeScreenHandler(syncId, inventory, location.get(inventory.player, FORGE_CONTROLLER_BLOCK_ENTITY)),
+            CodecUtils.toPacketCodec(BlockEntityLocation.ENDEC)));
 
         ResourceManagerHelper.get(ResourceType.SERVER_DATA).registerReloadListener(new AlloyForgeryGlobalRemaindersLoader());
-        ResourceManagerHelper.get(ResourceType.SERVER_DATA).registerReloadListener(ForgeFuelRegistry.FUEL_DATA_LOADER);
+        ResourceManagerHelper.get(ResourceType.SERVER_DATA).registerReloadListener(ForgeFuelDataLoader.FUEL_DATA_LOADER);
 
-        ForgeTierRegistry.initDataLoaders();
+        ForgeTierDataLoader.initDataLoaders();
 
         var recipeTagLoader = new RecipeTagLoader();
 

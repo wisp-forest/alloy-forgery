@@ -86,9 +86,9 @@ public class DelayedTagGroupLoader<T> extends TagGroupLoader<T> {
 
             if (!missingReferences.isEmpty()) {
                 LOGGER.error(
-                        "Couldn't load the given entries within tag {}: {}",
-                        id,
-                        missingReferences.stream().map(Objects::toString).collect(Collectors.joining(", "))
+                    "Couldn't load the given entries within tag {}: {}",
+                    id,
+                    missingReferences.stream().map(Objects::toString).collect(Collectors.joining(", "))
                 );
             }
 

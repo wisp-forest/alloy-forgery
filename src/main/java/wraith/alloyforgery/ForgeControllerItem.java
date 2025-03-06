@@ -7,8 +7,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import wraith.alloyforgery.block.ForgeControllerBlock;
 import wraith.alloyforgery.forges.ForgeDefinition;
-import wraith.alloyforgery.forges.ForgeTierRegistry;
-
+import wraith.alloyforgery.forges.ForgeTierDataLoader;
 import java.util.List;
 
 public class ForgeControllerItem extends BlockItem {
@@ -19,7 +18,7 @@ public class ForgeControllerItem extends BlockItem {
 
     @Override
     public void appendTooltip(ItemStack stack, TooltipContext context, List<Text> tooltip, TooltipType type) {
-        var tier = ForgeTierRegistry.getForgeRegistry(true).getForgeTier(getForgeDefinition());
+        var tier = ForgeTierDataLoader.getForgeRegistry(true).getForgeTier(getForgeDefinition());
 
         if (tier == null) return;
 

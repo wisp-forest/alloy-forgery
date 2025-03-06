@@ -32,7 +32,7 @@ public record RawAlloyForgeRecipe(Map<Ingredient, Integer> inputs, OutputData ou
         public int hashCode(Ingredient o) {
             String stringData;
 
-            if(o == null) return 0;
+            if (o == null) return 0;
 
             try {
                 stringData = Ingredient.ALLOW_EMPTY_CODEC.encodeStart(JsonOps.INSTANCE, o).getOrThrow(IllegalStateException::new).toString();
@@ -45,7 +45,7 @@ public record RawAlloyForgeRecipe(Map<Ingredient, Integer> inputs, OutputData ou
 
         @Override
         public boolean equals(Ingredient a, Ingredient b) {
-            if(a == null || b == null) return false;
+            if (a == null || b == null) return false;
 
             String stringDataA;
             String stringDataB;
@@ -72,17 +72,17 @@ public record RawAlloyForgeRecipe(Map<Ingredient, Integer> inputs, OutputData ou
         for (CountedIngredient countedIngredient : list) {
             var ingredient = countedIngredient.ingredient();
 
-            if(unprocessedData.containsKey(ingredient) && (AlloyForgery.CONFIG.strictRecipeChecks() || FabricLoader.getInstance().isDevelopmentEnvironment())) {
+            if (unprocessedData.containsKey(ingredient) && (AlloyForgery.CONFIG.strictRecipeChecks() || FabricLoader.getInstance().isDevelopmentEnvironment())) {
                 var jsonData = Ingredient.ALLOW_EMPTY_CODEC.encodeStart(JsonOps.INSTANCE, ingredient)
-                        .result()
-                        .map(JsonElement::toString)
-                        .orElse("Error Unknown");
+                    .result()
+                    .map(JsonElement::toString)
+                    .orElse("Error Unknown");
 
                 throw new IllegalStateException("Duplicate Ingredient Entry! Merge all ingredients of [" + jsonData + "] into a single entry and add a count!");
             }
 
             unprocessedData.computeIfAbsent(ingredient, key -> new MutableInt(0))
-                    .add(countedIngredient.count());
+                .add(countedIngredient.count());
         }
 
         var data = new LinkedHashMap<Ingredient, Integer>();
@@ -92,52 +92,52 @@ public record RawAlloyForgeRecipe(Map<Ingredient, Integer> inputs, OutputData ou
         return data;
     }, map -> {
         return map.entrySet().stream()
-                .map(entry -> new CountedIngredient(entry.getKey(), entry.getValue())).toList();
+            .map(entry -> new CountedIngredient(entry.getKey(), entry.getValue())).toList();
     });
 
     public static Endec<AlloyForgeRecipe.PendingOverride> PENDING_OVERRIDE = StructEndecBuilder.of(
-            MinecraftEndecs.ofRegistry(Registries.ITEM).optionalFieldOf("item", AlloyForgeRecipe.PendingOverride::item, () -> null),
-            MinecraftEndecs.ofRegistry(Registries.ITEM).optionalFieldOf("id", orderride -> null, () -> null), //TODO: REMOVE LATER
-            Endec.INT.fieldOf("count", AlloyForgeRecipe.PendingOverride::count),
-            CodecUtils.toEndec(ComponentChanges.CODEC).optionalFieldOf("components", AlloyForgeRecipe.PendingOverride::components, ComponentChanges.EMPTY),
-            (item, item2, count, components) -> {
-                if(item == null) item = item2;
+        MinecraftEndecs.ofRegistry(Registries.ITEM).optionalFieldOf("item", AlloyForgeRecipe.PendingOverride::item, () -> null),
+        MinecraftEndecs.ofRegistry(Registries.ITEM).optionalFieldOf("id", orderride -> null, () -> null), //TODO: REMOVE LATER
+        Endec.INT.fieldOf("count", AlloyForgeRecipe.PendingOverride::count),
+        CodecUtils.toEndec(ComponentChanges.CODEC).optionalFieldOf("components", AlloyForgeRecipe.PendingOverride::components, ComponentChanges.EMPTY),
+        (item, item2, count, components) -> {
+            if (item == null) item = item2;
 
-                return new AlloyForgeRecipe.PendingOverride(item, count, components);
-            }
+            return new AlloyForgeRecipe.PendingOverride(item, count, components);
+        }
     );
 
     public static StructEndec<RawAlloyForgeRecipe> ENDEC = StructEndecBuilder.of(
-            INPUTS.validate(ingredientToCount -> {
-                if (ingredientToCount.isEmpty()) {
-                    throw new JsonSyntaxException("Inputs cannot be empty");
-                } else if (ingredientToCount.keySet().size() > 10) {
-                    throw new JsonSyntaxException("Recipe has more than 10 distinct input ingredients");
-                } else if (ingredientToCount.values().stream().mapToInt(integer -> integer).sum() > (10 * 64)) {
-                    throw new JsonSyntaxException("Recipe exceeded maximum input item count of " + (10 * 64));
-                }
-            }).fieldOf("inputs", RawAlloyForgeRecipe::inputs),
-            OutputData.ENDEC.fieldOf("output", RawAlloyForgeRecipe::outputData),
-            Endec.INT.fieldOf("min_forge_tier", RawAlloyForgeRecipe::minForgeTier),
-            Endec.INT.fieldOf("fuel_per_tick", RawAlloyForgeRecipe::requiredFuel),
-            PENDING_OVERRIDE.mapOf().xmap(rawData -> {
-                Map<AlloyForgeRecipe.OverrideRange, AlloyForgeRecipe.PendingOverride> data = new LinkedHashMap<>();
+        INPUTS.validate(ingredientToCount -> {
+            if (ingredientToCount.isEmpty()) {
+                throw new JsonSyntaxException("Inputs cannot be empty");
+            } else if (ingredientToCount.keySet().size() > 10) {
+                throw new JsonSyntaxException("Recipe has more than 10 distinct input ingredients");
+            } else if (ingredientToCount.values().stream().mapToInt(integer -> integer).sum() > (10 * 64)) {
+                throw new JsonSyntaxException("Recipe exceeded maximum input item count of " + (10 * 64));
+            }
+        }).fieldOf("inputs", RawAlloyForgeRecipe::inputs),
+        OutputData.ENDEC.fieldOf("output", RawAlloyForgeRecipe::outputData),
+        Endec.INT.fieldOf("min_forge_tier", RawAlloyForgeRecipe::minForgeTier),
+        Endec.INT.fieldOf("fuel_per_tick", RawAlloyForgeRecipe::requiredFuel),
+        PENDING_OVERRIDE.mapOf().xmap(rawData -> {
+            Map<AlloyForgeRecipe.OverrideRange, AlloyForgeRecipe.PendingOverride> data = new LinkedHashMap<>();
 
-                rawData.forEach((s, pendingOverride) -> data.put(AlloyForgeRecipe.OverrideRange.fromString(s), pendingOverride));
+            rawData.forEach((s, pendingOverride) -> data.put(AlloyForgeRecipe.OverrideRange.fromString(s), pendingOverride));
 
-                return data;
-            }, data -> {
-                Map<String, AlloyForgeRecipe.PendingOverride> rawData = new LinkedHashMap<>();
+            return data;
+        }, data -> {
+            Map<String, AlloyForgeRecipe.PendingOverride> rawData = new LinkedHashMap<>();
 
-                data.forEach((range, pendingOverride) -> rawData.put(range.toString(), pendingOverride));
+            data.forEach((range, pendingOverride) -> rawData.put(range.toString(), pendingOverride));
 
-                return rawData;
-            }).optionalFieldOf("overrides", RawAlloyForgeRecipe::overrideData, HashMap::new),
-            RawAlloyForgeRecipe::new
+            return rawData;
+        }).optionalFieldOf("overrides", RawAlloyForgeRecipe::overrideData, HashMap::new),
+        RawAlloyForgeRecipe::new
     );
 
-    public Pair<ItemStack, ImmutableMap<AlloyForgeRecipe.OverrideRange, ItemStack>> finalOutputData(Map<AlloyForgeRecipe.OverrideRange, AlloyForgeRecipe.PendingOverride> overridesBuilder){
-        if(outputData.outputItem() == null) return new Pair<>(ItemStack.EMPTY, ImmutableMap.of());
+    public Pair<ItemStack, ImmutableMap<AlloyForgeRecipe.OverrideRange, ItemStack>> finalOutputData(Map<AlloyForgeRecipe.OverrideRange, AlloyForgeRecipe.PendingOverride> overridesBuilder) {
+        if (outputData.outputItem() == null) return new Pair<>(ItemStack.EMPTY, ImmutableMap.of());
 
         final var builder = ImmutableMap.<AlloyForgeRecipe.OverrideRange, ItemStack>builder();
 
@@ -153,7 +153,7 @@ public record RawAlloyForgeRecipe(Map<Ingredient, Integer> inputs, OutputData ou
                 stack = entry.getValue().stack();
             }
 
-            if(!entry.getValue().components().isEmpty()) {
+            if (!entry.getValue().components().isEmpty()) {
                 stack.applyChanges(entry.getValue().components());
             }
 
@@ -163,11 +163,11 @@ public record RawAlloyForgeRecipe(Map<Ingredient, Integer> inputs, OutputData ou
         return new Pair<>(outputStack, builder.build());
     }
 
-    public AlloyForgeRecipe generateRecipe(){
+    public AlloyForgeRecipe generateRecipe() {
         return generateRecipe(false);
     }
 
-    public AlloyForgeRecipe generateRecipe(boolean isDataGenerated){
+    public AlloyForgeRecipe generateRecipe(boolean isDataGenerated) {
         var outputData = this.finalOutputData(this.overrideData);
 
         final var recipe = new AlloyForgeRecipe(Optional.of(this), this.inputs, outputData.getLeft(), minForgeTier, requiredFuel, outputData.getRight());

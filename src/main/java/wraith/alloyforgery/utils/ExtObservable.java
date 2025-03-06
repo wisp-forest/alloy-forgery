@@ -1,10 +1,6 @@
 package wraith.alloyforgery.utils;
 
-import io.wispforest.owo.util.EventSource;
-import io.wispforest.owo.util.EventStream;
-import io.wispforest.owo.util.Observable;
-
-import java.util.Collection;
+import io.wispforest.owo.util.*;
 import java.util.function.Consumer;
 
 public class ExtObservable<T> extends Observable<T> {
