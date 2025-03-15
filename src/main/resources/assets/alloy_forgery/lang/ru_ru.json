@@ -1,19 +1,56 @@
 {
-  "block.alloy_forgery.bricks_forge_controller": "Контроллер кузницы из кирпичей",
-  "block.alloy_forgery.stone_bricks_forge_controller": "Контроллер кузницы из каменных кирпичей",
-  "block.alloy_forgery.deepslate_bricks_forge_controller": "Контроллер кузницы из глубинносланцевых кирпичей",
-  "block.alloy_forgery.end_stone_bricks_forge_controller": "Контроллер кузницы из эндерняковых кирпичей",
+  "block.alloy_forgery.bricks_forge_controller": "Контроллер кирпичной кузницы",
+  "block.alloy_forgery.stone_bricks_forge_controller": "Контроллер кузницы из каменного кирпича",
+  "block.alloy_forgery.deepslate_bricks_forge_controller": "Контроллер кузницы из глубинносланцевого кирпича",
+  "block.alloy_forgery.end_stone_bricks_forge_controller": "Контроллер кузницы из эндернякового кирпича",
   "block.alloy_forgery.polished_blackstone_forge_controller": "Контроллер кузницы из полированного чернита",
+  "block.alloy_forgery.prismarine_bricks_forge_controller": "Контроллер кузницы из призмаринового кирпича",
 
   "tooltip.alloy_forgery.forge_tier": "Уровень: %d",
   "tooltip.alloy_forgery.fuel_capacity": "Запас топлива: %d",
+  "tooltip.alloy_forgery.invalid_tier": "Для этого рецепта требуется контроллер кузницы уровня %d",
 
-  "container.alloy_forgery.forge_controller": "Контроллер кузницы",
+  "tooltip.alloy_forgery.slot_toggle_enable": "Отключить переключение слота",
+  "tooltip.alloy_forgery.slot_toggle_disable": "Включить переключение слота",
 
-  "container.alloy_forgery.rei.title": "Alloy Forgery",
+  "tooltip.alloy_forgery.enabled_slot": "Нажмите, чтобы отключить слот",
+  "tooltip.alloy_forgery.disabled_slot": "Нажмите, чтобы включить слот",
+
+  "container.alloy_forgery.forge_controller": "Кузница сплавов",
+
+  "container.alloy_forgery.rei.title": "Ковка из сплава",
   "container.alloy_forgery.rei.min_tier": "Требуемый уровень: %d",
-  "container.alloy_forgery.rei.fuel_per_tick": "Расход топлива в тик: %d",
+  "container.alloy_forgery.rei.fuel_per_tick": "Топлива за такт: %d",
+  "container.alloy_forgery.rei.button": "Прокрутить переопределения уровня",
 
-  "message.alloy_forgery.invalid_multiblock": "Есть ошибки в составлении многоблочной структуры",
-  "itemGroup.alloy_forgery.alloy_forgery": "Alloy Forgery"
+  "message.alloy_forgery.invalid_multiblock": "Недопустимое составление многоблочной структуры",
+  "itemGroup.alloy_forgery.alloy_forgery": "Ковка из Сплава",
+  "itemGroup.alloy_forgery.alloy_forgery.button.discord": "Discord",
+  "itemGroup.alloy_forgery.alloy_forgery.button.curseforge": "CurseForge",
+  "itemGroup.alloy_forgery.alloy_forgery.button.modrinth": "Modrinth",
+  "itemGroup.alloy_forgery.alloy_forgery.button.github": "GitHub",
+
+  "emi.category.alloy_forgery.alloy_forge": "Ковка из сплава",
+
+  "tag.item.c.copper_ores": "Медные руды",
+  "tag.item.c.iron_ores": "Железные руды",
+  "tag.item.c.gold_ores": "Золотые руды",
+  "tag.item.c.raw_copper_blocks": "Блоки рудной меди",
+  "tag.item.c.raw_iron_blocks": "Блоки рудного железа",
+  "tag.item.c.raw_gold_blocks": "Блоки рудного золота",
+
+  "text.config.alloy_forgery.title": "Настройки ковки из сплава",
+  "text.config.alloy_forgery.section.blasting_adaption": "Плавильное приспособление",
+
+  "text.config.alloy_forgery.option.allowHigherTierOutput": "Разрешить выход более высокого уровня",
+  "text.config.alloy_forgery.option.allowHigherTierOutput.tooltip": "Переключите для включения или выключения выхода более высокого уровня плавильного приспособления для всех рецептов",
+
+  "text.config.alloy_forgery.option.allowBlastingFurnaceAdaption": "Разрешить адаптацию рецептов плавильной печи",
+  "text.config.alloy_forgery.option.allowBlastingFurnaceAdaption.tooltip": "Переключите для включения или выключения плавильного приспособления для всех рецептов выплавки",
+
+  "text.config.alloy_forgery.option.baseInputAmount": "Базовое входное количество",
+  "text.config.alloy_forgery.option.baseInputAmount.tooltip": "Настраивает базовое входное количество для адаптированных рецептов",
+
+  "text.config.alloy_forgery.option.higherTierOutputIncrease": "Количество выхода дополнительного уровня",
+  "text.config.alloy_forgery.option.higherTierOutputAmount.tooltip": "Настраивает дополнительное количество, увеличивающуюся при достижении уровня 3"
 }
