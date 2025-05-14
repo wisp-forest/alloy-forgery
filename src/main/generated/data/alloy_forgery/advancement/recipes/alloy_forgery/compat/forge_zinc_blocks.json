@@ -4,8 +4,8 @@
       "condition": "fabric:tags_populated",
       "registry": "minecraft:item",
       "values": [
-        "c:storage_blocks/zinc",
-        "c:storage_blocks/raw_zinc"
+        "c:storage_blocks/raw_zinc",
+        "c:storage_blocks/zinc"
       ]
     }
   ],

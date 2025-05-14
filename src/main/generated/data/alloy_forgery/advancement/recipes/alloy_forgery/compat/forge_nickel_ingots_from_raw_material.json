@@ -4,8 +4,8 @@
       "condition": "fabric:tags_populated",
       "registry": "minecraft:item",
       "values": [
-        "c:ingots/nickel",
-        "c:raw_materials/nickel"
+        "c:raw_materials/nickel",
+        "c:ingots/nickel"
       ]
     }
   ],

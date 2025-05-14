@@ -4,8 +4,8 @@
       "condition": "fabric:tags_populated",
       "registry": "minecraft:item",
       "values": [
-        "c:ingots/lead",
-        "c:raw_materials/lead"
+        "c:raw_materials/lead",
+        "c:ingots/lead"
       ]
     }
   ],

@@ -1,0 +1,43 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:tags_populated",
+      "registry": "minecraft:item",
+      "values": [
+        "c:storage_blocks/raw_gold",
+        "c:storage_blocks/raw_silver",
+        "c:storage_blocks/electrum"
+      ]
+    }
+  ],
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_electrum": {
+      "conditions": {
+        "items": [
+          {
+            "items": "#c:storage_blocks/raw_silver"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "minecraft:compat/alloys/forge_electrum_from_raw_ore_blocks"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_electrum"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "minecraft:compat/alloys/forge_electrum_from_raw_ore_blocks"
+    ]
+  }
+}

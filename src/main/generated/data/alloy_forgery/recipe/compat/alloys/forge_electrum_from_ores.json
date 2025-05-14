@@ -11,28 +11,30 @@
     }
   ],
   "type": "alloy_forgery:forging",
+  "fuel_per_tick": 10,
   "inputs": [
     {
+      "count": 1,
       "tag": "c:ores/gold"
     },
-	  {
+    {
+      "count": 1,
       "tag": "c:ores/silver"
     }
   ],
+  "min_forge_tier": 2,
   "output": {
+    "count": 2,
     "priority": [
       "techreborn:electrum_ingot",
       "indrev:electrum_ingot",
       "modern_industrialization:electrum_ingot"
     ],
-    "tag": "c:ingots/electrum",
-    "count": 2
+    "tag": "c:ingots/electrum"
   },
   "overrides": {
     "3+": {
       "count": 3
     }
-  },
-  "min_forge_tier": 2,
-  "fuel_per_tick": 10
+  }
 }

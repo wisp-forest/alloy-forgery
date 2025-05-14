@@ -1,6 +1,9 @@
 package wraith.alloyforgery.data.builders;
 
+import com.google.common.collect.Streams;
 import com.mojang.logging.LogUtils;
+import net.fabricmc.fabric.api.resource.conditions.v1.ResourceCondition;
+import net.fabricmc.fabric.api.resource.conditions.v1.ResourceConditions;
 import net.minecraft.advancement.*;
 import net.minecraft.advancement.AdvancementRequirements.CriterionMerger;
 import net.minecraft.advancement.criterion.RecipeUnlockedCriterion;
@@ -10,12 +13,16 @@ import net.minecraft.data.server.recipe.RecipeExporter;
 import net.minecraft.item.*;
 import net.minecraft.recipe.Ingredient;
 import net.minecraft.registry.Registries;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.tag.TagKey;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import wraith.alloyforgery.recipe.*;
 import java.util.*;
+import java.util.function.BiFunction;
+import java.util.function.Function;
+import java.util.stream.Stream;
 
 public class AlloyForgeryRecipeBuilder implements CraftingRecipeJsonBuilder {
 
@@ -23,6 +30,8 @@ public class AlloyForgeryRecipeBuilder implements CraftingRecipeJsonBuilder {
 
     private final Map<String, AdvancementCriterion<?>> advancementBuilder = new LinkedHashMap<>();
     private String group = "";
+
+    private final Set<TagKey<Item>> inputTags = new LinkedHashSet<>();
 
     @Nullable
     private final TagKey<Item> outputTag;
@@ -73,12 +82,29 @@ public class AlloyForgeryRecipeBuilder implements CraftingRecipeJsonBuilder {
     }
 
     public AlloyForgeryRecipeBuilder addPriorityOutput(Identifier... outputId) {
-        priorities.addAll(List.of(outputId));
+        return addPriorityOutput(List.of(outputId));
+    }
+
+    public AlloyForgeryRecipeBuilder addPriorityOutput(List<Identifier> outputIds) {
+        priorities.addAll(outputIds);
+        return this;
+    }
+
+    public AlloyForgeryRecipeBuilder tagInputs(Map<TagKey<Item>, Integer> inputs) {
+        inputs.forEach(this::input);
+
         return this;
     }
 
     public AlloyForgeryRecipeBuilder input(TagKey<Item> input, int count) {
+        this.inputTags.add(input);
         this.inputs.put(Ingredient.fromTag(input), count);
+        return this;
+    }
+
+    public AlloyForgeryRecipeBuilder itemInputs(Map<ItemConvertible, Integer> inputs) {
+        inputs.forEach(this::input);
+
         return this;
     }
 
@@ -88,7 +114,7 @@ public class AlloyForgeryRecipeBuilder implements CraftingRecipeJsonBuilder {
     }
 
     public AlloyForgeryRecipeBuilder input(ItemStack inputStack) {
-        this.inputs.put(Ingredient.ofItems(inputStack.getItem()), inputStack.getCount());
+        this.inputs.put(Ingredient.ofStacks(inputStack), inputStack.getCount());
         return this;
     }
 
@@ -136,6 +162,12 @@ public class AlloyForgeryRecipeBuilder implements CraftingRecipeJsonBuilder {
     @Override
     public AlloyForgeryRecipeBuilder criterion(String string, AdvancementCriterion criterion) {
         this.advancementBuilder.put(string, criterion);
+        return this;
+    }
+
+    public <T> AlloyForgeryRecipeBuilder criterion(String string, Map<T, Integer> inputs, Function<T, AdvancementCriterion> criterionMaker) {
+        inputs.keySet().forEach(itemTagKey -> this.criterion(string, criterionMaker.apply(itemTagKey)));
+
         return this;
     }
 
@@ -194,6 +226,14 @@ public class AlloyForgeryRecipeBuilder implements CraftingRecipeJsonBuilder {
         }
 
         this.offerTo(exporter, identifier2);
+    }
+
+    public void offerToWithConditions(RecipeExporter exporter, String recipePath, BiFunction<RecipeExporter, ResourceCondition[], RecipeExporter> withConditionsWrapper) {
+        var tags = (TagKey<Item>[]) Streams.concat(inputTags.stream(), Stream.of(this.outputTag)).toArray(TagKey[]::new);
+
+        exporter = withConditionsWrapper.apply(exporter, new ResourceCondition[]{ResourceConditions.tagsPopulated(RegistryKeys.ITEM, tags)});
+
+        offerTo(exporter, recipePath);
     }
 
     public void validate(Identifier recipeId) {

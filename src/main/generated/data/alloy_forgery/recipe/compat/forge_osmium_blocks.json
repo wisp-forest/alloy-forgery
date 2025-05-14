@@ -4,8 +4,8 @@
       "condition": "fabric:tags_populated",
       "registry": "minecraft:item",
       "values": [
-        "c:storage_blocks/osmium",
-        "c:storage_blocks/raw_osmium"
+        "c:storage_blocks/raw_osmium",
+        "c:storage_blocks/osmium"
       ]
     }
   ],

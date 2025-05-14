@@ -4,8 +4,8 @@
       "condition": "fabric:tags_populated",
       "registry": "minecraft:item",
       "values": [
-        "c:ingots/tin",
-        "c:raw_materials/tin"
+        "c:raw_materials/tin",
+        "c:ingots/tin"
       ]
     }
   ],

@@ -4,8 +4,8 @@
       "condition": "fabric:tags_populated",
       "registry": "minecraft:item",
       "values": [
-        "c:ingots/adamantite",
-        "c:ores/adamantite"
+        "c:ores/adamantite",
+        "c:ingots/adamantite"
       ]
     }
   ],

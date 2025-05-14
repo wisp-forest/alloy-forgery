@@ -4,8 +4,8 @@
       "condition": "fabric:tags_populated",
       "registry": "minecraft:item",
       "values": [
-        "c:ingots/antimony",
-        "c:raw_materials/antimony"
+        "c:raw_materials/antimony",
+        "c:ingots/antimony"
       ]
     }
   ],

@@ -4,8 +4,8 @@
       "condition": "fabric:tags_populated",
       "registry": "minecraft:item",
       "values": [
-        "c:ingots/osmium",
-        "c:ores/osmium"
+        "c:ores/osmium",
+        "c:ingots/osmium"
       ]
     }
   ],

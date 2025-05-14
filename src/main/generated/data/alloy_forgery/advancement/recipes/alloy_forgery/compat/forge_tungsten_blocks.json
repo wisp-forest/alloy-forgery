@@ -4,8 +4,8 @@
       "condition": "fabric:tags_populated",
       "registry": "minecraft:item",
       "values": [
-        "c:storage_blocks/tungsten",
-        "c:storage_blocks/raw_tungsten"
+        "c:storage_blocks/raw_tungsten",
+        "c:storage_blocks/tungsten"
       ]
     }
   ],

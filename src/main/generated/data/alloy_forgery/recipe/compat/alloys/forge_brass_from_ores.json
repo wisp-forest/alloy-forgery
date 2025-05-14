@@ -11,22 +11,25 @@
     }
   ],
   "type": "alloy_forgery:forging",
+  "fuel_per_tick": 5,
   "inputs": [
     {
-      "tag": "c:ores/copper",
-      "count": 2
+      "count": 2,
+      "tag": "c:ores/copper"
     },
     {
+      "count": 1,
       "tag": "c:ores/zinc"
     }
   ],
+  "min_forge_tier": 1,
   "output": {
+    "count": 3,
     "priority": [
       "create:brass_ingot",
       "techreborn:brass_ingot"
     ],
-    "tag": "c:ingots/brass",
-    "count": 3
+    "tag": "c:ingots/brass"
   },
   "overrides": {
     "2+": {
@@ -35,7 +38,5 @@
     "3+": {
       "count": 5
     }
-  },
-  "min_forge_tier": 1,
-  "fuel_per_tick": 5
+  }
 }

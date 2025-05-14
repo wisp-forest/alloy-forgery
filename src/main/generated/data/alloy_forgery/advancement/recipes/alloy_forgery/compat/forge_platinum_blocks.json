@@ -4,8 +4,8 @@
       "condition": "fabric:tags_populated",
       "registry": "minecraft:item",
       "values": [
-        "c:storage_blocks/platinum",
-        "c:storage_blocks/raw_platinum"
+        "c:storage_blocks/raw_platinum",
+        "c:storage_blocks/platinum"
       ]
     }
   ],

@@ -4,8 +4,8 @@
       "condition": "fabric:tags_populated",
       "registry": "minecraft:item",
       "values": [
-        "c:ingots/tungsten",
-        "c:raw_materials/tungsten"
+        "c:raw_materials/tungsten",
+        "c:ingots/tungsten"
       ]
     }
   ],

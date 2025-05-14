@@ -4,30 +4,39 @@
       "condition": "fabric:tags_populated",
       "registry": "minecraft:item",
       "values": [
-        "c:coal",
-        "c:ingots/iron",
+        "c:ores/iron",
+        "c:ores/coal",
         "c:ingots/steel"
       ]
     }
   ],
   "type": "alloy_forgery:forging",
+  "fuel_per_tick": 5,
   "inputs": [
     {
-      "tag": "c:ingots/iron"
+      "count": 1,
+      "tag": "c:ores/iron"
     },
-	  {
-      "tag": "c:coal"
+    {
+      "count": 1,
+      "tag": "c:ores/coal"
     }
   ],
+  "min_forge_tier": 1,
   "output": {
+    "count": 2,
     "priority": [
       "techreborn:steel_ingot",
-      "indrev:steel_ingot",
       "modern_industrialization:steel_ingot"
     ],
-    "tag": "c:ingots/steel",
-    "count": 2
+    "tag": "c:ingots/steel"
   },
-  "min_forge_tier": 1,
-  "fuel_per_tick": 5
+  "overrides": {
+    "2+": {
+      "count": 3
+    },
+    "3+": {
+      "count": 4
+    }
+  }
 }

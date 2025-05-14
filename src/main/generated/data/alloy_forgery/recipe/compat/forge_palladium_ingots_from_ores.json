@@ -4,8 +4,8 @@
       "condition": "fabric:tags_populated",
       "registry": "minecraft:item",
       "values": [
-        "c:ingots/palladium",
-        "c:ores/palladium"
+        "c:ores/palladium",
+        "c:ingots/palladium"
       ]
     }
   ],

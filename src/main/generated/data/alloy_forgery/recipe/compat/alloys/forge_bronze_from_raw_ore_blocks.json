@@ -4,32 +4,38 @@
       "condition": "fabric:tags_populated",
       "registry": "minecraft:item",
       "values": [
-        "c:ingots/tin",
-        "c:ingots/copper",
-        "c:ingots/bronze"
+        "c:storage_blocks/raw_copper",
+        "c:storage_blocks/raw_tin",
+        "c:storage_blocks/bronze"
       ]
     }
   ],
   "type": "alloy_forgery:forging",
+  "fuel_per_tick": 45,
   "inputs": [
     {
-      "tag": "c:ingots/copper",
-      "count": 2
+      "count": 3,
+      "tag": "c:storage_blocks/raw_copper"
     },
-	  {
-      "tag": "c:ingots/tin"
+    {
+      "count": 1,
+      "tag": "c:storage_blocks/raw_tin"
     }
   ],
+  "min_forge_tier": 1,
   "output": {
+    "count": 4,
     "priority": [
       "mythicmetals:bronze_ingot",
       "techreborn:bronze_ingot",
       "indrev:bronze_ingot",
       "modern_industrialization:bronze_ingot"
     ],
-    "tag": "c:ingots/bronze",
-    "count": 2
+    "tag": "c:storage_blocks/bronze"
   },
-  "min_forge_tier": 1,
-  "fuel_per_tick": 5
+  "overrides": {
+    "2+": {
+      "count": 5
+    }
+  }
 }

@@ -4,8 +4,8 @@
       "condition": "fabric:tags_populated",
       "registry": "minecraft:item",
       "values": [
-        "c:ingots/mythril",
-        "c:ores/mythril"
+        "c:ores/mythril",
+        "c:ingots/mythril"
       ]
     }
   ],

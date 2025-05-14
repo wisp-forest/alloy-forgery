@@ -4,8 +4,8 @@
       "condition": "fabric:tags_populated",
       "registry": "minecraft:item",
       "values": [
-        "c:ingots/manganese",
-        "c:raw_materials/manganese"
+        "c:raw_materials/manganese",
+        "c:ingots/manganese"
       ]
     }
   ],

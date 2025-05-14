@@ -4,35 +4,36 @@
       "condition": "fabric:tags_populated",
       "registry": "minecraft:item",
       "values": [
-        "c:raw_materials/copper",
-        "c:raw_materials/zinc",
-        "c:ingots/brass"
+        "c:storage_blocks/raw_copper",
+        "c:storage_blocks/raw_zinc",
+        "c:storage_blocks/brass"
       ]
     }
   ],
   "type": "alloy_forgery:forging",
+  "fuel_per_tick": 45,
   "inputs": [
     {
-      "tag": "c:raw_materials/copper",
-      "count": 2
+      "count": 2,
+      "tag": "c:storage_blocks/raw_copper"
     },
-	{
-      "tag": "c:raw_materials/zinc"
+    {
+      "count": 1,
+      "tag": "c:storage_blocks/raw_zinc"
     }
   ],
+  "min_forge_tier": 1,
   "output": {
+    "count": 3,
     "priority": [
       "create:brass_ingot",
       "techreborn:brass_ingot"
     ],
-    "tag": "c:ingots/brass",
-    "count": 3
+    "tag": "c:storage_blocks/brass"
   },
   "overrides": {
     "2+": {
       "count": 4
     }
-  },
-  "min_forge_tier": 1,
-  "fuel_per_tick": 5
+  }
 }

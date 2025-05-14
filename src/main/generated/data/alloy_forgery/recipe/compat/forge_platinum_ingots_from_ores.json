@@ -4,8 +4,8 @@
       "condition": "fabric:tags_populated",
       "registry": "minecraft:item",
       "values": [
-        "c:ingots/platinum",
-        "c:ores/platinum"
+        "c:ores/platinum",
+        "c:ingots/platinum"
       ]
     }
   ],

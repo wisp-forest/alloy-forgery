@@ -1,0 +1,43 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:tags_populated",
+      "registry": "minecraft:item",
+      "values": [
+        "c:ores/copper",
+        "c:ores/zinc",
+        "c:ingots/brass"
+      ]
+    }
+  ],
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_brass": {
+      "conditions": {
+        "items": [
+          {
+            "items": "#c:ores/zinc"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "minecraft:compat/alloys/forge_brass_from_ores"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_brass"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "minecraft:compat/alloys/forge_brass_from_ores"
+    ]
+  }
+}

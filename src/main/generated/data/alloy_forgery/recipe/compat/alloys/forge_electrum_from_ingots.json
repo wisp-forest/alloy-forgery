@@ -4,35 +4,33 @@
       "condition": "fabric:tags_populated",
       "registry": "minecraft:item",
       "values": [
-        "c:raw_materials/gold",
-        "c:raw_materials/silver",
+        "c:ingots/gold",
+        "c:ingots/silver",
         "c:ingots/electrum"
       ]
     }
   ],
   "type": "alloy_forgery:forging",
+  "fuel_per_tick": 10,
   "inputs": [
     {
-      "tag": "c:raw_materials/gold"
+      "count": 1,
+      "tag": "c:ingots/gold"
     },
-	  {
-      "tag": "c:raw_materials/silver"
+    {
+      "count": 1,
+      "tag": "c:ingots/silver"
     }
   ],
+  "min_forge_tier": 2,
   "output": {
+    "count": 2,
     "priority": [
       "techreborn:electrum_ingot",
       "indrev:electrum_ingot",
       "modern_industrialization:electrum_ingot"
     ],
-    "tag": "c:ingots/electrum",
-    "count": 2
+    "tag": "c:ingots/electrum"
   },
-  "overrides": {
-    "3+": {
-      "count": 3
-    }
-  },
-  "min_forge_tier": 2,
-  "fuel_per_tick": 10
+  "overrides": {}
 }

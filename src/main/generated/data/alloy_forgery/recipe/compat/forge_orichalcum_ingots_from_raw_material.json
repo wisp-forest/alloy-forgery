@@ -4,8 +4,8 @@
       "condition": "fabric:tags_populated",
       "registry": "minecraft:item",
       "values": [
-        "c:ingots/orichalcum",
-        "c:raw_materials/orichalcum"
+        "c:raw_materials/orichalcum",
+        "c:ingots/orichalcum"
       ]
     }
   ],

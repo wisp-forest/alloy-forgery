@@ -4,35 +4,36 @@
       "condition": "fabric:tags_populated",
       "registry": "minecraft:item",
       "values": [
-        "c:raw_materials/iron",
-        "c:raw_materials/nickel",
-        "c:ingots/invar"
+        "c:storage_blocks/raw_iron",
+        "c:storage_blocks/raw_nickel",
+        "c:storage_blocks/invar"
       ]
     }
   ],
   "type": "alloy_forgery:forging",
+  "fuel_per_tick": 45,
   "inputs": [
     {
-      "tag": "c:raw_materials/iron",
-      "count": 2
+      "count": 2,
+      "tag": "c:storage_blocks/raw_iron"
     },
-	{
-      "tag": "c:raw_materials/nickel"
+    {
+      "count": 1,
+      "tag": "c:storage_blocks/raw_nickel"
     }
   ],
+  "min_forge_tier": 1,
   "output": {
+    "count": 3,
     "priority": [
       "techreborn:invar_ingot",
       "modern_industrialization:invar_ingot"
     ],
-    "tag": "c:ingots/invar",
-    "count": 3
+    "tag": "c:storage_blocks/invar"
   },
   "overrides": {
     "2+": {
       "count": 4
     }
-  },
-  "min_forge_tier": 1,
-  "fuel_per_tick": 5
+  }
 }
