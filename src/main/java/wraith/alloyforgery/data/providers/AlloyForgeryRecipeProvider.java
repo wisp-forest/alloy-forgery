@@ -12,7 +12,10 @@ import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.registry.tag.TagKey;
 import net.minecraft.util.Identifier;
 import wraith.alloyforgery.data.builders.AlloyForgeryRecipeBuilder;
+
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 import static wraith.alloyforgery.data.AlloyForgeryTags.Items.*;
 
@@ -22,6 +25,55 @@ public class AlloyForgeryRecipeProvider extends FabricRecipeProvider {
 
     public AlloyForgeryRecipeProvider(FabricDataOutput output, CompletableFuture<RegistryWrapper.WrapperLookup> registriesFuture) {
         super(output, registriesFuture);
+
+        setupCompatibilityRecipes();
+    }
+
+    public void setupCompatibilityRecipes() {
+        this.createMaterialRecipesWithRank("zinc", RecipeRank.ADVANCED);
+
+        this.createMaterialRecipesWithRank("tungsten", RecipeRank.EXTREME, "techreborn", "indrev", "modern_industrialization");
+
+        this.createMaterialRecipesWithRank("titanium", RecipeRank.ADVANCED, "techreborn", "modern_industrialization");
+
+        this.createMaterialRecipesWithRank("tin", RecipeRank.STANDARD, "mythicmetals", "techreborn", "indrev", "modern_industrialization");
+
+        this.createMaterialRecipesWithRank("silver", RecipeRank.STANDARD, "mythicmetals", "techreborn", "indrev", "modern_industrialization");
+
+        this.createMaterialRecipesWithRank("platinum", RecipeRank.ADVANCED,"mythicmetals", "modern_industrialization");
+
+        this.createMaterialRecipesWithRank("palladium", RecipeRank.EXTREME,"mythicmetals");
+
+        this.createMaterialRecipesWithRank("osmium", RecipeRank.ADVANCED,"mythicmetals");
+
+        this.createMaterialRecipesWithRank("orichalcum", RecipeRank.ADVANCED,"mythicmetals");
+
+        this.createMaterialRecipesWithRank("nickel", RecipeRank.STANDARD, "techreborn", "modern_industrialization");
+
+        this.createMaterialRecipesWithRank("mythril", RecipeRank.ADVANCED,"mythicmetals");
+
+        this.createMaterialRecipesWithRank("manganese", RecipeRank.STANDARD, "mythicmetals", "modern_industrialization");
+
+        this.createMaterialRecipesWithRank("lead", RecipeRank.STANDARD, "techreborn", "indrev", "modern_industrialization");
+
+        this.createMaterialRecipesWithRank("iridium", RecipeRank.ADVANCED,"techreborn", "modern_industrialization");
+
+        this.createMaterialRecipesWithRank("antimony", RecipeRank.STANDARD, "modern_industrialization");
+
+        this.createMaterialRecipesWithRank("adamantite", RecipeRank.ADVANCED,"mythicmetals");
+    }
+
+    private final Map<String, MaterialRank> materialRanking = new HashMap<>();
+
+    private final Map<MaterialRecipeType, Map<String, MaterialRecipe>> compatibilityRecipes = new HashMap<>();
+
+    public MaterialRank getOrCreateRank(String materialName, RecipeRank purposedRank) {
+        return this.materialRanking.computeIfAbsent(materialName, name -> new MaterialRank(name, purposedRank));
+    }
+
+    public void createMaterialRecipesWithRank(String materialName, RecipeRank purposedRank, String... modids) {
+        this.materialRanking.computeIfAbsent(materialName, name -> new MaterialRank(name, purposedRank))
+                .createMaterialRecipes(modids);
     }
 
     @Override
@@ -37,248 +89,34 @@ public class AlloyForgeryRecipeProvider extends FabricRecipeProvider {
 
         createRawBlockRecipe("gold", Items.GOLD_BLOCK, ConventionalItemTags.STORAGE_BLOCKS_RAW_GOLD)
             .offerTo(exporter);
-        //////////////////////////////////
-        // Compat Storage Block recipes //
-        //////////////////////////////////
-        this.exportWithTagConditions(AlloyForgeryRecipeProvider::createAdvancedRawBlockRecipe,
-            "zinc_blocks", STORAGE_BLOCKS_RAW_ZINC, STORAGE_BLOCKS_ZINC);
 
-        this.exportWithTagConditions(AlloyForgeryRecipeProvider::createExtremeRawBlockRecipe, "tungsten_blocks", STORAGE_BLOCKS_RAW_TUNGSTEN, STORAGE_BLOCKS_TUNGSTEN,
-            Identifier.of("techreborn:tungsten_block"),
-            Identifier.of("indrev:tungsten_block"),
-            Identifier.of("modern_industrialization:tungsten_block")
-        );
-
-        this.exportWithTagConditions(AlloyForgeryRecipeProvider::createAdvancedRawBlockRecipe, "titanium_blocks", STORAGE_BLOCKS_RAW_TITANIUM, STORAGE_BLOCKS_TITANIUM,
-            Identifier.of("techreborn:titanium_block"),
-            Identifier.of("modern_industrialization:titanium_block")
-        );
-
-        this.exportWithTagConditions(AlloyForgeryRecipeProvider::createStandardRawBlockRecipe, "tin_blocks", STORAGE_BLOCKS_RAW_TIN, STORAGE_BLOCKS_TIN,
-            Identifier.of("mythicmetals:tin_block"),
-            Identifier.of("techreborn:tin_block"),
-            Identifier.of("indrev:tin_block"),
-            Identifier.of("modern_industrialization:tin_block")
-        );
-
-        this.exportWithTagConditions(AlloyForgeryRecipeProvider::createStandardRawBlockRecipe, "silver_blocks", STORAGE_BLOCKS_RAW_SILVER, STORAGE_BLOCKS_SILVER,
-            Identifier.of("mythicmetals:silver_block"),
-            Identifier.of("techreborn:silver_block"),
-            Identifier.of("indrev:silver_block"),
-            Identifier.of("modern_industrialization:silver_block")
-        );
-
-        this.exportWithTagConditions(AlloyForgeryRecipeProvider::createAdvancedRawBlockRecipe, "platinum_blocks", STORAGE_BLOCKS_RAW_PLATINUM, STORAGE_BLOCKS_PLATINUM,
-            Identifier.of("mythicmetals:platinum_block"),
-            Identifier.of("modern_industrialization:platinum_block")
-        );
-
-        this.exportWithTagConditions(AlloyForgeryRecipeProvider::createExtremeRawBlockRecipe, "palladium_blocks", STORAGE_BLOCKS_RAW_PALLADIUM, STORAGE_BLOCKS_PALLADIUM,
-            Identifier.of("mythicmetals:palladium_block")
-        );
-
-        this.exportWithTagConditions(AlloyForgeryRecipeProvider::createAdvancedRawBlockRecipe, "osmium_blocks", STORAGE_BLOCKS_RAW_OSMIUM, STORAGE_BLOCKS_OSMIUM,
-            Identifier.of("mythicmetals:osmium_block")
-        );
-
-        this.exportWithTagConditions(AlloyForgeryRecipeProvider::createAdvancedRawBlockRecipe, "orichalcum_blocks", STORAGE_BLOCKS_RAW_ORICHALCUM, STORAGE_BLOCKS_ORICHALCUM,
-            Identifier.of("mythicmetals:orichalcum_block")
-        );
-
-        this.exportWithTagConditions(AlloyForgeryRecipeProvider::createStandardRawBlockRecipe, "nickel_blocks", STORAGE_BLOCKS_RAW_NICKEL, STORAGE_BLOCKS_NICKEL,
-            Identifier.of("techreborn:nickel_block"),
-            Identifier.of("modern_industrialization:nickel_block")
-        );
-
-        this.exportWithTagConditions(AlloyForgeryRecipeProvider::createAdvancedRawBlockRecipe, "mythril_blocks", STORAGE_BLOCKS_RAW_MYTHRIL, STORAGE_BLOCKS_MYTHRIL,
-            Identifier.of("mythicmetals:mythril_block")
-        );
-
-        this.exportWithTagConditions(AlloyForgeryRecipeProvider::createStandardRawBlockRecipe, "manganese_blocks", STORAGE_BLOCKS_RAW_MANGANESE, STORAGE_BLOCKS_MANGANESE,
-            Identifier.of("mythicmetals:manganese_block"),
-            Identifier.of("modern_industrialization:manganese_block")
-        );
-
-        this.exportWithTagConditions(AlloyForgeryRecipeProvider::createStandardRawBlockRecipe, "lead_blocks", STORAGE_BLOCKS_RAW_LEAD, STORAGE_BLOCKS_LEAD,
-            Identifier.of("techreborn:lead_block"),
-            Identifier.of("indrev:lead_block"),
-            Identifier.of("modern_industrialization:lead_block")
-        );
-
-        this.exportWithTagConditions(AlloyForgeryRecipeProvider::createAdvancedRawBlockRecipe, "iridium_blocks", STORAGE_BLOCKS_RAW_IRIDIUM, STORAGE_BLOCKS_IRIDIUM,
-            Identifier.of("techreborn:iridium_block"),
-            Identifier.of("modern_industrialization:iridium_block")
-        );
-
-        this.exportWithTagConditions(AlloyForgeryRecipeProvider::createStandardRawBlockRecipe, "antimony_blocks", STORAGE_BLOCKS_RAW_ANTIMONY, STORAGE_BLOCKS_ANTIMONY,
-            Identifier.of("modern_industrialization:antimony_block")
-        );
-
-        this.exportWithTagConditions(AlloyForgeryRecipeProvider::createAdvancedRawBlockRecipe, "adamantite_blocks", STORAGE_BLOCKS_RAW_ADAMANTITE, STORAGE_BLOCKS_ADAMANTITE,
-            Identifier.of("mythicmetals:adamantite_block")
-        );
-
-        /////////////////////////////
-        // raw ore -> ingot compat //
-        /////////////////////////////
-        this.exportWithTagConditions(AlloyForgeryRecipeProvider::createAdvancedRawOreRecipe,
-            "zinc_ingots_from_raw_material", RAW_MATERIALS_ZINC, INGOTS_ZINC);
-
-        this.exportWithTagConditions(AlloyForgeryRecipeProvider::createExtremeRawOreRecipe, "tungsten_ingots_from_raw_material", RAW_MATERIALS_TUNGSTEN, INGOTS_TUNGSTEN,
-            Identifier.of("techreborn:tungsten_ingot"),
-            Identifier.of("indrev:tungsten_ingot"),
-            Identifier.of("modern_industrialization:tungsten_ingot"));
-
-
-        this.exportWithTagConditions(AlloyForgeryRecipeProvider::createAdvancedRawOreRecipe, "titanium_ingots_from_raw_material", RAW_MATERIALS_TITANIUM, INGOTS_TITANIUM,
-            Identifier.of("techreborn:titanium_ingot"),
-            Identifier.of("modern_industrialization:titanium_ingot")
-        );
-
-        this.exportWithTagConditions(AlloyForgeryRecipeProvider::createStandardRawOreRecipe, "tin_ingots_from_raw_material", RAW_MATERIALS_TIN, INGOTS_TIN,
-            Identifier.of("mythicmetals:tin_ingot"),
-            Identifier.of("techreborn:tin_ingot"),
-            Identifier.of("indrev:tin_ingot"),
-            Identifier.of("modern_industrialization:tin_ingot")
-        );
-
-        this.exportWithTagConditions(AlloyForgeryRecipeProvider::createStandardRawOreRecipe, "silver_ingots_from_raw_material", RAW_MATERIALS_SILVER, INGOTS_SILVER,
-            Identifier.of("mythicmetals:silver_ingot"),
-            Identifier.of("techreborn:silver_ingot"),
-            Identifier.of("indrev:silver_ingot"),
-            Identifier.of("modern_industrialization:silver_ingot")
-        );
-
-        this.exportWithTagConditions(AlloyForgeryRecipeProvider::createAdvancedRawOreRecipe, "platinum_ingots_from_raw_material", RAW_MATERIALS_PLATINUM, INGOTS_PLATINUM,
-            Identifier.of("mythicmetals:platinum_ingot"),
-            Identifier.of("modern_industrialization:platinum_ingot")
-        );
-
-        this.exportWithTagConditions(AlloyForgeryRecipeProvider::createExtremeRawOreRecipe, "palladium_ingots_from_raw_material", RAW_MATERIALS_PALLADIUM, INGOTS_PALLADIUM,
-            Identifier.of("mythicmetals:palladium_ingot")
-        );
-
-        this.exportWithTagConditions(AlloyForgeryRecipeProvider::createAdvancedRawOreRecipe, "osmium_ingots_from_raw_material", RAW_MATERIALS_OSMIUM, INGOTS_OSMIUM,
-            Identifier.of("mythicmetals:osmium_ingot")
-        );
-
-        this.exportWithTagConditions(AlloyForgeryRecipeProvider::createAdvancedRawOreRecipe, "orichalcum_ingots_from_raw_material", RAW_MATERIALS_ORICHALCUM, INGOTS_ORICHALCUM,
-            Identifier.of("mythicmetals:orichalcum_ingot")
-        );
-
-        this.exportWithTagConditions(AlloyForgeryRecipeProvider::createStandardRawOreRecipe, "nickel_ingots_from_raw_material", RAW_MATERIALS_NICKEL, INGOTS_NICKEL,
-            Identifier.of("techreborn:nickel_ingot"),
-            Identifier.of("modern_industrialization:nickel_ingot")
-        );
-
-        this.exportWithTagConditions(AlloyForgeryRecipeProvider::createAdvancedRawOreRecipe, "mythril_ingots_from_raw_material", RAW_MATERIALS_MYTHRIL, INGOTS_MYTHRIL,
-            Identifier.of("mythicmetals:mythril_ingot")
-        );
-
-        this.exportWithTagConditions(AlloyForgeryRecipeProvider::createStandardRawOreRecipe, "manganese_ingots_from_raw_material", RAW_MATERIALS_MANGANESE, INGOTS_MANGANESE,
-            Identifier.of("mythicmetals:manganese_ingot"),
-            Identifier.of("modern_industrialization:manganese_ingot")
-        );
-
-        this.exportWithTagConditions(AlloyForgeryRecipeProvider::createStandardRawOreRecipe, "lead_ingots_from_raw_material", RAW_MATERIALS_LEAD, INGOTS_LEAD,
-            Identifier.of("techreborn:lead_ingot"),
-            Identifier.of("indrev:lead_ingot"),
-            Identifier.of("modern_industrialization:lead_ingot")
-        );
-
-        this.exportWithTagConditions(AlloyForgeryRecipeProvider::createAdvancedRawOreRecipe, "iridium_ingots_from_raw_material", RAW_MATERIALS_IRIDIUM, INGOTS_IRIDIUM,
-            Identifier.of("techreborn:iridium_ingot"),
-            Identifier.of("modern_industrialization:iridium_ingot")
-        );
-
-        this.exportWithTagConditions(AlloyForgeryRecipeProvider::createStandardRawOreRecipe, "antimony_ingots_from_raw_material", RAW_MATERIALS_ANTIMONY, INGOTS_ANTIMONY,
-            Identifier.of("modern_industrialization:antimony_ingot")
-        );
-
-        this.exportWithTagConditions(AlloyForgeryRecipeProvider::createAdvancedRawOreRecipe, "adamantite_ingots_from_raw_material", RAW_MATERIALS_ADAMANTITE, INGOTS_ADAMANTITE,
-            Identifier.of("mythicmetals:adamantite_ingot")
-        );
-
-        ///////////////////////////////
-        // ore block -> ingot compat //
-        ///////////////////////////////
-        this.exportWithTagConditions(AlloyForgeryRecipeProvider::createAdvancedOreRecipe,
-            "zinc_ingots_from_ores", ORES_ZINC, INGOTS_ZINC);
-
-        this.exportWithTagConditions(AlloyForgeryRecipeProvider::createExtremeOreRecipe, "tungsten_ingots_from_ores", ORES_TUNGSTEN, INGOTS_TUNGSTEN,
-            Identifier.of("techreborn:tungsten_ingot"),
-            Identifier.of("indrev:tungsten_ingot"),
-            Identifier.of("modern_industrialization:tungsten_ingot"));
-
-
-        this.exportWithTagConditions(AlloyForgeryRecipeProvider::createAdvancedOreRecipe, "titanium_ingots_from_ores", ORES_TITANIUM, INGOTS_TITANIUM,
-            Identifier.of("techreborn:titanium_ingot"),
-            Identifier.of("modern_industrialization:titanium_ingot")
-        );
-
-        this.exportWithTagConditions(AlloyForgeryRecipeProvider::createStandardOreRecipe, "tin_ingots_from_ores", ORES_TIN, INGOTS_TIN,
-            Identifier.of("mythicmetals:tin_ingot"),
-            Identifier.of("techreborn:tin_ingot"),
-            Identifier.of("indrev:tin_ingot"),
-            Identifier.of("modern_industrialization:tin_ingot")
-        );
-
-        this.exportWithTagConditions(AlloyForgeryRecipeProvider::createStandardOreRecipe, "silver_ingots_from_ores", ORES_SILVER, INGOTS_SILVER,
-            Identifier.of("mythicmetals:silver_ingot"),
-            Identifier.of("techreborn:silver_ingot"),
-            Identifier.of("indrev:silver_ingot"),
-            Identifier.of("modern_industrialization:silver_ingot")
-        );
-
-        this.exportWithTagConditions(AlloyForgeryRecipeProvider::createAdvancedOreRecipe, "platinum_ingots_from_ores", ORES_PLATINUM, INGOTS_PLATINUM,
-            Identifier.of("mythicmetals:platinum_ingot"),
-            Identifier.of("modern_industrialization:platinum_ingot")
-        );
-
-        this.exportWithTagConditions(AlloyForgeryRecipeProvider::createExtremeOreRecipe, "palladium_ingots_from_ores", ORES_PALLADIUM, INGOTS_PALLADIUM,
-            Identifier.of("mythicmetals:palladium_ingot")
-        );
-
-        this.exportWithTagConditions(AlloyForgeryRecipeProvider::createAdvancedOreRecipe, "osmium_ingots_from_ores", ORES_OSMIUM, INGOTS_OSMIUM,
-            Identifier.of("mythicmetals:osmium_ingot")
-        );
-
-        this.exportWithTagConditions(AlloyForgeryRecipeProvider::createAdvancedOreRecipe, "orichalcum_ingots_from_ores", ORES_ORICHALCUM, INGOTS_ORICHALCUM,
-            Identifier.of("mythicmetals:orichalcum_ingot")
-        );
-
-        this.exportWithTagConditions(AlloyForgeryRecipeProvider::createStandardOreRecipe, "nickel_ingots_from_ores", ORES_NICKEL, INGOTS_NICKEL,
-            Identifier.of("techreborn:nickel_ingot"),
-            Identifier.of("modern_industrialization:nickel_ingot")
-        );
-
-        this.exportWithTagConditions(AlloyForgeryRecipeProvider::createAdvancedOreRecipe, "mythril_ingots_from_ores", ORES_MYTHRIL, INGOTS_MYTHRIL,
-            Identifier.of("mythicmetals:mythril_ingot")
-        );
-
-        this.exportWithTagConditions(AlloyForgeryRecipeProvider::createStandardOreRecipe, "manganese_ingots_from_ores", ORES_MANGANESE, INGOTS_MANGANESE,
-            Identifier.of("mythicmetals:manganese_ingot"),
-            Identifier.of("modern_industrialization:manganese_ingot")
-        );
-
-        this.exportWithTagConditions(AlloyForgeryRecipeProvider::createStandardOreRecipe, "lead_ingots_from_ores", ORES_LEAD, INGOTS_LEAD,
-            Identifier.of("techreborn:lead_ingot"),
-            Identifier.of("indrev:lead_ingot"),
-            Identifier.of("modern_industrialization:lead_ingot")
-        );
-
-        this.exportWithTagConditions(AlloyForgeryRecipeProvider::createAdvancedOreRecipe, "iridium_ingots_from_ores", ORES_IRIDIUM, INGOTS_IRIDIUM,
-            Identifier.of("techreborn:iridium_ingot"),
-            Identifier.of("modern_industrialization:iridium_ingot")
-        );
-
-        this.exportWithTagConditions(AlloyForgeryRecipeProvider::createStandardOreRecipe, "antimony_ingots_from_ores", ORES_ANTIMONY, INGOTS_ANTIMONY,
-            Identifier.of("modern_industrialization:antimony_ingot")
-        );
-
-        this.exportWithTagConditions(AlloyForgeryRecipeProvider::createAdvancedOreRecipe, "adamantite_ingots_from_ores", ORES_ADAMANTITE, INGOTS_ADAMANTITE,
-            Identifier.of("mythicmetals:adamantite_ingot")
-        );
+        this.compatibilityRecipes.forEach((recipeType, recipeMap) -> {
+            for (var materialRecipe : recipeMap.values()) {
+                switch (materialRecipe.recipeTypes) {
+                    case RAW_ORE -> {
+                        switch (materialRecipe.rank) {
+                            case STANDARD -> this.exportStandardRawOreRecipe(materialRecipe.materialName, materialRecipe.modids, materialRecipe.additionalPriorities);
+                            case ADVANCED -> this.exportAdvancedRawOreRecipe(materialRecipe.materialName, materialRecipe.modids, materialRecipe.additionalPriorities);
+                            case EXTREME  ->  this.exportExtremeRawOreRecipe(materialRecipe.materialName, materialRecipe.modids, materialRecipe.additionalPriorities);
+                        }
+                    }
+                    case RAW_ORE_BLOCK -> {
+                        switch (materialRecipe.rank) {
+                            case STANDARD -> this.exportStandardRawBlockRecipe(materialRecipe.materialName, materialRecipe.modids, materialRecipe.additionalPriorities);
+                            case ADVANCED -> this.exportAdvancedRawBlockRecipe(materialRecipe.materialName, materialRecipe.modids, materialRecipe.additionalPriorities);
+                            case EXTREME  ->  this.exportExtremeRawBlockRecipe(materialRecipe.materialName, materialRecipe.modids, materialRecipe.additionalPriorities);
+                        }
+                    }
+                    case ORE_BLOCK -> {
+                        switch (materialRecipe.rank) {
+                            case STANDARD -> this.exportStandardOreRecipe(materialRecipe.materialName, materialRecipe.modids, materialRecipe.additionalPriorities);
+                            case ADVANCED -> this.exportAdvancedOreRecipe(materialRecipe.materialName, materialRecipe.modids, materialRecipe.additionalPriorities);
+                            case EXTREME  ->  this.exportExtremeOreRecipe(materialRecipe.materialName, materialRecipe.modids, materialRecipe.additionalPriorities);
+                        }
+                    }
+                }
+            }
+        });
     }
 
     //-------------------------------------------
@@ -306,6 +144,8 @@ public class AlloyForgeryRecipeProvider extends FabricRecipeProvider {
             .setMinimumForgeTier(2);
     }
 
+    //--
+
     /**
      * Preset recipe builder for tier 1 recipes, specifically for smelting raw ores.
      */
@@ -328,6 +168,8 @@ public class AlloyForgeryRecipeProvider extends FabricRecipeProvider {
         return createOverriddenRecipe(criterionName, output, input, 2, 2, 3, 3, 135)
             .setMinimumForgeTier(2);
     }
+
+    //--
 
     /**
      * Preset recipe builder for tier 1 recipes, specifically for smelting ore blocks.
@@ -389,6 +231,11 @@ public class AlloyForgeryRecipeProvider extends FabricRecipeProvider {
 
     //-------------------------------------------
 
+    @Deprecated(forRemoval = true)
+    public void exportWithTagConditions(AFRBuilderMethod builder, String name, TagKey<Item> input, TagKey<Item> output, Identifier... priorities) {
+        exportRecipe(builder, name, input, output, priorities);
+    }
+
     /**
      * Used to export recipes with an ordered list of tag priorities
      *
@@ -399,15 +246,243 @@ public class AlloyForgeryRecipeProvider extends FabricRecipeProvider {
      * @param priorities a list which specify decides which items take priority when using a tagged output. E.G. if "mythicmetals:steel_ingot" is provided, and is present in the recipe output, then the recipe always outputs this item
      * @see ResourceConditions#tagsPopulated(net.minecraft.registry.RegistryKey, TagKey[])
      */
-    public void exportWithTagConditions(AFRBuilderMethod builder, String name, TagKey<Item> input, TagKey<Item> output, Identifier... priorities) {
+    public void exportRecipe(AFRBuilderMethod builder, String name, TagKey<Item> input, TagKey<Item> output, Identifier... priorities) {
         builder.build(name, output, input)
             .addPriorityOutput(priorities)
             .offerTo(this.withConditions(this.exporter, ResourceConditions.tagsPopulated(RegistryKeys.ITEM, output, input)), "compat/forge_" + name);
     }
 
+    public void exportRecipe(AFRBuilderMethod builder, String materialName, String recipeTemplate, String inputTagTemplate, String outputTagTemplate, String priorityTemplate, List<String> modids, List<Identifier> additionalPriorities) {
+        var priorities = modids.stream().map(modid -> Identifier.of(modid, materialName + priorityTemplate)).collect(Collectors.toList());
+
+        priorities.addAll(additionalPriorities);
+
+        exportRecipe(builder, materialName + recipeTemplate, common(inputTagTemplate + materialName), common(outputTagTemplate + materialName), priorities.toArray(Identifier[]::new));
+    }
+
+    //--
+
+    public void exportStandardRawBlockRecipe(String materialName, String ...modids) {
+        exportStandardRawBlockRecipe(materialName, Arrays.stream(modids).toList(), List.of());
+    }
+
+    /**
+     * Preset recipe builder for tier 1 recipes, specifically for smelting raw material blocks.
+     */
+    public void exportStandardRawBlockRecipe(String materialName, List<String> modids, List<Identifier> additionalPriorities) {
+        this.exportRecipe(
+                AlloyForgeryRecipeProvider::createStandardRawBlockRecipe,
+                materialName,
+                "_blocks", "storage_blocks/raw_", "storage_blocks/", "_block",
+                modids,
+                additionalPriorities
+        );
+    }
+
+    public void exportAdvancedRawBlockRecipe(String materialName, String ...modids) {
+        exportAdvancedRawBlockRecipe(materialName, Arrays.stream(modids).toList(), List.of());
+    }
+
+    /**
+     * Preset recipe builder for tier 2 recipes, specifically for smelting raw material blocks.
+     */
+    public void exportAdvancedRawBlockRecipe(String materialName, List<String> modids, List<Identifier> additionalPriorities) {
+        this.exportRecipe(
+                AlloyForgeryRecipeProvider::createAdvancedRawBlockRecipe,
+                materialName,
+                "_blocks", "storage_blocks/raw_", "storage_blocks/", "_block",
+                modids,
+                additionalPriorities
+        );
+    }
+
+    public void exportExtremeRawBlockRecipe(String materialName, String ...modids) {
+        exportExtremeRawBlockRecipe(materialName, Arrays.stream(modids).toList(), List.of());
+    }
+
+    /**
+     * Preset recipe builder for tier 3 recipes, specifically for smelting raw material blocks.
+     */
+    public void exportExtremeRawBlockRecipe(String materialName, List<String> modids, List<Identifier> additionalPriorities) {
+        this.exportRecipe(
+                AlloyForgeryRecipeProvider::createExtremeRawBlockRecipe,
+                materialName,
+                "_blocks", "storage_blocks/raw_", "storage_blocks/", "_block",
+                modids,
+                additionalPriorities
+        );
+    }
+
+    //--
+
+    public void exportStandardRawOreRecipe(String materialName, String ...modids) {
+        exportStandardRawOreRecipe(materialName, Arrays.stream(modids).toList(), List.of());
+    }
+
+    /**
+     * Preset recipe builder for tier 1 recipes, specifically for smelting raw ores.
+     */
+    public void exportStandardRawOreRecipe(String materialName, List<String> modids, List<Identifier> additionalPriorities) {
+        this.exportRecipe(
+                AlloyForgeryRecipeProvider::createStandardRawOreRecipe,
+                materialName,
+                "_ingots_from_raw_material", "raw_materials/", "ingots/", "_ingot",
+                modids,
+                additionalPriorities
+        );
+    }
+
+    public void exportAdvancedRawOreRecipe(String materialName, String ...modids) {
+        exportAdvancedRawOreRecipe(materialName, Arrays.stream(modids).toList(), List.of());
+    }
+
+    /**
+     * Preset recipe builder for tier 2 recipes, specifically for smelting raw ores.
+     */
+    public void exportAdvancedRawOreRecipe(String materialName, List<String> modids, List<Identifier> additionalPriorities) {
+        this.exportRecipe(
+                AlloyForgeryRecipeProvider::createAdvancedRawOreRecipe,
+                materialName,
+                "_ingots_from_raw_material", "raw_materials/", "ingots/", "_ingot",
+                modids,
+                additionalPriorities
+        );
+    }
+
+    public void exportExtremeRawOreRecipe(String materialName, String ...modids) {
+        exportExtremeRawOreRecipe(materialName, Arrays.stream(modids).toList(), List.of());
+    }
+
+    /**
+     * Preset recipe builder for tier 3 recipes, specifically for smelting raw ores.
+     */
+    public void exportExtremeRawOreRecipe(String materialName, List<String> modids, List<Identifier> additionalPriorities) {
+        this.exportRecipe(
+                AlloyForgeryRecipeProvider::createExtremeRawOreRecipe,
+                materialName,
+                "_ingots_from_raw_material", "raw_materials/", "ingots/", "_ingot",
+                modids,
+                additionalPriorities
+        );
+    }
+
+    //--
+
+    public void exportStandardOreRecipe(String materialName, String ...modids) {
+        exportStandardOreRecipe(materialName, Arrays.stream(modids).toList(), List.of());
+    }
+
+    /**
+     * Preset recipe builder for tier 1 recipes, specifically for smelting ore blocks.
+     */
+    public void exportStandardOreRecipe(String materialName, List<String> modids, List<Identifier> additionalPriorities) {
+        this.exportRecipe(
+                AlloyForgeryRecipeProvider::createStandardOreRecipe,
+                materialName,
+                "_ingots_from_ores", "ores/", "ingots/", "_ingot",
+                modids,
+                additionalPriorities
+        );
+    }
+
+    public void exportAdvancedOreRecipe(String materialName, String ...modids) {
+        exportAdvancedOreRecipe(materialName, Arrays.stream(modids).toList(), List.of());
+    }
+
+    /**
+     * Preset recipe builder for tier 2 recipes, specifically for smelting ore blocks.
+     */
+    public void exportAdvancedOreRecipe(String materialName, List<String> modids, List<Identifier> additionalPriorities) {
+        this.exportRecipe(
+                AlloyForgeryRecipeProvider::createAdvancedOreRecipe,
+                materialName,
+                "_ingots_from_ores", "ores/", "ingots/", "_ingot",
+                modids,
+                additionalPriorities
+        );
+    }
+
+    public void exportExtremeOreRecipe(String materialName, String ...modids) {
+        exportExtremeOreRecipe(materialName, Arrays.stream(modids).toList(), List.of());
+    }
+
+    /**
+     * Preset recipe builder for tier 3 recipes, specifically for smelting ore blocks.
+     */
+    public void exportExtremeOreRecipe(String materialName, List<String> modids, List<Identifier> additionalPriorities) {
+        this.exportRecipe(
+                AlloyForgeryRecipeProvider::createExtremeOreRecipe,
+                materialName,
+                "_ingots_from_ores", "ores/", "ingots/", "_ingot",
+                modids,
+                additionalPriorities
+        );
+    }
+
+    //--
+
     public interface AFRBuilderMethod {
         AlloyForgeryRecipeBuilder build(String criterionName, TagKey<Item> output, TagKey<Item> input);
     }
+
+    public final class MaterialRank {
+        private final String materialName;
+        private final RecipeRank rank;
+
+        public MaterialRank(String materialName, RecipeRank rank) {
+            this.materialName = materialName;
+            this.rank = rank;
+        }
+
+        public void createMaterialRecipes(String... modids) {
+            for (var value : MaterialRecipeType.values()) createMaterialRecipe(value, modids);
+        }
+
+        public void createMaterialRecipes(Identifier... additionalPriorities) {
+            for (var value : MaterialRecipeType.values()) createMaterialRecipe(value, additionalPriorities);
+        }
+
+        public void createMaterialRecipe(MaterialRecipeType recipeType, String... modids) {
+            var holder = compatibilityRecipes.computeIfAbsent(recipeType, type -> new HashMap<>())
+                    .computeIfAbsent(materialName, name -> new MaterialRecipe(name, this.rank, recipeType));
+
+            for (String modid : modids) holder.addModid(modid);
+        }
+
+        public void createMaterialRecipe(MaterialRecipeType recipeType, Identifier... additionalPriorities) {
+            var holder = compatibilityRecipes.computeIfAbsent(recipeType, type -> new HashMap<>())
+                    .computeIfAbsent(materialName, name -> new MaterialRecipe(name, this.rank, recipeType));
+
+            for (Identifier id : additionalPriorities) holder.addPriority(id);
+        }
+    }
+
+    private static final class MaterialRecipe {
+        private final String materialName;
+        private final RecipeRank rank;
+        private final MaterialRecipeType recipeTypes;
+
+        private final List<String> modids = new ArrayList<>();
+        private final List<Identifier> additionalPriorities = new ArrayList<>();
+
+        public MaterialRecipe(String materialName, RecipeRank rank, MaterialRecipeType recipeTypes) {
+            this.materialName = materialName;
+            this.rank = rank;
+            this.recipeTypes = recipeTypes;
+        }
+
+        public void addModid(String modid) {
+            this.modids.add(modid);
+        }
+
+        public void addPriority(Identifier id) {
+            this.additionalPriorities.add(id);
+        }
+    }
+
+    public enum RecipeRank { STANDARD, ADVANCED, EXTREME }
+
+    public enum MaterialRecipeType { RAW_ORE, RAW_ORE_BLOCK, ORE_BLOCK }
 
     //-------------------------------------------
 }
