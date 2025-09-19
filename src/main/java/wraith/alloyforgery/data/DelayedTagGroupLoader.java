@@ -2,6 +2,7 @@ package wraith.alloyforgery.data;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
+import com.mojang.datafixers.util.Either;
 import com.mojang.logging.LogUtils;
 import net.minecraft.registry.tag.TagEntry;
 import net.minecraft.registry.tag.TagGroupLoader;
@@ -27,7 +28,7 @@ public class DelayedTagGroupLoader<T> extends TagGroupLoader<T> {
     private final String dataType;
 
     public DelayedTagGroupLoader(String dataType) {
-        super(identifier -> Optional.empty(), dataType);
+        super((id, required) -> Optional.empty(), dataType);
 
         this.dataType = dataType;
     }
@@ -39,32 +40,31 @@ public class DelayedTagGroupLoader<T> extends TagGroupLoader<T> {
     }
 
     // Copy of vanilla but returns both the error list and the tag resolved to its best effort
-    private Pair<Collection<TrackedEntry>, Collection<T>> resolveAll(TagEntry.ValueGetter<T> valueGetter, List<TrackedEntry> entries) {
-        ImmutableSet.Builder<T> builder = ImmutableSet.builder();
-        List<TrackedEntry> list = new ArrayList();
+    private Pair<List<TrackedEntry>, List<T>> resolveAll(TagEntry.ValueGetter<T> valueGetter, List<TagGroupLoader.TrackedEntry> entries) {
+        SequencedSet<T> sequencedSet = new LinkedHashSet();
+        List<TagGroupLoader.TrackedEntry> list = new ArrayList();
 
-        for (TrackedEntry trackedEntry : entries) {
-            if (!trackedEntry.entry().resolve(valueGetter, builder::add)) {
+        for (TagGroupLoader.TrackedEntry trackedEntry : entries) {
+            if (!trackedEntry.entry().resolve(valueGetter, sequencedSet::add)) {
                 list.add(trackedEntry);
             }
         }
 
-        return new Pair<>(list, builder.build());
+        return new Pair<>(list, List.copyOf(sequencedSet));
     }
 
     // Copy to vanilla but checks if this versions registeryGetter is set and adjusts
     // error handling to log the error without throwing the entire tag out
     @Override
-    public Map<Identifier, Collection<T>> buildGroup(Map<Identifier, List<TrackedEntry>> tags) {
+    public Map<Identifier, List<T>> buildGroup(Map<Identifier, List<TrackedEntry>> tags) {
         if (registryGetter == null)
             throw new RuntimeException("DelayedTagGroupLoader did not have the required registeryGetter set to resolve! [Type: " + this.dataType + "]");
 
-        final Map<Identifier, Collection<T>> map = Maps.newHashMap();
+        final Map<Identifier, List<T>> map = Maps.newHashMap();
 
         TagEntry.ValueGetter<T> valueGetter = new TagEntry.ValueGetter<>() {
-            @Nullable
             @Override
-            public T direct(Identifier id) {
+            public @Nullable T direct(Identifier id, boolean required) {
                 return registryGetter.apply(id).orElse(null);
             }
 

@@ -9,7 +9,7 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import wraith.alloyforgery.compat.LegacyIdMappings;
 
 @Mixin(SimpleDefaultedRegistry.class)
-public class DefaultedRegistryMixin {
+public abstract class DefaultedRegistryMixin {
     @ModifyVariable(at = @At("HEAD"), method = "get(Lnet/minecraft/util/Identifier;)Ljava/lang/Object;", ordinal = 0, argsOnly = true)
     private Identifier fixMissingFromRegistry(@Nullable Identifier id) {
         return LegacyIdMappings.remap(id);

@@ -2,17 +2,23 @@ package wraith.alloyforgery.data.builders;
 
 import com.google.common.collect.Streams;
 import com.mojang.logging.LogUtils;
+import net.fabricmc.fabric.api.recipe.v1.ingredient.CustomIngredient;
 import net.fabricmc.fabric.api.resource.conditions.v1.ResourceCondition;
 import net.fabricmc.fabric.api.resource.conditions.v1.ResourceConditions;
+import net.fabricmc.fabric.impl.recipe.ingredient.CustomIngredientImpl;
+import net.fabricmc.fabric.impl.recipe.ingredient.builtin.ComponentsIngredient;
 import net.minecraft.advancement.*;
 import net.minecraft.advancement.AdvancementRequirements.CriterionMerger;
 import net.minecraft.advancement.criterion.RecipeUnlockedCriterion;
 import net.minecraft.component.ComponentChanges;
-import net.minecraft.data.server.recipe.CraftingRecipeJsonBuilder;
-import net.minecraft.data.server.recipe.RecipeExporter;
+import net.minecraft.data.recipe.CraftingRecipeJsonBuilder;
+import net.minecraft.data.recipe.RecipeExporter;
 import net.minecraft.item.*;
 import net.minecraft.recipe.Ingredient;
+import net.minecraft.recipe.Recipe;
 import net.minecraft.registry.Registries;
+import net.minecraft.registry.RegistryEntryLookup;
+import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.tag.TagKey;
 import net.minecraft.util.Identifier;
@@ -90,15 +96,15 @@ public class AlloyForgeryRecipeBuilder implements CraftingRecipeJsonBuilder {
         return this;
     }
 
-    public AlloyForgeryRecipeBuilder tagInputs(Map<TagKey<Item>, Integer> inputs) {
-        inputs.forEach(this::input);
+    public AlloyForgeryRecipeBuilder tagInputs(RegistryEntryLookup<Item> registryLookup, Map<TagKey<Item>, Integer> inputs) {
+        inputs.forEach((itemTagKey, integer) -> this.input(registryLookup, itemTagKey, integer));
 
         return this;
     }
 
-    public AlloyForgeryRecipeBuilder input(TagKey<Item> input, int count) {
+    public AlloyForgeryRecipeBuilder input(RegistryEntryLookup<Item> registryLookup, TagKey<Item> input, int count) {
         this.inputTags.add(input);
-        this.inputs.put(Ingredient.fromTag(input), count);
+        this.inputs.put(Ingredient.fromTag(registryLookup.getOrThrow(input)), count);
         return this;
     }
 
@@ -114,7 +120,10 @@ public class AlloyForgeryRecipeBuilder implements CraftingRecipeJsonBuilder {
     }
 
     public AlloyForgeryRecipeBuilder input(ItemStack inputStack) {
-        this.inputs.put(Ingredient.ofStacks(inputStack), inputStack.getCount());
+        var ingredient = new ComponentsIngredient(Ingredient.ofItem(inputStack.getItem()), inputStack.getComponentChanges())
+                .toVanilla();
+
+        this.inputs.put(ingredient, inputStack.getCount());
         return this;
     }
 
@@ -184,32 +193,36 @@ public class AlloyForgeryRecipeBuilder implements CraftingRecipeJsonBuilder {
     }
 
     @Override
-    public void offerTo(RecipeExporter exporter, Identifier recipeId) { //Consumer<RecipeJsonProvider> exporter
-        var advancementId = Identifier.of(recipeId.getNamespace(), "recipes/" + "alloy_forgery" + "/" + recipeId.getPath());
+    public void offerTo(RecipeExporter exporter, RegistryKey<Recipe<?>> recipeId) {
+        var advancementId = Identifier.of(recipeId.getValue().getNamespace(), "recipes/" + "alloy_forgery" + "/" + recipeId.getValue().getPath());
 
-        this.validate(recipeId);
+        this.validate(recipeId.getValue());
 
         Advancement.Builder builder = exporter.getAdvancementBuilder()
-            .criterion("has_the_recipe", RecipeUnlockedCriterion.create(recipeId))
-            .rewards(AdvancementRewards.Builder.recipe(recipeId))
-            .criteriaMerger(CriterionMerger.OR);
+                .criterion("has_the_recipe", RecipeUnlockedCriterion.create(recipeId))
+                .rewards(AdvancementRewards.Builder.recipe(recipeId))
+                .criteriaMerger(CriterionMerger.OR);
 
         this.advancementBuilder.forEach(builder::criterion);
 
         var recipe = new RawAlloyForgeRecipe(
-            inputs,
-            new OutputData(
-                this.outputCount,
-                this.outputItem != null ? this.outputItem.asItem() : null,
-                this.priorities.isEmpty() ? null : this.priorities,
-                this.outputTag
-            ),
-            minimumTier,
-            fuelPerTick,
-            ranges
+                inputs,
+                new OutputData(
+                        this.outputCount,
+                        this.outputItem != null ? this.outputItem.asItem() : null,
+                        this.priorities.isEmpty() ? null : this.priorities,
+                        this.outputTag
+                ),
+                minimumTier,
+                fuelPerTick,
+                ranges
         );
 
         exporter.accept(recipeId, recipe.generateRecipe(true), builder.build(advancementId));
+    }
+
+    public void offerTo(RecipeExporter exporter, Identifier recipeId) { //Consumer<RecipeJsonProvider> exporter
+        offerTo(exporter, RegistryKey.of(RegistryKeys.RECIPE, recipeId));
     }
 
     @Override

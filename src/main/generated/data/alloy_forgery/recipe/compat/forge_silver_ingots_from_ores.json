@@ -14,7 +14,7 @@
   "inputs": [
     {
       "count": 2,
-      "tag": "c:ores/silver"
+      "ingredient": "#c:ores/silver"
     }
   ],
   "min_forge_tier": 1,

@@ -259,7 +259,7 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
         var recipeInput = new AlloyForgeRecipeInput(this);
 
         if (this.recipeCache.isEmpty() || !this.recipeCache.get().value().matches(recipeInput, this.world)) {
-            this.recipeCache = this.world.getRecipeManager().getFirstMatch(AlloyForgeRecipe.Type.INSTANCE, recipeInput, this.world);
+            this.recipeCache = this.world.getServer().getRecipeManager().getFirstMatch(AlloyForgeRecipe.Type.INSTANCE, recipeInput, this.world);
         }
 
         if (this.recipeCache.isEmpty() && this.requiredTierToCraft.get() != -1) {

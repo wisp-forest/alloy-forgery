@@ -14,7 +14,7 @@
   "inputs": [
     {
       "count": 2,
-      "tag": "c:raw_materials/mythril"
+      "ingredient": "#c:raw_materials/mythril"
     }
   ],
   "min_forge_tier": 2,

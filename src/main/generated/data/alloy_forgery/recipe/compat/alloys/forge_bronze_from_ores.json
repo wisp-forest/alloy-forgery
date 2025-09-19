@@ -15,11 +15,11 @@
   "inputs": [
     {
       "count": 3,
-      "tag": "c:ores/copper"
+      "ingredient": "#c:ores/copper"
     },
     {
       "count": 1,
-      "tag": "c:ores/tin"
+      "ingredient": "#c:ores/tin"
     }
   ],
   "min_forge_tier": 1,

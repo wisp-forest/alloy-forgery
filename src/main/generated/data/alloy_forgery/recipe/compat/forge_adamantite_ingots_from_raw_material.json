@@ -14,7 +14,7 @@
   "inputs": [
     {
       "count": 2,
-      "tag": "c:raw_materials/adamantite"
+      "ingredient": "#c:raw_materials/adamantite"
     }
   ],
   "min_forge_tier": 2,

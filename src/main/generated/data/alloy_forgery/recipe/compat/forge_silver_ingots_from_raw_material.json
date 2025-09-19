@@ -14,7 +14,7 @@
   "inputs": [
     {
       "count": 2,
-      "tag": "c:raw_materials/silver"
+      "ingredient": "#c:raw_materials/silver"
     }
   ],
   "min_forge_tier": 1,

@@ -15,11 +15,11 @@
   "inputs": [
     {
       "count": 2,
-      "tag": "c:ingots/copper"
+      "ingredient": "#c:ingots/copper"
     },
     {
       "count": 1,
-      "tag": "c:ingots/zinc"
+      "ingredient": "#c:ingots/zinc"
     }
   ],
   "min_forge_tier": 1,

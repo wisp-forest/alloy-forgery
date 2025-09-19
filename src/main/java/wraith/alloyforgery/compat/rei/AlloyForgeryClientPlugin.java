@@ -4,6 +4,7 @@ import me.shedaniel.math.Rectangle;
 import me.shedaniel.rei.api.client.plugins.REIClientPlugin;
 import me.shedaniel.rei.api.client.registry.category.CategoryRegistry;
 import me.shedaniel.rei.api.client.registry.display.DisplayRegistry;
+import me.shedaniel.rei.api.client.registry.display.DynamicDisplayGenerator;
 import me.shedaniel.rei.api.client.registry.screen.ScreenRegistry;
 import me.shedaniel.rei.api.common.util.EntryStacks;
 import wraith.alloyforgery.client.AlloyForgeScreen;
@@ -30,8 +31,8 @@ public class AlloyForgeryClientPlugin implements REIClientPlugin {
         }, AlloyForgeScreen.class, AlloyForgeryCommonPlugin.ID);
     }
 
-    @Override
-    public void registerDisplays(DisplayRegistry registry) {
-        registry.registerRecipeFiller(AlloyForgeRecipe.class, AlloyForgeRecipe.Type.INSTANCE, AlloyForgingDisplay::of);
-    }
+//    @Override
+//    public void registerDisplays(DisplayRegistry registry) {
+//        registry.registerRecipeFiller(AlloyForgeRecipe.class, AlloyForgeRecipe.Type.INSTANCE, AlloyForgingDisplay::of);
+//    }
 }

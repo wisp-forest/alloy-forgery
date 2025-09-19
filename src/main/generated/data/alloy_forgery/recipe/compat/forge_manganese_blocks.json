@@ -14,7 +14,7 @@
   "inputs": [
     {
       "count": 2,
-      "tag": "c:storage_blocks/raw_manganese"
+      "ingredient": "#c:storage_blocks/raw_manganese"
     }
   ],
   "min_forge_tier": 1,

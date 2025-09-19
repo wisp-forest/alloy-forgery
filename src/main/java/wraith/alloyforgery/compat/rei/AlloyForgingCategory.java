@@ -64,7 +64,7 @@ public class AlloyForgingCategory implements DisplayCategory<AlloyForgingDisplay
 
         final var tierLabel = Widgets.createLabel(new Point(origin.x + 12, origin.y + 11), Text.translatable("container.alloy_forgery.rei.min_tier", display.minForgeTier));
         widgets.add(tierLabel.leftAligned().color(textColor).noShadow());
-        widgets.add(Widgets.createLabel(new Point(origin.x + 12, origin.y + 24), Text.translatable("container.alloy_forgery.rei.fuel_per_tick", display.requiredFuel)).leftAligned().color(textColor).noShadow());
+        widgets.add(Widgets.createLabel(new Point(origin.x + 12, origin.y + 24), Text.translatable("container.alloy_forgery.rei.fuel_per_tick", display.fuelPerTick)).leftAligned().color(textColor).noShadow());
 
         final MutableInt overrideIndex = new MutableInt(1);
         final List<AlloyForgeRecipe.OverrideRange> overrides = new ArrayList<>(display.overrides.keySet());

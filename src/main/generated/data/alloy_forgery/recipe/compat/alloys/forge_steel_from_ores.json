@@ -15,11 +15,11 @@
   "inputs": [
     {
       "count": 1,
-      "tag": "c:ores/iron"
+      "ingredient": "#c:ores/iron"
     },
     {
       "count": 1,
-      "tag": "c:ores/coal"
+      "ingredient": "#c:ores/coal"
     }
   ],
   "min_forge_tier": 1,

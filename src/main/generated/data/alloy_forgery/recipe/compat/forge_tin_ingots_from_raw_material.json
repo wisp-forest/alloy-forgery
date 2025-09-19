@@ -14,7 +14,7 @@
   "inputs": [
     {
       "count": 2,
-      "tag": "c:raw_materials/tin"
+      "ingredient": "#c:raw_materials/tin"
     }
   ],
   "min_forge_tier": 1,

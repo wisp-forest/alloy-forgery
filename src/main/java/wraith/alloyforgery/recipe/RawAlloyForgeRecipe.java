@@ -2,6 +2,8 @@ package wraith.alloyforgery.recipe;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonNull;
+import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSyntaxException;
 import com.mojang.serialization.JsonOps;
 import io.wispforest.endec.Endec;
@@ -11,6 +13,7 @@ import io.wispforest.owo.serialization.CodecUtils;
 import io.wispforest.owo.serialization.endec.MinecraftEndecs;
 import it.unimi.dsi.fastutil.Hash;
 import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenCustomHashMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.component.ComponentChanges;
 import net.minecraft.item.ItemStack;
@@ -19,6 +22,8 @@ import net.minecraft.registry.Registries;
 import net.minecraft.util.Pair;
 import org.apache.commons.lang3.mutable.MutableInt;
 import wraith.alloyforgery.AlloyForgery;
+import wraith.alloyforgery.utils.EndecUtils;
+
 import java.util.*;
 
 public record RawAlloyForgeRecipe(Map<Ingredient, Integer> inputs, OutputData outputData,
@@ -27,53 +32,53 @@ public record RawAlloyForgeRecipe(Map<Ingredient, Integer> inputs, OutputData ou
 
     private static final List<AlloyForgeRecipe> ingredientInputFormatIssues = new ArrayList<>();
 
-    private static final Hash.Strategy<Ingredient> INGREDIENT_STRATEGY = new Hash.Strategy<>() {
-        @Override
-        public int hashCode(Ingredient o) {
-            String stringData;
-
-            if (o == null) return 0;
-
-            try {
-                stringData = Ingredient.ALLOW_EMPTY_CODEC.encodeStart(JsonOps.INSTANCE, o).getOrThrow(IllegalStateException::new).toString();
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-
-            return stringData.hashCode();
-        }
-
-        @Override
-        public boolean equals(Ingredient a, Ingredient b) {
-            if (a == null || b == null) return false;
-
-            String stringDataA;
-            String stringDataB;
-
-            try {
-                stringDataA = Ingredient.ALLOW_EMPTY_CODEC.encodeStart(JsonOps.INSTANCE, a).getOrThrow(IllegalStateException::new).toString();
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-
-            try {
-                stringDataB = Ingredient.ALLOW_EMPTY_CODEC.encodeStart(JsonOps.INSTANCE, b).getOrThrow(IllegalStateException::new).toString();
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-
-            return stringDataA.equals(stringDataB);
-        }
-    };
+//    private static final Hash.Strategy<Ingredient> INGREDIENT_STRATEGY = new Hash.Strategy<>() {
+//        @Override
+//        public int hashCode(Ingredient o) {
+//            String stringData;
+//
+//            if (o == null) return 0;
+//
+//            try {
+//                stringData = Ingredient.CODEC.encodeStart(JsonOps.INSTANCE, o).getOrThrow(IllegalStateException::new).toString();
+//            } catch (Exception e) {
+//                throw new RuntimeException(e);
+//            }
+//
+//            return stringData.hashCode();
+//        }
+//
+//        @Override
+//        public boolean equals(Ingredient a, Ingredient b) {
+//            if (a == null || b == null) return false;
+//
+//            String stringDataA;
+//            String stringDataB;
+//
+//            try {
+//                stringDataA = Ingredient.CODEC.encodeStart(JsonOps.INSTANCE, a).getOrThrow(IllegalStateException::new).toString();
+//            } catch (Exception e) {
+//                throw new RuntimeException(e);
+//            }
+//
+//            try {
+//                stringDataB = Ingredient.CODEC.encodeStart(JsonOps.INSTANCE, b).getOrThrow(IllegalStateException::new).toString();
+//            } catch (Exception e) {
+//                throw new RuntimeException(e);
+//            }
+//
+//            return stringDataA.equals(stringDataB);
+//        }
+//    };
 
     public static Endec<Map<Ingredient, Integer>> INPUTS = CountedIngredient.ENDEC.listOf().xmap(list -> {
-        var unprocessedData = new Object2ObjectLinkedOpenCustomHashMap<Ingredient, MutableInt>(INGREDIENT_STRATEGY);
+        var unprocessedData = new Object2ObjectLinkedOpenHashMap<Ingredient, MutableInt>();
 
         for (CountedIngredient countedIngredient : list) {
             var ingredient = countedIngredient.ingredient();
 
             if (unprocessedData.containsKey(ingredient) && (AlloyForgery.CONFIG.strictRecipeChecks() || FabricLoader.getInstance().isDevelopmentEnvironment())) {
-                var jsonData = Ingredient.ALLOW_EMPTY_CODEC.encodeStart(JsonOps.INSTANCE, ingredient)
+                var jsonData = Ingredient.CODEC.encodeStart(JsonOps.INSTANCE, ingredient)
                     .result()
                     .map(JsonElement::toString)
                     .orElse("Error Unknown");
@@ -99,7 +104,7 @@ public record RawAlloyForgeRecipe(Map<Ingredient, Integer> inputs, OutputData ou
         MinecraftEndecs.ofRegistry(Registries.ITEM).optionalFieldOf("item", AlloyForgeRecipe.PendingOverride::item, () -> null),
         MinecraftEndecs.ofRegistry(Registries.ITEM).optionalFieldOf("id", orderride -> null, () -> null), //TODO: REMOVE LATER
         Endec.INT.fieldOf("count", AlloyForgeRecipe.PendingOverride::count),
-        CodecUtils.toEndec(ComponentChanges.CODEC).optionalFieldOf("components", AlloyForgeRecipe.PendingOverride::components, ComponentChanges.EMPTY),
+        EndecUtils.optionalFieldOf("components", CodecUtils.toEndec(ComponentChanges.CODEC), AlloyForgeRecipe.PendingOverride::components, () -> ComponentChanges.EMPTY),
         (item, item2, count, components) -> {
             if (item == null) item = item2;
 

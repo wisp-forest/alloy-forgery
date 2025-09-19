@@ -8,6 +8,8 @@ import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.util.Identifier;
 import wraith.alloyforgery.AlloyForgery;
 import wraith.alloyforgery.ForgeControllerItem;
@@ -38,11 +40,17 @@ public class ForgeRegistry {
     private static final Map<Identifier, Block> CONTROLLER_BLOCK_REGISTRY = new HashMap<>();
 
     static void registerDefinition(Identifier forgeDefinitionId, ForgeDefinition definition) {
-        final var controllerBlock = new ForgeControllerBlock(definition);
         final var controllerBlockRegistryId = AlloyForgery.id(Registries.BLOCK.getId(definition.material()).getPath() + "_forge_controller");
 
+        final var controllerBlock = new ForgeControllerBlock(definition, controllerBlockRegistryId);
+
         Registry.register(Registries.BLOCK, controllerBlockRegistryId, controllerBlock);
-        Registry.register(Registries.ITEM, controllerBlockRegistryId, new ForgeControllerItem(controllerBlock, new Item.Settings()));
+        Registry.register(Registries.ITEM, controllerBlockRegistryId, new ForgeControllerItem(
+            controllerBlock,
+            new Item.Settings()
+                .registryKey(RegistryKey.of(RegistryKeys.ITEM, controllerBlockRegistryId))
+                .useBlockPrefixedTranslationKey()
+        ));
 
         TagInjector.inject(Registries.BLOCK, MINEABLE_PICKAXE, controllerBlock);
 

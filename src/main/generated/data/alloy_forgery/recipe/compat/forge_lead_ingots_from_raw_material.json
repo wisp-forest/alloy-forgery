@@ -14,7 +14,7 @@
   "inputs": [
     {
       "count": 2,
-      "tag": "c:raw_materials/lead"
+      "ingredient": "#c:raw_materials/lead"
     }
   ],
   "min_forge_tier": 1,

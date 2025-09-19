@@ -2,7 +2,7 @@
   "type": "alloy_forgery:forging",
   "inputs": [
     {
-      "tag": "minecraft:smelts_to_glass",
+      "ingredient": "#minecraft:smelts_to_glass",
       "count": 2
     }
   ],

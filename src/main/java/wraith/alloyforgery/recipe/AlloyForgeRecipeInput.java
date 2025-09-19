@@ -11,7 +11,7 @@ public record AlloyForgeRecipeInput(Inventory inventory) implements RecipeInput 
     }
 
     @Override
-    public int getSize() {
+    public int size() {
         return this.inventory.size();
     }
 

@@ -10,6 +10,7 @@ import it.unimi.dsi.fastutil.ints.Int2IntMap;
 import net.minecraft.component.ComponentChanges;
 import net.minecraft.item.*;
 import net.minecraft.recipe.*;
+import net.minecraft.recipe.book.RecipeBookCategory;
 import net.minecraft.registry.*;
 import net.minecraft.registry.tag.TagKey;
 import net.minecraft.util.Identifier;
@@ -71,9 +72,9 @@ public class AlloyForgeRecipe implements Recipe<AlloyForgeRecipeInput> {
         return this.secondaryID;
     }
 
-    public void finishRecipe(DynamicRegistryManager drm, PendingRecipeData pendingData, Function<AlloyForgeRecipe, Identifier> lookup) {
+    public void finishRecipe(RegistryEntryLookup.RegistryLookup registryLookup, PendingRecipeData pendingData, Function<AlloyForgeRecipe, Identifier> lookup) {
         if (pendingData.defaultTag() != null) {
-            final var itemEntryList = drm.get(RegistryKeys.ITEM).getEntryList(pendingData.defaultTag().getLeft());
+            final var itemEntryList = registryLookup.getOrThrow(RegistryKeys.ITEM).getOptional(pendingData.defaultTag().getLeft());
 
             itemEntryList.ifPresentOrElse(registryEntries -> {
                 this.output = registryEntries.get(0).value().getDefaultStack();
@@ -159,17 +160,20 @@ public class AlloyForgeRecipe implements Recipe<AlloyForgeRecipeInput> {
     }
 
     @SuppressWarnings("SuspiciousToArrayCall")
-    @Override
-    public DefaultedList<Ingredient> getIngredients() {
-        final var allIngredients = new ArrayList<>();
+    @Nullable
+    private IngredientPlacement ingredientPlacement;
 
-        for (Map.Entry<Ingredient, Integer> entry : inputs.entrySet()) {
-            for (int i = 0; i < entry.getValue(); i++) {
-                allIngredients.add(entry.getKey());
-            }
+    @Override
+    public IngredientPlacement getIngredientPlacement() {
+        if (this.ingredientPlacement == null) {
+            this.ingredientPlacement = IngredientPlacement.forMultipleSlots(
+                    getIngredientsMap().keySet()
+                            .stream()
+                            .map(Optional::of)
+                            .toList());
         }
 
-        return DefaultedList.copyOf(Ingredient.EMPTY, allIngredients.toArray(Ingredient[]::new));
+        return this.ingredientPlacement;
     }
 
     public Map<Ingredient, Integer> getIngredientsMap() {
@@ -182,7 +186,7 @@ public class AlloyForgeRecipe implements Recipe<AlloyForgeRecipeInput> {
     public ItemStack craft(AlloyForgeRecipeInput input, RegistryWrapper.WrapperLookup lookup) {
         return (input.inventory() instanceof ForgeControllerBlockEntity controller)
             ? getResult(controller.forgeTier().value())
-            : getResult(lookup);
+            : getBaseResult();
     }
 
     public void consumeIngredients(AlloyForgeRecipeInput input) {
@@ -192,10 +196,11 @@ public class AlloyForgeRecipe implements Recipe<AlloyForgeRecipeInput> {
 
     @Nullable
     public static DefaultedList<ItemStack> gatherRemainders(RecipeEntry<AlloyForgeRecipe> recipeEntry, AlloyForgeRecipeInput input) {
+        final var id = recipeEntry.id().getValue();
         final var recipe = recipeEntry.value();
-        final var remainders = DefaultedList.ofSize(input.getSize(), ItemStack.EMPTY);
+        final var remainders = DefaultedList.ofSize(input.size(), ItemStack.EMPTY);
         //noinspection UnstableApiUsage
-        final var owoRemainders = RecipeRemainderStorage.has(recipeEntry.id()) ? RecipeRemainderStorage.get(recipeEntry.id()) : Map.<Item, ItemStack>of();
+        final var owoRemainders = RecipeRemainderStorage.has(id) ? RecipeRemainderStorage.get(id) : Map.<Item, ItemStack>of();
 
         if (owoRemainders.isEmpty() && GLOBAL_REMAINDERS.isEmpty()) return null;
 
@@ -218,19 +223,6 @@ public class AlloyForgeRecipe implements Recipe<AlloyForgeRecipeInput> {
         }
 
         return setAnyRemainders ? remainders : null;
-    }
-
-    @Override
-    public boolean fits(int width, int height) {
-        return false;
-    }
-
-    // Do not override
-    @Override
-    @ApiStatus.Internal
-    @Deprecated
-    public ItemStack getResult(RegistryWrapper.WrapperLookup lookup) {
-        return this.output.copy();
     }
 
     /**
@@ -260,13 +252,18 @@ public class AlloyForgeRecipe implements Recipe<AlloyForgeRecipeInput> {
     }
 
     @Override
-    public RecipeSerializer<?> getSerializer() {
+    public RecipeSerializer<? extends Recipe<AlloyForgeRecipeInput>> getSerializer() {
         return AlloyForgeRecipeSerializer.INSTANCE;
     }
 
     @Override
-    public RecipeType<?> getType() {
+    public RecipeType<? extends Recipe<AlloyForgeRecipeInput>> getType() {
         return Type.INSTANCE;
+    }
+
+    @Override
+    public RecipeBookCategory getRecipeBookCategory() {
+        return null;
     }
 
     public int getMinForgeTier() {

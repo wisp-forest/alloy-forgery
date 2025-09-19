@@ -1,6 +1,7 @@
 package wraith.alloyforgery.mixin;
 
 import net.minecraft.recipe.RecipeManager;
+import net.minecraft.recipe.ServerRecipeManager;
 import net.minecraft.registry.ReloadableRegistries;
 import net.minecraft.server.DataPackContents;
 import net.minecraft.util.Identifier;
@@ -17,22 +18,22 @@ public abstract class DataPackContentsMixin {
 
     @Shadow
     @Final
-    private RecipeManager recipeManager;
+    private ServerRecipeManager recipeManager;
     @Shadow
     @Final
     private ReloadableRegistries.Lookup reloadableRegistries;
 
-    @Inject(method = "refresh", at = @At("TAIL"))
+    @Inject(method = "applyPendingTagLoads", at = @At("TAIL"))
     private void alloy_forgery$onRefresh(CallbackInfo ci) {
-        var recipeEntries = recipeManager.listAllOfType(AlloyForgeRecipe.Type.INSTANCE);
+        var recipeEntries = recipeManager.getAllOfType(AlloyForgeRecipe.Type.INSTANCE);
 
         var map = new HashMap<AlloyForgeRecipe, Identifier>();
 
         for (var entry : recipeEntries) {
-            map.put(entry.value(), entry.id());
+            map.put(entry.value(), entry.id().getValue());
         }
 
-        AlloyForgeRecipe.PENDING_RECIPES.forEach((recipe, pendingRecipeData) -> recipe.finishRecipe(this.reloadableRegistries.getRegistryManager(), pendingRecipeData, key -> map.getOrDefault(key, Identifier.of(AlloyForgery.MOD_ID, "unknown_recipe"))));
+        AlloyForgeRecipe.PENDING_RECIPES.forEach((recipe, pendingRecipeData) -> recipe.finishRecipe(this.reloadableRegistries.createRegistryLookup(), pendingRecipeData, key -> map.getOrDefault(key, Identifier.of(AlloyForgery.MOD_ID, "unknown_recipe"))));
 
         AlloyForgeRecipe.PENDING_RECIPES.clear();
     }

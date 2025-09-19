@@ -2,6 +2,7 @@ package wraith.alloyforgery.forges;
 
 import com.google.common.collect.ImmutableList;
 import com.google.gson.*;
+import com.mojang.logging.LogUtils;
 import com.mojang.serialization.JsonOps;
 import io.wispforest.endec.Endec;
 import io.wispforest.endec.StructEndec;
@@ -13,14 +14,18 @@ import io.wispforest.owo.serialization.endec.MinecraftEndecs;
 import net.minecraft.block.Block;
 import net.minecraft.recipe.RecipeSerializer;
 import net.minecraft.registry.Registries;
+import net.minecraft.registry.RegistryOps;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.JsonHelper;
+import org.slf4j.Logger;
 import wraith.alloyforgery.AlloyForgery;
 import wraith.alloyforgery.utils.RecipeInjector;
 import wraith.alloyforgery.utils.data.EndecableModDataLoader;
 import java.util.*;
 
 public record ForgeDefinition(Block material, ImmutableList<Block> additionalMaterials, boolean blockEntity) {
+
+    private static final Logger LOGGER = LogUtils.getLogger();
 
     public ForgeDefinition(Block material, ImmutableList<Block> additionalMaterials) {
         this(material, additionalMaterials, false);
@@ -87,12 +92,8 @@ public record ForgeDefinition(Block material, ImmutableList<Block> additionalMat
                     "###"
                 ],
                 "key": {
-                    "#": {
-                        "item": "{material}"
-                    },
-                    "B": {
-                        "item": "minecraft:blast_furnace"
-                    }
+                    "#": "{material}",
+                    "B": "minecraft:blast_furnace"
                 },
                 "result": {
                     "id": "{controller}",
@@ -127,13 +128,17 @@ public record ForgeDefinition(Block material, ImmutableList<Block> additionalMat
             for (var forgeEntry : ForgeRegistry.getForgeEntries()) {
                 var id = forgeEntry.getKey();
 
-                var recipe = RecipeSerializer.SHAPED.codec()
-                    .codec()
-                    .decode(JsonOps.INSTANCE, forgeEntry.getValue().generateRecipe(id))
-                    .getOrThrow(string -> new IllegalStateException("Unable to generate recipe for given ForgeDefinition [" + id + "]: " + string))
-                    .getFirst();
+                try {
+                    var recipe = RecipeSerializer.SHAPED.codec()
+                            .codec()
+                            .decode(RegistryOps.of(JsonOps.INSTANCE, instance.lookup()), forgeEntry.getValue().generateRecipe(id))
+                            .getOrThrow(string -> new IllegalStateException("Unable to generate recipe for given ForgeDefinition [" + id + "]: " + string))
+                            .getFirst();
 
-                instance.addRecipe(id.withSuffixedPath("_recipe"), recipe);
+                    instance.addRecipe(id.withSuffixedPath("_recipe"), recipe);
+                } catch (Throwable e) {
+                    LOGGER.error("{} recipe had a issue!", id, e);
+                }
             }
         });
     }

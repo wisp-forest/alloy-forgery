@@ -14,7 +14,7 @@
   "inputs": [
     {
       "count": 2,
-      "tag": "c:raw_materials/tungsten"
+      "ingredient": "#c:raw_materials/tungsten"
     }
   ],
   "min_forge_tier": 2,

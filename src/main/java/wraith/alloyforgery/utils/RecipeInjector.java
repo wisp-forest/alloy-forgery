@@ -5,16 +5,27 @@ import com.mojang.logging.LogUtils;
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
+import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.*;
+import net.minecraft.recipe.display.SlotDisplayContexts;
 import net.minecraft.recipe.input.RecipeInput;
 import net.minecraft.registry.Registries;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.context.ContextParameterMap;
+import net.minecraft.world.World;
 import org.slf4j.Logger;
-import wraith.alloyforgery.mixin.RecipeManagerAccessor;
+import wraith.alloyforgery.mixin.PreparedRecipesAccessor;
+import wraith.alloyforgery.mixin.ServerRecipeManagerAccessor;
+
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Stream;
 
 /**
  * Helper class to safety allow for injecting recipes into the Recipe Manager <b>without
@@ -37,13 +48,15 @@ public final class RecipeInjector {
         }
     });
 
-    private final RecipeManager manager;
+    private final ServerRecipeManager manager;
+    private final World world;
 
     private final Multimap<RecipeType<?>, RecipeEntry<?>> recipes = HashMultimap.create();
     private final Map<Identifier, RecipeEntry<?>> recipesById = new HashMap<>();
 
-    public RecipeInjector(RecipeManager manager) {
+    public RecipeInjector(ServerRecipeManager manager, World world) {
         this.manager = manager;
+        this.world = world;
     }
 
     /**
@@ -61,7 +74,7 @@ public final class RecipeInjector {
 
         var type = (RecipeType<R>) recipe.getType();
 
-        var bl = manager.listAllOfType(type)
+        var bl = manager.getAllOfType(type)
             .stream()
             .anyMatch(recipeEntry -> id.equals(recipeEntry.id()));
 
@@ -71,7 +84,7 @@ public final class RecipeInjector {
             return;
         }
 
-        var recipeEntry = new RecipeEntry<>(id, recipe);
+        var recipeEntry = new RecipeEntry<>(RegistryKey.of(RegistryKeys.RECIPE, id), recipe);
 
         recipes.put(recipe.getType(), recipeEntry);
         recipesById.put(id, recipeEntry);
@@ -80,12 +93,18 @@ public final class RecipeInjector {
     /**
      * @return The current instance of the {@link RecipeManager}
      */
-    public RecipeManager manager() {
+    public ServerRecipeManager manager() {
         return this.manager;
     }
 
     public RegistryWrapper.WrapperLookup lookup() {
-        return ((RecipeManagerAccessor) this.manager).af$getRegistryLookup();
+        return ((ServerRecipeManagerAccessor) this.manager).af$getRegistryLookup();
+    }
+
+    public List<ItemStack> getStacks(Ingredient ingredient) {
+        var ctx = SlotDisplayContexts.createParameters(this.world);
+
+        return ingredient.toDisplay().getStacks(ctx);
     }
 
     /**
@@ -105,17 +124,17 @@ public final class RecipeInjector {
 
     public static void injectRecipes(MinecraftServer server) {
         var manager = server.getRecipeManager();
-        var injector = new RecipeInjector(server.getRecipeManager());
+        var injector = new RecipeInjector(server.getRecipeManager(), server.getWorld(World.OVERWORLD));
 
         ADD_RECIPES.invoker().addRecipes(injector);
 
-        var managerAccessor = (RecipeManagerAccessor) manager;
+        var preparedRecipesAccessor = (PreparedRecipesAccessor) ((ServerRecipeManagerAccessor) manager).af$preparedRecipes();
 
-        injector.recipes.putAll(managerAccessor.af$getRecipes());
-        injector.recipesById.putAll(managerAccessor.af$getRecipesById());
+        injector.recipes.putAll(preparedRecipesAccessor.af$getRecipes());
+        injector.recipesById.putAll(preparedRecipesAccessor.af$getRecipesById());
 
-        managerAccessor.af$setRecipes(ImmutableMultimap.copyOf(injector.recipes));
-        managerAccessor.af$setRecipesById(ImmutableMap.copyOf(injector.recipesById));
+        preparedRecipesAccessor.af$setRecipes(ImmutableMultimap.copyOf(injector.recipes));
+        preparedRecipesAccessor.af$setRecipesById(ImmutableMap.copyOf(injector.recipesById));
 
         injector.recipes.clear();
         injector.recipesById.clear();

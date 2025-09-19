@@ -6,6 +6,8 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
 import net.minecraft.recipe.Recipe;
 import net.minecraft.recipe.RecipeEntry;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.tag.TagGroupLoader;
 import net.minecraft.resource.*;
 import net.minecraft.server.MinecraftServer;
@@ -53,7 +55,7 @@ public class RecipeTagLoader extends SinglePreparationResourceReloader<Map<Ident
      * @return true if the tag exists and if the given entry exists within the Tag group
      */
     public static boolean isWithinTag(Identifier tag, RecipeEntry<?> entry) {
-        return isWithinTag(tag, entry.id());
+        return isWithinTag(tag, entry.id().getRegistry());
     }
 
     /**
@@ -95,14 +97,14 @@ public class RecipeTagLoader extends SinglePreparationResourceReloader<Map<Ident
     public void resolveEntries(MinecraftServer server) {
         var recipeManager = server.getRecipeManager();
 
-        Map<Identifier, Collection<RecipeEntry<Recipe<?>>>> map = tagGroupLoader.setGetter(identifier -> {
-                return Optional.ofNullable((RecipeEntry<Recipe<?>>) recipeManager.get(identifier).orElse(null));
+        Map<Identifier, List<RecipeEntry<Recipe<?>>>> map = tagGroupLoader.setGetter(identifier -> {
+                return Optional.ofNullable((RecipeEntry<Recipe<?>>) recipeManager.get(RegistryKey.of(RegistryKeys.RECIPE, identifier)).orElse(null));
             })
             .buildGroup(RAW_TAG_DATA);
 
         RESOLVED_ENTRIES.clear();
 
-        map.forEach((id, recipes) -> RESOLVED_ENTRIES.put(id, recipes.stream().map(RecipeEntry::id).collect(Collectors.toSet())));
+        map.forEach((id, recipes) -> RESOLVED_ENTRIES.put(id, recipes.stream().map(RecipeEntry::id).map(RegistryKey::getValue).collect(Collectors.toSet())));
     }
 
     // Packet that acts as a sync packet for the Recipe Based Tag Entries

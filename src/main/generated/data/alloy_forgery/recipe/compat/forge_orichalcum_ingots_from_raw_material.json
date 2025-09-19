@@ -14,7 +14,7 @@
   "inputs": [
     {
       "count": 2,
-      "tag": "c:raw_materials/orichalcum"
+      "ingredient": "#c:raw_materials/orichalcum"
     }
   ],
   "min_forge_tier": 2,

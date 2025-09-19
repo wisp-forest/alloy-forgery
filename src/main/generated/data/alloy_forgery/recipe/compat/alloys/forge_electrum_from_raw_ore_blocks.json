@@ -15,11 +15,11 @@
   "inputs": [
     {
       "count": 1,
-      "tag": "c:storage_blocks/raw_gold"
+      "ingredient": "#c:storage_blocks/raw_gold"
     },
     {
       "count": 1,
-      "tag": "c:storage_blocks/raw_silver"
+      "ingredient": "#c:storage_blocks/raw_silver"
     }
   ],
   "min_forge_tier": 2,

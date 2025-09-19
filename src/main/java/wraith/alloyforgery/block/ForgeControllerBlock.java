@@ -11,12 +11,15 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.particle.ParticleTypes;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.*;
 import net.minecraft.text.Text;
 import net.minecraft.util.*;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
@@ -28,44 +31,57 @@ import wraith.alloyforgery.forges.ForgeFuelDataLoader;
 public class ForgeControllerBlock extends BlockWithEntity {
 
     public static final BooleanProperty LIT = Properties.LIT;
-    public static final DirectionProperty FACING = Properties.HORIZONTAL_FACING;
+    public static final EnumProperty<Direction> FACING = Properties.HORIZONTAL_FACING;
 
     public final ForgeDefinition forgeDefinition;
 
-    public ForgeControllerBlock(ForgeDefinition forgeDefinition) {
-        super(Settings.copy(Blocks.BLACKSTONE));
+    public ForgeControllerBlock(ForgeDefinition forgeDefinition, Settings settings) {
+        super(settings);
+
         this.forgeDefinition = forgeDefinition;
         this.setDefaultState(this.getStateManager().getDefaultState().with(LIT, false));
+    }
+
+    public ForgeControllerBlock(ForgeDefinition forgeDefinition, Identifier blockId) {
+        this(forgeDefinition, Settings.copy(Blocks.BLACKSTONE).registryKey(RegistryKey.of(RegistryKeys.BLOCK, blockId)));
     }
 
     @Override
     protected MapCodec<? extends BlockWithEntity> getCodec() {
         return CodecUtils.toMapCodec(
-            StructEndecBuilder.of(
-                ForgeDefinition.FORGE_DEFINITION.fieldOf("forge_definition", s -> forgeDefinition),
-                ForgeControllerBlock::new
-            ));
+                StructEndecBuilder.of(
+                        ForgeDefinition.FORGE_DEFINITION.fieldOf("forge_definition", s -> forgeDefinition),
+                        CodecUtils.toEndec(AbstractBlock.Settings.CODEC).fieldOf("properties", AbstractBlock::getSettings),
+                        ForgeControllerBlock::new
+                )
+        );
     }
 
     @Override
-    protected ItemActionResult onUseWithItem(ItemStack playerStack, BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+    protected ActionResult onUseWithItem(ItemStack playerStack, BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+        var result = ActionResult.SUCCESS;
+
         if (!world.isClient) {
             final var fuelDefinition = ForgeFuelDataLoader.getFuelForItem(playerStack.getItem());
-            if (!(world.getBlockEntity(pos) instanceof ForgeControllerBlockEntity controller))
-                return ItemActionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+            if (!(world.getBlockEntity(pos) instanceof ForgeControllerBlockEntity controller)) {
+                return ActionResult.PASS_TO_DEFAULT_BLOCK_ACTION;
+            }
 
             if (fuelDefinition.hasReturnType() && controller.canAddFuel(fuelDefinition.fuel())) {
                 if (!player.getAbilities().creativeMode) {
-                    player.getStackInHand(hand).decrement(1);
                     player.getInventory().offerOrDrop(new ItemStack(fuelDefinition.returnType()));
+
+                    var newStack = playerStack.copy();
+
+                    newStack.decrement(1);
+
+                    result = ActionResult.SUCCESS.withNewHandStack(newStack);
                 }
                 controller.addFuel(fuelDefinition.fuel());
-            } else if (FluidStorageUtil.interactWithFluidStorage(controller, player, hand)) {
-                return ItemActionResult.SUCCESS;
-            } else {
+            } else if (!FluidStorageUtil.interactWithFluidStorage(controller, player, hand)) {
                 if (!controller.verifyMultiblock()) {
                     player.sendMessage(Text.translatable("message.alloy_forgery.invalid_multiblock").formatted(Formatting.GRAY), true);
-                    return ItemActionResult.SUCCESS;
+                    return ActionResult.SUCCESS;
                 }
 
                 final var screenHandlerFactory = state.createScreenHandlerFactory(world, pos);
@@ -75,7 +91,7 @@ public class ForgeControllerBlock extends BlockWithEntity {
             }
         }
 
-        return ItemActionResult.SUCCESS;
+        return result;
     }
 
     @Override

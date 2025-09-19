@@ -14,7 +14,7 @@
   "inputs": [
     {
       "count": 2,
-      "tag": "c:raw_materials/manganese"
+      "ingredient": "#c:raw_materials/manganese"
     }
   ],
   "min_forge_tier": 1,

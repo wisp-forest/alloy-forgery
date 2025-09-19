@@ -14,7 +14,7 @@
   "inputs": [
     {
       "count": 2,
-      "tag": "c:ores/tin"
+      "ingredient": "#c:ores/tin"
     }
   ],
   "min_forge_tier": 1,

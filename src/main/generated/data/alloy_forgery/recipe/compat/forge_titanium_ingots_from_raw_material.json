@@ -14,7 +14,7 @@
   "inputs": [
     {
       "count": 2,
-      "tag": "c:raw_materials/titanium"
+      "ingredient": "#c:raw_materials/titanium"
     }
   ],
   "min_forge_tier": 2,

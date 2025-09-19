@@ -14,7 +14,7 @@
   "inputs": [
     {
       "count": 2,
-      "tag": "c:storage_blocks/raw_adamantite"
+      "ingredient": "#c:storage_blocks/raw_adamantite"
     }
   ],
   "min_forge_tier": 2,

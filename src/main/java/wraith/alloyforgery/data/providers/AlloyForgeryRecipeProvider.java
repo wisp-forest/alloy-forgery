@@ -2,32 +2,38 @@ package wraith.alloyforgery.data.providers;
 
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricRecipeProvider;
+import net.fabricmc.fabric.api.resource.conditions.v1.ResourceCondition;
 import net.fabricmc.fabric.api.resource.conditions.v1.ResourceConditions;
 import net.fabricmc.fabric.api.tag.convention.v2.ConventionalItemTags;
-import net.minecraft.data.server.recipe.RecipeExporter;
-import net.minecraft.data.server.recipe.RecipeProvider;
+import net.minecraft.data.recipe.RecipeExporter;
+import net.minecraft.data.recipe.RecipeGenerator;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.registry.tag.TagKey;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
+import wraith.alloyforgery.AlloyForgery;
 import wraith.alloyforgery.data.builders.AlloyForgeryRecipeBuilder;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static wraith.alloyforgery.data.AlloyForgeryTags.Items.*;
 
-public class AlloyForgeryRecipeProvider extends FabricRecipeProvider {
+public class AlloyForgeryRecipeProvider extends RecipeGenerator {
 
-    public RecipeExporter exporter;
+    protected final BiFunction<RecipeExporter, ResourceCondition[], RecipeExporter> withConditionsWrapper;
 
-    public AlloyForgeryRecipeProvider(FabricDataOutput output, CompletableFuture<RegistryWrapper.WrapperLookup> registriesFuture) {
-        super(output, registriesFuture);
+    public AlloyForgeryRecipeProvider(RecipeExporter recipeExporter, RegistryWrapper.WrapperLookup registryLookup, BiFunction<RecipeExporter, ResourceCondition[], RecipeExporter> withConditionsWrapper) {
+        super(registryLookup, recipeExporter);
+
+        this.withConditionsWrapper = withConditionsWrapper;
     }
 
     public void setupCompatibilityRecipes() {
@@ -91,10 +97,8 @@ public class AlloyForgeryRecipeProvider extends FabricRecipeProvider {
         commonInputExceptions.put(templatedPath, properPath);
     }
 
-    @Override
-    public void generate(RecipeExporter exporter) {
+    public void generate() {
         setupCompatibilityRecipes();
-        this.exporter = exporter;
 
         // Vanilla recipes
         createRawBlockRecipe("copper", Items.COPPER_BLOCK, ConventionalItemTags.STORAGE_BLOCKS_RAW_COPPER)
@@ -185,14 +189,14 @@ public class AlloyForgeryRecipeProvider extends FabricRecipeProvider {
     /**
      * Preset recipe builder for tier 1 recipes, specifically for smelting raw material blocks.
      */
-    public static AlloyForgeryRecipeBuilder createStandardRawBlockRecipe(String criterionName, TagKey<Item> output, TagKey<Item> input) {
+    public AlloyForgeryRecipeBuilder createStandardRawBlockRecipe(String criterionName, TagKey<Item> output, TagKey<Item> input) {
         return createAFRecipeWithOverride(criterionName, output, input, 2, 3, 2, 4, 45);
     }
 
     /**
      * Preset recipe builder for tier 2 recipes, specifically for smelting raw material blocks.
      */
-    public static AlloyForgeryRecipeBuilder createAdvancedRawBlockRecipe(String criterionName, TagKey<Item> output, TagKey<Item> input) {
+    public AlloyForgeryRecipeBuilder createAdvancedRawBlockRecipe(String criterionName, TagKey<Item> output, TagKey<Item> input) {
         return createAFRecipeWithOverride(criterionName, output, input, 2, 2, 3, 3, 90)
             .setMinimumForgeTier(2);
     }
@@ -200,7 +204,7 @@ public class AlloyForgeryRecipeProvider extends FabricRecipeProvider {
     /**
      * Preset recipe builder for tier 3 recipes, specifically for smelting raw material blocks.
      */
-    public static AlloyForgeryRecipeBuilder createExtremeRawBlockRecipe(String criterionName, TagKey<Item> output, TagKey<Item> input) {
+    public AlloyForgeryRecipeBuilder createExtremeRawBlockRecipe(String criterionName, TagKey<Item> output, TagKey<Item> input) {
         return createAFRecipeWithOverride(criterionName, output, input, 2, 2, 3, 3, 135)
             .setMinimumForgeTier(2);
     }
@@ -210,14 +214,14 @@ public class AlloyForgeryRecipeProvider extends FabricRecipeProvider {
     /**
      * Preset recipe builder for tier 1 recipes, specifically for smelting raw ores.
      */
-    public static AlloyForgeryRecipeBuilder createStandardRawOreRecipe(String criterionName, TagKey<Item> output, TagKey<Item> input) {
+    public AlloyForgeryRecipeBuilder createStandardRawOreRecipe(String criterionName, TagKey<Item> output, TagKey<Item> input) {
         return createAFRecipeWithOverride(criterionName, output, input, 2, 3, 2, 4, 45);
     }
 
     /**
      * Preset recipe builder for tier 2 recipes, specifically for smelting raw ores.
      */
-    public static AlloyForgeryRecipeBuilder createAdvancedRawOreRecipe(String criterionName, TagKey<Item> output, TagKey<Item> input) {
+    public AlloyForgeryRecipeBuilder createAdvancedRawOreRecipe(String criterionName, TagKey<Item> output, TagKey<Item> input) {
         return createAFRecipeWithOverride(criterionName, output, input, 2, 2, 3, 3, 90)
             .setMinimumForgeTier(2);
     }
@@ -225,7 +229,7 @@ public class AlloyForgeryRecipeProvider extends FabricRecipeProvider {
     /**
      * Preset recipe builder for tier 3 recipes, specifically for smelting raw ores.
      */
-    public static AlloyForgeryRecipeBuilder createExtremeRawOreRecipe(String criterionName, TagKey<Item> output, TagKey<Item> input) {
+    public AlloyForgeryRecipeBuilder createExtremeRawOreRecipe(String criterionName, TagKey<Item> output, TagKey<Item> input) {
         return createAFRecipeWithOverride(criterionName, output, input, 2, 2, 3, 3, 135)
             .setMinimumForgeTier(2);
     }
@@ -235,14 +239,14 @@ public class AlloyForgeryRecipeProvider extends FabricRecipeProvider {
     /**
      * Preset recipe builder for tier 1 recipes, specifically for smelting ore blocks.
      */
-    public static AlloyForgeryRecipeBuilder createStandardOreRecipe(String criterionName, TagKey<Item> output, TagKey<Item> input) {
+    public AlloyForgeryRecipeBuilder createStandardOreRecipe(String criterionName, TagKey<Item> output, TagKey<Item> input) {
         return createAFRecipeWithOverride(criterionName, output, input, 2, 3, 2, 4, 45);
     }
 
     /**
      * Preset recipe builder for tier 2 recipes, specifically for smelting ore blocks.
      */
-    public static AlloyForgeryRecipeBuilder createAdvancedOreRecipe(String criterionName, TagKey<Item> output, TagKey<Item> input) {
+    public AlloyForgeryRecipeBuilder createAdvancedOreRecipe(String criterionName, TagKey<Item> output, TagKey<Item> input) {
         return createAFRecipeWithOverride(criterionName, output, input, 2, 2, 3, 3, 90)
             .setMinimumForgeTier(2);
     }
@@ -250,16 +254,16 @@ public class AlloyForgeryRecipeProvider extends FabricRecipeProvider {
     /**
      * Preset recipe builder for tier 3 recipes, specifically for smelting ore blocks..
      */
-    public static AlloyForgeryRecipeBuilder createExtremeOreRecipe(String criterionName, TagKey<Item> output, TagKey<Item> input) {
+    public AlloyForgeryRecipeBuilder createExtremeOreRecipe(String criterionName, TagKey<Item> output, TagKey<Item> input) {
         return createAFRecipeWithOverride(criterionName, output, input, 2, 2, 3, 3, 135)
             .setMinimumForgeTier(2);
     }
 
     //-------------------------------------------
 
-    public static AlloyForgeryRecipeBuilder createRawBlockRecipe(String criterionName, Item output, TagKey<Item> input) {
+    public AlloyForgeryRecipeBuilder createRawBlockRecipe(String criterionName, Item output, TagKey<Item> input) {
         return AlloyForgeryRecipeBuilder.create(output, 3)
-                .input(input, 2)
+                .input(registries.getOrThrow(RegistryKeys.ITEM), input, 2)
                 .criterion("has_" + criterionName, conditionsFromTag(input))
                 .overrideRange(2, true, 4)
                 .setFuelPerTick(45);
@@ -282,31 +286,31 @@ public class AlloyForgeryRecipeProvider extends FabricRecipeProvider {
      * @param fuelPerTick    how much fuel is consumed per tick for the recipe
      * @return an AlloyForgeryRecipeBuilder which should be passed to {@link AlloyForgeryRecipeProvider#exportCompatRecipe(AFRBuilderMethod, String, TagKey, TagKey, Identifier...)}
      */
-    public static AlloyForgeryRecipeBuilder createAFRecipeWithOverride(String inputCriterionName, TagKey<Item> output, TagKey<Item> input, int inputAmount, int outputAmount, int overrideIndex, int overrideAmount, int fuelPerTick) {
+    public AlloyForgeryRecipeBuilder createAFRecipeWithOverride(String inputCriterionName, TagKey<Item> output, TagKey<Item> input, int inputAmount, int outputAmount, int overrideIndex, int overrideAmount, int fuelPerTick) {
 
         return createAFRecipeWithOverride(inputCriterionName, output, new LinkedHashMap<>(Map.of(input, inputAmount)), outputAmount, overrideIndex, overrideAmount, fuelPerTick);
     }
 
-    public static AlloyForgeryRecipeBuilder createAFRecipeWithOverride(String inputCriterionName, TagKey<Item> output, SequencedMap<TagKey<Item>, Integer> inputs, int outputAmount, int overrideIndex, int overrideAmount, int fuelPerTick) {
+    public AlloyForgeryRecipeBuilder createAFRecipeWithOverride(String inputCriterionName, TagKey<Item> output, SequencedMap<TagKey<Item>, Integer> inputs, int outputAmount, int overrideIndex, int overrideAmount, int fuelPerTick) {
         return createAFRecipeWithOverrides(inputCriterionName, output, inputs, outputAmount, new LinkedHashMap<>(Map.of(overrideIndex, overrideAmount)), fuelPerTick);
     }
 
-    public static AlloyForgeryRecipeBuilder createAFRecipe(String inputCriterionName, TagKey<Item> output, Consumer<SequencedMap<TagKey<Item>, Integer>> inputs, int outputAmount, int fuelPerTick) {
+    public AlloyForgeryRecipeBuilder createAFRecipe(String inputCriterionName, TagKey<Item> output, Consumer<SequencedMap<TagKey<Item>, Integer>> inputs, int outputAmount, int fuelPerTick) {
         return createAFRecipeWithOverrides(inputCriterionName, output, inputs, outputAmount, map -> {}, fuelPerTick);
     }
 
-    public static AlloyForgeryRecipeBuilder createAFRecipeWithOverrides(String inputCriterionName, TagKey<Item> output, Consumer<SequencedMap<TagKey<Item>, Integer>> inputs, int outputAmount, Consumer<SequencedMap<Integer, Integer>> overrides, int fuelPerTick) {
+    public AlloyForgeryRecipeBuilder createAFRecipeWithOverrides(String inputCriterionName, TagKey<Item> output, Consumer<SequencedMap<TagKey<Item>, Integer>> inputs, int outputAmount, Consumer<SequencedMap<Integer, Integer>> overrides, int fuelPerTick) {
         return createAFRecipeWithOverrides(inputCriterionName, output, Util.make(new LinkedHashMap<>(), inputs), outputAmount, Util.make(new LinkedHashMap<>(), overrides), fuelPerTick);
     }
 
-    public static AlloyForgeryRecipeBuilder createAFRecipe(String inputCriterionName, TagKey<Item> output, SequencedMap<TagKey<Item>, Integer> inputs, int outputAmount, int fuelPerTick) {
+    public AlloyForgeryRecipeBuilder createAFRecipe(String inputCriterionName, TagKey<Item> output, SequencedMap<TagKey<Item>, Integer> inputs, int outputAmount, int fuelPerTick) {
         return createAFRecipeWithOverrides(inputCriterionName, output, inputs, outputAmount, new LinkedHashMap<>(), fuelPerTick);
     }
 
-    public static AlloyForgeryRecipeBuilder createAFRecipeWithOverrides(String inputCriterionName, TagKey<Item> output, SequencedMap<TagKey<Item>, Integer> inputs, int outputAmount, SequencedMap<Integer, Integer> overrides, int fuelPerTick) {
+    public AlloyForgeryRecipeBuilder createAFRecipeWithOverrides(String inputCriterionName, TagKey<Item> output, SequencedMap<TagKey<Item>, Integer> inputs, int outputAmount, SequencedMap<Integer, Integer> overrides, int fuelPerTick) {
         var builder = AlloyForgeryRecipeBuilder.create(output, outputAmount)
-                .tagInputs(inputs)
-                .criterion("has_" + inputCriterionName, inputs, RecipeProvider::conditionsFromTag)
+                .tagInputs(registries.getOrThrow(RegistryKeys.ITEM), inputs)
+                .criterion("has_" + inputCriterionName, inputs, this::conditionsFromTag)
                 .setFuelPerTick(fuelPerTick);
 
         overrides.forEach((overrideIndex, overrideAmount) -> builder.overrideRange(overrideIndex, true, overrideAmount));
@@ -352,7 +356,7 @@ public class AlloyForgeryRecipeProvider extends FabricRecipeProvider {
     }
 
     public void exportRecipe(String name, AlloyForgeryRecipeBuilder builder) {
-        builder.offerToWithConditions(this.exporter, name, this::withConditions);
+        builder.offerToWithConditions(this.exporter, name, withConditionsWrapper);
     }
 
     //--
@@ -363,7 +367,7 @@ public class AlloyForgeryRecipeProvider extends FabricRecipeProvider {
 
     public void exportStandardRawBlockRecipe(String materialName, List<String> modids, List<Identifier> additionalPriorities) {
         this.exportCompatRecipe(
-                AlloyForgeryRecipeProvider::createStandardRawBlockRecipe,
+                this::createStandardRawBlockRecipe,
                 materialName,
                 "_blocks", "storage_blocks/raw_", "storage_blocks/", "_block",
                 modids,
@@ -377,7 +381,7 @@ public class AlloyForgeryRecipeProvider extends FabricRecipeProvider {
 
     public void exportAdvancedRawBlockRecipe(String materialName, List<String> modids, List<Identifier> additionalPriorities) {
         this.exportCompatRecipe(
-                AlloyForgeryRecipeProvider::createAdvancedRawBlockRecipe,
+                this::createAdvancedRawBlockRecipe,
                 materialName,
                 "_blocks", "storage_blocks/raw_", "storage_blocks/", "_block",
                 modids,
@@ -391,7 +395,7 @@ public class AlloyForgeryRecipeProvider extends FabricRecipeProvider {
 
     public void exportExtremeRawBlockRecipe(String materialName, List<String> modids, List<Identifier> additionalPriorities) {
         this.exportCompatRecipe(
-                AlloyForgeryRecipeProvider::createExtremeRawBlockRecipe,
+                this::createExtremeRawBlockRecipe,
                 materialName,
                 "_blocks", "storage_blocks/raw_", "storage_blocks/", "_block",
                 modids,
@@ -407,7 +411,7 @@ public class AlloyForgeryRecipeProvider extends FabricRecipeProvider {
 
     public void exportStandardRawOreRecipe(String materialName, List<String> modids, List<Identifier> additionalPriorities) {
         this.exportCompatRecipe(
-                AlloyForgeryRecipeProvider::createStandardRawOreRecipe,
+                this::createStandardRawOreRecipe,
                 materialName,
                 "_ingots_from_raw_material", "raw_materials/", "ingots/", "_ingot",
                 modids,
@@ -421,7 +425,7 @@ public class AlloyForgeryRecipeProvider extends FabricRecipeProvider {
 
     public void exportAdvancedRawOreRecipe(String materialName, List<String> modids, List<Identifier> additionalPriorities) {
         this.exportCompatRecipe(
-                AlloyForgeryRecipeProvider::createAdvancedRawOreRecipe,
+                this::createAdvancedRawOreRecipe,
                 materialName,
                 "_ingots_from_raw_material", "raw_materials/", "ingots/", "_ingot",
                 modids,
@@ -435,7 +439,7 @@ public class AlloyForgeryRecipeProvider extends FabricRecipeProvider {
 
     public void exportExtremeRawOreRecipe(String materialName, List<String> modids, List<Identifier> additionalPriorities) {
         this.exportCompatRecipe(
-                AlloyForgeryRecipeProvider::createExtremeRawOreRecipe,
+                this::createExtremeRawOreRecipe,
                 materialName,
                 "_ingots_from_raw_material", "raw_materials/", "ingots/", "_ingot",
                 modids,
@@ -454,7 +458,7 @@ public class AlloyForgeryRecipeProvider extends FabricRecipeProvider {
      */
     public void exportStandardOreRecipe(String materialName, List<String> modids, List<Identifier> additionalPriorities) {
         this.exportCompatRecipe(
-                AlloyForgeryRecipeProvider::createStandardOreRecipe,
+                this::createStandardOreRecipe,
                 materialName,
                 "_ingots_from_ores", "ores/", "ingots/", "_ingot",
                 modids,
@@ -468,7 +472,7 @@ public class AlloyForgeryRecipeProvider extends FabricRecipeProvider {
 
     public void exportAdvancedOreRecipe(String materialName, List<String> modids, List<Identifier> additionalPriorities) {
         this.exportCompatRecipe(
-                AlloyForgeryRecipeProvider::createAdvancedOreRecipe,
+                this::createAdvancedOreRecipe,
                 materialName,
                 "_ingots_from_ores", "ores/", "ingots/", "_ingot",
                 modids,
@@ -482,7 +486,7 @@ public class AlloyForgeryRecipeProvider extends FabricRecipeProvider {
 
     public void exportExtremeOreRecipe(String materialName, List<String> modids, List<Identifier> additionalPriorities) {
         this.exportCompatRecipe(
-                AlloyForgeryRecipeProvider::createExtremeOreRecipe,
+                this::createExtremeOreRecipe,
                 materialName,
                 "_ingots_from_ores", "ores/", "ingots/", "_ingot",
                 modids,
@@ -620,15 +624,4 @@ public class AlloyForgeryRecipeProvider extends FabricRecipeProvider {
 
     public enum MaterialRecipeType { RAW_ORE, RAW_ORE_BLOCK, ORE_BLOCK }
 
-    //-------------------------------------------
-
-    @Deprecated(forRemoval = true)
-    public void exportWithTagConditions(AFRBuilderMethod builder, String name, TagKey<Item> input, TagKey<Item> output, Identifier... priorities) {
-        exportCompatRecipe(builder, name, input, output, priorities);
-    }
-
-    @Deprecated(forRemoval = true)
-    public static AlloyForgeryRecipeBuilder createOverriddenRecipe(String criterionName, TagKey<Item> output, TagKey<Item> input, int inputAmount, int outputAmount, int overrideIndex, int overrideAmount, int fuelPerTick) {
-        return createAFRecipeWithOverride(criterionName, output, input, inputAmount, outputAmount, overrideIndex, overrideAmount, fuelPerTick);
-    }
 }

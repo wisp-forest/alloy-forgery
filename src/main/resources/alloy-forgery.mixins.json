@@ -7,9 +7,15 @@
     "DataPackContentsMixin",
     "DefaultedRegistryMixin",
     "HopperBlockEntityAccessor",
-    "RecipeManagerAccessor",
+    "PreparedRecipesAccessor",
+    "ServerRecipeManagerAccessor",
     "RecipeEntryMixin",
-    "PlayerManagerMixin"
+    "PlayerManagerMixin",
+    "JsonDataLoaderAccessor",
+    "SingleStackRecipeAccessor",
+    "DataResultMixin",
+    "DataResultMixin$DataResultErrorMixin",
+    "RegistryEntryListNamedMixin"
   ],
   "injectors": {
     "defaultRequire": 1

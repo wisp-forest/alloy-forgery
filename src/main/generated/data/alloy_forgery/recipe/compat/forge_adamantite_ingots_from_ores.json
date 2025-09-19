@@ -14,7 +14,7 @@
   "inputs": [
     {
       "count": 2,
-      "tag": "c:ores/adamantite"
+      "ingredient": "#c:ores/adamantite"
     }
   ],
   "min_forge_tier": 2,

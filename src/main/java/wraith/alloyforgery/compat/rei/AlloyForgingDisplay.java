@@ -1,6 +1,11 @@
 package wraith.alloyforgery.compat.rei;
 
 import com.google.common.collect.ImmutableMap;
+import com.mojang.serialization.MapCodec;
+import io.wispforest.endec.Endec;
+import io.wispforest.endec.StructEndec;
+import io.wispforest.endec.impl.StructEndecBuilder;
+import io.wispforest.owo.serialization.CodecUtils;
 import io.wispforest.owo.serialization.endec.MinecraftEndecs;
 import io.wispforest.owo.serialization.format.nbt.NbtDeserializer;
 import io.wispforest.owo.serialization.format.nbt.NbtSerializer;
@@ -8,14 +13,21 @@ import me.shedaniel.rei.api.common.category.CategoryIdentifier;
 import me.shedaniel.rei.api.common.display.Display;
 import me.shedaniel.rei.api.common.display.DisplaySerializer;
 import me.shedaniel.rei.api.common.entry.EntryIngredient;
+import me.shedaniel.rei.api.common.entry.EntryStack;
 import me.shedaniel.rei.api.common.util.EntryIngredients;
+import me.shedaniel.rei.api.common.util.EntryStacks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.*;
+import net.minecraft.network.RegistryByteBuf;
+import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.recipe.Ingredient;
 import net.minecraft.recipe.RecipeEntry;
 import net.minecraft.util.Identifier;
+import org.jetbrains.annotations.Nullable;
+import wraith.alloyforgery.compat.CountedIngredientDisplay;
 import wraith.alloyforgery.recipe.AlloyForgeRecipe;
 import java.util.*;
+import java.util.stream.Stream;
 
 public class AlloyForgingDisplay implements Display {
 
@@ -23,18 +35,18 @@ public class AlloyForgingDisplay implements Display {
     private final EntryIngredient output;
 
     public final int minForgeTier;
-    public final int requiredFuel;
+    public final int fuelPerTick;
 
     public final Map<AlloyForgeRecipe.OverrideRange, ItemStack> overrides;
 
     public final Optional<Identifier> recipeID;
 
-    private AlloyForgingDisplay(List<EntryIngredient> inputs, EntryIngredient output, int minForgeTier, int requiredFuel, Map<AlloyForgeRecipe.OverrideRange, ItemStack> overrides, Optional<Identifier> recipeID) {
+    private AlloyForgingDisplay(List<EntryIngredient> inputs, EntryIngredient output, int minForgeTier, int fuelPerTick, Map<AlloyForgeRecipe.OverrideRange, ItemStack> overrides, Optional<Identifier> recipeID) {
         this.inputs = inputs;
         this.output = output;
 
         this.minForgeTier = minForgeTier;
-        this.requiredFuel = requiredFuel;
+        this.fuelPerTick = fuelPerTick;
 
         this.overrides = overrides;
 
@@ -51,10 +63,8 @@ public class AlloyForgingDisplay implements Display {
                 int stackCount = Math.min(i, 64);
 
                 convertedInputs.add(
-                    EntryIngredients.ofItemStacks(Arrays.stream(entry.getKey().getMatchingStacks())
-                        .map(ItemStack::copy)
-                        .peek(stack -> stack.setCount(stackCount))
-                        .toList()));
+                    EntryIngredients.ofSlotDisplay(new CountedIngredientDisplay(entry.getKey().toDisplay(), stackCount))
+                );
 
                 i -= stackCount;
             }
@@ -66,7 +76,7 @@ public class AlloyForgingDisplay implements Display {
             recipe.getMinForgeTier(),
             recipe.getFuelPerTick(),
             recipe.getTierOverrides(),
-            recipe.secondaryID().or(() -> Optional.of(recipeEntry.id())));
+            recipe.secondaryID().or(() -> Optional.of(recipeEntry.id().getValue())));
     }
 
     @Override
@@ -89,72 +99,22 @@ public class AlloyForgingDisplay implements Display {
         return recipeID;
     }
 
-    public enum Serializer implements DisplaySerializer<AlloyForgingDisplay> {
-
-        INSTANCE;
-
-        @Override
-        public NbtCompound save(NbtCompound tag, AlloyForgingDisplay display) {
-            // Store the fuel per tick
-            tag.putInt("fuel_per_tick", display.requiredFuel);
-
-            // Save the minimum Forge Tier
-            tag.putInt("min_forge_tier", display.minForgeTier);
-
-            // Store the recipe inputs
-            NbtList inputs = new NbtList();
-            inputs.addAll(display.inputs.stream().map(EntryIngredient::saveIngredient).toList());
-            tag.put("inputs", inputs);
-
-            // Store the recipe output
-            tag.put("output", display.output.saveIngredient());
-
-            NbtList overrides = new NbtList();
-            display.overrides.forEach((overrideRange, itemStack) -> {
-                NbtCompound overrideTag = new NbtCompound();
-
-                overrideTag.putInt("lower", overrideRange.lowerBound());
-                overrideTag.putInt("upper", overrideRange.upperBound());
-                overrideTag.put("stack", MinecraftEndecs.ITEM_STACK.encodeFully(NbtSerializer::of, itemStack));
-
-                overrides.add(overrideTag);
-            });
-            tag.put("overrides", overrides);
-
-            display.recipeID.ifPresent(id -> tag.putString("recipeID", id.toString()));
-
-            return tag;
-        }
-
-        @Override
-        public AlloyForgingDisplay read(NbtCompound tag) {
-            // Get the fuel per tick
-            int requiredFuel = tag.getInt("fuel_per_tick");
-
-            // Get the minimum Forge Tier
-            int minForgeTier = tag.getInt("fuel_per_tick");
-
-            // We get a list of all the recipe inputs
-            List<EntryIngredient> input = new ArrayList<>();
-            tag.getList("inputs", NbtElement.LIST_TYPE).forEach(nbtElement -> input.add(EntryIngredient.read((NbtList) nbtElement)));
-
-            // We get the single recipe output
-            EntryIngredient output = EntryIngredient.read(tag.getList("output", NbtElement.LIST_TYPE));
-
-            // Last thing we grab is the recipes Override Range Values
-            ImmutableMap.Builder<AlloyForgeRecipe.OverrideRange, ItemStack> builder = new ImmutableMap.Builder<>();
-            tag.getList("overrides", NbtElement.COMPOUND_TYPE).forEach(nbtElement -> {
-                NbtCompound overrideTag = (NbtCompound) nbtElement;
-
-                AlloyForgeRecipe.OverrideRange range = new AlloyForgeRecipe.OverrideRange(overrideTag.getInt("lower"), overrideTag.getInt("upper"));
-                ItemStack stack = MinecraftEndecs.ITEM_STACK.decodeFully(NbtDeserializer::of, overrideTag.getCompound("stack"));
-
-                builder.put(range, stack);
-            });
-
-            var recipeID = tag.contains("recipeID") ? Identifier.tryParse(tag.getString("recipeID")) : null;
-
-            return new AlloyForgingDisplay(input, output, minForgeTier, requiredFuel, builder.build(), Optional.ofNullable(recipeID));
-        }
+    @Override
+    public @Nullable DisplaySerializer<AlloyForgingDisplay> getSerializer() {
+        return SERIALIZER;
     }
+
+    public static final Endec<EntryIngredient> ENTRY_INGREDIENT_ENDEC = CodecUtils.toEndecWithRegistries(EntryIngredient.codec(), EntryIngredient.streamCodec());
+
+    public static final StructEndec<AlloyForgingDisplay> ENDEC = StructEndecBuilder.of(
+            ENTRY_INGREDIENT_ENDEC.listOf().fieldOf("inputs", (display) -> display.inputs),
+            ENTRY_INGREDIENT_ENDEC.fieldOf("output", (display) -> display.output),
+            Endec.INT.fieldOf("min_forge_tier", (display) -> display.minForgeTier),
+            Endec.INT.fieldOf("fuel_per_tick", (display) -> display.fuelPerTick),
+            Endec.map(AlloyForgeRecipe.OverrideRange.OVERRIDE_RANGE, MinecraftEndecs.ITEM_STACK).fieldOf("overrides", (display) -> display.overrides),
+            MinecraftEndecs.IDENTIFIER.optionalOf().fieldOf("recipe_id", (display) -> display.recipeID),
+            AlloyForgingDisplay::new
+    );
+
+    public static final DisplaySerializer<AlloyForgingDisplay> SERIALIZER = DisplaySerializer.of(CodecUtils.toMapCodec(ENDEC), CodecUtils.toPacketCodec(ENDEC));
 }

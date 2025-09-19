@@ -14,7 +14,7 @@
   "inputs": [
     {
       "count": 2,
-      "tag": "c:ores/palladium"
+      "ingredient": "#c:ores/palladium"
     }
   ],
   "min_forge_tier": 2,

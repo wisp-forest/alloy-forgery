@@ -1,3 +1,6 @@
 {
-  "parent": "alloy_forgery:block/deepslate_bricks_forge_controller"
+  "model": {
+    "type": "minecraft:model",
+    "model": "alloy_forgery:block/deepslate_bricks_forge_controller"
+  }
 }

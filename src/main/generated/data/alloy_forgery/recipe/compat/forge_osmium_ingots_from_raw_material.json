@@ -14,7 +14,7 @@
   "inputs": [
     {
       "count": 2,
-      "tag": "c:raw_materials/osmium"
+      "ingredient": "#c:raw_materials/osmium"
     }
   ],
   "min_forge_tier": 2,

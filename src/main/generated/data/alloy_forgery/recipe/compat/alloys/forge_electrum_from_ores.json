@@ -15,11 +15,11 @@
   "inputs": [
     {
       "count": 1,
-      "tag": "c:ores/gold"
+      "ingredient": "#c:ores/gold"
     },
     {
       "count": 1,
-      "tag": "c:ores/silver"
+      "ingredient": "#c:ores/silver"
     }
   ],
   "min_forge_tier": 2,

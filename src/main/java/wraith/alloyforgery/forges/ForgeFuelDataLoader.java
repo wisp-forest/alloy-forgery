@@ -8,9 +8,15 @@ import io.wispforest.owo.serialization.endec.MinecraftEndecs;
 import it.unimi.dsi.fastutil.Pair;
 import net.minecraft.item.Item;
 import net.minecraft.registry.Registries;
+import net.minecraft.resource.ResourceManager;
+import net.minecraft.resource.ResourceType;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.profiler.Profiler;
 import wraith.alloyforgery.AlloyForgery;
-import wraith.alloyforgery.utils.data.EndecableDataLoader;
+import wraith.alloyforgery.utils.data.EndecDataLoader;
+
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class ForgeFuelDataLoader {
@@ -21,12 +27,19 @@ public class ForgeFuelDataLoader {
         Pair::of
     );
 
-    public static final EndecableDataLoader FUEL_DATA_LOADER = EndecableDataLoader.of(
-        AlloyForgery.id("forge_fuel_loader"),
-        "alloy_forge_fuels",
-        "fuels",
-        ForgeFuelDataLoader.FUEL_ENTRY.listOf(),
-        (id, fuelEntries) -> fuelEntries.forEach(fuelEntry -> ForgeFuelDataLoader.register(fuelEntry.first(), fuelEntry.second())));
+    public static final EndecDataLoader<List<Pair<Item, ForgeFuelDefinition>>> FUEL_DATA_LOADER = new EndecDataLoader<>(
+            AlloyForgery.id("forge_fuel_loader"),
+            "alloy_forge_fuels",
+            ForgeFuelDataLoader.FUEL_ENTRY.listOf().structOf("fuels"),
+            ResourceType.SERVER_DATA
+    ) {
+        @Override
+        protected void apply(Map<Identifier, List<Pair<Item, ForgeFuelDefinition>>> prepared, ResourceManager manager, Profiler profiler) {
+            prepared.forEach((identifier, fuelEntries) -> {
+                fuelEntries.forEach(fuelEntry -> ForgeFuelDataLoader.register(fuelEntry.first(), fuelEntry.second()));
+            });
+        }
+    };
 
     private static final Map<Item, ForgeFuelDefinition> REGISTRY = new HashMap<>();
 

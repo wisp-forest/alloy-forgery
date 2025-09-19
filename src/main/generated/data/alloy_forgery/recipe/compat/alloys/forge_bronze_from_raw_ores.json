@@ -15,11 +15,11 @@
   "inputs": [
     {
       "count": 3,
-      "tag": "c:raw_materials/copper"
+      "ingredient": "#c:raw_materials/copper"
     },
     {
       "count": 1,
-      "tag": "c:raw_materials/tin"
+      "ingredient": "#c:raw_materials/tin"
     }
   ],
   "min_forge_tier": 1,

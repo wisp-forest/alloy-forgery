@@ -36,7 +36,7 @@ public record MapCodecStructEndec<T>(MapCodec<T> codec) implements StructEndec<T
         if (deserializer instanceof SelfDescribedDeserializer<?>) {
             value = EdmEndec.INSTANCE.decode(ctx, deserializer);
         } else {
-            value = struct.field("value", ctx, EdmEndec.INSTANCE);
+            value = struct.field("value", ctx, EdmEndec.INSTANCE, null);
         }
 
         return codec.decode(ops, ops.getMap(value).getOrThrow(IllegalStateException::new))

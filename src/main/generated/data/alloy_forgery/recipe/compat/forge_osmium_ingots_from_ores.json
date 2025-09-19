@@ -14,7 +14,7 @@
   "inputs": [
     {
       "count": 2,
-      "tag": "c:ores/osmium"
+      "ingredient": "#c:ores/osmium"
     }
   ],
   "min_forge_tier": 2,

@@ -13,6 +13,8 @@ import net.minecraft.registry.tag.TagKey;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
+import wraith.alloyforgery.utils.EndecUtils;
+
 import java.util.List;
 
 public record OutputData(Integer count, ComponentChanges components, @Nullable Item outputItem, @Nullable List<Identifier> items, @Nullable TagKey<Item> defaultTag) {
@@ -34,7 +36,7 @@ public record OutputData(Integer count, ComponentChanges components, @Nullable I
 
     private static final Endec<OutputData> NEW_FORMAT_ENDEC = StructEndecBuilder.of(
         Endec.INT.fieldOf("count", OutputData::count),
-        CodecUtils.toEndec(ComponentChanges.CODEC).optionalFieldOf("components", OutputData::components, ComponentChanges.EMPTY),
+        EndecUtils.optionalFieldOf("components", CodecUtils.toEndec(ComponentChanges.CODEC), OutputData::components, () -> ComponentChanges.EMPTY),
         MinecraftEndecs.ofRegistry(Registries.ITEM).optionalFieldOf("item", OutputData::outputItem, () -> null),
         MinecraftEndecs.IDENTIFIER.listOf().optionalFieldOf("priority", OutputData::items, () -> null),
         MinecraftEndecs.unprefixedTagKey(RegistryKeys.ITEM).optionalFieldOf("tag", OutputData::defaultTag, () -> null),

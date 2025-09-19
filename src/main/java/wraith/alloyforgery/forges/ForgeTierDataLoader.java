@@ -4,14 +4,17 @@ import io.wispforest.endec.Endec;
 import io.wispforest.owo.serialization.endec.MinecraftEndecs;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
+import net.minecraft.resource.ResourceManager;
 import net.minecraft.resource.ResourceType;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.profiler.Profiler;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 import wraith.alloyforgery.AlloyForgery;
 import wraith.alloyforgery.networking.AlloyForgeNetworking;
 import wraith.alloyforgery.networking.TierDataSync;
-import wraith.alloyforgery.utils.data.EndecableDataLoader;
+import wraith.alloyforgery.utils.data.EndecDataLoader;
+
 import java.util.*;
 
 public class ForgeTierDataLoader {
@@ -19,26 +22,32 @@ public class ForgeTierDataLoader {
     private static final ForgeTierDataLoader SERVER = new ForgeTierDataLoader();
     private static final ForgeTierDataLoader CLIENT = new ForgeTierDataLoader();
 
-    private static final EndecableDataLoader TIER_DATA_LOADER = EndecableDataLoader.of(
-        AlloyForgery.id("forge_tier"),
-        "alloy_forge/tier",
-        ForgeTier.ENDEC,
-        (identifier, forgeTier) -> {
-            SERVER.idToForgeTier.put(identifier, forgeTier);
-            SERVER.forgeTierToId.put(forgeTier, identifier);
-        });
+    private static final EndecDataLoader<ForgeTier> TIER_DATA_LOADER = new EndecDataLoader<>(
+            AlloyForgery.id("forge_tier"),
+            "alloy_forge/tier",
+            ForgeTier.ENDEC,
+            ResourceType.SERVER_DATA) {
+        @Override
+        protected void apply(Map<Identifier, ForgeTier> prepared, ResourceManager manager, Profiler profiler) {
+            prepared.forEach((identifier, forgeTier) -> {
+                SERVER.idToForgeTier.put(identifier, forgeTier);
+                SERVER.forgeTierToId.put(forgeTier, identifier);
+            });
+        }
+    };
 
-    private static final EndecableDataLoader TIER_BINDING_LOADER = EndecableDataLoader.of(
-        AlloyForgery.id("tier_binding"),
-        "alloy_forge/tier_binding",
-        Endec.map(Identifier::toString, Identifier::tryParse, MinecraftEndecs.IDENTIFIER),
-        (identifier, map) -> map.forEach(SERVER.forgeDefinitionToTier::putIfAbsent)
-    ).addDependencies(TIER_DATA_LOADER.getFabricId());
+    private static final EndecDataLoader<Map<Identifier, Identifier>> TIER_BINDING_LOADER = new EndecDataLoader<>(
+            AlloyForgery.id("forge_tier"),
+            "alloy_forge/tier",
+            Endec.map(Identifier::toString, Identifier::tryParse, MinecraftEndecs.IDENTIFIER),
+            ResourceType.SERVER_DATA) {
+        @Override
+        protected void apply(Map<Identifier, Map<Identifier, Identifier>> prepared, ResourceManager manager, Profiler profiler) {
+            prepared.forEach((identifier, bindings) -> bindings.forEach(SERVER.forgeDefinitionToTier::putIfAbsent));
+        }
+    };
 
     public static void initDataLoaders() {
-        ResourceManagerHelper.get(ResourceType.SERVER_DATA).registerReloadListener(TIER_DATA_LOADER);
-        ResourceManagerHelper.get(ResourceType.SERVER_DATA).registerReloadListener(TIER_BINDING_LOADER);
-
         ServerLifecycleEvents.SYNC_DATA_PACK_CONTENTS.register((player, joined) -> {
             AlloyForgeNetworking.CHANNEL.serverHandle(player).send(new TierDataSync(SERVER.idToForgeTier(), SERVER.forgeDefinitionToTier()));
         });

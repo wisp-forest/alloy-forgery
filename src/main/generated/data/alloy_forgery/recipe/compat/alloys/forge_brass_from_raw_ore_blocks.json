@@ -15,11 +15,11 @@
   "inputs": [
     {
       "count": 2,
-      "tag": "c:storage_blocks/raw_copper"
+      "ingredient": "#c:storage_blocks/raw_copper"
     },
     {
       "count": 1,
-      "tag": "c:storage_blocks/raw_zinc"
+      "ingredient": "#c:storage_blocks/raw_zinc"
     }
   ],
   "min_forge_tier": 1,

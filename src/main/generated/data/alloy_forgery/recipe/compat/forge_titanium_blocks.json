@@ -14,7 +14,7 @@
   "inputs": [
     {
       "count": 2,
-      "tag": "c:storage_blocks/raw_titanium"
+      "ingredient": "#c:storage_blocks/raw_titanium"
     }
   ],
   "min_forge_tier": 2,

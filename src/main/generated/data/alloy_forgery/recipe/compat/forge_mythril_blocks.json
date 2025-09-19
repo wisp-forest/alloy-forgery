@@ -14,7 +14,7 @@
   "inputs": [
     {
       "count": 2,
-      "tag": "c:storage_blocks/raw_mythril"
+      "ingredient": "#c:storage_blocks/raw_mythril"
     }
   ],
   "min_forge_tier": 2,

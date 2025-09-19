@@ -15,11 +15,11 @@
   "inputs": [
     {
       "count": 1,
-      "tag": "c:ingots/iron"
+      "ingredient": "#c:ingots/iron"
     },
     {
       "count": 1,
-      "tag": "c:coal"
+      "ingredient": "#c:coal"
     }
   ],
   "min_forge_tier": 1,
