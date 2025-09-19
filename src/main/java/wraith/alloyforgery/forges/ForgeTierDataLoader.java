@@ -37,8 +37,8 @@ public class ForgeTierDataLoader {
     };
 
     private static final EndecDataLoader<Map<Identifier, Identifier>> TIER_BINDING_LOADER = new EndecDataLoader<>(
-            AlloyForgery.id("forge_tier"),
-            "alloy_forge/tier",
+            AlloyForgery.id("forge_tier_bindings"),
+            "alloy_forge/tier_binding",
             Endec.map(Identifier::toString, Identifier::tryParse, MinecraftEndecs.IDENTIFIER),
             ResourceType.SERVER_DATA) {
         @Override
