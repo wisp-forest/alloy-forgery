@@ -34,7 +34,7 @@ public class AlloyForgeryItemGroup {
         final var tierRegistry = ForgeTierDataLoader.getForgeRegistry(true);
 
         blockList.sort(Comparator.comparingInt(value -> {
-            var tier = tierRegistry.getForgeTier(((ForgeControllerBlock) value).forgeDefinition);
+            var tier = tierRegistry.getBoundForgeTier(((ForgeControllerBlock) value).forgeDefinitionId);
 
             if (tier == null) tier = ForgeTier.DEFAULT;
 

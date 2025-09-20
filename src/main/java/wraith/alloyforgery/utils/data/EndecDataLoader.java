@@ -22,9 +22,7 @@ import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 import wraith.alloyforgery.mixin.JsonDataLoaderAccessor;
 
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -43,23 +41,7 @@ public abstract class EndecDataLoader<T> extends JsonDataLoader<T> {
 
     protected final boolean requiresRegistries;
 
-    protected EndecDataLoader(Identifier id, String type, Endec<T> endec, ResourceType packType) {
-        this(id, type, endec, packType, false);
-    }
-
-    protected EndecDataLoader(Identifier id, String type, Endec<T> endec, ResourceType packType, Set<Identifier> value) {
-        this(id, type, endec, packType, SerializationContext.empty(),false, value);
-    }
-
-    protected EndecDataLoader(Identifier id, String type, Endec<T> endec, ResourceType packType, boolean requiresRegistries) {
-        this(id, type, endec, packType, SerializationContext.empty(), requiresRegistries);
-    }
-
-    protected EndecDataLoader(Identifier id, String type, Endec<T> endec, ResourceType packType, SerializationContext context, boolean requiresRegistries) {
-        this(id, type, endec, packType, context, requiresRegistries, Set.of());
-    }
-
-    protected EndecDataLoader(Identifier id, String type, Endec<T> endec, ResourceType packType, SerializationContext context, boolean requiresRegistries, Set<Identifier> value) {
+    private EndecDataLoader(Identifier id, String type, Endec<T> endec, SerializationContext context, boolean requiresRegistries, Set<Identifier> value) {
         super(new DelayedRecursiveCodec<>(), ResourceFinder.json(type));
 
         this.id = id;
@@ -67,18 +49,75 @@ public abstract class EndecDataLoader<T> extends JsonDataLoader<T> {
         this.endec = endec;
         this.context = context;
         this.requiresRegistries = requiresRegistries;
-        this.dependencies = value;
+        this.dependencies = Collections.unmodifiableSet(value);
 
         setupCodec();
+    }
 
+    public static <T> EndecDataLoader.Builder<T> builder(String type, Endec<T> endec) {
+        return new Builder<>(type, endec);
+    }
 
-        if (ResourceType.SERVER_DATA.equals(packType) && requiresRegistries) {
-            ResourceManagerHelper.get(packType).registerReloadListener(id, wrapperLookup -> {
-                this.setupOps(wrapperLookup);
-                return new IdentifiableResourceReloadListenerImpl(id, this, this.dependencies);
-            });
-        } else {
-            ResourceManagerHelper.get(packType).registerReloadListener(new IdentifiableResourceReloadListenerImpl(id, this, this.dependencies));
+    public static class Builder<T> {
+        protected final String type;
+        protected final Endec<T> endec;
+
+        //--
+
+        protected final Set<Identifier> dependencies = new HashSet<>();
+
+        protected SerializationContext context = SerializationContext.empty();
+
+        protected boolean requiresRegistries = false;
+
+        Builder(String type, Endec<T> endec) {
+            this.type = type;
+            this.endec = endec;
+        }
+
+        public Builder<T> addDependencies(Identifier ...dependencies) {
+            return addDependencies(List.of(dependencies));
+        }
+
+        public Builder<T> addDependencies(Collection<Identifier> dependencies) {
+            this.dependencies.addAll(dependencies);
+
+            return this;
+        }
+
+        public Builder<T> requiresRegistries(boolean value) {
+            this.requiresRegistries = value;
+
+            return this;
+        }
+
+        public Builder<T> setContext(SerializationContext context) {
+            this.context = context;
+
+            return this;
+        }
+
+        public EndecDataLoader<T> create(Identifier id, ResourceType packType, LoadedDataHandler<T> handler) {
+            var loader = new EndecDataLoader<T>(id, this.type, this.endec, this.context, this.requiresRegistries, this.dependencies) {
+                @Override
+                protected void apply(Map<Identifier, T> prepared, ResourceManager manager, Profiler profiler) {
+                    handler.handleData(prepared, manager, profiler);
+                }
+            };
+
+            var manager = ResourceManagerHelper.get(packType);
+            var listenerWithId = new IdentifiableResourceReloadListenerImpl(id, loader, loader.getDependencyIds());
+
+            if (ResourceType.SERVER_DATA.equals(packType) && requiresRegistries) {
+                manager.registerReloadListener(id, wrapperLookup -> {
+                    loader.setupOps(wrapperLookup);
+                    return listenerWithId;
+                });
+            } else {
+                manager.registerReloadListener(listenerWithId);
+            }
+
+            return loader;
         }
     }
 
@@ -99,7 +138,7 @@ public abstract class EndecDataLoader<T> extends JsonDataLoader<T> {
     private RegistryWrapper.WrapperLookup registries = null;
 
     @ApiStatus.Internal
-    private EndecDataLoader<T> setupOps(RegistryWrapper.WrapperLookup registries) {
+    EndecDataLoader<T> setupOps(RegistryWrapper.WrapperLookup registries) {
         this.registries = registries;
 
         // Resets the given converted endec to grab new context with current registries
@@ -154,5 +193,9 @@ public abstract class EndecDataLoader<T> extends JsonDataLoader<T> {
         public String toString() {
             return "RecursiveCodec[" + name + ']';
         }
+    }
+
+    public interface LoadedDataHandler<T> {
+        void handleData(Map<Identifier, T> data, ResourceManager manager, Profiler profiler);
     }
 }

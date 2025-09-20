@@ -8,6 +8,7 @@ import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
@@ -29,21 +30,25 @@ public record BlockEntityLocation(BlockPos blockPos, RegistryKey<World> worldKey
     }
 
     public <T extends BlockEntity> T get(PlayerEntity player, BlockEntityType<T> blockEntityType) {
-        var originWorld = player.getWorld();
+        return get(player.getWorld(), blockEntityType);
+    }
 
-        if (!originWorld.getRegistryKey().equals(worldKey())) {
-            var server = originWorld.getServer();
+    public <T extends BlockEntity> T get(World world, BlockEntityType<T> blockEntityType) {
+        if (!world.getRegistryKey().equals(worldKey())) {
+            var server = world.getServer();
 
-            if (server == null)
+            if (server == null) {
                 throw new IllegalStateException("Unable to get the given block entity due to a inability to get the needed server instance!");
+            }
 
-            originWorld = server.getWorld(this.worldKey());
+            world = server.getWorld(this.worldKey());
         }
 
-        if (originWorld == null)
+        if (world == null) {
             throw new IllegalStateException("Unable to get the given block entity due to a inability to get the needed origin world! [World: " + this.worldKey().getValue() + "]");
+        }
 
-        return originWorld.getBlockEntity(this.blockPos(), blockEntityType)
+        return world.getBlockEntity(this.blockPos(), blockEntityType)
             .orElseThrow(() -> new IllegalStateException("Unable to get the given block entity due not finding any block entity at the given location! [World: " + this.worldKey().getValue() + ", Pos: " + this.blockPos() + "]"));
     }
 }

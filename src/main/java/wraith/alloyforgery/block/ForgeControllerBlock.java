@@ -4,6 +4,9 @@ import com.mojang.serialization.MapCodec;
 import io.wispforest.endec.impl.StructEndecBuilder;
 import io.wispforest.owo.particles.ClientParticles;
 import io.wispforest.owo.serialization.CodecUtils;
+import io.wispforest.owo.serialization.endec.MinecraftEndecs;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorageUtil;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.*;
@@ -33,24 +36,24 @@ public class ForgeControllerBlock extends BlockWithEntity {
     public static final BooleanProperty LIT = Properties.LIT;
     public static final EnumProperty<Direction> FACING = Properties.HORIZONTAL_FACING;
 
-    public final ForgeDefinition forgeDefinition;
+    public final Identifier forgeDefinitionId;
 
-    public ForgeControllerBlock(ForgeDefinition forgeDefinition, Settings settings) {
+    public ForgeControllerBlock(Identifier forgeDefinitionId, Settings settings) {
         super(settings);
 
-        this.forgeDefinition = forgeDefinition;
+        this.forgeDefinitionId = forgeDefinitionId;
         this.setDefaultState(this.getStateManager().getDefaultState().with(LIT, false));
     }
 
-    public ForgeControllerBlock(ForgeDefinition forgeDefinition, Identifier blockId) {
-        this(forgeDefinition, Settings.copy(Blocks.BLACKSTONE).registryKey(RegistryKey.of(RegistryKeys.BLOCK, blockId)));
+    public static ForgeControllerBlock of(Identifier forgeDefinitionId, Identifier blockId) {
+        return new ForgeControllerBlock(forgeDefinitionId, Settings.copy(Blocks.BLACKSTONE).registryKey(RegistryKey.of(RegistryKeys.BLOCK, blockId)));
     }
 
     @Override
     protected MapCodec<? extends BlockWithEntity> getCodec() {
         return CodecUtils.toMapCodec(
                 StructEndecBuilder.of(
-                        ForgeDefinition.FORGE_DEFINITION.fieldOf("forge_definition", s -> forgeDefinition),
+                        MinecraftEndecs.IDENTIFIER.fieldOf("forge_definition", s -> forgeDefinitionId),
                         CodecUtils.toEndec(AbstractBlock.Settings.CODEC).fieldOf("properties", AbstractBlock::getSettings),
                         ForgeControllerBlock::new
                 )
@@ -96,16 +99,18 @@ public class ForgeControllerBlock extends BlockWithEntity {
 
     @Override
     public void onStateReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean moved) {
-        if (state.getBlock() != newState.getBlock()) {
-            if (world.getBlockEntity(pos) instanceof ForgeControllerBlockEntity forgeController) {
-                ItemScatterer.spawn(world, pos, forgeController);
-                ItemScatterer.spawn(world, pos.getX(), pos.getY(), pos.getZ(), forgeController.getFuelStack());
-            }
-            super.onStateReplaced(state, world, pos, newState, moved);
+        if (state.getBlock() == newState.getBlock()) return;
+
+        if (world.getBlockEntity(pos) instanceof ForgeControllerBlockEntity forgeController) {
+            ItemScatterer.spawn(world, pos, forgeController);
+            ItemScatterer.spawn(world, pos.getX(), pos.getY(), pos.getZ(), forgeController.getFuelStack());
         }
+
+        super.onStateReplaced(state, world, pos, newState, moved);
     }
 
     @Override
+    @Environment(EnvType.CLIENT)
     public void randomDisplayTick(BlockState state, World world, BlockPos pos, Random random) {
         if (!state.get(LIT)) return;
 
@@ -150,8 +155,9 @@ public class ForgeControllerBlock extends BlockWithEntity {
 
     @Override
     public int getComparatorOutput(BlockState state, World world, BlockPos pos) {
-        if (!(world.getBlockEntity(pos) instanceof ForgeControllerBlockEntity controller)) return 0;
-        return controller.getCurrentSmeltTime() == 0 ? 0 : Math.max(1, Math.round(controller.getSmeltProgress() * 0.46875f));
+        return world.getBlockEntity(pos, AlloyForgery.FORGE_CONTROLLER_BLOCK_ENTITY)
+            .map(ForgeControllerBlockEntity::getCompartorOutput)
+            .orElse(0);
     }
 
     @Override

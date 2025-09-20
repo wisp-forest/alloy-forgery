@@ -12,9 +12,7 @@ public record TierDataSync(Map<Identifier, ForgeTier> idToForgeTier, Map<Identif
 
     @Environment(EnvType.CLIENT)
     public static void handlePacket(TierDataSync packet, ClientAccess access) {
-        var tier = ForgeTierDataLoader.getForgeRegistry(true);
-
-        tier.setTierInfo(packet.idToForgeTier());
-        tier.forgeDefinitionBindings(packet.forgeDefinitionToTier());
+        ForgeTierDataLoader.getForgeRegistry(true)
+            .setTierData(packet.idToForgeTier(), packet.forgeDefinitionToTier());
     }
 }

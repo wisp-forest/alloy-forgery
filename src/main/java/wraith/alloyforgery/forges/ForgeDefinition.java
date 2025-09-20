@@ -17,6 +17,7 @@ import net.minecraft.registry.Registries;
 import net.minecraft.registry.RegistryOps;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.JsonHelper;
+import org.jetbrains.annotations.ApiStatus;
 import org.slf4j.Logger;
 import wraith.alloyforgery.AlloyForgery;
 import wraith.alloyforgery.utils.RecipeInjector;
@@ -45,7 +46,11 @@ public record ForgeDefinition(Block material, ImmutableList<Block> additionalMat
         return ForgeRegistry.getId(this);
     }
 
+    @ApiStatus.Internal
+    public static final Map<Identifier, ForgeTier> legacyForgeDefinitionIdToTier = new HashMap<>();
+
     @Deprecated
+    @ApiStatus.Internal
     public static void loadAndEnqueue(Identifier id, JsonObject json) {
         final int forgeTier = JsonHelper.getInt(json, "tier");
         final float speedMultiplier = JsonHelper.getFloat(json, "speed_multiplier", 1);
@@ -53,6 +58,8 @@ public record ForgeDefinition(Block material, ImmutableList<Block> additionalMat
 
         // TODO: ADD DEPRECATION WARNING ABOUT LOADING TIER INFO
         var tier = new ForgeTier(forgeTier, speedMultiplier, fuelCapacity, Optional.empty());
+
+        legacyForgeDefinitionIdToTier.put(id, tier);
 
         final var mainMaterialId = Identifier.tryParse(JsonHelper.getString(json, "material"));
 
@@ -62,6 +69,7 @@ public record ForgeDefinition(Block material, ImmutableList<Block> additionalMat
         loadAndEnqueue(id, new RawForgeDefinition(mainMaterialId, additionalMaterialIds, false));
     }
 
+    @ApiStatus.Internal
     private static void loadAndEnqueue(Identifier id, RawForgeDefinition rawForgeDefinition) {
         final var action = ComplexRegistryAction.Builder.create(() -> {
             final var mainMaterial = Registries.BLOCK.get(rawForgeDefinition.materialId());

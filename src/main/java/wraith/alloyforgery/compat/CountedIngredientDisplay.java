@@ -1,6 +1,5 @@
 package wraith.alloyforgery.compat;
 
-import blue.endless.jankson.annotation.Serializer;
 import io.wispforest.endec.Endec;
 import io.wispforest.endec.StructEndec;
 import io.wispforest.endec.impl.StructEndecBuilder;

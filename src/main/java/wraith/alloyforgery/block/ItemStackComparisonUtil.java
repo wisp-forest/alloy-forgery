@@ -12,12 +12,10 @@ public class ItemStackComparisonUtil {
         if (list1.size() != list2.size()) return true;
 
         for (int i = 0; i < list1.size(); i++) {
-            ItemStack stack1 = list1.get(i);
-            ItemStack stack2 = list2.get(i);
+            var stack1 = list1.get(i);
+            var stack2 = list2.get(i);
 
-            if (!ItemStack.areEqual(stack1, stack2)) {
-                return true;
-            }
+            if (!ItemStack.areEqual(stack1, stack2)) return true;
         }
 
         return false;

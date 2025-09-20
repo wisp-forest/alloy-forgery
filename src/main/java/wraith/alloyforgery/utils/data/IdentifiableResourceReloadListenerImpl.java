@@ -12,8 +12,7 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 
-public record IdentifiableResourceReloadListenerImpl(Identifier location, ResourceReloader listener,
-                                                     Set<Identifier> dependencies) implements IdentifiableResourceReloadListener {
+public record IdentifiableResourceReloadListenerImpl(Identifier location, ResourceReloader listener, Set<Identifier> dependencies) implements IdentifiableResourceReloadListener {
 
     public IdentifiableResourceReloadListenerImpl(Identifier location, ResourceReloader listener, Identifier... dependencies) {
         this(location, listener, new HashSet<>(List.of(dependencies)));

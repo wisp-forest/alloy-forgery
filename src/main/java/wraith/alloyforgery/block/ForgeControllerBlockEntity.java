@@ -30,6 +30,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.ItemScatterer;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.*;
@@ -66,7 +67,7 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
 
     private final FluidHolder fluidHolder = new FluidHolder();
 
-    private final ForgeDefinition forgeDefinition;
+    private final Identifier forgeDefinitionId;
     private final ImmutableList<BlockPos> multiblockPositions;
     private final Direction facing;
 
@@ -79,7 +80,7 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
 
     public ForgeControllerBlockEntity(BlockPos pos, BlockState state) {
         super(AlloyForgery.FORGE_CONTROLLER_BLOCK_ENTITY, pos, state);
-        forgeDefinition = ((ForgeControllerBlock) state.getBlock()).forgeDefinition;
+        forgeDefinitionId = ((ForgeControllerBlock) state.getBlock()).forgeDefinitionId;
         facing = state.get(ForgeControllerBlock.FACING);
 
         multiblockPositions = generateMultiblockPositions(pos.toImmutable(), state.get(ForgeControllerBlock.FACING));
@@ -88,7 +89,7 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
     public ForgeTier forgeTier() {
         if (this.world == null) return ForgeTier.DEFAULT;
 
-        var tier = ForgeTierDataLoader.getForgeRegistry(this.world.isClient()).getForgeTier(this.forgeDefinition);
+        var tier = ForgeTierDataLoader.getForgeRegistry(this.world.isClient()).getBoundForgeTier(this.forgeDefinitionId);
 
         if (tier == null) return ForgeTier.DEFAULT;
 
@@ -151,7 +152,8 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
     }
 
     public ForgeDefinition getForgeDefinition() {
-        return this.forgeDefinition;
+        return ForgeRegistry.getForgeDefinition(this.forgeDefinitionId)
+            .orElseThrow(() -> new IllegalArgumentException("Unable to locate the given definition as its not registered! [Id: " + this.forgeDefinitionId + "]"));
     }
 
     public void disableSlot(int index) {
@@ -162,6 +164,12 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
     public void enableSlot(int index) {
         this.disabledSlots.get().remove(index);
         this.disabledSlots.markDirty();
+    }
+
+    public int getCompartorOutput() {
+        return this.getCurrentSmeltTime() != 0
+            ? Math.max(1, Math.round(this.getSmeltProgress() * 0.46875f))
+            : 0;
     }
 
     @Override
@@ -418,7 +426,9 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
 
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public boolean verifyMultiblock() {
-        final BlockState belowController = world.getBlockState(multiblockPositions.get(0));
+        final var belowController = world.getBlockState(multiblockPositions.get(0));
+        final var forgeDefinition = getForgeDefinition();
+
         if (!(belowController.isOf(Blocks.HOPPER) || forgeDefinition.isBlockValid(belowController.getBlock())))
             return false;
 

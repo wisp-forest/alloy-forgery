@@ -42,7 +42,7 @@ public class ForgeRegistry {
     static void registerDefinition(Identifier forgeDefinitionId, ForgeDefinition definition) {
         final var controllerBlockRegistryId = AlloyForgery.id(Registries.BLOCK.getId(definition.material()).getPath() + "_forge_controller");
 
-        final var controllerBlock = new ForgeControllerBlock(definition, controllerBlockRegistryId);
+        final var controllerBlock = ForgeControllerBlock.of(forgeDefinitionId, controllerBlockRegistryId);
 
         Registry.register(Registries.BLOCK, controllerBlockRegistryId, controllerBlock);
         Registry.register(Registries.ITEM, controllerBlockRegistryId, new ForgeControllerItem(

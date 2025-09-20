@@ -81,21 +81,15 @@ public class AlloyForgery implements ModInitializer {
                         .xmap(either -> Either.unwrap(either.mapRight(Item::getDefaultStack)), Either::left)
         );
 
-        new EndecDataLoader<>(
-                Identifier.of(AlloyForgery.MOD_ID, "forge_remainder"),
-                "forge_remainder",
-                remaindersEndec,
-                ResourceType.SERVER_DATA
-        ) {
-            @Override
-            protected void apply(Map<Identifier, Map<Item, ItemStack>> prepared, ResourceManager manager, Profiler profiler) {
-                prepared.values().forEach(AlloyForgeRecipe::addRemainders);
-            }
-        };
+        EndecDataLoader.builder("forge_remainder", remaindersEndec)
+            .create(Identifier.of(AlloyForgery.MOD_ID, "forge_remainder"), ResourceType.SERVER_DATA, (data, manager, profiler) -> {
+                data.values().forEach(AlloyForgeRecipe::addRemainders);
+            });
+
+        ForgeFuelDataLoader.init();
+        ForgeTierDataLoader.init();
 
         Reflection.initialize(ForgeFuelDataLoader.class);
-
-        ForgeTierDataLoader.initDataLoaders();
 
         var recipeTagLoader = new RecipeTagLoader();
 

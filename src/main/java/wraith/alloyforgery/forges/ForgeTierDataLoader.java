@@ -8,6 +8,7 @@ import net.minecraft.resource.ResourceManager;
 import net.minecraft.resource.ResourceType;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.profiler.Profiler;
+import org.apache.commons.compress.archivers.sevenz.CLI;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 import wraith.alloyforgery.AlloyForgery;
@@ -22,39 +23,31 @@ public class ForgeTierDataLoader {
     private static final ForgeTierDataLoader SERVER = new ForgeTierDataLoader();
     private static final ForgeTierDataLoader CLIENT = new ForgeTierDataLoader();
 
-    private static final EndecDataLoader<ForgeTier> TIER_DATA_LOADER = new EndecDataLoader<>(
-            AlloyForgery.id("forge_tier"),
-            "alloy_forge/tier",
-            ForgeTier.ENDEC,
-            ResourceType.SERVER_DATA) {
-        @Override
-        protected void apply(Map<Identifier, ForgeTier> prepared, ResourceManager manager, Profiler profiler) {
-            prepared.forEach((identifier, forgeTier) -> {
-                SERVER.idToForgeTier.put(identifier, forgeTier);
-                SERVER.forgeTierToId.put(forgeTier, identifier);
+    public static final Identifier TIER_LOADER = AlloyForgery.id("forge_tier");
+    public static final Identifier TIER_BINDINGS_LOADER = AlloyForgery.id("forge_tier_bindings");
+
+    public static void init() {
+        EndecDataLoader.builder("alloy_forge/tier", ForgeTier.ENDEC)
+            .create(TIER_LOADER, ResourceType.SERVER_DATA, (data, manager, profiler) -> {
+                data.forEach(SERVER::registerTier);
+
+                ForgeDefinition.legacyForgeDefinitionIdToTier.forEach((id, forgeTier) -> SERVER.registerTier(id.withSuffixedPath("_legacy_tier"), forgeTier));
             });
-        }
-    };
 
-    private static final EndecDataLoader<Map<Identifier, Identifier>> TIER_BINDING_LOADER = new EndecDataLoader<>(
-            AlloyForgery.id("forge_tier_bindings"),
-            "alloy_forge/tier_binding",
-            Endec.map(Identifier::toString, Identifier::tryParse, MinecraftEndecs.IDENTIFIER),
-            ResourceType.SERVER_DATA) {
-        @Override
-        protected void apply(Map<Identifier, Map<Identifier, Identifier>> prepared, ResourceManager manager, Profiler profiler) {
-            prepared.forEach((identifier, bindings) -> bindings.forEach(SERVER.forgeDefinitionToTier::putIfAbsent));
-        }
-    };
+        EndecDataLoader.builder("alloy_forge/tier_binding", Endec.map(Identifier::toString, Identifier::tryParse, MinecraftEndecs.IDENTIFIER))
+            .create(TIER_BINDINGS_LOADER, ResourceType.SERVER_DATA, (data, manager, profiler) -> {
+                data.values().forEach((bindings) -> bindings.forEach(SERVER.forgeDefinitionToTier::putIfAbsent));
 
-    public static void initDataLoaders() {
+                ForgeDefinition.legacyForgeDefinitionIdToTier.keySet().forEach(id -> SERVER.forgeDefinitionToTier.putIfAbsent(id, id.withSuffixedPath("_legacy_tier")));
+            });
+
         ServerLifecycleEvents.SYNC_DATA_PACK_CONTENTS.register((player, joined) -> {
             AlloyForgeNetworking.CHANNEL.serverHandle(player).send(new TierDataSync(SERVER.idToForgeTier(), SERVER.forgeDefinitionToTier()));
         });
     }
 
-    private final Map<Identifier, ForgeTier> idToForgeTier = new HashMap<>();
-    private final Map<ForgeTier, Identifier> forgeTierToId = new HashMap<>();
+    private final Map<Identifier, ForgeTier> idToForgeTier = new IdentityHashMap<>();
+    private final Map<ForgeTier, Identifier> forgeTierToId = new IdentityHashMap<>();
 
     private final Map<Identifier, Identifier> forgeDefinitionToTier = new HashMap<>();
 
@@ -73,8 +66,8 @@ public class ForgeTierDataLoader {
     }
 
     @Nullable
-    public ForgeTier getForgeTier(ForgeDefinition forgeDefinition) {
-        return forgeDefinition.id()
+    public ForgeTier getBoundForgeTier(Identifier forgeDefinitionId) {
+        return Optional.of(forgeDefinitionId)
             .map(forgeDefinitionToTier()::get)
             .map(idToForgeTier()::get)
             .orElse(null);
@@ -93,18 +86,21 @@ public class ForgeTierDataLoader {
     }
 
     @ApiStatus.Internal
-    public void forgeDefinitionBindings(Map<Identifier, Identifier> forgeDefinitionToTier) {
+    public void setTierData(Map<Identifier, ForgeTier> idToForgeTier, Map<Identifier, Identifier> forgeDefinitionToTier) {
         this.forgeDefinitionToTier.clear();
         this.forgeDefinitionToTier.putAll(forgeDefinitionToTier);
-    }
 
-    @ApiStatus.Internal
-    public void setTierInfo(Map<Identifier, ForgeTier> idToForgeTier) {
         this.idToForgeTier.clear();
         this.idToForgeTier.putAll(idToForgeTier);
 
         this.forgeTierToId.clear();
-
         idToForgeTier.forEach((identifier, forgeTier) -> this.forgeTierToId.put(forgeTier, identifier));
+    }
+
+    private void registerTier(Identifier id, ForgeTier tier) {
+        if (SERVER.idToForgeTier.containsKey(id)) return;
+
+        SERVER.idToForgeTier.put(id, tier);
+        SERVER.forgeTierToId.put(tier, id);
     }
 }
