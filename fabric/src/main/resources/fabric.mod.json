@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "id": "${mod_id}",
+  "version": "${mod_version}",
+  "name": "${mod_name}",
+  "description": "${mod_description}",
+  "authors": [
+    "${list_of_authors}"
+  ],
+  "contributors": [
+    "${list_of_contributors}"
+  ],
+  "contact": {
+    "${contact_entry}": ""
+  },
+  "license": "${mod_license}",
+  "icon": "assets/${mod_id}/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "io.wispforest.alloyforgery.fabric.AlloyForgeryFabric"
+    ],
+    "client": [
+      "io.wispforest.alloyforgery.fabric.client.AlloyForgeryClientFabric"
+    ]
+  },
+  "mixins": [
+    "${mod_id}-fabric.mixins.json",
+    "${mod_id}-common.mixins.json"
+  ],
+  "accessWidener": "${mod_id}.accesswidener",
+  "depends": {
+    "fabricloader": "${fabric_loader_version_range}",
+    "fabric-api": "${fabric_api_version_range}",
+    "minecraft": "${fabric_minecraft_version_range}",
+    "owo": "${owo_fabric_version_range}"
+  }
+}

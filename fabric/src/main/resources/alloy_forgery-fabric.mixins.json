@@ -1,0 +1,14 @@
+{
+  "required": true,
+  "package": "io.wispforest.alloyforgery.fabric.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "minVersion": "0.8",
+  "mixins": [
+    "ForgeControllerBlockEntityMixin",
+    "ModDataLoaderMixin"
+  ],
+  "client": [],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

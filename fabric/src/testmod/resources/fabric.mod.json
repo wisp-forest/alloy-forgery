@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "id": "${test_mod_id}",
+  "version": "1.0.0",
+  "name": "${test_mod_id}",
+  "description": "This is a test mod for ${mod_id}",
+  "authors": [],
+  "contact": {},
+  "license": "${mod_license}",
+  "icon": "assets/${test_mod_id}/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "io.example.fabric.ExampleTestModFabricInit"
+    ],
+    "client":[]
+  },
+  "mixins": [
+    "${test_mod_id}-fabric.mixins.json"
+  ]
+}
