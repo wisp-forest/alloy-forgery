@@ -1,0 +1,42 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:tags_populated",
+      "registry": "minecraft:item",
+      "values": [
+        "c:storage_blocks/raw_antimony",
+        "c:storage_blocks/antimony"
+      ]
+    }
+  ],
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_antimony_blocks": {
+      "conditions": {
+        "items": [
+          {
+            "items": "#c:storage_blocks/raw_antimony"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "minecraft:compat/forge_antimony_blocks"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_antimony_blocks"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "minecraft:compat/forge_antimony_blocks"
+    ]
+  }
+}

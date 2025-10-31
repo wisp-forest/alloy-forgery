@@ -15,6 +15,12 @@ architectury {
     }
 }
 
+fabricApi {
+    configureDataGeneration {
+        modId.set(rootProject.property("mod_id") as String)
+    }
+}
+
 dependencies {
     // Core Libs
     modImplementation(libs.fabric.loader)

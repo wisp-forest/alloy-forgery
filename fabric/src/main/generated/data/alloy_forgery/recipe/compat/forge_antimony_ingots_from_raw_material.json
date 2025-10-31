@@ -1,0 +1,33 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:tags_populated",
+      "registry": "minecraft:item",
+      "values": [
+        "c:raw_materials/antimony",
+        "c:ingots/antimony"
+      ]
+    }
+  ],
+  "type": "alloy_forgery:forging",
+  "fuel_per_tick": 45,
+  "inputs": [
+    {
+      "count": 2,
+      "ingredient": "#c:raw_materials/antimony"
+    }
+  ],
+  "min_forge_tier": 1,
+  "output": {
+    "count": 3,
+    "priority": [
+      "modern_industrialization:antimony_ingot"
+    ],
+    "tag": "c:ingots/antimony"
+  },
+  "overrides": {
+    "2+": {
+      "count": 4
+    }
+  }
+}

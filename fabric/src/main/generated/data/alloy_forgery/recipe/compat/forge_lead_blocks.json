@@ -1,0 +1,35 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:tags_populated",
+      "registry": "minecraft:item",
+      "values": [
+        "c:storage_blocks/raw_lead",
+        "c:storage_blocks/lead"
+      ]
+    }
+  ],
+  "type": "alloy_forgery:forging",
+  "fuel_per_tick": 45,
+  "inputs": [
+    {
+      "count": 2,
+      "ingredient": "#c:storage_blocks/raw_lead"
+    }
+  ],
+  "min_forge_tier": 1,
+  "output": {
+    "count": 3,
+    "priority": [
+      "techreborn:lead_block",
+      "indrev:lead_block",
+      "modern_industrialization:lead_block"
+    ],
+    "tag": "c:storage_blocks/lead"
+  },
+  "overrides": {
+    "2+": {
+      "count": 4
+    }
+  }
+}

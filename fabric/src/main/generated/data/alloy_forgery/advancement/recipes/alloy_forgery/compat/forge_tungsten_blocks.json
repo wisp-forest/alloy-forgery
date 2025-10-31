@@ -1,0 +1,42 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:tags_populated",
+      "registry": "minecraft:item",
+      "values": [
+        "c:storage_blocks/raw_tungsten",
+        "c:storage_blocks/tungsten"
+      ]
+    }
+  ],
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "minecraft:compat/forge_tungsten_blocks"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    },
+    "has_tungsten_blocks": {
+      "conditions": {
+        "items": [
+          {
+            "items": "#c:storage_blocks/raw_tungsten"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_tungsten_blocks"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "minecraft:compat/forge_tungsten_blocks"
+    ]
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:tags_populated",
+      "registry": "minecraft:item",
+      "values": [
+        "c:ores/orichalcum",
+        "c:ingots/orichalcum"
+      ]
+    }
+  ],
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_orichalcum_ingots_from_ores": {
+      "conditions": {
+        "items": [
+          {
+            "items": "#c:ores/orichalcum"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "minecraft:compat/forge_orichalcum_ingots_from_ores"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_orichalcum_ingots_from_ores"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "minecraft:compat/forge_orichalcum_ingots_from_ores"
+    ]
+  }
+}

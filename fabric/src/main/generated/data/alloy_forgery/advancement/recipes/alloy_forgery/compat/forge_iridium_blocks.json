@@ -1,0 +1,42 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:tags_populated",
+      "registry": "minecraft:item",
+      "values": [
+        "c:storage_blocks/raw_iridium",
+        "c:storage_blocks/iridium"
+      ]
+    }
+  ],
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_iridium_blocks": {
+      "conditions": {
+        "items": [
+          {
+            "items": "#c:storage_blocks/raw_iridium"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "minecraft:compat/forge_iridium_blocks"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_iridium_blocks"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "minecraft:compat/forge_iridium_blocks"
+    ]
+  }
+}

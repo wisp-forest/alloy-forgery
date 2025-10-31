@@ -1,0 +1,33 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:tags_populated",
+      "registry": "minecraft:item",
+      "values": [
+        "c:raw_materials/palladium",
+        "c:ingots/palladium"
+      ]
+    }
+  ],
+  "type": "alloy_forgery:forging",
+  "fuel_per_tick": 135,
+  "inputs": [
+    {
+      "count": 2,
+      "ingredient": "#c:raw_materials/palladium"
+    }
+  ],
+  "min_forge_tier": 2,
+  "output": {
+    "count": 2,
+    "priority": [
+      "mythicmetals:palladium_ingot"
+    ],
+    "tag": "c:ingots/palladium"
+  },
+  "overrides": {
+    "3+": {
+      "count": 3
+    }
+  }
+}

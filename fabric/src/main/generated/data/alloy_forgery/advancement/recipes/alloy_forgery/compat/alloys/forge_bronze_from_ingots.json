@@ -1,0 +1,43 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:tags_populated",
+      "registry": "minecraft:item",
+      "values": [
+        "c:ingots/copper",
+        "c:ingots/tin",
+        "c:ingots/bronze"
+      ]
+    }
+  ],
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_bronze": {
+      "conditions": {
+        "items": [
+          {
+            "items": "#c:ingots/tin"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "minecraft:compat/alloys/forge_bronze_from_ingots"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_bronze"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "minecraft:compat/alloys/forge_bronze_from_ingots"
+    ]
+  }
+}

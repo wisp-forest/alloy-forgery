@@ -1,0 +1,36 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:tags_populated",
+      "registry": "minecraft:item",
+      "values": [
+        "c:storage_blocks/raw_tin",
+        "c:storage_blocks/tin"
+      ]
+    }
+  ],
+  "type": "alloy_forgery:forging",
+  "fuel_per_tick": 45,
+  "inputs": [
+    {
+      "count": 2,
+      "ingredient": "#c:storage_blocks/raw_tin"
+    }
+  ],
+  "min_forge_tier": 1,
+  "output": {
+    "count": 3,
+    "priority": [
+      "mythicmetals:tin_block",
+      "techreborn:tin_block",
+      "indrev:tin_block",
+      "modern_industrialization:tin_block"
+    ],
+    "tag": "c:storage_blocks/tin"
+  },
+  "overrides": {
+    "2+": {
+      "count": 4
+    }
+  }
+}

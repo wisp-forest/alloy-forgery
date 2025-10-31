@@ -1,0 +1,42 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:tags_populated",
+      "registry": "minecraft:item",
+      "values": [
+        "c:raw_materials/titanium",
+        "c:ingots/titanium"
+      ]
+    }
+  ],
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "minecraft:compat/forge_titanium_ingots_from_raw_material"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    },
+    "has_titanium_ingots_from_raw_material": {
+      "conditions": {
+        "items": [
+          {
+            "items": "#c:raw_materials/titanium"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_titanium_ingots_from_raw_material"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "minecraft:compat/forge_titanium_ingots_from_raw_material"
+    ]
+  }
+}
