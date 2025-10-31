@@ -51,11 +51,11 @@ public class ForgeControllerBlock extends BlockWithEntity {
     @Override
     protected MapCodec<? extends BlockWithEntity> getCodec() {
         return CodecUtils.toMapCodec(
-                StructEndecBuilder.of(
-                        MinecraftEndecs.IDENTIFIER.fieldOf("forge_definition", s -> forgeDefinitionId),
-                        CodecUtils.toEndec(AbstractBlock.Settings.CODEC).fieldOf("properties", AbstractBlock::getSettings),
-                        ForgeControllerBlock::new
-                )
+            StructEndecBuilder.of(
+                MinecraftEndecs.IDENTIFIER.fieldOf("forge_definition", s -> forgeDefinitionId),
+                CodecUtils.toEndec(AbstractBlock.Settings.CODEC).fieldOf("properties", AbstractBlock::getSettings),
+                ForgeControllerBlock::new
+            )
         );
     }
 

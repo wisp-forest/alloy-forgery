@@ -1,7 +1,9 @@
 package io.wispforest.alloyforgery.recipe;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Streams;
 import com.google.gson.JsonSyntaxException;
+import io.wispforest.alloyforgery.forges.ForgeTier;
 import io.wispforest.endec.Endec;
 import io.wispforest.endec.impl.StructEndecBuilder;
 import io.wispforest.owo.util.RecipeRemainderStorage;
@@ -13,6 +15,7 @@ import net.minecraft.recipe.*;
 import net.minecraft.recipe.book.RecipeBookCategory;
 import net.minecraft.registry.*;
 import net.minecraft.registry.tag.TagKey;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Pair;
 import net.minecraft.util.collection.DefaultedList;
@@ -21,11 +24,14 @@ import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 import io.wispforest.alloyforgery.AlloyForgery;
 import io.wispforest.alloyforgery.block.ForgeControllerBlockEntity;
+
+import java.lang.reflect.Array;
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 public class AlloyForgeRecipe implements Recipe<AlloyForgeRecipeInput> {
 
@@ -278,67 +284,8 @@ public class AlloyForgeRecipe implements Recipe<AlloyForgeRecipeInput> {
         return tierOverrides;
     }
 
-    public record OverrideRange(int lowerBound, int upperBound) {
-
-        public static Endec<OverrideRange> OVERRIDE_RANGE = StructEndecBuilder.of(
-            Endec.INT.fieldOf("lowerBound", AlloyForgeRecipe.OverrideRange::lowerBound),
-            Endec.INT.fieldOf("upperBound", AlloyForgeRecipe.OverrideRange::upperBound),
-            AlloyForgeRecipe.OverrideRange::new
-        );
-
-        public OverrideRange(int lowerBound) {
-            this(lowerBound, -1);
-        }
-
-        public boolean test(int value) {
-            return value >= lowerBound && (upperBound == -1 || value <= upperBound);
-        }
-
-        public static AlloyForgeRecipe.OverrideRange fromString(String s) {
-            AlloyForgeRecipe.OverrideRange overrideRange;
-
-            if (s.matches("\\d+\\+")) {
-                overrideRange = new AlloyForgeRecipe.OverrideRange(Integer.parseInt(s.substring(0, s.length() - 1)));
-            } else if (s.matches("\\d+ to \\d+")) {
-                overrideRange = new AlloyForgeRecipe.OverrideRange(Integer.parseInt(s.substring(0, s.indexOf(" "))), Integer.parseInt(s.substring(s.lastIndexOf(" ") + 1, s.length())));
-            } else if (s.matches("\\d+")) {
-                overrideRange = new AlloyForgeRecipe.OverrideRange(Integer.parseInt(s), Integer.parseInt(s));
-            } else {
-                throw new JsonSyntaxException("Invalid override range token: " + s);
-            }
-
-            return overrideRange;
-        }
-
-        // Any attempt to optimize this mess has been unilaterally denied
-        @Override
-        public String toString() {
-            var outString = String.valueOf(lowerBound);
-            var chars = outString.chars().mapToObj(value -> (char) value).collect(Collectors.toList());
-
-            if (upperBound != lowerBound) {
-                if (upperBound == -1) {
-                    chars.add('+');
-                } else {
-                    var to = " to ".chars().mapToObj(value -> (char) value).collect(Collectors.toList());
-                    to.forEach(character -> chars.add(character));
-
-                    var bound = String.valueOf(upperBound).chars().mapToObj(value -> (char) value).collect(Collectors.toList());
-                    bound.forEach(character -> chars.add(character));
-                }
-            }
-
-            var output = new StringBuilder();
-            chars.forEach(character -> output.append(character));
-
-            return output.toString();
-        }
-
-    }
-
     public static class Type implements RecipeType<AlloyForgeRecipe> {
-        private Type() {
-        }
+        private Type() {}
 
         public static final Identifier ID = AlloyForgery.id("forging");
         public static final Type INSTANCE = new Type();
@@ -371,6 +318,119 @@ public class AlloyForgeRecipe implements Recipe<AlloyForgeRecipeInput> {
     public static class InvalidTagException extends RuntimeException {
         public InvalidTagException(String message) {
             super(message);
+        }
+    }
+
+    public record OverrideRange(int lowerBound, int upperBound) {
+
+        public static Endec<OverrideRange> OVERRIDE_RANGE = StructEndecBuilder.of(
+            Endec.INT.fieldOf("lowerBound", AlloyForgeRecipe.OverrideRange::lowerBound),
+            Endec.INT.fieldOf("upperBound", AlloyForgeRecipe.OverrideRange::upperBound),
+            AlloyForgeRecipe.OverrideRange::new
+        );
+
+        public OverrideRange(int lowerBound) {
+            this(lowerBound, -1);
+        }
+
+        public boolean test(int value) {
+            return value >= lowerBound && (upperBound == -1 || value <= upperBound);
+        }
+
+        public static AlloyForgeRecipe.OverrideRange fromString(String s) {
+            AlloyForgeRecipe.OverrideRange overrideRange;
+
+            if (s.matches("\\d+\\+")) {
+                overrideRange = new AlloyForgeRecipe.OverrideRange(Integer.parseInt(s.substring(0, s.length() - 1)));
+            } else if (s.matches("\\d+ to \\d+")) {
+                overrideRange = new AlloyForgeRecipe.OverrideRange(Integer.parseInt(s.substring(0, s.indexOf(" "))), Integer.parseInt(s.substring(s.lastIndexOf(" ") + 1, s.length())));
+            } else if (s.matches("\\d+")) {
+                overrideRange = new AlloyForgeRecipe.OverrideRange(Integer.parseInt(s), Integer.parseInt(s));
+            } else {
+                throw new JsonSyntaxException("Invalid override range token: " + s);
+            }
+
+            return overrideRange;
+        }
+
+        public Text toText(boolean isClientSide) {
+            var lowerTierName = ForgeTier.toName(isClientSide, lowerBound);
+
+            if (upperBound != lowerBound) {
+                if (upperBound == -1) {
+                    return Text.translatable("tooltip.alloy_forgery.override_range.greater_or_equal_to", lowerTierName);
+                } else {
+                    var to = " to ".chars().mapToObj(value -> (char) value).toArray(Character[]::new);
+
+                    var upperTierName = ForgeTier.toName(isClientSide, lowerBound);
+
+                    return Text.translatable("tooltip.alloy_forgery.override_range.range", lowerTierName, upperTierName);
+                }
+            } else {
+                return Text.translatable("tooltip.alloy_forgery.override_range.equal_to", lowerTierName);
+            }
+        }
+
+        // Biograpgy:
+        // - Proginator: glisco
+        // - Reason: Used massive intellect to handcraft one of the methods of all time as an act of defence to all
+        //   proper coding practices meaning it is ART, and it must be protected!
+        //
+        // Curator Notes:
+        // - Noaaan: Any attempt to optimize this mess has been unilaterally denied
+        // - Blodhgarm: With permission from proginator, adjustments to the code WAS made
+        //
+        // Any issues may be direct at the original author though the below Code:
+        //
+        // ██████████████████████████████████████████████████████
+        // ██              ████  ██████  ████  ██              ██
+        // ██  ██████████  ██    ██            ██  ██████████  ██
+        // ██  ██      ██  ████      ████  ██████  ██      ██  ██
+        // ██  ██      ██  ██    ██          ████  ██      ██  ██
+        // ██  ██      ██  ██████  ██    ████  ██  ██      ██  ██
+        // ██  ██████████  ██  ██  ██████    ████  ██████████  ██
+        // ██              ██  ██  ██  ██  ██  ██              ██
+        // ████████████████████████  ████  ██  ██████████████████
+        // ██          ██          ████  ██████  ██  ██  ██  ████
+        // ████      ██  ██████  ██  ██  ██████████  ██████  ████
+        // ██  ██████  ██    ██  ██████      ██████████  ██    ██
+        // ██        ██████          ████            ████████  ██
+        // ██    ████  ██    ██  ██████  ██████        ██      ██
+        // ██    ████  ██████          ██  ██  ████  ██  ██  ████
+        // ██  ██  ██      ██  ██  ██        ██  ██      ██    ██
+        // ██  ██    ██  ████  ██    ██████████████    ██████  ██
+        // ██  ██  ██  ██  ██  ██        ██            ██  ██████
+        // ██████████████████  ████  ██    ██  ██████    ████████
+        // ██              ██  ██  ██████████  ██  ██  ██      ██
+        // ██  ██████████  ████  ██  ████  ██  ██████    ████  ██
+        // ██  ██      ██  ██  ██  ████                ██    ████
+        // ██  ██      ██  ██  ██          ████    ██          ██
+        // ██  ██      ██  ██      ██  ████████  ██████    ██  ██
+        // ██  ██████████  ██  ██████████████  ████      ████  ██
+        // ██              ██  ████████    ████                ██
+        // ██████████████████████████████████████████████████████
+        //
+        @Override
+        public String toString() {
+            var outString = String.valueOf(lowerBound);
+            var chars = outString.chars().mapToObj(value -> (char) value);
+
+            if (upperBound != lowerBound) {
+                if (upperBound == -1) {
+                    chars = Stream.concat(chars, Stream.of('+'));
+                } else {
+                    var to = " to ".chars().mapToObj(value -> (char) value).toArray(Character[]::new);
+                    chars = Stream.concat(chars, Arrays.stream(to));
+
+                    var bound = String.valueOf(upperBound).chars().mapToObj(value -> (char) value).toArray(Character[]::new);
+                    chars = Stream.concat(chars, Arrays.stream(bound));
+                }
+            }
+
+            var output = new StringBuffer();
+            chars.forEach(character -> output.append(character));
+
+            return output.toString();
         }
     }
 }

@@ -19,29 +19,9 @@ import io.wispforest.alloyforgery.compat.CountedIngredientDisplay;
 import io.wispforest.alloyforgery.recipe.AlloyForgeRecipe;
 import java.util.*;
 
-public class AlloyForgingDisplay implements Display {
-
-    private final List<EntryIngredient> inputs;
-    private final EntryIngredient output;
-
-    public final int minForgeTier;
-    public final int fuelPerTick;
-
-    public final Map<AlloyForgeRecipe.OverrideRange, ItemStack> overrides;
-
-    public final Optional<Identifier> recipeID;
-
-    private AlloyForgingDisplay(List<EntryIngredient> inputs, EntryIngredient output, int minForgeTier, int fuelPerTick, Map<AlloyForgeRecipe.OverrideRange, ItemStack> overrides, Optional<Identifier> recipeID) {
-        this.inputs = inputs;
-        this.output = output;
-
-        this.minForgeTier = minForgeTier;
-        this.fuelPerTick = fuelPerTick;
-
-        this.overrides = overrides;
-
-        this.recipeID = recipeID;
-    }
+public record AlloyForgingDisplay(List<EntryIngredient> inputs, EntryIngredient output,
+                                  int minForgeTier, int fuelPerTick,
+                                  Map<AlloyForgeRecipe.OverrideRange, ItemStack> overrides, Optional<Identifier> recipeID) implements Display {
 
     public static AlloyForgingDisplay of(RecipeEntry<AlloyForgeRecipe> recipeEntry) {
         List<EntryIngredient> convertedInputs = new ArrayList<>();
@@ -97,13 +77,13 @@ public class AlloyForgingDisplay implements Display {
     public static final Endec<EntryIngredient> ENTRY_INGREDIENT_ENDEC = CodecUtils.toEndecWithRegistries(EntryIngredient.codec(), EntryIngredient.streamCodec());
 
     public static final StructEndec<AlloyForgingDisplay> ENDEC = StructEndecBuilder.of(
-            ENTRY_INGREDIENT_ENDEC.listOf().fieldOf("inputs", (display) -> display.inputs),
-            ENTRY_INGREDIENT_ENDEC.fieldOf("output", (display) -> display.output),
-            Endec.INT.fieldOf("min_forge_tier", (display) -> display.minForgeTier),
-            Endec.INT.fieldOf("fuel_per_tick", (display) -> display.fuelPerTick),
-            Endec.map(AlloyForgeRecipe.OverrideRange.OVERRIDE_RANGE, MinecraftEndecs.ITEM_STACK).fieldOf("overrides", (display) -> display.overrides),
-            MinecraftEndecs.IDENTIFIER.optionalOf().fieldOf("recipe_id", (display) -> display.recipeID),
-            AlloyForgingDisplay::new
+        ENTRY_INGREDIENT_ENDEC.listOf().fieldOf("inputs", (display) -> display.inputs),
+        ENTRY_INGREDIENT_ENDEC.fieldOf("output", (display) -> display.output),
+        Endec.INT.fieldOf("min_forge_tier", (display) -> display.minForgeTier),
+        Endec.INT.fieldOf("fuel_per_tick", (display) -> display.fuelPerTick),
+        Endec.map(AlloyForgeRecipe.OverrideRange.OVERRIDE_RANGE, MinecraftEndecs.ITEM_STACK).fieldOf("overrides", (display) -> display.overrides),
+        MinecraftEndecs.IDENTIFIER.optionalOf().fieldOf("recipe_id", (display) -> display.recipeID),
+        AlloyForgingDisplay::new
     );
 
     public static final DisplaySerializer<AlloyForgingDisplay> SERIALIZER = DisplaySerializer.of(CodecUtils.toMapCodec(ENDEC), CodecUtils.toPacketCodec(ENDEC));

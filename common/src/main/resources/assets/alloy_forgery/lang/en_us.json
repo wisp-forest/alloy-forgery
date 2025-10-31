@@ -6,8 +6,82 @@
   "block.alloy_forgery.polished_blackstone_forge_controller": "Polished Blackstone Forge Controller",
   "block.alloy_forgery.prismarine_bricks_forge_controller": "Prismarine Bricks Forge Controller",
 
-  "tooltip.alloy_forgery.forge_tier": "Tier: %d",
-  "tooltip.alloy_forgery.fuel_capacity": "Fuel Capacity: %d",
+  "tooltip.alloy_forgery.forge_tier": [
+    { "text": "Tier", "color": "gray" },
+    { "text": ": ", "color": "dark_gray" },
+    { "index": 0, "color": "white" }
+  ],
+  "tooltip.alloy_forgery.speed_multiplier": [
+    { "text": "Speed", "color": "gray" },
+    { "text": ": ", "color": "dark_gray" },
+    { "index": 0, "color": "white"},
+    { "text": "x", "color": "gray" }
+  ],
+  "tooltip.alloy_forgery.fuel_consumption_multiplier": [
+    { "text": "Fuel Consumption", "color": "gray" },
+    { "text": ": ", "color": "dark_gray" },
+    { "index": 0, "color": "white"},
+    { "text": "x", "color": "gray" }
+  ],
+  "tooltip.alloy_forgery.fuel_capacity": [
+    { "text": "Fuel Capacity", "color": "gray" },
+    { "text": ": ", "color": "dark_gray" },
+    { "index": 0, "color": "white" }
+  ],
+
+  "alloy_forgery.tier.name.alloy_forgery.common_tier": [
+    { "text": "Common", "color": "gray"}
+  ],
+  "alloy_forgery.tier.name.alloy_forgery.common_plus_tier": [
+    { "text": "Common+", "color": "white"}
+  ],
+  "alloy_forgery.tier.name.alloy_forgery.uncommon_tier": [
+    { "text": "Uncommon", "color": "green"}
+  ],
+  "alloy_forgery.tier.name.alloy_forgery.rare_tier": [
+    { "text": "Rare", "color": "yellow"}
+  ],
+
+  "alloy_forgery.tier.advanced_name.alloy_forgery.common_tier": [
+    { "text": "Common", "color": "gray"},
+    { "text": " [", "color": "gray"},
+    { "index": 0, "color": "white"},
+    { "text": "]", "color": "gray"}
+  ],
+  "alloy_forgery.tier.advanced_name.alloy_forgery.common_plus_tier": [
+    { "text": "Common+", "color": "white"},
+    { "text": " [", "color": "gray"},
+    { "index": 0, "color": "white"},
+    { "text": "]", "color": "gray"}
+  ],
+  "alloy_forgery.tier.advanced_name.alloy_forgery.uncommon_tier": [
+    { "text": "Uncommon", "color": "green"},
+    { "text": " [", "color": "gray"},
+    { "index": 0, "color": "white"},
+    { "text": "]", "color": "gray"}
+  ],
+  "alloy_forgery.tier.advanced_name.alloy_forgery.rare_tier": [
+    { "text": "Rare", "color": "yellow"},
+    { "text": " [", "color": "gray"},
+    { "index": 0, "color": "white"},
+    { "text": "]", "color": "gray"}
+  ],
+
+  "tooltip.alloy_forgery.override_range.equal_to": [
+    { "index": 0 }
+  ],
+
+  "tooltip.alloy_forgery.override_range.greater_or_equal_to": [
+    { "index": 0 },
+    { "text": "+" }
+  ],
+
+  "tooltip.alloy_forgery.override_range.range": [
+    { "index": 0 },
+    { "text": " to " },
+    { "index": 1 }
+  ],
+
   "tooltip.alloy_forgery.invalid_tier": "This recipe requires a Forge Controller of Tier %d",
 
   "tooltip.alloy_forgery.slot_toggle_enable": "Disable Slot toggling",
@@ -19,9 +93,17 @@
   "container.alloy_forgery.forge_controller": "Alloy Forge",
 
   "container.alloy_forgery.rei.title": "Alloy Forging",
-  "container.alloy_forgery.rei.min_tier": "Required Tier: %d",
-  "container.alloy_forgery.rei.fuel_per_tick": "Fuel per tick: %d",
-  "container.alloy_forgery.rei.button": "Cycle Tier Overrides",
+  "tooltip.alloy_forgery.recipe.min_tier": [
+    { "text": "Required Tier", "color": "white" },
+    { "text": ": ", "color": "gray" },
+    { "index": 0 }
+  ],
+  "tooltip.alloy_forgery.recipe.fuel_per_tick": [
+    { "text": "Fuel per tick", "color": "white" },
+    { "text": ": ", "color": "gray" },
+    { "index": 0 }
+  ],
+  "tooltip.alloy_forgery.recipe.button": "Cycle Tier Overrides",
 
   "message.alloy_forgery.invalid_multiblock": "Invalid Multiblock Configuration",
   "itemGroup.alloy_forgery.alloy_forgery": "Alloy Forgery",

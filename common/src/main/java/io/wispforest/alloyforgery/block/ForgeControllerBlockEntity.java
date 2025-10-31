@@ -283,7 +283,7 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
         var recipe = recipeCache.get().value();
 
         if (this.currentSmeltTime < this.forgeTier().maxSmeltTime()) {
-            final float fuelRequirement = recipe.getFuelPerTick() * this.forgeTier().speedMultiplier();
+            final float fuelRequirement = recipe.getFuelPerTick() * this.forgeTier().fuelConsumptionMultiplier();
 
             if (this.fuel - fuelRequirement < 0) {
                 this.currentSmeltTime = 0;

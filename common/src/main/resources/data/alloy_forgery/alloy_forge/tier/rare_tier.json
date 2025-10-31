@@ -1,5 +1,6 @@
 {
   "tier": 3,
-  "fuel_capacity": 192000,
-  "speed_multiplier": 2
+  "speed_multiplier": 2,
+  "fuel_consumption_multiplier": 2.1,
+  "fuel_capacity": 192000
 }

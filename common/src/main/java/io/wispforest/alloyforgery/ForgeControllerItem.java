@@ -20,10 +20,7 @@ public class ForgeControllerItem extends BlockItem {
     public void appendTooltip(ItemStack stack, TooltipContext context, List<Text> tooltip, TooltipType type) {
         var tier = ForgeTierDataLoader.getForgeRegistry(true).getBoundForgeTier(getForgeDefinition());
 
-        if (tier == null) return;
-
-        tooltip.add(Text.translatable("tooltip.alloy_forgery.forge_tier", tier.value()).formatted(Formatting.GRAY));
-        tooltip.add(Text.translatable("tooltip.alloy_forgery.fuel_capacity", tier.fuelCapacity()).formatted(Formatting.GRAY));
+        if (tier != null) tier.tooltip(true, tooltip::add);
     }
 
     public Identifier getForgeDefinition() {

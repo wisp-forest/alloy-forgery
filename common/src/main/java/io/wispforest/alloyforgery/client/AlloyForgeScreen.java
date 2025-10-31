@@ -1,5 +1,6 @@
 package io.wispforest.alloyforgery.client;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import io.wispforest.owo.ui.base.BaseUIModelHandledScreen;
 import io.wispforest.owo.ui.base.BaseUIModelScreen;
 import io.wispforest.owo.ui.component.ButtonComponent;
@@ -7,6 +8,7 @@ import io.wispforest.owo.ui.component.TextureComponent;
 import io.wispforest.owo.ui.container.FlowLayout;
 import io.wispforest.owo.ui.core.PositionedRectangle;
 import io.wispforest.owo.ui.core.Sizing;
+import io.wispforest.owo.ui.util.NinePatchTexture;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
@@ -24,6 +26,8 @@ import io.wispforest.alloyforgery.networking.AlloyForgeNetworking;
 import io.wispforest.alloyforgery.networking.DisableSlotToggle;
 import io.wispforest.alloyforgery.utils.ForgeInputSlot;
 import java.util.List;
+
+import static io.wispforest.owo.ui.component.ButtonComponent.*;
 
 public class AlloyForgeScreen extends BaseUIModelHandledScreen<FlowLayout, AlloyForgeScreenHandler> {
 
@@ -62,11 +66,17 @@ public class AlloyForgeScreen extends BaseUIModelHandledScreen<FlowLayout, Alloy
                 btn.tooltip(Text.translatable("tooltip.alloy_forgery.slot_toggle_" + (this.allowSlotToggling ? "enable" : "disable")));
             })
             .renderer((context, button, delta) -> {
-                ButtonComponent.Renderer.VANILLA.draw(context, button, delta);
+                RenderSystem.enableDepthTest();
+
+                var texture = button.active
+                    ? (button.isHovered() ? HOVERED_TEXTURE : (!this.allowSlotToggling ? ACTIVE_TEXTURE : DISABLED_TEXTURE))
+                    : DISABLED_TEXTURE;
+
+                NinePatchTexture.draw(texture, context, button.getX(), button.getY(), button.width(), button.height());
 
                 context.push().translate(-0.75, -0.75, 0);
 
-                context.drawCenteredTextWithShadow(MinecraftClient.getInstance().textRenderer, "⏻", button.x() + 8, button.y() + 4, 0xFFFFFFFF);
+                context.drawCenteredTextWithShadow(MinecraftClient.getInstance().textRenderer, "⏻", button.x() + 8, button.y() + 4, !this.allowSlotToggling ? 0xFFFFFFFF : 0xFF90D5FF);
 
                 context.pop();
             });
@@ -151,17 +161,15 @@ public class AlloyForgeScreen extends BaseUIModelHandledScreen<FlowLayout, Alloy
     public void drawSlot(DrawContext context, Slot slot) {
         if (slot instanceof ForgeInputSlot crafterInputSlot && this.handler.isSlotDisabled(slot)) {
             this.drawDisabledSlot(context, crafterInputSlot);
-
-            super.drawSlot(context, slot);
-
-            return;
         }
 
         super.drawSlot(context, slot);
     }
 
     private void drawDisabledSlot(DrawContext context, ForgeInputSlot slot) {
-        context.drawTexture(RenderLayer::getGuiTextured, DISABLED_SLOT_TEXTURE, slot.x - 1, slot.y - 1, 3, 0, 0, 18, 18, 18, 18);
+        context.drawTexture(RenderLayer::getGuiTextured, DISABLED_SLOT_TEXTURE, slot.x - 1, slot.y - 1, 0, 0, 18, 18, 18, 18);
+
+        context.draw();
     }
 
     public int rootX() {

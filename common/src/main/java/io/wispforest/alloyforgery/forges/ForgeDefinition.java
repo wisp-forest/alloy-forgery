@@ -52,12 +52,13 @@ public record ForgeDefinition(Block material, ImmutableList<Block> additionalMat
     @Deprecated
     @ApiStatus.Internal
     public static void loadAndEnqueue(Identifier id, JsonObject json) {
+        LOGGER.warn("A given Forge Definition '{}' has been loaded though a deprecated manor, please bug the author to switch over to the new system.", id);
         final int forgeTier = JsonHelper.getInt(json, "tier");
         final float speedMultiplier = JsonHelper.getFloat(json, "speed_multiplier", 1);
         final int fuelCapacity = JsonHelper.getInt(json, "fuel_capacity", 48000);
 
         // TODO: ADD DEPRECATION WARNING ABOUT LOADING TIER INFO
-        var tier = new ForgeTier(forgeTier, speedMultiplier, fuelCapacity, Optional.empty());
+        var tier = new ForgeTier(id, forgeTier, speedMultiplier, fuelCapacity, Optional.empty());
 
         legacyForgeDefinitionIdToTier.put(id, tier);
 
