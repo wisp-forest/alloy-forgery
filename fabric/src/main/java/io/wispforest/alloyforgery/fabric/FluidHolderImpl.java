@@ -74,7 +74,7 @@ public final class FluidHolderImpl extends SingleVariantStorage<FluidVariant> im
 
     @Override
     public float amountInBuckets() {
-        return (this.getAmount() / (float) FluidConstants.BUCKET) * 50;
+        return this.getAmount() / (float) FluidConstants.BUCKET;
     }
 
     @Override

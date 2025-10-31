@@ -43,8 +43,9 @@ public class AlloyForgeryFabric implements ModInitializer {
             .registerReloadListener(new IdentifiableResourceReloadListenerImpl(RecipeTagLoader.ID, RecipeTagLoader.INSTANCE));
 
         ItemStorage.SIDED.registerFallback((world, pos, state, blockEntity, context) -> {
-            if (context == Direction.DOWN && world.getBlockEntity(pos.up()) instanceof ForgeControllerBlockEntity froge)
+            if (context == Direction.DOWN && world.getBlockEntity(pos.up()) instanceof ForgeControllerBlockEntity froge){
                 return InventoryStorage.of(froge, Direction.DOWN);
+            }
 
             return null;
         });
@@ -69,6 +70,8 @@ public class AlloyForgeryFabric implements ModInitializer {
         ServerLifecycleEvents.SYNC_DATA_PACK_CONTENTS.register((player, joined) -> {
             AlloyForgeNetworking.CHANNEL.serverHandle(player).send(ForgeTierDataLoader.createSyncPacket());
         });
+
+        initEvents();
     }
 
     public void initEvents() {
