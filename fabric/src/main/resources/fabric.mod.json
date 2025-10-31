@@ -22,6 +22,9 @@
     ],
     "client": [
       "io.wispforest.alloyforgery.fabric.client.AlloyForgeryClientFabric"
+    ],
+    "fabric-datagen" : [
+      "io.wispforest.alloyforgery.fabric.data.AlloyForgeryData"
     ]
   },
   "mixins": [

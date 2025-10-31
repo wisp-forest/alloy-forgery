@@ -1,15 +1,30 @@
 package io.wispforest.alloyforgery.fabric.data;
 
+import io.wispforest.alloyforgery.data.providers.RecipeExporterConditionWrapper;
 import io.wispforest.alloyforgery.data.providers.ResourceConditionHolder;
+import net.fabricmc.fabric.api.datagen.v1.provider.FabricRecipeProvider;
 import net.fabricmc.fabric.api.resource.conditions.v1.ResourceCondition;
+import net.minecraft.data.recipe.RecipeExporter;
 import net.minecraft.item.ItemConvertible;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.tag.TagKey;
 
 import java.util.List;
+import java.util.function.BiFunction;
 
 public record FabricResourceConditionHolder(List<ResourceCondition> conditions) implements ResourceConditionHolder {
+
+    public static RecipeExporterConditionWrapper createWrapper(BiFunction<RecipeExporter, ResourceCondition[], RecipeExporter> providerConditionWrapper) {
+        return (recipeExporter, holder) -> {
+            if (holder instanceof FabricResourceConditionHolder(java.util.List<ResourceCondition> conditions1)) {
+                return providerConditionWrapper.apply(recipeExporter, conditions1.toArray(ResourceCondition[]::new));
+            }
+
+            return recipeExporter;
+        };
+    }
+
     @Override
     public <T extends ItemConvertible> ResourceConditionHolder withTags(RegistryKey<Registry<T>> key, TagKey<T>... tags) {
         this.conditions.add(net.fabricmc.fabric.api.resource.conditions.v1.ResourceConditions.tagsPopulated(key, tags));
