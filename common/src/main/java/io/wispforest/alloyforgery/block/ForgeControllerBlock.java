@@ -27,7 +27,6 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
-import io.wispforest.alloyforgery.AlloyForgery;
 import io.wispforest.alloyforgery.forges.ForgeFuelDataLoader;
 
 public class ForgeControllerBlock extends BlockWithEntity {
@@ -88,7 +87,7 @@ public class ForgeControllerBlock extends BlockWithEntity {
 
                 final var screenHandlerFactory = state.createScreenHandlerFactory(world, pos);
                 if (screenHandlerFactory != null) {
-                    player.openHandledScreen(screenHandlerFactory);
+                    GeneralPlatformUtils.INSTANCE.openHandledScreen(player, controller, screenHandlerFactory);
                 }
             }
         }
@@ -143,7 +142,7 @@ public class ForgeControllerBlock extends BlockWithEntity {
     @Nullable
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
-        return world.isClient ? null : validateTicker(type, AlloyForgery.FORGE_CONTROLLER_BLOCK_ENTITY, (world1, pos, state1, blockEntity) -> blockEntity.tick());
+        return world.isClient ? null : validateTicker(type, ForgeControllerBlockEntity.FORGE_CONTROLLER_BLOCK_ENTITY, (world1, pos, state1, blockEntity) -> blockEntity.tick());
     }
 
     @Nullable
@@ -154,7 +153,7 @@ public class ForgeControllerBlock extends BlockWithEntity {
 
     @Override
     public int getComparatorOutput(BlockState state, World world, BlockPos pos) {
-        return world.getBlockEntity(pos, AlloyForgery.FORGE_CONTROLLER_BLOCK_ENTITY)
+        return world.getBlockEntity(pos, ForgeControllerBlockEntity.FORGE_CONTROLLER_BLOCK_ENTITY)
             .map(ForgeControllerBlockEntity::getCompartorOutput)
             .orElse(0);
     }

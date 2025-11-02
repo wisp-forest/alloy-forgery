@@ -1,5 +1,5 @@
 {
-  "accessWidener": "alloy-forgery.accesswidener",
+  "accessWidener": "alloy_forgery.accesswidener",
   "interfaces": {
     "net/minecraft/class_8786": [
       "wraith/alloyforgery/pond/RecipeTagHelper"

@@ -118,7 +118,7 @@ public record ForgeDefinition(Block material, ImmutableList<Block> additionalMat
         return ForgeRegistry.GSON.fromJson(recipe, JsonObject.class);
     }
 
-    public static void initLoaders() {
+    public static void runDataLoaders() {
         EndecableModDataLoader.of(
             AlloyForgery.id("old_forge_definition_loader"),
             "alloy_forges",
@@ -132,7 +132,9 @@ public record ForgeDefinition(Block material, ImmutableList<Block> additionalMat
             RawForgeDefinition.ENDEC,
             ForgeDefinition::loadAndEnqueue
         ).load();
+    }
 
+    public static void injectRecipeAdditions() {
         RecipeInjector.ADD_RECIPES.register(instance -> {
             for (var forgeEntry : ForgeRegistry.getForgeEntries()) {
                 var id = forgeEntry.getKey();

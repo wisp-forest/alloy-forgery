@@ -59,8 +59,10 @@ loom {
         runs (Utils.getSetupRunsAction(project))
 
         if (currentPlatform == "neoforge") {
+            println("Setup for Neoforge")
             neoForge {}
         } else if(currentPlatform == "forge") {
+            println("Setup for Forge")
             forge {}
         }
     } else {
@@ -106,12 +108,16 @@ repositories {
 dependencies {
     minecraft("com.mojang:minecraft:${libs.versions.minecraft.asProvider().get()}")
 
-    mappings (
-        loom.layered {
-            this.mappings("net.fabricmc:yarn:${project.property("yarn_mappings")}:v2")
-            this.mappings("dev.architectury:yarn-mappings-patch-neoforge:${rootProject.property("yarn_mappings_patch_neoforge_version")}")
-        }
-    )
+    if (projectPlatform == "neoforge") {
+        mappings (
+            loom.layered {
+                this.mappings("net.fabricmc:yarn:${project.property("yarn_mappings")}:v2")
+                this.mappings("dev.architectury:yarn-mappings-patch-neoforge:${rootProject.property("yarn_mappings_patch_neoforge_version")}")
+            }
+        )
+    } else {
+        mappings ("net.fabricmc:yarn:${project.property("yarn_mappings")}:v2")
+    }
 
     if (projectPlatform != "common" && enabledTestmodPlatforms.contains(projectPlatform)) {
         "testmodImplementation"(sourceSets.main.get().output)

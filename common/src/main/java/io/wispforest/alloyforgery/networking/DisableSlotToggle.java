@@ -1,11 +1,11 @@
 package io.wispforest.alloyforgery.networking;
 
+import io.wispforest.alloyforgery.block.ForgeControllerBlockEntity;
 import io.wispforest.endec.Endec;
 import io.wispforest.endec.StructEndec;
 import io.wispforest.endec.impl.StructEndecBuilder;
 import io.wispforest.owo.network.ServerAccess;
 import net.minecraft.block.entity.BlockEntity;
-import io.wispforest.alloyforgery.AlloyForgery;
 import io.wispforest.alloyforgery.client.BlockEntityLocation;
 
 public record DisableSlotToggle(BlockEntityLocation location, Integer slotIndex, Boolean isDisabled) {
@@ -22,7 +22,7 @@ public record DisableSlotToggle(BlockEntityLocation location, Integer slotIndex,
     }
 
     public static void handle(DisableSlotToggle packet, ServerAccess serverAccess) {
-        var forge = packet.location().get(serverAccess.player(), AlloyForgery.FORGE_CONTROLLER_BLOCK_ENTITY);
+        var forge = packet.location().get(serverAccess.player(), ForgeControllerBlockEntity.FORGE_CONTROLLER_BLOCK_ENTITY);
 
         if (packet.isDisabled()) {
             forge.disableSlot(packet.slotIndex());

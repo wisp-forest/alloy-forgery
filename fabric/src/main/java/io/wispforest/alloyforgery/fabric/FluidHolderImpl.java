@@ -78,7 +78,7 @@ public final class FluidHolderImpl extends SingleVariantStorage<FluidVariant> im
     }
 
     @Override
-    public long getFluidAmount() {
+    public long getFluidAmountAsLong() {
         return this.amount;
     }
 

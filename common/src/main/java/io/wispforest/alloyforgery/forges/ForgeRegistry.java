@@ -1,6 +1,8 @@
 package io.wispforest.alloyforgery.forges;
 
+import com.google.common.base.Suppliers;
 import com.google.gson.Gson;
+import io.wispforest.alloyforgery.block.ForgeControllerBlockEntity;
 import io.wispforest.alloyforgery.utils.GeneralPlatformUtils;
 import io.wispforest.endec.Endec;
 import io.wispforest.owo.serialization.endec.MinecraftEndecs;
@@ -16,6 +18,9 @@ import io.wispforest.alloyforgery.AlloyForgery;
 import io.wispforest.alloyforgery.ForgeControllerItem;
 import io.wispforest.alloyforgery.block.ForgeControllerBlock;
 import java.util.*;
+import java.util.function.BiFunction;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 public class ForgeRegistry {
 
@@ -35,27 +40,69 @@ public class ForgeRegistry {
     public static final Gson GSON = new Gson();
     private static final Identifier MINEABLE_PICKAXE = Identifier.of("mineable/pickaxe");
 
-    private static final Map<Identifier, ForgeDefinition> ID_TO_FORGE_DEFINITION = new HashMap<>();
-    private static final Map<ForgeDefinition, Identifier> FORGE_DEFINITION_TO_ID = new HashMap<>();
+    private static final Map<Identifier, ForgeDefinition> ID_TO_FORGE_DEFINITION = new LinkedHashMap<>();
+    private static final Map<ForgeDefinition, Identifier> FORGE_DEFINITION_TO_ID = new LinkedHashMap<>();
 
-    private static final Map<Identifier, Block> CONTROLLER_BLOCK_REGISTRY = new HashMap<>();
+    private static final Map<Identifier, Block> CONTROLLER_BLOCK_REGISTRY = new LinkedHashMap<>();
+
+    private static final Map<Identifier, EntryHolder> REGISTERED_ENTRIES = new LinkedHashMap<>();
+
+    private static final class EntryHolder {
+        private final Identifier controllerId;
+        private final Identifier forgeDefinitionId;
+        private final Supplier<ForgeControllerBlock> controllerBlock;
+
+        private EntryHolder(Identifier forgeDefinitionId, Identifier controllerId, BiFunction<Identifier, Identifier, ForgeControllerBlock> controllerBlock) {
+            this.forgeDefinitionId = forgeDefinitionId;
+            this.controllerId = controllerId;
+            this.controllerBlock = Suppliers.memoize(() -> controllerBlock.apply(forgeDefinitionId, controllerId));
+        }
+
+        private Item createItem() {
+            return new ForgeControllerItem(
+                controllerBlock(),
+                new Item.Settings()
+                    .registryKey(RegistryKey.of(RegistryKeys.ITEM, controllerId))
+                    .useBlockPrefixedTranslationKey()
+            );
+        }
+
+        public void registerItem() {
+            Registry.register(Registries.ITEM, controllerId, createItem());
+        }
+
+        public void registerBlock() {
+            var controllerBlock = controllerBlock();
+
+            Registry.register(Registries.BLOCK, controllerId, controllerBlock);
+
+            TagInjector.inject(Registries.BLOCK, MINEABLE_PICKAXE, controllerBlock);
+
+            CONTROLLER_BLOCK_REGISTRY.put(forgeDefinitionId, controllerBlock);
+            GeneralPlatformUtils.INSTANCE.addToBlockEntity(ForgeControllerBlockEntity.FORGE_CONTROLLER_BLOCK_ENTITY, controllerBlock);
+        }
+
+        public ForgeControllerBlock controllerBlock() {
+            return controllerBlock.get();
+        }
+    }
+
+    public static void handleLoadedEntries(boolean blockRegistry) {
+        for (var value : REGISTERED_ENTRIES.values()) {
+            if(blockRegistry) {
+                value.registerBlock();
+            } else {
+                value.registerItem();
+            }
+        }
+    }
 
     static void registerDefinition(Identifier forgeDefinitionId, ForgeDefinition definition) {
-        final var controllerBlockRegistryId = AlloyForgery.id(Registries.BLOCK.getId(definition.material()).getPath() + "_forge_controller");
+        final var controllerId = AlloyForgery.id(Registries.BLOCK.getId(definition.material()).getPath() + "_forge_controller");
 
-        final var controllerBlock = ForgeControllerBlock.of(forgeDefinitionId, controllerBlockRegistryId);
+        REGISTERED_ENTRIES.put(controllerId, new EntryHolder(forgeDefinitionId, controllerId, ForgeControllerBlock::of));
 
-        Registry.register(Registries.BLOCK, controllerBlockRegistryId, controllerBlock);
-        Registry.register(Registries.ITEM, controllerBlockRegistryId, new ForgeControllerItem(
-            controllerBlock,
-            new Item.Settings()
-                .registryKey(RegistryKey.of(RegistryKeys.ITEM, controllerBlockRegistryId))
-                .useBlockPrefixedTranslationKey()
-        ));
-
-        TagInjector.inject(Registries.BLOCK, MINEABLE_PICKAXE, controllerBlock);
-
-        store(forgeDefinitionId, definition, controllerBlock);
+        store(forgeDefinitionId, definition);
     }
 
     public static Optional<ForgeDefinition> getForgeDefinition(Identifier id) {
@@ -82,10 +129,9 @@ public class ForgeRegistry {
         return CONTROLLER_BLOCK_REGISTRY.values().stream().toList();
     }
 
-    private static void store(Identifier id, ForgeDefinition definition, ForgeControllerBlock block) {
+    private static void store(Identifier id, ForgeDefinition definition) {
         FORGE_DEFINITION_TO_ID.put(definition, id);
         ID_TO_FORGE_DEFINITION.put(id, definition);
-        CONTROLLER_BLOCK_REGISTRY.put(id, block);
-        GeneralPlatformUtils.INSTANCE.addToBlockEntity(AlloyForgery.FORGE_CONTROLLER_BLOCK_ENTITY, block);
+
     }
 }

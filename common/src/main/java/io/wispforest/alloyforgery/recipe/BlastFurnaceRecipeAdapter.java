@@ -55,7 +55,7 @@ public class BlastFurnaceRecipeAdapter implements RecipeInjector.AddRecipes {
         for (RecipeEntry<BlastingRecipe> recipeEntry : instance.getAllOfType(RecipeType.BLASTING)) {
             var recipe = recipeEntry.value();
 
-            if (!isUniqueRecipe(instance, alloyForgeryRecipes, recipe) || RecipeTagLoader.isWithinTag(BLACKLISTED_BLASTING_RECIPES, recipeEntry))
+            if (!isUniqueRecipe(instance, alloyForgeryRecipes, recipe) || RecipeTagLoader.isWithinTag(false, BLACKLISTED_BLASTING_RECIPES, recipeEntry))
                 continue;
 
             var secondaryID = recipeEntry.id().getValue();
@@ -71,7 +71,7 @@ public class BlastFurnaceRecipeAdapter implements RecipeInjector.AddRecipes {
 
             var extraOutput = ImmutableMap.<AlloyForgeRecipe.OverrideRange, ItemStack>builder();
 
-            if (AlloyForgery.CONFIG.allowHigherTierOutput() && !RecipeTagLoader.isWithinTag(BLACKLISTED_INCREASED_OUTPUT, recipeEntry) && !isDustRecipe(instance, recipeEntry)) {
+            if (AlloyForgery.CONFIG.allowHigherTierOutput() && !RecipeTagLoader.isWithinTag(false, BLACKLISTED_INCREASED_OUTPUT, recipeEntry) && !isDustRecipe(instance, recipeEntry)) {
                 var increasedOutput = mainOutput.copy();
 
                 increasedOutput.increment(AlloyForgery.CONFIG.higherTierOutputIncrease());

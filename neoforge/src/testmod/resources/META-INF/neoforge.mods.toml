@@ -1,0 +1,17 @@
+modLoader = "javafml"
+loaderVersion = "[1,)"
+#issueTrackerURL = ""
+license = "${mod_license}"
+
+[[mods]]
+modId = "${test_mod_id}"
+version = "1.0.0"
+displayName = "${test_mod_id}"
+authors = ""
+description = '''
+This is a test mod for ${mod_id}
+'''
+#logoFile = ""
+
+[[mixins]]
+config = '${test_mod_id}-neoforge.mixins.json'

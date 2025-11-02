@@ -119,6 +119,10 @@ public abstract class EndecDataLoader<T> extends JsonDataLoader<T> {
         return dependencies;
     }
 
+    public boolean requiresRegistries() {
+        return this.requiresRegistries;
+    }
+
     protected void setupCodec() {
         ((DelayedRecursiveCodec<T>) ((JsonDataLoaderAccessor<T>) this).codec())
                 .setup(this.endec.toString(), codec -> CodecUtils.toCodec(endec, this.getContext()));

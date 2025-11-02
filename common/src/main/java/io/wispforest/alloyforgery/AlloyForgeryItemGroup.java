@@ -8,6 +8,7 @@ import io.wispforest.owo.itemgroup.OwoItemGroup;
 import io.wispforest.owo.itemgroup.gui.ItemGroupButton;
 import io.wispforest.owo.itemgroup.gui.ItemGroupTab;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.text.Text;
 import io.wispforest.alloyforgery.block.ForgeControllerBlock;
 import java.util.*;
@@ -18,7 +19,7 @@ public class AlloyForgeryItemGroup {
 
     public static final OwoItemGroup GROUP = OwoItemGroup.builder(AlloyForgery.id("alloy_forgery"), () -> {
         if (CONTROLLER_CACHE == null) return null;
-        return Icon.of(CONTROLLER_CACHE.get(0));
+        return Icon.of(CONTROLLER_CACHE.isEmpty() ? Items.BARRIER.getDefaultStack() : CONTROLLER_CACHE.get(0));
     }).initializer(group -> {
         group.tabs.add(new ItemGroupTab(Icon.of(ItemStack.EMPTY), Text.empty(), (context, entries) -> {
             if (CONTROLLER_CACHE == null) createControllerCache();

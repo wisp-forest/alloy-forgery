@@ -1,0 +1,42 @@
+modLoader = "javafml"
+loaderVersion = "${neoforge_loader_version_range}"
+issueTrackerURL = "${mod_issuepage}"
+license = "${mod_license}"
+
+[[mods]]
+modId = "${mod_id}"
+version = "${mod_version}"
+displayName = "${mod_name}"
+authors = "${mod_authors}, ${mod_contributors}"
+credits = "${mod_credits}"
+description = '''
+${mod_description}
+'''
+logoFile = "assets/${mod_id}/icon.png"
+displayURL = "${mod_sourcepage}"
+
+[[mixins]]
+config = '${mod_id}-common.mixins.json'
+[[mixins]]
+config = '${mod_id}-neoforge.mixins.json'
+
+[[dependencies.${mod_id}]]
+modId = "neoforge"
+required = true
+versionRange = "${neoforge_version_range}"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.${mod_id}]]
+modId = "minecraft"
+required = true
+versionRange = "${neoforge_minecraft_version_range}"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.${mod_id}]]
+modId = "owo"
+required = true
+versionRange = "${owo_neoforge_version_range}"
+ordering = "NONE"
+side = "BOTH"

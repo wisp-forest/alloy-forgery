@@ -29,9 +29,11 @@ public class RecipeTagLoader extends SinglePreparationResourceReloader<Map<Ident
 
     private RecipeTagLoader() {}
 
-    private static final Map<Identifier, Set<Identifier>> RESOLVED_ENTRIES = new HashMap<>();
+    private static final Map<Identifier, Set<Identifier>> RESOLVED_CLIENT_ENTRIES = new LinkedHashMap<>();
+    private static final Map<Identifier, Set<Identifier>> RESOLVED_SERVER_ENTRIES = new LinkedHashMap<>();
 
-    private static final Map<Identifier, List<TagGroupLoader.TrackedEntry>> RAW_TAG_DATA = new HashMap<>();
+    private boolean areEntriesResolved = true;
+    private static final Map<Identifier, List<TagGroupLoader.TrackedEntry>> RAW_TAG_DATA = new LinkedHashMap<>();
 
     private final DelayedTagGroupLoader<RecipeEntry<Recipe<?>>> tagGroupLoader = new DelayedTagGroupLoader<>("tags/recipe");
 
@@ -45,6 +47,7 @@ public class RecipeTagLoader extends SinglePreparationResourceReloader<Map<Ident
         RAW_TAG_DATA.clear();
 
         RAW_TAG_DATA.putAll(prepared);
+        areEntriesResolved = false;
     }
 
     //--
@@ -54,8 +57,8 @@ public class RecipeTagLoader extends SinglePreparationResourceReloader<Map<Ident
      * @param entry Recipe Entry to check
      * @return true if the tag exists and if the given entry exists within the Tag group
      */
-    public static boolean isWithinTag(Identifier tag, RecipeEntry<?> entry) {
-        return isWithinTag(tag, entry.id().getRegistry());
+    public static boolean isWithinTag(boolean isClient, Identifier tag, RecipeEntry<?> entry) {
+        return isWithinTag(isClient, tag, entry.id().getRegistry());
     }
 
     /**
@@ -63,21 +66,19 @@ public class RecipeTagLoader extends SinglePreparationResourceReloader<Map<Ident
      * @param recipeID Recipe identifier
      * @return true if the tag exists and if the given entry exists within the Tag group
      */
-    public static boolean isWithinTag(Identifier tag, Identifier recipeID) {
-        if (!RESOLVED_ENTRIES.containsKey(tag)) return false;
+    public static boolean isWithinTag(boolean isClient, Identifier tag, Identifier recipeID) {
+        var entries = (isClient ? RESOLVED_CLIENT_ENTRIES : RESOLVED_SERVER_ENTRIES);
 
-        return RESOLVED_ENTRIES.get(tag).contains(recipeID);
+        return entries.containsKey(tag) && entries.get(tag).contains(recipeID);
     }
 
     //--
 
     @ApiStatus.Internal
-    public void endDataPackReload(MinecraftServer server, LifecycledResourceManager resourceManager, boolean success) {
-        if (!success) return;
+    public void sendPlayerPacketAfterDataLoad(ServerPlayerEntity player) {
+        resolveEntries(player.server);
 
-        resolveEntries(server);
-
-        AlloyForgeNetworking.CHANNEL.serverHandle(server).send(TagPacket.of(RESOLVED_ENTRIES));
+        sendTagPacket(player);
     }
 
     @ApiStatus.Internal
@@ -86,6 +87,8 @@ public class RecipeTagLoader extends SinglePreparationResourceReloader<Map<Ident
     }
 
     private void resolveEntries(MinecraftServer server) {
+        if (areEntriesResolved) return;
+
         var recipeManager = server.getRecipeManager();
 
         Map<Identifier, List<RecipeEntry<Recipe<?>>>> map = tagGroupLoader.setGetter(identifier -> {
@@ -93,13 +96,15 @@ public class RecipeTagLoader extends SinglePreparationResourceReloader<Map<Ident
             })
             .buildGroup(RAW_TAG_DATA);
 
-        RESOLVED_ENTRIES.clear();
+        RESOLVED_SERVER_ENTRIES.clear();
 
-        map.forEach((id, recipes) -> RESOLVED_ENTRIES.put(id, recipes.stream().map(RecipeEntry::id).map(RegistryKey::getValue).collect(Collectors.toSet())));
+        map.forEach((id, recipes) -> RESOLVED_SERVER_ENTRIES.put(id, recipes.stream().map(RecipeEntry::id).map(RegistryKey::getValue).collect(Collectors.toSet())));
+
+        areEntriesResolved = true;
     }
 
     public void sendTagPacket(ServerPlayerEntity player) {
-        AlloyForgeNetworking.CHANNEL.serverHandle(player).send(RecipeTagLoader.TagPacket.of(RESOLVED_ENTRIES));
+        AlloyForgeNetworking.CHANNEL.serverHandle(player).send(RecipeTagLoader.TagPacket.of(RESOLVED_SERVER_ENTRIES));
     }
 
     // Packet that acts as a sync packet for the Recipe Based Tag Entries
@@ -111,9 +116,9 @@ public class RecipeTagLoader extends SinglePreparationResourceReloader<Map<Ident
         }
 
         public static void handlePacket(TagPacket packet, ClientAccess access) {
-            RESOLVED_ENTRIES.clear();
+            RESOLVED_CLIENT_ENTRIES.clear();
 
-            RESOLVED_ENTRIES.putAll(
+            RESOLVED_CLIENT_ENTRIES.putAll(
                 packet.entries.stream().collect(Collectors.toMap(TagEntry::id, e -> new HashSet<>(e.entries())))
             );
         }

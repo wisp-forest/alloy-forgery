@@ -10,7 +10,7 @@ public interface FluidStorage {
 
     float amountInBuckets();
 
-    long getFluidAmount();
+    long getFluidAmountAsLong();
 
     void setFluidAmount(long amount);
 }

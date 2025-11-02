@@ -47,7 +47,7 @@ public final class FabricGeneralPlatformUtils implements GeneralPlatformUtils {
     }
 
     @Override
-    public void addToBlockEntity(BlockEntityType<?> type, Block... blocks) {
+    public void addToBlockEntity(BlockEntityType<ForgeControllerBlockEntity> type, Block... blocks) {
         for (var block : blocks) type.addSupportedBlock(block);
     }
 

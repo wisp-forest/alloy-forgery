@@ -9,6 +9,7 @@ import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.ScreenHandler;
+import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.server.network.ServerPlayerEntity;
 import org.jetbrains.annotations.Nullable;
@@ -23,6 +24,7 @@ import java.util.function.Function;
 
 public class AlloyForgeScreenHandler extends ScreenHandler {
 
+    public static ScreenHandlerType<AlloyForgeScreenHandler> ALLOY_FORGE_SCREEN_HANDLER_TYPE;
     private final Inventory controllerInventory;
 
     private final boolean isServer;
@@ -37,7 +39,7 @@ public class AlloyForgeScreenHandler extends ScreenHandler {
     private final SyncedProperty<Set<Integer>> disabledSlots;
 
     public AlloyForgeScreenHandler(int syncId, PlayerInventory playerInventory, ForgeControllerBlockEntity forge) {
-        super(AlloyForgery.ALLOY_FORGE_SCREEN_HANDLER_TYPE, syncId);
+        super(ALLOY_FORGE_SCREEN_HANDLER_TYPE, syncId);
 
         this.isServer = playerInventory.player instanceof ServerPlayerEntity;
 

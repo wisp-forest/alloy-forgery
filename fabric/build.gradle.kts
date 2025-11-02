@@ -15,9 +15,22 @@ architectury {
     }
 }
 
+var generatedResources = file("src/generated/resources")
+
+sourceSets {
+    main {
+        resources {
+            srcDir(generatedResources)
+            exclude(".cache/**")
+        }
+    }
+}
+
 fabricApi {
     configureDataGeneration {
         modId.set(rootProject.property("mod_id") as String)
+        outputDirectory = generatedResources
+        client = true
     }
 }
 

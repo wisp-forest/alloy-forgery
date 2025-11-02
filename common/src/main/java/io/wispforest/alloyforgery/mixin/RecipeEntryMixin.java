@@ -11,6 +11,6 @@ import io.wispforest.alloyforgery.pond.RecipeTagHelper;
 public abstract class RecipeEntryMixin implements RecipeTagHelper {
     @Override
     public boolean isIn(Identifier tag) {
-        return RecipeTagLoader.isWithinTag(tag, ((RecipeEntry<Recipe<?>>) (Object) this));
+        return RecipeTagLoader.isWithinTag(false, tag, ((RecipeEntry<Recipe<?>>) (Object) this));
     }
 }

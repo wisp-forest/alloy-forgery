@@ -16,14 +16,17 @@ import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.recipe.*;
 import net.minecraft.recipe.input.RecipeInput;
 import net.minecraft.resource.ResourceType;
+import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
+import java.util.OptionalInt;
 import java.util.ServiceLoader;
 import java.util.stream.Stream;
 
@@ -42,7 +45,7 @@ public interface GeneralPlatformUtils {
 
     <T extends BlockEntity> BlockEntityType<T> createBlockEntityType(Factory<T> factory);
 
-    void addToBlockEntity(BlockEntityType<?> type, Block...blocks);
+    void addToBlockEntity(BlockEntityType<ForgeControllerBlockEntity> type, Block...blocks);
 
     @FunctionalInterface
     public interface Factory<T extends BlockEntity> {
@@ -70,6 +73,12 @@ public interface GeneralPlatformUtils {
     //--
 
     ResourceConditionHolder createConditionsHolder();
+
+    //--
+
+    default OptionalInt openHandledScreen(PlayerEntity player, ForgeControllerBlockEntity blockEntity, @Nullable NamedScreenHandlerFactory factory) {
+        return player.openHandledScreen(factory);
+    }
 
     //--
 

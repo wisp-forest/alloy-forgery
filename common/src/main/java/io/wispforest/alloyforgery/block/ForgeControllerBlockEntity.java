@@ -9,6 +9,7 @@ import io.wispforest.owo.util.ImplementedInventory;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.block.entity.HopperBlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
@@ -46,6 +47,7 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
     private static final int[] LEFT_SLOTS = new int[]{11};
 
     public static final int INVENTORY_SIZE = 12;
+    public static BlockEntityType<ForgeControllerBlockEntity> FORGE_CONTROLLER_BLOCK_ENTITY;
     private final DefaultedList<ItemStack> items = DefaultedList.ofSize(INVENTORY_SIZE, ItemStack.EMPTY);
 
     public final ExtObservable<Set<Integer>> disabledSlots = ExtObservable.of(new HashSet<>());
@@ -71,7 +73,7 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
     public final ExtObservable<Integer> lavaProgress = ExtObservable.of(0);
 
     public ForgeControllerBlockEntity(BlockPos pos, BlockState state) {
-        super(AlloyForgery.FORGE_CONTROLLER_BLOCK_ENTITY, pos, state);
+        super(FORGE_CONTROLLER_BLOCK_ENTITY, pos, state);
         forgeDefinitionId = ((ForgeControllerBlock) state.getBlock()).forgeDefinitionId;
         facing = state.get(ForgeControllerBlock.FACING);
 
@@ -229,7 +231,7 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
 
         final var emptyFuelSpace = this.forgeTier().fuelCapacity() - this.fuel;
 
-        var fluidAmount = this.fluidHolder.getFluidAmount();
+        var fluidAmount = this.fluidHolder.getFluidAmountAsLong();
 
         if (fluidAmount >= 81 && emptyFuelSpace > 0f) {
             final float fuelInsertAmount = Math.min((fluidAmount / 81f) * 24, ((emptyFuelSpace) / 24) * 24);

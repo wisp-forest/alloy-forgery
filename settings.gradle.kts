@@ -21,7 +21,7 @@ include("common")
 
 include("fabric")
 
-//include("neoforge")
+include("neoforge")
 //include("neoforge-publish")
 
 rootProject.name = "alloy-forgery"//rootProject.property("mod_name")
