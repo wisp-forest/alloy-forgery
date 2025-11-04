@@ -27,9 +27,17 @@ public class AlloyForgeryFabric implements ModInitializer {
 
     @Override
     public void onInitialize() {
+
         ForgeDefinition.runDataLoaders();
 
         AlloyForgery.init();
+
+        AlloyForgery.registerBlockEntities();
+        AlloyForgery.registerRecipeTypes();
+        AlloyForgery.registerRecipeSerializers();
+        AlloyForgery.registerScreenHandlerType();
+        AlloyForgery.registerSlotDisplays();
+        AlloyForgery.registerItemGroup();
 
         ForgeRegistry.handleLoadedEntries(true);
         ForgeRegistry.handleLoadedEntries(false);
@@ -57,13 +65,6 @@ public class AlloyForgeryFabric implements ModInitializer {
                 ForgeControllerBlockEntity.FORGE_CONTROLLER_BLOCK_ENTITY
             );
         });
-
-        AlloyForgery.registerBlockEntities();
-        AlloyForgery.registerRecipeTypes();
-        AlloyForgery.registerRecipeSerializers();
-        AlloyForgery.registerScreenHandlerType();
-        AlloyForgery.registerSlotDisplays();
-        AlloyForgery.registerItemGroup();
 
         ServerLifecycleEvents.SYNC_DATA_PACK_CONTENTS.register((player, joined) -> {
             AlloyForgeNetworking.CHANNEL.serverHandle(player).send(ForgeTierDataLoader.createSyncPacket());

@@ -192,7 +192,7 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
     public void tick() {
         this.smeltProgress.set(Math.round((this.currentSmeltTime / (float) forgeTier().maxSmeltTime()) * 19));
         this.fuelProgress.set(Math.round((this.fuel / (float) forgeTier().fuelCapacity()) * 48));
-        this.lavaProgress.set(Math.round(this.fluidHolder.amountInBuckets() * 50));
+        this.lavaProgress.set(Math.round(this.fluidHolder.fullnessAmount() * 50));
 
         world.updateComparators(pos, getCachedState().getBlock());
 
@@ -231,13 +231,16 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
 
         final var emptyFuelSpace = this.forgeTier().fuelCapacity() - this.fuel;
 
-        var fluidAmount = this.fluidHolder.getFluidAmountAsLong();
+        var fluidAmount = this.fluidHolder.getFluidAmountInDroplets();
 
         if (fluidAmount >= 81 && emptyFuelSpace > 0f) {
-            final float fuelInsertAmount = Math.min((fluidAmount / 81f) * 24, ((emptyFuelSpace) / 24) * 24);
+            // Fuel Unit -> Millibuckets: / 24
+            // Droplets  -> Millibuckets: / 81
 
-            this.fuel += fuelInsertAmount;
-            this.fluidHolder.setFluidAmount((long) (fluidAmount - ((fuelInsertAmount / 24) * 81)));
+            final float fuelInsertAmount = Math.min(fluidAmount / 81f, (emptyFuelSpace) / 24);
+
+            this.fuel += fuelInsertAmount * 24;
+            this.fluidHolder.setFluidAmountInDroplets((long) (fluidAmount - (fuelInsertAmount * 81)));
         }
 
         final var currentBlockState = this.world.getBlockState(pos);

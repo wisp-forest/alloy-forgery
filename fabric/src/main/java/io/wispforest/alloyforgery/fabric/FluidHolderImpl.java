@@ -1,7 +1,5 @@
 package io.wispforest.alloyforgery.fabric;
 
-import io.wispforest.alloyforgery.block.ForgeControllerBlockEntity;
-import io.wispforest.alloyforgery.utils.EndecUtils;
 import io.wispforest.alloyforgery.utils.FluidStorage;
 import io.wispforest.endec.Endec;
 import io.wispforest.owo.serialization.CodecUtils;
@@ -17,7 +15,6 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.RegistryWrapper;
 
 import java.util.Iterator;
-import java.util.Objects;
 
 public final class FluidHolderImpl extends SingleVariantStorage<FluidVariant> implements InsertionOnlyStorage<FluidVariant>, FluidStorage {
     public static final Endec<FluidVariant> FLUID_VARIANT = CodecUtils.toEndec(FluidVariant.CODEC).catchErrors((ctx, deserializer, e) -> FluidVariant.blank());
@@ -61,29 +58,34 @@ public final class FluidHolderImpl extends SingleVariantStorage<FluidVariant> im
     //--
 
     @Override
-    public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
+    public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookupProvider) {
         this.amount = nbt.getLong("Amount");
         this.variant = FLUID_VARIANT.decodeFully(NbtDeserializer::of, nbt.getCompound("Variant"));
     }
 
     @Override
-    public void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
+    public void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookupProvider) {
         nbt.putLong("Amount", this.amount);
         nbt.put("Variant", FLUID_VARIANT.encodeFully(NbtSerializer::of, this.variant));
     }
 
     @Override
-    public float amountInBuckets() {
+    public float fullnessAmount() {
         return this.getAmount() / (float) FluidConstants.BUCKET;
     }
 
     @Override
-    public long getFluidAmountAsLong() {
+    public long getFluidAmountInDroplets() {
         return this.amount;
     }
 
     @Override
-    public void setFluidAmount(long amount) {
-        this.amount = amount;
+    public long setFluidAmountInDroplets(long amount) {
+        var cappedAmount = Math.min(amount, this.getCapacity());
+        var spilledAmount = amount - cappedAmount;
+
+        this.amount = Math.min(amount, this.getCapacity());
+
+        return spilledAmount <= 0 ? 0 : spilledAmount;
     }
 }
