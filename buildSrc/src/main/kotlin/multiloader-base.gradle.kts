@@ -126,7 +126,7 @@ dependencies {
     // General Libs
     var owolibDependency = if (projectPlatform == "neoforge") libs.owolib.neo else libs.owolib.fabric
 
-    modApi(owolibDependency) {
+    modImplementation(owolibDependency) {
         if (projectPlatform == "common") exclude("net.fabricmc.fabric-api")
     }
     annotationProcessor(owolibDependency) {

@@ -23,7 +23,7 @@ fabric_api    = "0.119.4+1.21.4"    # https://fabricmc.net/develop
 fabric_loader_range=">=0.16.9"
 fabric_api_range="*"
 
-neoforge      = "21.4.89-beta"      # https://projects.neoforged.net/neoforged/neoforge
+neoforge      = "21.4.155"      # https://projects.neoforged.net/neoforged/neoforge
 ffapi_base    = "0.4.42+d1308dedd1"
 
 neoforge_range="[21.4.33-beta,)"
@@ -40,7 +40,7 @@ endec_netty   = "0.1.5"
 endec_gson    = "0.1.6"
 endec_jankson = "0.1.6"
 
-owo_fabric   = "0.12.19+1.21.4"
+owo_fabric   = "0.12.20+1.21.4"
 owo_neoforge = "0.12.19-beta.2+1.21.4"
 
 owo_fabric_range   = ">=0.12.19+1.21.4"

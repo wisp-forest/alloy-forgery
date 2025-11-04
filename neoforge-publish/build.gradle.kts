@@ -123,10 +123,13 @@ publishing {
     }
     repositories {
         maven {
-            url = uri(ENV["MAVEN_URL"]!!)
-            credentials {
-                username = ENV["MAVEN_USER"]
-                password = ENV["MAVEN_PASSWORD"]
+            var mavenUrl = ENV["MAVEN_URL"]
+            if (mavenUrl != null) {
+                url = uri(mavenUrl)
+                credentials {
+                    username = ENV["MAVEN_USER"]
+                    password = ENV["MAVEN_PASSWORD"]
+                }
             }
         }
     }
