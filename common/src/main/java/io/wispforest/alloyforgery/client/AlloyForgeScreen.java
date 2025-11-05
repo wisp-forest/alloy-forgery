@@ -6,10 +6,12 @@ import io.wispforest.alloyforgery.networking.AlloyForgeNetworking;
 import io.wispforest.alloyforgery.networking.DisableSlotToggle;
 import io.wispforest.alloyforgery.utils.ForgeInputSlot;
 import io.wispforest.owo.ui.base.BaseOwoHandledScreen;
+import io.wispforest.owo.ui.component.ButtonComponent;
 import io.wispforest.owo.ui.component.TextureComponent;
 import io.wispforest.owo.ui.container.Containers;
 import io.wispforest.owo.ui.container.FlowLayout;
 import io.wispforest.owo.ui.core.*;
+import io.wispforest.owo.ui.util.NinePatchTexture;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.client.render.RenderLayer;
@@ -54,7 +56,7 @@ public class AlloyForgeScreen extends BaseOwoHandledScreen<FlowLayout, AlloyForg
     }
 
     private Identifier themedTextureID(String suffix) {
-        return AlloyForgery.id("textures/gui/" + (AlloyForgery.CONFIG.darkModeTheme() ? "dark" : "light") + "/" + suffix);
+        return AlloyForgery.id("textures/gui/theme/" + (AlloyForgery.CONFIG.darkModeTheme() ? "dark" : "light") + "/" + suffix);
     }
 
     private Identifier textureID(String suffix) {
@@ -66,8 +68,19 @@ public class AlloyForgeScreen extends BaseOwoHandledScreen<FlowLayout, AlloyForg
         return OwoUIAdapter.create(this, Containers::verticalFlow);
     }
 
-    public <T> T getThemedValue(T light, T dark) {
+    private static <T> T getThemedValue(T light, T dark) {
         return AlloyForgery.CONFIG.darkModeTheme() ? dark : light;
+    }
+
+    private static final ButtonComponent.Renderer BUTTON_RENDERER = (context, button, delta) -> {
+        NinePatchTexture.draw(getBtnTexture(button), context, button.getX(), button.getY(), button.width(), button.height());
+    };
+
+    private static Identifier getBtnTexture(ButtonComponent btn) {
+        var btnType = (btn.visible ? (btn.isHovered() ? "hovered" : "active") : "disabled");
+        var themeType = getThemedValue("light", "dark");
+
+        return AlloyForgery.id("theme/" + themeType + "/button/" + btnType);
     }
 
 //    @Override
@@ -103,7 +116,7 @@ public class AlloyForgeScreen extends BaseOwoHandledScreen<FlowLayout, AlloyForg
                 )
                 .child(
                     // Invalid Cross
-                    invalidCross = texture(textureID("forge_controller.png"), 241, 1, 14, 14)
+                    invalidCross = texture(textureID("cross.png"), 0, 0, 14, 14, 14, 14)
                         .visibleArea(PositionedRectangle.of(0, 0, 14, 0))
                         .configure(textureComponent -> {
                             textureComponent.positioning(Positioning.absolute(147, 25))
@@ -133,8 +146,18 @@ public class AlloyForgeScreen extends BaseOwoHandledScreen<FlowLayout, AlloyForg
                                 this.allowSlotToggling = !allowSlotToggling;
 
                                 btn.tooltip(Text.translatable("tooltip.alloy_forgery.slot_toggle_" + (this.allowSlotToggling ? "enable" : "disable")));
-                            }).tooltip(Text.translatable("tooltip.alloy_forgery.slot_toggle_disable"))
-                                .sizing(Sizing.fixed(14), Sizing.fixed(14))
+                            }).renderer((context, button, delta) -> {
+                                    BUTTON_RENDERER.draw(context, button, delta);
+
+                                    context.push()
+                                        .translate(button.getX(), button.getY(), 0);
+
+                                    context.drawTexture(RenderLayer::getGuiTextured, textureID("slot_locks.png"),4, 3, this.allowSlotToggling ? 10 : 0, 0, 10, 12, 20, 12);
+
+                                    context.pop();
+                                })
+                                .tooltip(Text.translatable("tooltip.alloy_forgery.slot_toggle_disable"))
+                                .sizing(Sizing.fixed(18), Sizing.fixed(18))
                         ).horizontalAlignment(HorizontalAlignment.CENTER)
                         .positioning(Positioning.absolute(140, 75))
                 )
