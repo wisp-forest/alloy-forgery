@@ -21,6 +21,7 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.*;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
 public class AlloyForgeScreenHandler extends ScreenHandler {
 
@@ -37,6 +38,8 @@ public class AlloyForgeScreenHandler extends ScreenHandler {
     private final SyncedProperty<Integer> requiredTierToCraft;
 
     private final SyncedProperty<Set<Integer>> disabledSlots;
+
+    private final List<Slot> inputSlots;
 
     public AlloyForgeScreenHandler(int syncId, PlayerInventory playerInventory, ForgeControllerBlockEntity forge) {
         super(ALLOY_FORGE_SCREEN_HANDLER_TYPE, syncId);
@@ -76,6 +79,8 @@ public class AlloyForgeScreenHandler extends ScreenHandler {
             .defaultSlotFactory()
             .moveTo(8, 107)
             .playerInventory(playerInventory);
+
+        this.inputSlots = this.slots.stream().filter(slot -> slot instanceof ForgeInputSlot).toList();;
     }
 
     //--
@@ -185,5 +190,9 @@ public class AlloyForgeScreenHandler extends ScreenHandler {
 
     public Inventory getControllerInventory() {
         return this.controllerInventory;
+    }
+
+    public List<Slot> getInputSlots() {
+        return this.inputSlots;
     }
 }

@@ -68,6 +68,7 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
     private float fuel;
     private int currentSmeltTime;
 
+    // TODO: USE BASE VALUES AND ADD TOOLTIP INFO TO THE FORGES
     public final ExtObservable<Integer> smeltProgress = ExtObservable.of(0);
     public final ExtObservable<Integer> fuelProgress = ExtObservable.of(0);
     public final ExtObservable<Integer> lavaProgress = ExtObservable.of(0);

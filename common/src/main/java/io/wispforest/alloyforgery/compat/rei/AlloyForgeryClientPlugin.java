@@ -1,11 +1,11 @@
 package io.wispforest.alloyforgery.compat.rei;
 
+import io.wispforest.alloyforgery.client.AlloyForgeScreen;
 import me.shedaniel.math.Rectangle;
 import me.shedaniel.rei.api.client.plugins.REIClientPlugin;
 import me.shedaniel.rei.api.client.registry.category.CategoryRegistry;
 import me.shedaniel.rei.api.client.registry.screen.ScreenRegistry;
 import me.shedaniel.rei.api.common.util.EntryStacks;
-import io.wispforest.alloyforgery.client.AlloyForgeScreen;
 import io.wispforest.alloyforgery.forges.ForgeRegistry;
 
 public class AlloyForgeryClientPlugin implements REIClientPlugin {

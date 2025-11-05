@@ -16,4 +16,7 @@ public class AlloyForgeryConfigModel {
     public int baseInputAmount = 2;
 
     public int higherTierOutputIncrease = 1;
+
+    @SectionHeader("screen")
+    public boolean darkModeTheme = false;
 }
