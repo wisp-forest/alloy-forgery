@@ -4,12 +4,18 @@
       "type": "neoforge:and",
       "values": [
         {
-          "type": "neoforge:tag_empty",
-          "tag": "c:raw_materials/silver"
+          "type": "neoforge:not",
+          "value": {
+            "type": "neoforge:tag_empty",
+            "tag": "c:raw_materials/silver"
+          }
         },
         {
-          "type": "neoforge:tag_empty",
-          "tag": "c:ingots/silver"
+          "type": "neoforge:not",
+          "value": {
+            "type": "neoforge:tag_empty",
+            "tag": "c:ingots/silver"
+          }
         }
       ]
     }

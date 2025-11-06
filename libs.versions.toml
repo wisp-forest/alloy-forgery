@@ -49,8 +49,8 @@ owo_neoforge_range = ">=0.12.19-beta.2+1.21.4"
 jankson = "1.2.2"
 
 # Item Viewer Info 
-rei      = "18.0.796"
-arch_api = "15.0.1"               # https://modrinth.com/mod/architectury-api/versions
+rei      = "18.0.808"
+arch_api = "15.0.3"               # https://modrinth.com/mod/architectury-api/versions
 
 emi = "1.1.18+1.21.1"
 

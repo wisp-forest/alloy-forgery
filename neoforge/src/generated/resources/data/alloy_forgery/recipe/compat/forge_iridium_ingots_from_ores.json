@@ -4,12 +4,18 @@
       "type": "neoforge:and",
       "values": [
         {
-          "type": "neoforge:tag_empty",
-          "tag": "c:ores/iridium"
+          "type": "neoforge:not",
+          "value": {
+            "type": "neoforge:tag_empty",
+            "tag": "c:ores/iridium"
+          }
         },
         {
-          "type": "neoforge:tag_empty",
-          "tag": "c:ingots/iridium"
+          "type": "neoforge:not",
+          "value": {
+            "type": "neoforge:tag_empty",
+            "tag": "c:ingots/iridium"
+          }
         }
       ]
     }

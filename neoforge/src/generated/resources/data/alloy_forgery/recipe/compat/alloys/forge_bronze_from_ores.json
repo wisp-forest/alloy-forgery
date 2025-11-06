@@ -4,16 +4,25 @@
       "type": "neoforge:and",
       "values": [
         {
-          "type": "neoforge:tag_empty",
-          "tag": "c:ores/copper"
+          "type": "neoforge:not",
+          "value": {
+            "type": "neoforge:tag_empty",
+            "tag": "c:ores/copper"
+          }
         },
         {
-          "type": "neoforge:tag_empty",
-          "tag": "c:ores/tin"
+          "type": "neoforge:not",
+          "value": {
+            "type": "neoforge:tag_empty",
+            "tag": "c:ores/tin"
+          }
         },
         {
-          "type": "neoforge:tag_empty",
-          "tag": "c:ingots/bronze"
+          "type": "neoforge:not",
+          "value": {
+            "type": "neoforge:tag_empty",
+            "tag": "c:ingots/bronze"
+          }
         }
       ]
     }

@@ -1,0 +1,53 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:and",
+      "values": [
+        {
+          "type": "neoforge:not",
+          "value": {
+            "type": "neoforge:tag_empty",
+            "tag": "c:ores/zinc"
+          }
+        },
+        {
+          "type": "neoforge:not",
+          "value": {
+            "type": "neoforge:tag_empty",
+            "tag": "c:ingots/zinc"
+          }
+        }
+      ]
+    }
+  ],
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "minecraft:compat/forge_zinc_ingots_from_ores"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    },
+    "has_zinc_ingots_from_ores": {
+      "conditions": {
+        "items": [
+          {
+            "items": "#c:ores/zinc"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_zinc_ingots_from_ores"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "minecraft:compat/forge_zinc_ingots_from_ores"
+    ]
+  }
+}

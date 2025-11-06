@@ -4,16 +4,25 @@
       "type": "neoforge:and",
       "values": [
         {
-          "type": "neoforge:tag_empty",
-          "tag": "c:storage_blocks/raw_iron"
+          "type": "neoforge:not",
+          "value": {
+            "type": "neoforge:tag_empty",
+            "tag": "c:storage_blocks/raw_iron"
+          }
         },
         {
-          "type": "neoforge:tag_empty",
-          "tag": "c:storage_blocks/coal"
+          "type": "neoforge:not",
+          "value": {
+            "type": "neoforge:tag_empty",
+            "tag": "c:storage_blocks/coal"
+          }
         },
         {
-          "type": "neoforge:tag_empty",
-          "tag": "c:storage_blocks/steel"
+          "type": "neoforge:not",
+          "value": {
+            "type": "neoforge:tag_empty",
+            "tag": "c:storage_blocks/steel"
+          }
         }
       ]
     }

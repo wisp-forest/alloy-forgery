@@ -4,12 +4,18 @@
       "type": "neoforge:and",
       "values": [
         {
-          "type": "neoforge:tag_empty",
-          "tag": "c:raw_materials/antimony"
+          "type": "neoforge:not",
+          "value": {
+            "type": "neoforge:tag_empty",
+            "tag": "c:raw_materials/antimony"
+          }
         },
         {
-          "type": "neoforge:tag_empty",
-          "tag": "c:ingots/antimony"
+          "type": "neoforge:not",
+          "value": {
+            "type": "neoforge:tag_empty",
+            "tag": "c:ingots/antimony"
+          }
         }
       ]
     }

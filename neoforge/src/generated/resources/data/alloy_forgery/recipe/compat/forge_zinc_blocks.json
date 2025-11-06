@@ -4,12 +4,18 @@
       "type": "neoforge:and",
       "values": [
         {
-          "type": "neoforge:tag_empty",
-          "tag": "c:storage_blocks/raw_zinc"
+          "type": "neoforge:not",
+          "value": {
+            "type": "neoforge:tag_empty",
+            "tag": "c:storage_blocks/raw_zinc"
+          }
         },
         {
-          "type": "neoforge:tag_empty",
-          "tag": "c:storage_blocks/zinc"
+          "type": "neoforge:not",
+          "value": {
+            "type": "neoforge:tag_empty",
+            "tag": "c:storage_blocks/zinc"
+          }
         }
       ]
     }

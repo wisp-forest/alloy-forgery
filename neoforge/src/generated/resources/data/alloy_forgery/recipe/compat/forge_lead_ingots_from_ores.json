@@ -4,12 +4,18 @@
       "type": "neoforge:and",
       "values": [
         {
-          "type": "neoforge:tag_empty",
-          "tag": "c:ores/lead"
+          "type": "neoforge:not",
+          "value": {
+            "type": "neoforge:tag_empty",
+            "tag": "c:ores/lead"
+          }
         },
         {
-          "type": "neoforge:tag_empty",
-          "tag": "c:ingots/lead"
+          "type": "neoforge:not",
+          "value": {
+            "type": "neoforge:tag_empty",
+            "tag": "c:ingots/lead"
+          }
         }
       ]
     }

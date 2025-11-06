@@ -1,0 +1,53 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:and",
+      "values": [
+        {
+          "type": "neoforge:not",
+          "value": {
+            "type": "neoforge:tag_empty",
+            "tag": "c:storage_blocks/raw_lead"
+          }
+        },
+        {
+          "type": "neoforge:not",
+          "value": {
+            "type": "neoforge:tag_empty",
+            "tag": "c:storage_blocks/lead"
+          }
+        }
+      ]
+    }
+  ],
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_lead_blocks": {
+      "conditions": {
+        "items": [
+          {
+            "items": "#c:storage_blocks/raw_lead"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "minecraft:compat/forge_lead_blocks"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_lead_blocks"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "minecraft:compat/forge_lead_blocks"
+    ]
+  }
+}

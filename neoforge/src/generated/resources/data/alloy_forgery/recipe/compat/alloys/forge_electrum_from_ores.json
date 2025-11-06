@@ -4,16 +4,25 @@
       "type": "neoforge:and",
       "values": [
         {
-          "type": "neoforge:tag_empty",
-          "tag": "c:ores/gold"
+          "type": "neoforge:not",
+          "value": {
+            "type": "neoforge:tag_empty",
+            "tag": "c:ores/gold"
+          }
         },
         {
-          "type": "neoforge:tag_empty",
-          "tag": "c:ores/silver"
+          "type": "neoforge:not",
+          "value": {
+            "type": "neoforge:tag_empty",
+            "tag": "c:ores/silver"
+          }
         },
         {
-          "type": "neoforge:tag_empty",
-          "tag": "c:ingots/electrum"
+          "type": "neoforge:not",
+          "value": {
+            "type": "neoforge:tag_empty",
+            "tag": "c:ingots/electrum"
+          }
         }
       ]
     }

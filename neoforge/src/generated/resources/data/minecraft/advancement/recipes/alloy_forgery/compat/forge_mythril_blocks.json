@@ -1,0 +1,53 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:and",
+      "values": [
+        {
+          "type": "neoforge:not",
+          "value": {
+            "type": "neoforge:tag_empty",
+            "tag": "c:storage_blocks/raw_mythril"
+          }
+        },
+        {
+          "type": "neoforge:not",
+          "value": {
+            "type": "neoforge:tag_empty",
+            "tag": "c:storage_blocks/mythril"
+          }
+        }
+      ]
+    }
+  ],
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_mythril_blocks": {
+      "conditions": {
+        "items": [
+          {
+            "items": "#c:storage_blocks/raw_mythril"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "minecraft:compat/forge_mythril_blocks"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_mythril_blocks"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "minecraft:compat/forge_mythril_blocks"
+    ]
+  }
+}

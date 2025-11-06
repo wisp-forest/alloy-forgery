@@ -28,7 +28,7 @@ public record NeoforgeResourceConditionHolder(List<ICondition> conditions) imple
 
     @Override
     public <T extends ItemConvertible> ResourceConditionHolder withTags(RegistryKey<Registry<T>> key, TagKey<T>... tags) {
-        this.conditions.add(NeoForgeConditions.and(Arrays.stream(tags).map(NeoForgeConditions::tagEmpty).toArray(ICondition[]::new)));
+        this.conditions.add(NeoForgeConditions.and(Arrays.stream(tags).map(NeoForgeConditions::tagEmpty).map(NeoForgeConditions::not).toArray(ICondition[]::new)));
 
         return this;
     }

@@ -1,0 +1,53 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:and",
+      "values": [
+        {
+          "type": "neoforge:not",
+          "value": {
+            "type": "neoforge:tag_empty",
+            "tag": "c:raw_materials/zinc"
+          }
+        },
+        {
+          "type": "neoforge:not",
+          "value": {
+            "type": "neoforge:tag_empty",
+            "tag": "c:ingots/zinc"
+          }
+        }
+      ]
+    }
+  ],
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "minecraft:compat/forge_zinc_ingots_from_raw_material"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    },
+    "has_zinc_ingots_from_raw_material": {
+      "conditions": {
+        "items": [
+          {
+            "items": "#c:raw_materials/zinc"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_zinc_ingots_from_raw_material"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "minecraft:compat/forge_zinc_ingots_from_raw_material"
+    ]
+  }
+}

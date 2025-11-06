@@ -4,12 +4,18 @@
       "type": "neoforge:and",
       "values": [
         {
-          "type": "neoforge:tag_empty",
-          "tag": "c:storage_blocks/raw_orichalcum"
+          "type": "neoforge:not",
+          "value": {
+            "type": "neoforge:tag_empty",
+            "tag": "c:storage_blocks/raw_orichalcum"
+          }
         },
         {
-          "type": "neoforge:tag_empty",
-          "tag": "c:storage_blocks/orichalcum"
+          "type": "neoforge:not",
+          "value": {
+            "type": "neoforge:tag_empty",
+            "tag": "c:storage_blocks/orichalcum"
+          }
         }
       ]
     }

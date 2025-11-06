@@ -4,16 +4,25 @@
       "type": "neoforge:and",
       "values": [
         {
-          "type": "neoforge:tag_empty",
-          "tag": "c:ingots/iron"
+          "type": "neoforge:not",
+          "value": {
+            "type": "neoforge:tag_empty",
+            "tag": "c:ingots/iron"
+          }
         },
         {
-          "type": "neoforge:tag_empty",
-          "tag": "c:coal"
+          "type": "neoforge:not",
+          "value": {
+            "type": "neoforge:tag_empty",
+            "tag": "c:coal"
+          }
         },
         {
-          "type": "neoforge:tag_empty",
-          "tag": "c:ingots/steel"
+          "type": "neoforge:not",
+          "value": {
+            "type": "neoforge:tag_empty",
+            "tag": "c:ingots/steel"
+          }
         }
       ]
     }
