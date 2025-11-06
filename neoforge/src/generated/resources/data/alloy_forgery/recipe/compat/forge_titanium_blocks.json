@@ -1,0 +1,39 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:and",
+      "values": [
+        {
+          "type": "neoforge:tag_empty",
+          "tag": "c:storage_blocks/raw_titanium"
+        },
+        {
+          "type": "neoforge:tag_empty",
+          "tag": "c:storage_blocks/titanium"
+        }
+      ]
+    }
+  ],
+  "type": "alloy_forgery:forging",
+  "fuel_per_tick": 90,
+  "inputs": [
+    {
+      "count": 2,
+      "ingredient": "#c:storage_blocks/raw_titanium"
+    }
+  ],
+  "min_forge_tier": 2,
+  "output": {
+    "count": 2,
+    "priority": [
+      "techreborn:titanium_block",
+      "modern_industrialization:titanium_block"
+    ],
+    "tag": "c:storage_blocks/titanium"
+  },
+  "overrides": {
+    "3+": {
+      "count": 3
+    }
+  }
+}

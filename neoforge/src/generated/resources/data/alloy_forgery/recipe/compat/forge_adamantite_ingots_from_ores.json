@@ -1,0 +1,38 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:and",
+      "values": [
+        {
+          "type": "neoforge:tag_empty",
+          "tag": "c:ores/adamantite"
+        },
+        {
+          "type": "neoforge:tag_empty",
+          "tag": "c:ingots/adamantite"
+        }
+      ]
+    }
+  ],
+  "type": "alloy_forgery:forging",
+  "fuel_per_tick": 90,
+  "inputs": [
+    {
+      "count": 2,
+      "ingredient": "#c:ores/adamantite"
+    }
+  ],
+  "min_forge_tier": 2,
+  "output": {
+    "count": 2,
+    "priority": [
+      "mythicmetals:adamantite_ingot"
+    ],
+    "tag": "c:ingots/adamantite"
+  },
+  "overrides": {
+    "3+": {
+      "count": 3
+    }
+  }
+}

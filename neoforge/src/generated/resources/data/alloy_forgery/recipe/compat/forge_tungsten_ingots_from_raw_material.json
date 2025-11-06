@@ -1,0 +1,40 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:and",
+      "values": [
+        {
+          "type": "neoforge:tag_empty",
+          "tag": "c:raw_materials/tungsten"
+        },
+        {
+          "type": "neoforge:tag_empty",
+          "tag": "c:ingots/tungsten"
+        }
+      ]
+    }
+  ],
+  "type": "alloy_forgery:forging",
+  "fuel_per_tick": 135,
+  "inputs": [
+    {
+      "count": 2,
+      "ingredient": "#c:raw_materials/tungsten"
+    }
+  ],
+  "min_forge_tier": 2,
+  "output": {
+    "count": 2,
+    "priority": [
+      "techreborn:tungsten_ingot",
+      "indrev:tungsten_ingot",
+      "modern_industrialization:tungsten_ingot"
+    ],
+    "tag": "c:ingots/tungsten"
+  },
+  "overrides": {
+    "3+": {
+      "count": 3
+    }
+  }
+}

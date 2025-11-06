@@ -1,0 +1,39 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:and",
+      "values": [
+        {
+          "type": "neoforge:tag_empty",
+          "tag": "c:ores/platinum"
+        },
+        {
+          "type": "neoforge:tag_empty",
+          "tag": "c:ingots/platinum"
+        }
+      ]
+    }
+  ],
+  "type": "alloy_forgery:forging",
+  "fuel_per_tick": 90,
+  "inputs": [
+    {
+      "count": 2,
+      "ingredient": "#c:ores/platinum"
+    }
+  ],
+  "min_forge_tier": 2,
+  "output": {
+    "count": 2,
+    "priority": [
+      "mythicmetals:platinum_ingot",
+      "modern_industrialization:platinum_ingot"
+    ],
+    "tag": "c:ingots/platinum"
+  },
+  "overrides": {
+    "3+": {
+      "count": 3
+    }
+  }
+}

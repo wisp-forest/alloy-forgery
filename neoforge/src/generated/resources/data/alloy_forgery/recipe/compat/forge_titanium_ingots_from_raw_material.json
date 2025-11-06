@@ -1,0 +1,39 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:and",
+      "values": [
+        {
+          "type": "neoforge:tag_empty",
+          "tag": "c:raw_materials/titanium"
+        },
+        {
+          "type": "neoforge:tag_empty",
+          "tag": "c:ingots/titanium"
+        }
+      ]
+    }
+  ],
+  "type": "alloy_forgery:forging",
+  "fuel_per_tick": 90,
+  "inputs": [
+    {
+      "count": 2,
+      "ingredient": "#c:raw_materials/titanium"
+    }
+  ],
+  "min_forge_tier": 2,
+  "output": {
+    "count": 2,
+    "priority": [
+      "techreborn:titanium_ingot",
+      "modern_industrialization:titanium_ingot"
+    ],
+    "tag": "c:ingots/titanium"
+  },
+  "overrides": {
+    "3+": {
+      "count": 3
+    }
+  }
+}

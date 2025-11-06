@@ -1,0 +1,38 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:and",
+      "values": [
+        {
+          "type": "neoforge:tag_empty",
+          "tag": "c:ores/mythril"
+        },
+        {
+          "type": "neoforge:tag_empty",
+          "tag": "c:ingots/mythril"
+        }
+      ]
+    }
+  ],
+  "type": "alloy_forgery:forging",
+  "fuel_per_tick": 90,
+  "inputs": [
+    {
+      "count": 2,
+      "ingredient": "#c:ores/mythril"
+    }
+  ],
+  "min_forge_tier": 2,
+  "output": {
+    "count": 2,
+    "priority": [
+      "mythicmetals:mythril_ingot"
+    ],
+    "tag": "c:ingots/mythril"
+  },
+  "overrides": {
+    "3+": {
+      "count": 3
+    }
+  }
+}

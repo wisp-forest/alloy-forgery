@@ -1,0 +1,50 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:and",
+      "values": [
+        {
+          "type": "neoforge:tag_empty",
+          "tag": "c:ores/iron"
+        },
+        {
+          "type": "neoforge:tag_empty",
+          "tag": "c:ores/coal"
+        },
+        {
+          "type": "neoforge:tag_empty",
+          "tag": "c:ingots/steel"
+        }
+      ]
+    }
+  ],
+  "type": "alloy_forgery:forging",
+  "fuel_per_tick": 5,
+  "inputs": [
+    {
+      "count": 1,
+      "ingredient": "#c:ores/iron"
+    },
+    {
+      "count": 1,
+      "ingredient": "#c:ores/coal"
+    }
+  ],
+  "min_forge_tier": 1,
+  "output": {
+    "count": 2,
+    "priority": [
+      "techreborn:steel_ingot",
+      "modern_industrialization:steel_ingot"
+    ],
+    "tag": "c:ingots/steel"
+  },
+  "overrides": {
+    "2+": {
+      "count": 3
+    },
+    "3+": {
+      "count": 4
+    }
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:and",
+      "values": [
+        {
+          "type": "neoforge:tag_empty",
+          "tag": "c:storage_blocks/raw_adamantite"
+        },
+        {
+          "type": "neoforge:tag_empty",
+          "tag": "c:storage_blocks/adamantite"
+        }
+      ]
+    }
+  ],
+  "type": "alloy_forgery:forging",
+  "fuel_per_tick": 90,
+  "inputs": [
+    {
+      "count": 2,
+      "ingredient": "#c:storage_blocks/raw_adamantite"
+    }
+  ],
+  "min_forge_tier": 2,
+  "output": {
+    "count": 2,
+    "priority": [
+      "mythicmetals:adamantite_block"
+    ],
+    "tag": "c:storage_blocks/adamantite"
+  },
+  "overrides": {
+    "3+": {
+      "count": 3
+    }
+  }
+}

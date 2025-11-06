@@ -1,0 +1,38 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:and",
+      "values": [
+        {
+          "type": "neoforge:tag_empty",
+          "tag": "c:raw_materials/antimony"
+        },
+        {
+          "type": "neoforge:tag_empty",
+          "tag": "c:ingots/antimony"
+        }
+      ]
+    }
+  ],
+  "type": "alloy_forgery:forging",
+  "fuel_per_tick": 45,
+  "inputs": [
+    {
+      "count": 2,
+      "ingredient": "#c:raw_materials/antimony"
+    }
+  ],
+  "min_forge_tier": 1,
+  "output": {
+    "count": 3,
+    "priority": [
+      "modern_industrialization:antimony_ingot"
+    ],
+    "tag": "c:ingots/antimony"
+  },
+  "overrides": {
+    "2+": {
+      "count": 4
+    }
+  }
+}

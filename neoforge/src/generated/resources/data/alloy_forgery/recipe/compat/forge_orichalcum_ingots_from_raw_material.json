@@ -1,0 +1,38 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:and",
+      "values": [
+        {
+          "type": "neoforge:tag_empty",
+          "tag": "c:raw_materials/orichalcum"
+        },
+        {
+          "type": "neoforge:tag_empty",
+          "tag": "c:ingots/orichalcum"
+        }
+      ]
+    }
+  ],
+  "type": "alloy_forgery:forging",
+  "fuel_per_tick": 90,
+  "inputs": [
+    {
+      "count": 2,
+      "ingredient": "#c:raw_materials/orichalcum"
+    }
+  ],
+  "min_forge_tier": 2,
+  "output": {
+    "count": 2,
+    "priority": [
+      "mythicmetals:orichalcum_ingot"
+    ],
+    "tag": "c:ingots/orichalcum"
+  },
+  "overrides": {
+    "3+": {
+      "count": 3
+    }
+  }
+}
