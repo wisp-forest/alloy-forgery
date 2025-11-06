@@ -4,17 +4,11 @@ import io.wispforest.helpers.Utils
 import io.wispforest.helpers.UtilsJava
 
 plugins {
-    id("architectury-plugin")
     id("dev.architectury.loom")
     id("maven-publish")
     id("base")
     id("java")
     id("java-library")
-}
-
-architectury {
-    minecraft = libs.versions.minecraft.asProvider().get()
-    compileOnly()
 }
 
 base {

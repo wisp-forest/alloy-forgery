@@ -4,13 +4,14 @@ import com.google.common.collect.ImmutableMap;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonSyntaxException;
 import com.mojang.serialization.JsonOps;
+import io.wispforest.alloyforgery.utils.GeneralPlatformUtils;
+import io.wispforest.alloyforgery.utils.LoaderPlatformUtils;
 import io.wispforest.endec.Endec;
 import io.wispforest.endec.StructEndec;
 import io.wispforest.endec.impl.StructEndecBuilder;
 import io.wispforest.owo.serialization.CodecUtils;
 import io.wispforest.owo.serialization.endec.MinecraftEndecs;
 import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.component.ComponentChanges;
 import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.Ingredient;
@@ -73,7 +74,7 @@ public record RawAlloyForgeRecipe(Map<Ingredient, Integer> inputs, OutputData ou
         for (CountedIngredient countedIngredient : list) {
             var ingredient = countedIngredient.ingredient();
 
-            if (unprocessedData.containsKey(ingredient) && (AlloyForgery.CONFIG.strictRecipeChecks() || FabricLoader.getInstance().isDevelopmentEnvironment())) {
+            if (unprocessedData.containsKey(ingredient) && (AlloyForgery.CONFIG.strictRecipeChecks() || LoaderPlatformUtils.INSTANCE.isDevelopmentEnvironment())) {
                 var jsonData = Ingredient.CODEC.encodeStart(JsonOps.INSTANCE, ingredient)
                     .result()
                     .map(JsonElement::toString)

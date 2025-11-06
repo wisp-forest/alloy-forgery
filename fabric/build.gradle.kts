@@ -8,32 +8,6 @@ plugins {
     id("com.github.johnrengelman.shadow")
 }
 
-architectury {
-    platformSetupLoomIde()
-    fabric {
-        platformPackage = "fabric"
-    }
-}
-
-var generatedResources = file("src/generated/resources")
-
-sourceSets {
-    main {
-        resources {
-            srcDir(generatedResources)
-            exclude(".cache/**")
-        }
-    }
-}
-
-fabricApi {
-    configureDataGeneration {
-        modId.set(rootProject.property("mod_id") as String)
-        outputDirectory = generatedResources
-        client = true
-    }
-}
-
 dependencies {
     // Core Libs
     modImplementation(libs.fabric.loader)

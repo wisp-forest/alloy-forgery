@@ -19,7 +19,45 @@ configurations {
 
 dependencies {
     "common"(project(":common", "namedElements")) { this.setTransitive(false) }
-    "shadowCommon"(project(":common", "transformProduction$currentPlatformDisplayName")) { this.setTransitive(false) }
+}
+
+//--
+
+var generatedResources = file("src/generated/resources")
+
+sourceSets {
+    main {
+        resources {
+            srcDir(generatedResources)
+            exclude(".cache/**")
+        }
+    }
+}
+
+if (currentPlatform == "fabric") {
+    fabricApi {
+        configureDataGeneration {
+            modId.set(rootProject.property("mod_id") as String)
+            outputDirectory = generatedResources
+            client = true
+        }
+    }
+} else {
+    loom {
+        runs {
+            create("data-generation"){
+                clientData()
+
+                name("Data Generation")
+
+                programArgs.addAll(
+                    mutableListOf(
+                        "--all", "--mod", rootProject.property("mod_id") as String, "--output", generatedResources.absolutePath
+                    )
+                )
+            }
+        }
+    }
 }
 
 //--
@@ -32,6 +70,7 @@ tasks.shadowJar {
 
     configurations = mutableListOf<FileCollection>(project.configurations["shadowCommon"]);
     archiveClassifier.set("dev-shadow")
+    destinationDirectory.set(destinationDirectory.get().dir("shadow"))
 }
 
 tasks.remapJar {

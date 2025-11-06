@@ -7,53 +7,6 @@ plugins {
     id("com.github.johnrengelman.shadow")
 }
 
-architectury {
-    platformSetupLoomIde()
-    neoForge {
-        platformPackage = "neoforge"
-    }
-}
-
-var generatedResources = file("src/generated/resources")
-
-sourceSets {
-    main {
-        resources {
-            srcDir(generatedResources)
-            exclude(".cache/**")
-        }
-    }
-}
-
-loom {
-    runs {
-        create("data-generation"){
-            clientData()
-
-            name("Data Generation")
-
-            programArgs.addAll(
-                mutableListOf(
-                    "--all", "--mod", rootProject.property("mod_id") as String, "--output", generatedResources.absolutePath
-                )
-            )
-        }
-//        create("data-generation"){
-//            clientData()
-//
-//            //forgeTemplate("dataClient")
-//
-//            name("Data Generation")
-//
-//            programArgs.addAll(
-//                mutableListOf(
-//                    "--all", "--mod", rootProject.property("mod_id") as String, "--output", generatedResources.absolutePath
-//                )
-//            )
-//        }
-    }
-}
-
 dependencies {
     // Core Libs
     neoForge(libs.neoforge)
