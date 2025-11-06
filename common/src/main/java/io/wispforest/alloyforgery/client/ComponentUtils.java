@@ -45,7 +45,7 @@ public class ComponentUtils {
     }
 
     private static Identifier getBtnTexture(ButtonComponent btn, Supplier<Boolean> isDarkMode) {
-        var btnType = (btn.visible ? (btn.isHovered() ? "hovered" : "active") : "disabled");
+        var btnType = (btn.active() ? (btn.isHovered() ? "hovered" : "active") : "disabled");
         var themeType = isDarkMode.get() ? "dark" : "light";
 
         return AlloyForgery.id("theme/" + themeType + "/button/" + btnType);
