@@ -13,14 +13,8 @@ public class AlloyForgeryCommonPlugin implements REICommonPlugin {
 
     @Override
     public void registerDisplays(ServerDisplayRegistry registry) {
-
         registry.beginRecipeFiller(AlloyForgeRecipe.class).fill(AlloyForgingDisplay::of);
     }
-
-//    @Override
-//    public void registerMenuInfo(MenuInfoRegistry registry) {
-//        registry.register(ID, AlloyForgeScreenHandler.class, SimpleMenuInfoProvider.of(AlloyForgeryMenuInfo::new));
-//    }
 
     @Override
     public void registerDisplaySerializer(DisplaySerializerRegistry registry) {

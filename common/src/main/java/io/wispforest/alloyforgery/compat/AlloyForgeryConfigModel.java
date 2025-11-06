@@ -7,8 +7,6 @@ import io.wispforest.alloyforgery.AlloyForgery;
 @Config(name = AlloyForgery.MOD_ID, wrapperName = "AlloyForgeryConfig")
 public class AlloyForgeryConfigModel {
 
-    public boolean strictRecipeChecks = true;
-
     @SectionHeader("blasting_adaption")
     public boolean allowHigherTierOutput = true;
     public boolean allowBlastingFurnaceAdaption = true;
@@ -19,4 +17,7 @@ public class AlloyForgeryConfigModel {
 
     @SectionHeader("screen")
     public boolean darkModeTheme = false;
+
+    @SectionHeader("debug")
+    public boolean strictRecipeChecks = true;
 }

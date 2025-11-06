@@ -25,6 +25,12 @@
     ],
     "fabric-datagen" : [
       "io.wispforest.alloyforgery.fabric.data.AlloyForgeryData"
+    ],
+    "rei_common": [
+      "io.wispforest.alloyforgery.compat.rei.AlloyForgeryCommonPlugin"
+    ],
+    "rei_client": [
+      "io.wispforest.alloyforgery.compat.rei.AlloyForgeryClientPlugin"
     ]
   },
   "mixins": [

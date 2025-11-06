@@ -6,12 +6,10 @@ import io.wispforest.alloyforgery.networking.AlloyForgeNetworking;
 import io.wispforest.alloyforgery.networking.DisableSlotToggle;
 import io.wispforest.alloyforgery.utils.ForgeInputSlot;
 import io.wispforest.owo.ui.base.BaseOwoHandledScreen;
-import io.wispforest.owo.ui.component.ButtonComponent;
 import io.wispforest.owo.ui.component.TextureComponent;
 import io.wispforest.owo.ui.container.Containers;
 import io.wispforest.owo.ui.container.FlowLayout;
 import io.wispforest.owo.ui.core.*;
-import io.wispforest.owo.ui.util.NinePatchTexture;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.client.render.RenderLayer;
@@ -23,13 +21,13 @@ import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.Util;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
 import static io.wispforest.owo.ui.container.Containers.*;
 import static io.wispforest.owo.ui.component.Components.*;
+import static io.wispforest.alloyforgery.client.ComponentUtils.*;
 
 public class AlloyForgeScreen extends BaseOwoHandledScreen<FlowLayout, AlloyForgeScreenHandler> {
 
@@ -55,42 +53,10 @@ public class AlloyForgeScreen extends BaseOwoHandledScreen<FlowLayout, AlloyForg
         this.playerInventoryTitleY = this.backgroundHeight - 93;
     }
 
-    private Identifier themedTextureID(String suffix) {
-        return AlloyForgery.id("textures/gui/theme/" + (AlloyForgery.CONFIG.darkModeTheme() ? "dark" : "light") + "/" + suffix);
-    }
-
-    private Identifier textureID(String suffix) {
-        return AlloyForgery.id("textures/gui/" + suffix);
-    }
-
     @Override
     protected @NotNull OwoUIAdapter<FlowLayout> createAdapter() {
         return OwoUIAdapter.create(this, Containers::verticalFlow);
     }
-
-    private static <T> T getThemedValue(T light, T dark) {
-        return AlloyForgery.CONFIG.darkModeTheme() ? dark : light;
-    }
-
-    private static final ButtonComponent.Renderer BUTTON_RENDERER = (context, button, delta) -> {
-        NinePatchTexture.draw(getBtnTexture(button), context, button.getX(), button.getY(), button.width(), button.height());
-    };
-
-    private static Identifier getBtnTexture(ButtonComponent btn) {
-        var btnType = (btn.visible ? (btn.isHovered() ? "hovered" : "active") : "disabled");
-        var themeType = getThemedValue("light", "dark");
-
-        return AlloyForgery.id("theme/" + themeType + "/button/" + btnType);
-    }
-
-//    @Override
-//    protected int getLayerZOffset(HandledScreenLayer layer) {
-//        return switch (layer) {
-//            case SLOT -> 400;
-//            case CURSOR_ITEM -> 500;
-//            case ITEM_TOOLTIP -> 550;
-//        };
-//    }
 
     @Override
     protected void build(FlowLayout rootComponent) {
@@ -162,45 +128,13 @@ public class AlloyForgeScreen extends BaseOwoHandledScreen<FlowLayout, AlloyForg
                         .positioning(Positioning.absolute(140, 75))
                 )
                 .child(
-                    Util.make(
-                        verticalFlow(Sizing.content(), Sizing.content()),
-                        layout -> {
-                            var inputSlots = this.getScreenHandler().getInputSlots().stream()
-                                .map(slot ->
-                                    verticalFlow(Sizing.content(), Sizing.content())
-                                        .child(slotAsComponent(slot.id))
-                                        .padding(Insets.of(1))
-                                        .surface((context, component) -> {
-                                            var slotTexture = themedTextureID("input_slot_background.png");
-
-                                            context.drawTexture(RenderLayer::getGuiTextured, slotTexture, component.x(), component.y() , this.handler.isSlotDisabled(slot) ? 18 : 0, 0,18, 18, 36, 18);
-                                        })
-                                )
-                                .toList();
-
-                            var middleIndex = (int) Math.floor(inputSlots.size() / 2f);
-
-                            boolean onlySingleRow = inputSlots.size() <= 2;
-
-                            if (onlySingleRow) middleIndex = inputSlots.size();
-
-                            var topSlots = inputSlots.subList(0, middleIndex);
-
-                            // 42, 41
-                            layout.child(horizontalFlow(Sizing.content(), Sizing.content()).children(topSlots));
-
-                            if (!onlySingleRow) {
-                                var bottomSlots = inputSlots.subList(middleIndex, inputSlots.size());
-
-                                layout.child(horizontalFlow(Sizing.content(), Sizing.content()).children(bottomSlots));
-                            }
-
-                            layout.surface(
-                                (context, component) -> context.drawRectOutline(component.x(), component.y(), component.width(), component.height(), getThemedValue(0xFF373737, 0xFF0B0B0B))
-                            );
+                    makeInputSlots(this.getScreenHandler().getInputSlots(), 1, AlloyForgery.CONFIG::darkModeTheme, slot -> new SlotComponent(slot.id){
+                        // TODO: REMOVE AS THIS IS Used to resolve clipping item text and other effects due to how rendering is more buffered and uses the wrong scissor
+                        @Override
+                        public void draw(OwoUIDrawContext context, int mouseX, int mouseY, float partialTicks, float delta) {
+                            this.didDraw = true;
                         }
-                    ).padding(Insets.of(1))
-                        //.horizontalAlignment(HorizontalAlignment.CENTER)
+                    }, this.handler::isSlotDisabled)
                         .positioning(Positioning.absolute(42, 41))
                 )
                 .surface((context, component) -> {
@@ -243,6 +177,11 @@ public class AlloyForgeScreen extends BaseOwoHandledScreen<FlowLayout, AlloyForg
                 .resetVisibleArea()
                 .tooltip(Text.translatable("tooltip.alloy_forgery.invalid_tier", requiredTier));
         }
+    }
+
+    @Override
+    protected void drawMouseoverTooltip(DrawContext context, int x, int y) {
+        super.drawMouseoverTooltip(context, x, y);
 
         if (this.allowSlotToggling
             && this.focusedSlot instanceof ForgeInputSlot
@@ -250,11 +189,15 @@ public class AlloyForgeScreen extends BaseOwoHandledScreen<FlowLayout, AlloyForg
             && !this.focusedSlot.hasStack()
             && !this.handler.player().isSpectator()) {
 
+            context.push().translate(0, 0, this.getLayerZOffset(HandledScreenLayer.ITEM_TOOLTIP));
+
             if (this.handler.isSlotDisabled(this.focusedSlot)) {
-                context.drawTooltip(this.textRenderer, DISABLED_SLOT_TEXT, mouseX, mouseY);
+                context.drawTooltip(this.textRenderer, DISABLED_SLOT_TEXT, x, y);
             } else {
-                context.drawTooltip(this.textRenderer, ENABLED_SLOT_TEXT, mouseX, mouseY);
+                context.drawTooltip(this.textRenderer, ENABLED_SLOT_TEXT, x, y);
             }
+
+            context.pop();
         }
     }
 
@@ -263,29 +206,21 @@ public class AlloyForgeScreen extends BaseOwoHandledScreen<FlowLayout, AlloyForg
         var player = this.handler.player();
 
         if (allowSlotToggling && slot instanceof ForgeInputSlot && !slot.hasStack() && !player.isSpectator()) {
-            if (actionType == SlotActionType.PICKUP) {
+            if (actionType == net.minecraft.screen.slot.SlotActionType.PICKUP) {
                 if (this.handler.isSlotDisabled(slot)) {
-                    this.enableInputSlot(slot);
+                    this.setSlotEnabled(slot, true);
                 } else /*if (this.handler.getCursorStack().isEmpty())*/ {
-                    this.disableInputSlot(slot);
+                    this.setSlotEnabled(slot, false);
                 }
             } else if(actionType == SlotActionType.SWAP) {
                 var itemStack = player.getInventory().getStack(button);
                 if (this.handler.isSlotDisabled(slot) && !itemStack.isEmpty()) {
-                    this.enableInputSlot(slot);
+                    this.setSlotEnabled(slot, true);
                 }
             }
         }
 
         super.onMouseClick(slot, slotId, button, actionType);
-    }
-
-    private void enableInputSlot(Slot slot) {
-        this.setSlotEnabled(slot, true);
-    }
-
-    private void disableInputSlot(Slot slot) {
-        this.setSlotEnabled(slot, false);
     }
 
     private void setSlotEnabled(Slot slot, boolean enabled) {

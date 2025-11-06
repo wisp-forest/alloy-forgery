@@ -94,12 +94,12 @@
 
   "container.alloy_forgery.rei.title": "Alloy Forging",
   "tooltip.alloy_forgery.recipe.min_tier": [
-    { "text": "Required Tier", "color": "white" },
+    { "text": "Tier" },
     { "text": ": ", "color": "gray" },
     { "index": 0 }
   ],
   "tooltip.alloy_forgery.recipe.fuel_per_tick": [
-    { "text": "Fuel per tick", "color": "white" },
+    { "text": "Fuel per tick" },
     { "text": ": ", "color": "gray" },
     { "index": 0 }
   ],
@@ -122,6 +122,7 @@
   "tag.item.c.raw_gold_blocks": "Raw Gold Ore Blocks",
 
   "text.config.alloy_forgery.title": "Alloy Forgery Config",
+
   "text.config.alloy_forgery.section.blasting_adaption": "Blasting Adaption",
 
   "text.config.alloy_forgery.option.allowHigherTierOutput": "Allow Higher Tier Output",
@@ -134,5 +135,15 @@
   "text.config.alloy_forgery.option.baseInputAmount.tooltip": "Adjusts the base input count for adapted recipes",
 
   "text.config.alloy_forgery.option.higherTierOutputIncrease": "Addition Tier Output Amount",
-  "text.config.alloy_forgery.option.higherTierOutputAmount.tooltip": "Adjusts the additional amount increased when reaching tier 3"
+  "text.config.alloy_forgery.option.higherTierOutputAmount.tooltip": "Adjusts the additional amount increased when reaching tier 3",
+
+  "text.config.alloy_forgery.section.screen": "Screen Settings",
+
+  "text.config.alloy_forgery.option.darkModeTheme": "Dark Mode",
+  "text.config.alloy_forgery.option.darkModeTheme.tooltip": "Changes the Alloy Screen to use the Dark mode textures",
+
+  "text.config.alloy_forgery.section.debug": "Debug Values",
+
+  "text.config.alloy_forgery.option.strictRecipeChecks": "Strict Recipe Checks",
+  "text.config.alloy_forgery.option.strictRecipeChecks.tooltip": "Used to adjust the strictness when validating recipe input values for Forge recipes"
 }

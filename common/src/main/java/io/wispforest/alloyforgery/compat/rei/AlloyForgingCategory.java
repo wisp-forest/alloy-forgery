@@ -1,36 +1,48 @@
 package io.wispforest.alloyforgery.compat.rei;
 
+import io.wispforest.alloyforgery.client.ComponentUtils;
 import io.wispforest.alloyforgery.forges.ForgeTier;
-import me.shedaniel.math.Point;
+import io.wispforest.owo.compat.rei.ReiUIAdapter;
+import io.wispforest.owo.ui.component.ButtonComponent;
+import io.wispforest.owo.ui.component.LabelComponent;
+import io.wispforest.owo.ui.container.Containers;
+import io.wispforest.owo.ui.core.*;
 import me.shedaniel.math.Rectangle;
 import me.shedaniel.rei.api.client.REIRuntime;
 import me.shedaniel.rei.api.client.gui.Renderer;
-import me.shedaniel.rei.api.client.gui.widgets.Button;
+import me.shedaniel.rei.api.client.gui.widgets.Slot;
 import me.shedaniel.rei.api.client.gui.widgets.Widget;
+import me.shedaniel.rei.api.client.gui.widgets.Widgets;
 import me.shedaniel.rei.api.client.registry.display.DisplayCategory;
 import me.shedaniel.rei.api.common.category.CategoryIdentifier;
 import me.shedaniel.rei.api.common.entry.EntryStack;
 import me.shedaniel.rei.api.common.util.EntryIngredients;
 import me.shedaniel.rei.api.common.util.EntryStacks;
+import net.minecraft.client.render.RenderLayer;
 import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
-import io.wispforest.alloyforgery.AlloyForgery;
 import io.wispforest.alloyforgery.forges.ForgeRegistry;
 import io.wispforest.alloyforgery.recipe.AlloyForgeRecipe;
+import org.apache.commons.lang3.mutable.MutableObject;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
-import static me.shedaniel.rei.api.client.gui.widgets.Widgets.*;
+import static io.wispforest.owo.ui.container.Containers.*;
+import static io.wispforest.owo.ui.component.Components.*;
+import static io.wispforest.alloyforgery.client.ComponentUtils.*;
 
 public class AlloyForgingCategory implements DisplayCategory<AlloyForgingDisplay> {
 
-    final Identifier GUI_TEXTURE = AlloyForgery.id("textures/gui/forge_controller.png");
-    final Identifier DARK_GUI_TEXTURE = AlloyForgery.id("textures/gui/forge_controller_dark.png");
-
     @Override
     public int getDisplayHeight() {
-        return 88;
+        return 84;
+    }
+
+    @Override
+    public int getDisplayWidth(AlloyForgingDisplay display) {
+        return DisplayCategory.super.getDisplayWidth(display);
     }
 
     @Override
@@ -45,54 +57,110 @@ public class AlloyForgingCategory implements DisplayCategory<AlloyForgingDisplay
 
     @Override
     public List<Widget> setupDisplay(AlloyForgingDisplay display, Rectangle bounds) {
-        final var origin = bounds.getLocation();
-        final int x = origin.x, y = origin.y;
+        final var rei = REIRuntime.getInstance();
+        final var textColor = rei.isDarkThemeEnabled() ? 0xafafaf : 0x3f3f3f;
+        final var adapter = new ReiUIAdapter<>(bounds, Containers::verticalFlow);
 
-        final var widgets = new ArrayList<Widget>();
-        final var texture = REIRuntime.getInstance().isDarkThemeEnabled() ? DARK_GUI_TEXTURE : GUI_TEXTURE;
-        final var textColor = REIRuntime.getInstance().isDarkThemeEnabled() ? 0xafafaf : 0x3f3f3f;
+        final var list = new ArrayList<Component>();
 
-        widgets.add(createRecipeBase(bounds));
+        for (int i = 0; i < 10; i++) {
+            var entry = (i < display.getInputEntries().size())
+                ? display.getInputEntries().get(i)
+                : null;
 
-        widgets.add(createTexturedWidget(texture, x + 10, y + 18, 42, 21, 124, 58));
-        widgets.add(createTexturedWidget(texture, x + 115, y + 21, 176, 0, 15, 19));
+            var component = adapter.wrap(Widgets::createSlot, slot -> {
+                slot.disableBackground();
 
-        for (int i = 0; i < display.getInputEntries().size(); i++) {
-            final var slotLocation = new Point(x + 12 + i % 5 * 18, y + 40 + (i > 4 ? 1 : 0) * 18);
-            widgets.add(createSlot(slotLocation).entries(display.getInputEntries().get(i)).markInput().disableBackground());
-            widgets.add(createTexturedWidget(texture, slotLocation.x - 1, slotLocation.y - 1, 208, 0, 18, 18));
+                if (entry != null) slot.entries(entry).markInput();
+            });
+
+            list.add(component);
         }
 
-        final var resultSlot = createSlot(new Point(x + 113, y + 47));
-        widgets.add(resultSlot.entries(display.getOutputEntries().get(0)).disableBackground().markOutput());
-
         final var minForgeTierName = ForgeTier.toName(true, display.minForgeTier());
+        final var slotEntries = new MutableObject<Slot>(null);
 
-        final var tierLabel = createLabel(new Point(x + 12, y + 11), Text.translatable("tooltip.alloy_forgery.recipe.min_tier", minForgeTierName));
+        adapter.rootComponent()
+            .child(
+                verticalFlow(Sizing.fill(100), Sizing.fill(100))
+                    .child(
+                        verticalFlow(Sizing.content(), Sizing.content())
+                            .child(
+                                label(Text.translatable("tooltip.alloy_forgery.recipe.min_tier", minForgeTierName))
+                                    .color(Color.ofRgb(textColor))
+                                    .shadow(false)
+                                    .margins(Insets.top(3))
+                                    .id("tier-label")
+                            )
+                            .child(
+                                label(Text.translatable("tooltip.alloy_forgery.recipe.fuel_per_tick", display.fuelPerTick()))
+                                    .color(Color.ofRgb(textColor))
+                                    .shadow(false)
+                                    .margins(Insets.top(3))
+                            )
+                            .child(
+                                horizontalFlow(Sizing.fixed(124), Sizing.fixed(38))
+                                    .child(
+                                        makeInputSlots(list, 0, rei::isDarkThemeEnabled, Function.identity(), component -> false)
+                                    )
+                                    .child(
+                                        verticalFlow(Sizing.content(), Sizing.content())
+                                            .child(adapter.wrap(
+                                                Widgets::createSlot,
+                                                slot -> {
+                                                    slotEntries.setValue(slot.entries(display.getOutputEntries().getFirst()).disableBackground().markOutput());
+                                                }
+                                            ))
+                                            .padding(Insets.of(4))
+                                            .surface((context, component) -> {
+                                                var backgroundTexture = ComponentUtils.themedTextureID("forge_controller_base.png", rei::isDarkThemeEnabled);
 
-        widgets.add(tierLabel.leftAligned().color(textColor).noShadow());
-        widgets.add(createLabel(new Point(x + 12, y + 24), Text.translatable("tooltip.alloy_forgery.recipe.fuel_per_tick", display.fuelPerTick())).leftAligned().color(textColor).noShadow());
+                                                context.drawTexture(RenderLayer::getGuiTextured, backgroundTexture, component.x(), component.y(), 140, 45, 26, 26, 176, 189);
+                                            })
+                                            .margins(Insets.left(6))
+                                    )
+                                    .verticalAlignment(VerticalAlignment.CENTER)
+                                    .margins(Insets.top(6))
+                            ).margins(Insets.left(4))
+                    )
+                    .child(
+                        button(Text.of("..."), buttonComponent -> {})
+                            .<ButtonComponent>configure(btn -> {
+                                final List<AlloyForgeRecipe.OverrideRange> overrides = new ArrayList<>(display.overrides().keySet());
 
-        final List<AlloyForgeRecipe.OverrideRange> overrides = new ArrayList<>(display.overrides().keySet());
+                                btn.onPress(new Consumer<>() {
+                                    private int overrideIndex = 1;
 
-        widgets.add(createButton(new Rectangle(x + 131, y + 6, 12, 12), Text.of("...")).onClick(new Consumer<>() {
-            private int overrideIndex = 1;
+                                    @Override
+                                    public void accept(ButtonComponent buttonComponent) {
+                                        var overrideTierName = overrideIndex == 0 ? minForgeTierName : overrides.get(overrideIndex - 1).toText(true);
 
-            @Override
-            public void accept(Button button) {
-                var overrideTierName = overrideIndex == 0 ? minForgeTierName : overrides.get(overrideIndex - 1).toText(true);
+                                        adapter.rootComponent().childById(LabelComponent.class, "tier-label")
+                                            .text(Text.translatable("tooltip.alloy_forgery.recipe.min_tier", overrideTierName));
 
-                tierLabel.setMessage(Text.translatable("tooltip.alloy_forgery.recipe.min_tier", overrideTierName));
+                                        slotEntries.getValue()
+                                            .clearEntries()
+                                            .entries(overrideIndex == 0 ? display.getOutputEntries().get(0) : EntryIngredients.of(display.overrides().get(overrides.get(overrideIndex - 1))));
 
-                resultSlot.clearEntries()
-                    .entries(overrideIndex == 0 ? display.getOutputEntries().get(0) : EntryIngredients.of(display.overrides().get(overrides.get(overrideIndex - 1))));
+                                        overrideIndex++;
+                                        if (overrideIndex - 1 > overrides.size() - 1) overrideIndex = 0;
+                                    }
+                                }).active(!overrides.isEmpty())
+                                    .renderer(createThemedButtonRenderer(rei::isDarkThemeEnabled))
+                                    .tooltip(Text.translatable("tooltip.alloy_forgery.recipe.button"));
+                            })
+                            .sizing(Sizing.fixed(14))
+                            .margins(Insets.of(0, 0, 0, 0))
+                            .positioning(Positioning.relative(100, 0))
+                    ).surface((context, component) -> {
+                        (REIRuntime.getInstance().isDarkThemeEnabled() ? Surface.DARK_PANEL : Surface.PANEL)
+                            .draw(context, component);
+                    }).padding(Insets.of(6))
+            );
 
-                overrideIndex++;
-                if (overrideIndex - 1 > overrides.size() - 1) overrideIndex = 0;
-            }
-        }).tooltipLine(Text.translatable("tooltip.alloy_forgery.recipe.button")).enabled(!overrides.isEmpty()));
+        adapter.prepare();
 
-        return widgets;
+        return List.of(adapter);
     }
 
     @Override
