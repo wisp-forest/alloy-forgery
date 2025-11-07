@@ -128,7 +128,7 @@ public record ForgeDefinition(Block material, ImmutableList<Block> additionalMat
 
         EndecableModDataLoader.of(
             AlloyForgery.id("forge_definition_loader"),
-            "alloy_forge/forge",
+            "alloy_forge/controller",
             RawForgeDefinition.ENDEC,
             ForgeDefinition::loadAndEnqueue
         ).load();
