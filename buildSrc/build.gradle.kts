@@ -18,5 +18,7 @@ dependencies {
 
     // Required to get Version Catalogs to show in buildSrc
     implementation(files(libs.javaClass.superclass.protectionDomain.codeSource.location))
+
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json-jvm:1.6.2")
 }
 

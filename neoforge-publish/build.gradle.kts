@@ -1,3 +1,4 @@
+import io.wispforest.helpers.Utils
 import org.gradle.jvm.tasks.Jar;
 import org.gradle.accessors.dm.LibrariesForLibs
 
@@ -50,11 +51,10 @@ neoForge {
 
     validateAccessTransformers = true
 
-    // TODO: UNKNOWN TO HOW BEST TO HANDLE THIS IF WE ARE JUST CONVERTING AW FROM COMMON
-//    accessTransformers {
-//        from(targetProject.file("src/main/resources/META-INF/accesstransformer.cfg"))
-//        publish(targetProject.file("src/main/resources/META-INF/accesstransformer.cfg"))
-//    }
+    accessTransformers {
+        from(targetProject.file("src/main/resources/META-INF/accesstransformer.cfg"))
+        publish(targetProject.file("src/main/resources/META-INF/accesstransformer.cfg"))
+    }
 
     interfaceInjectionData {
         from(targetProject.file("src/main/resources/interfaces.json"))
@@ -121,16 +121,6 @@ publishing {
             artifactId = "${rootProject.property("mod_id")}${(if (name.isEmpty()) "" else "-${name.replace("-mojmap", "")}")}"
         }
     }
-    repositories {
-        maven {
-            var mavenUrl = ENV["MAVEN_URL"]
-            if (mavenUrl != null) {
-                url = uri(mavenUrl)
-                credentials {
-                    username = ENV["MAVEN_USER"]
-                    password = ENV["MAVEN_PASSWORD"]
-                }
-            }
-        }
-    }
+
+    Utils.setupMavenRepo(targetProject, repositories)
 }

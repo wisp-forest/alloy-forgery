@@ -15,6 +15,9 @@ ${mod_description}
 logoFile = "assets/${mod_id}/icon.png"
 displayURL = "${mod_sourcepage}"
 
+[[accessTransformers]]
+file="META-INF/accesstransformer.cfg"
+
 [[mixins]]
 config = '${mod_id}-common.mixins.json'
 [[mixins]]

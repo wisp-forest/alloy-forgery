@@ -1,17 +1,18 @@
 import io.wispforest.helpers.Extensions.libs
+import io.wispforest.helpers.Utils
 
 plugins {
     id("java-library")
     id("maven-publish")
 }
 
-val ENV = System.getenv()
-
 publishing {
+    var modid = Utils.modId(rootProject)
+
     publications {
         create<MavenPublication>("mavenCommon") {
             val name = project.name
-            artifactId = "${rootProject.property("mod_id")}${(if(name.isEmpty()) "" else "-${name.replace("-mojmap", "")}")}"
+            artifactId = "${modid}${(if(name.isEmpty()) "" else "-${name.replace("-mojmap", "")}")}"
             afterEvaluate {
                 this@create.from(components["java"])
             }
@@ -22,7 +23,7 @@ publishing {
                 val name = project.name
 
                 version = "${rootProject.property("mod_version")}+${libs.versions.minecraft.asProvider().get()}-mojmap"
-                artifactId = "${rootProject.property("mod_id")}-${name}"
+                artifactId = "${modid}-${name}"
 
                 afterEvaluate {
                     this@create.from(components["java"])
@@ -44,17 +45,5 @@ publishing {
         }
     }
 
-    repositories {
-        maven {
-            var mavenUrl = ENV["MAVEN_URL"];
-
-            if (mavenUrl != null) {
-                url = uri(mavenUrl)
-                credentials {
-                    username = ENV["MAVEN_USER"]
-                    password = ENV["MAVEN_PASSWORD"]
-                }
-            }
-        }
-    }
+    Utils.setupMavenRepo(rootProject, repositories)
 }

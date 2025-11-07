@@ -1,5 +1,6 @@
 import io.wispforest.helpers.Extensions.currentPlatform
 import io.wispforest.helpers.Extensions.currentPlatformDisplayName
+import io.wispforest.helpers.Utils
 import org.gradle.kotlin.dsl.get
 
 plugins {
@@ -34,10 +35,12 @@ sourceSets {
     }
 }
 
+val modid = Utils.modId(rootProject)
+
 if (currentPlatform == "fabric") {
     fabricApi {
         configureDataGeneration {
-            modId.set(rootProject.property("mod_id") as String)
+            modId.set(modid)
             outputDirectory = generatedResources
             client = true
         }
@@ -52,7 +55,7 @@ if (currentPlatform == "fabric") {
 
                 programArgs.addAll(
                     mutableListOf(
-                        "--all", "--mod", rootProject.property("mod_id") as String, "--output", generatedResources.absolutePath
+                        "--all", "--mod", modid, "--output", generatedResources.absolutePath
                     )
                 )
             }
@@ -79,9 +82,9 @@ tasks.remapJar {
     archiveClassifier.set("")
 
     if (currentPlatform == "fabric") {
-        injectAccessWidener = true
+        //injectAccessWidener = true
     } else {
-        atAccessWideners.add("${rootProject.property("mod_id")}.accesswidener")
+        atAccessWideners.add("${modid}.accesswidener")
     }
 }
 

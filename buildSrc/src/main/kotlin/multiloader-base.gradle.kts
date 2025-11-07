@@ -11,8 +11,10 @@ plugins {
     id("java-library")
 }
 
+val modid = Utils.modId(rootProject)
+
 base {
-    archivesName = "${rootProject.property("mod_id")}${(if(project.name.isEmpty()) "" else "-${project.name.replace("-mojmap", "")}")}"
+    archivesName = "${modid}${(if(project.name.isEmpty()) "" else "-${project.name.replace("-mojmap", "")}")}"
 }
 
 version = "${project.property("mod_version")}+${libs.versions.minecraft.base.get()}${(if(project.name.contains("mojmap")) "-mojmap" else "")}"
@@ -60,7 +62,7 @@ loom {
             forge {}
         }
     } else {
-        val awPath = "src/main/resources/${rootProject.property("mod_id")}.accesswidener"
+        val awPath = "src/main/resources/${modid}.accesswidener"
         val awFile = file(awPath);
 
         if (!awFile.exists()) {
@@ -159,7 +161,7 @@ dependencies {
 
 tasks.processResources {
     val expandProps = mutableMapOf(
-        "mod_id"                             to rootProject.property("mod_id"),
+        "mod_id"                             to modid,
         "mod_name"                           to rootProject.property("mod_name"),
         "mod_version"                        to rootProject.property("mod_version"),
         "mod_license"                        to rootProject.property("mod_license"),
