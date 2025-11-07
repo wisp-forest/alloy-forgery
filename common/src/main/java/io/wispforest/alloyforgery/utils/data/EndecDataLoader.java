@@ -145,7 +145,7 @@ public abstract class EndecDataLoader<T> extends JsonDataLoader<T> {
         if (requiresRegistries) {
             Objects.requireNonNull(registries, "Can not build the needed context for the ManagedEndecDataLoader: " + this.getLoaderId());
 
-            return this.context.withAttributes(RegistriesAttribute.fromInfoGetter(new RegistryOps.CachedRegistryInfoGetter(registries)));
+            return this.context.withAttributes(RegistriesAttribute.fromCachedInfoGetter(new RegistryOps.CachedRegistryInfoGetter(registries)));
         }
 
         return this.context;
