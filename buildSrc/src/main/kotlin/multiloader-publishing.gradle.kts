@@ -6,6 +6,10 @@ plugins {
     id("maven-publish")
 }
 
+/**
+ * Handles the ability to publish either the common, neoforge, or fabric module. Common also publishes one in Mojang Mappings
+ * and sets up the maven credentials within [Utils.setupMavenRepo]
+ */
 publishing {
     var modid = Utils.modId(rootProject)
 

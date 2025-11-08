@@ -1,6 +1,7 @@
 package io.wispforest.helpers
 
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import net.fabricmc.loom.configuration.ide.RunConfigSettings
 import org.gradle.api.Action
@@ -11,7 +12,6 @@ import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.component.ModuleComponentIdentifier
 import org.gradle.api.artifacts.dsl.RepositoryHandler
 import org.gradle.api.tasks.SourceSetContainer
-import org.gradle.internal.impldep.kotlinx.serialization.json.JsonObject
 import org.gradle.kotlin.dsl.get
 import org.gradle.kotlin.dsl.named
 import java.net.URI
@@ -167,14 +167,14 @@ object Utils {
     }
 
     //-- Fabric FMJ Entry Utils
-    val removeLineTarget = "#REMOVE_LINE#"
-    val baseIndentation = "  "
+    const val removeLineTarget = "#REMOVE_LINE#"
+    const val baseIndentation = "  "
 
     fun indentation (level: Int): String {
         return baseIndentation.repeat(level);
     }
 
-    val separator = ",\n"
+    const val separator = ",\n"
 
     fun buildListEntry (project: Project, keys: List<String>): String {
         val rootProject = project.rootProject;
@@ -212,23 +212,16 @@ object Utils {
         var fullEntry = "$removeLineTarget\": \"\"$separator";
 
         keys.forEachIndexed { i, key ->
-            fullEntry += "${indentation(2)}${createMapEntry(rootProject, key)}"
+            fullEntry += run {
+                val propertyValue = rootProject.property("mod_$key") as String
+                "${indentation(2)}${(if (propertyValue.isNotBlank()) "\"$key\": \"$propertyValue\"" else "")}"
+            }
             fullEntry += if (i < keys.size - 1) separator else "\n";
         }
 
         fullEntry += "${indentation(2)}\"$removeLineTarget"
 
         return fullEntry;
-    }
-
-    fun createMapEntry(rootProject: Project, key: String): String {
-        return createMapEntry(rootProject, "mod_$key", key)
-    }
-
-    fun createMapEntry(rootProject: Project, propKey: String, entryKey: String): String {
-        val propertyValue = rootProject.property(propKey) as String;
-
-        return (if (propertyValue.isNotBlank()) "\"$entryKey\": \"$propertyValue\"" else "");
     }
 
     fun currentPlatform(project: Project): String {
@@ -239,7 +232,7 @@ object Utils {
         return project.property("mod_id") as String
     }
 
-    /*
+    /**
      * The given function is designed to pull maven credentials from environment variables with the
      * given key pattern of `${id}_maven_credentials` and accepting two types of JSON data format:
      *
@@ -247,7 +240,6 @@ object Utils {
      * - Base: Declaring the `url`, `user`, and `password` in standard JSON format allows for individual projects
      *   to declare credentials. Code: `"url":"","user":"","password":""`
      */
-
     fun setupMavenRepo(project: Project, repoHandler: RepositoryHandler) {
         setupMavenRepo(modId(project), repoHandler)
     }

@@ -1,9 +1,8 @@
-import io.wispforest.helpers.Utils
-import io.wispforest.helpers.Extensions.modrinth
-import io.wispforest.helpers.Extensions.modrinthImplementation
+import io.wispforest.helpers.neoForgeDataFile
 
 plugins {
     id("multiloader-platform")
+    id("multiloader-publishing")
     id("com.github.johnrengelman.shadow")
 }
 
@@ -19,6 +18,11 @@ dependencies {
     forgeRuntimeLibrary(libs.endec.jankson)
     forgeRuntimeLibrary(libs.jankson)
     // --
+}
+
+neoForgeDataFile {
+    publishAccessTransformersFile("src/main/resources/META-INF/accesstransformer.cfg")
+    publishInterfaceInjectionsFile("src/main/resources/interfaces.json")
 }
 
 repositories {}

@@ -18,11 +18,13 @@ configurations {
     "runtimeClasspath" { extendsFrom(common) }
 }
 
+// Setup platforms Shadow Configs
 dependencies {
-    "common"(project(":common", "namedElements")) { this.setTransitive(false) }
+    "common"(project(":common", "namedElements")) { this.isTransitive = false }
+    "shadowCommon"(project(":common", "namedElements")) { this.isTransitive = false }
 }
 
-//--
+//-- Data Generation Setup Section
 
 var generatedResources = file("src/generated/resources")
 
@@ -38,6 +40,7 @@ sourceSets {
 val modid = Utils.modId(rootProject)
 
 if (currentPlatform == "fabric") {
+    // Use Fabric API to setup data generation
     fabricApi {
         configureDataGeneration {
             modId.set(modid)
@@ -46,6 +49,7 @@ if (currentPlatform == "fabric") {
         }
     }
 } else {
+    // Create custom run that allows for Data Generation to work for Neoforge
     loom {
         runs {
             create("data-generation"){
@@ -63,8 +67,9 @@ if (currentPlatform == "fabric") {
     }
 }
 
-//--
+//-- Jar Handling Section
 
+// Setup shadow to take files from common module
 tasks.shadowJar {
     if (currentPlatform != "fabric") {
         exclude("fabric.mod.json")
@@ -76,18 +81,20 @@ tasks.shadowJar {
     destinationDirectory.set(destinationDirectory.get().dir("shadow"))
 }
 
+// Remap the shadow jar to the proper platform mapping
 tasks.remapJar {
     inputFile.set(tasks.shadowJar.get().archiveFile)
     dependsOn(tasks.shadowJar)
     archiveClassifier.set("")
 
     if (currentPlatform == "fabric") {
-        //injectAccessWidener = true
+        injectAccessWidener = true
     } else {
-        atAccessWideners.add("${modid}.accesswidener")
+        //atAccessWideners.add("${modid}.accesswidener")
     }
 }
 
+// Add Common files to Source
 tasks.getByName("sourcesJar", AbstractArchiveTask::class) {
     val commonSources = project(":common").tasks.getByName("sourcesJar", AbstractArchiveTask::class)
     dependsOn(commonSources)
