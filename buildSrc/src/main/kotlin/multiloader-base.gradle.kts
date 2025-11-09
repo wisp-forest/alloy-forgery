@@ -107,12 +107,12 @@ dependencies {
     if (projectPlatform == "neoforge") {
         mappings (
             loom.layered {
-                this.mappings("net.fabricmc:yarn:${project.property("yarn_mappings")}:v2")
-                this.mappings("dev.architectury:yarn-mappings-patch-neoforge:${rootProject.property("yarn_mappings_patch_neoforge_version")}")
+                this.mappings("net.fabricmc:yarn:${libs.versions.yarn.asProvider().get()}:v2")
+                this.mappings("dev.architectury:yarn-mappings-patch-neoforge:${libs.versions.yarn.patch.neoforge.get()}")
             }
         )
     } else {
-        mappings ("net.fabricmc:yarn:${project.property("yarn_mappings")}:v2")
+        mappings ("net.fabricmc:yarn:${libs.versions.yarn.asProvider().get()}:v2")
     }
 
     if (projectPlatform != "common" && enabledTestmodPlatforms.contains(projectPlatform)) {

@@ -15,7 +15,6 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 public class EndecUtils {
-    public static StructEndec<Ingredient> STRUCT_INGREDIENT = new MapCodecStructEndec<>(MapCodec.assumeMapUnsafe(Ingredient.CODEC));
     public static Endec<Ingredient> INGREDIENT = CodecUtils.toEndec(Ingredient.CODEC);
 
     public static <S, T> StructField<S, T> optionalFieldOf(String name, Endec<T> endec, Function<S, T> getter, Supplier<@Nullable T> defaultValue) {

@@ -37,7 +37,7 @@ public final class RecipeInjector {
     private static final Logger LOGGER = LogUtils.getLogger();
 
     /**
-     * Event called on {@link ServerLifecycleEvents#SERVER_STARTED} or {@link DataPackEvents#BEFORE_SYNC} which adds
+     * Event called on `ServerLifecycleEvents#SERVER_STARTED` or {@link DataPackEvents#BEFORE_SYNC} which adds
      * new recipes to the RecipeManager before sync to Players
      */
     public static final Event<AddRecipes> ADD_RECIPES = EventFactory.createArrayBacked(AddRecipes.class, addRecipes -> (instance) -> {

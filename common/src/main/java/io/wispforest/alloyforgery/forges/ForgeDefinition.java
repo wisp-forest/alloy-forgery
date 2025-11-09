@@ -32,7 +32,7 @@ public record ForgeDefinition(Block material, ImmutableList<Block> additionalMat
         this(material, additionalMaterials, false);
     }
 
-    public static Endec<ForgeDefinition> FORGE_DEFINITION = MinecraftEndecs.IDENTIFIER.xmap(
+    public static final Endec<ForgeDefinition> FORGE_DEFINITION = MinecraftEndecs.IDENTIFIER.xmap(
         identifier -> {
             return ForgeRegistry.getForgeDefinition(identifier)
                 .orElseThrow(() -> new IllegalStateException("Unable to locate ForgerDefinition with Identifier: [ID: " + identifier + "]"));

@@ -9,7 +9,7 @@ public class DataPackEvents {
 
     /**
      * Called before the Minecraft Server is about to sync tags and recipes to players. Similar to
-     * {@link ServerLifecycleEvents#SYNC_DATA_PACK_CONTENTS} as such is but only once at the head
+     * `ServerLifecycleEvents#SYNC_DATA_PACK_CONTENTS` as such is but only once at the head
      * of {@link PlayerManager#onDataPacksReloaded()}
      */
     public static final Event<BeforeSync> BEFORE_SYNC = EventFactory.createArrayBacked(BeforeSync.class, callbacks -> (server) -> {
