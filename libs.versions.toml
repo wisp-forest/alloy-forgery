@@ -10,7 +10,7 @@ neoforge_minecraft_range = "[1.21.4,1.21.5)"
 fabric_minecraft_range = "~1.21.4"
 
 yarn="1.21.4+build.8"
-yarn_patch_neoforge="1.21+build.4"
+yarn_patch_neoforge="1.21+build.6"
 
 # https://parchmentmc.org/docs/getting-started
 parchment = "2025.02.16"

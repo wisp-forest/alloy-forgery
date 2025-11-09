@@ -27,47 +27,6 @@ public record RawAlloyForgeRecipe(Map<Ingredient, Integer> inputs, OutputData ou
                                   int minForgeTier, int requiredFuel,
                                   Map<AlloyForgeRecipe.OverrideRange, AlloyForgeRecipe.PendingOverride> overrideData) {
 
-    private static final List<AlloyForgeRecipe> ingredientInputFormatIssues = new ArrayList<>();
-
-//    private static final Hash.Strategy<Ingredient> INGREDIENT_STRATEGY = new Hash.Strategy<>() {
-//        @Override
-//        public int hashCode(Ingredient o) {
-//            String stringData;
-//
-//            if (o == null) return 0;
-//
-//            try {
-//                stringData = Ingredient.CODEC.encodeStart(JsonOps.INSTANCE, o).getOrThrow(IllegalStateException::new).toString();
-//            } catch (Exception e) {
-//                throw new RuntimeException(e);
-//            }
-//
-//            return stringData.hashCode();
-//        }
-//
-//        @Override
-//        public boolean equals(Ingredient a, Ingredient b) {
-//            if (a == null || b == null) return false;
-//
-//            String stringDataA;
-//            String stringDataB;
-//
-//            try {
-//                stringDataA = Ingredient.CODEC.encodeStart(JsonOps.INSTANCE, a).getOrThrow(IllegalStateException::new).toString();
-//            } catch (Exception e) {
-//                throw new RuntimeException(e);
-//            }
-//
-//            try {
-//                stringDataB = Ingredient.CODEC.encodeStart(JsonOps.INSTANCE, b).getOrThrow(IllegalStateException::new).toString();
-//            } catch (Exception e) {
-//                throw new RuntimeException(e);
-//            }
-//
-//            return stringDataA.equals(stringDataB);
-//        }
-//    };
-
     public static Endec<Map<Ingredient, Integer>> INPUTS = CountedIngredient.ENDEC.listOf().xmap(list -> {
         var unprocessedData = new Object2ObjectLinkedOpenHashMap<Ingredient, MutableInt>();
 
