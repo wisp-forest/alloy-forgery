@@ -44,7 +44,7 @@ owo_fabric   = "0.12.20+1.21.4"
 owo_neoforge = "0.12.19-beta.2+1.21.4"
 
 owo_fabric_range   = ">=0.12.19+1.21.4"
-owo_neoforge_range = ">=0.12.19-beta.2+1.21.4"
+owo_neoforge_range = "[0.12.19-beta.2+1.21.4,)"
 
 jankson = "1.2.2"
 
