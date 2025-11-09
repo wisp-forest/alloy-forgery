@@ -3,6 +3,7 @@ package io.wispforest.alloyforgery.neoforge.utils;
 import io.wispforest.alloyforgery.block.ForgeControllerBlockEntity;
 import io.wispforest.alloyforgery.client.BlockEntityLocation;
 import io.wispforest.alloyforgery.data.providers.ResourceConditionHolder;
+import io.wispforest.alloyforgery.forges.ForgeRegistry;
 import io.wispforest.alloyforgery.neoforge.FluidHolderImpl;
 import io.wispforest.alloyforgery.neoforge.data.NeoforgeResourceConditionHolder;
 import io.wispforest.alloyforgery.utils.FluidStorage;
@@ -158,9 +159,39 @@ public class NeoforgeGeneralPlatformUtils implements GeneralPlatformUtils {
 
     //--
 
-
     @Override
     public ResourceConditionHolder createConditionsHolder() {
         return new NeoforgeResourceConditionHolder(new ArrayList<>());
     }
+
+    //--
+
+    @Override
+    public void handleDefinitionEntry(ForgeRegistry.EntryHolder holder) {
+        if (isFrozen) {
+            REGISTERED_ENTRIES.put(holder.controllerId, holder);
+        } else {
+            holder.registerBlock();
+            holder.registerItem();
+        }
+    }
+
+
+    private static boolean isFrozen = true;
+    private static final Map<Identifier, ForgeRegistry.EntryHolder> REGISTERED_ENTRIES = new LinkedHashMap<>();
+
+    public static void handleLoadedEntries() {
+        if (!REGISTERED_ENTRIES.isEmpty()) {
+            for (var value : REGISTERED_ENTRIES.values()) {
+                value.registerBlock();
+                value.registerItem();
+            }
+
+            REGISTERED_ENTRIES.clear();
+        }
+
+        isFrozen = false;
+    }
+
+    //--
 }
