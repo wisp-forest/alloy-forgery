@@ -45,11 +45,9 @@ public class ForgeRegistry {
 
     private static final Map<Identifier, Block> CONTROLLER_BLOCK_REGISTRY = new LinkedHashMap<>();
 
-    private static final Map<Identifier, EntryHolder> REGISTERED_ENTRIES = new LinkedHashMap<>();
-
-    private static final class EntryHolder {
-        private final Identifier controllerId;
-        private final Identifier forgeDefinitionId;
+    public static final class EntryHolder {
+        public final Identifier controllerId;
+        public final Identifier forgeDefinitionId;
         private final Supplier<ForgeControllerBlock> controllerBlock;
 
         private EntryHolder(Identifier forgeDefinitionId, Identifier controllerId, BiFunction<Identifier, Identifier, ForgeControllerBlock> controllerBlock) {
@@ -87,20 +85,10 @@ public class ForgeRegistry {
         }
     }
 
-    public static void handleLoadedEntries(boolean blockRegistry) {
-        for (var value : REGISTERED_ENTRIES.values()) {
-            if(blockRegistry) {
-                value.registerBlock();
-            } else {
-                value.registerItem();
-            }
-        }
-    }
-
     static void registerDefinition(Identifier forgeDefinitionId, ForgeDefinition definition) {
         final var controllerId = AlloyForgery.id(Registries.BLOCK.getId(definition.material()).getPath() + "_forge_controller");
 
-        REGISTERED_ENTRIES.put(controllerId, new EntryHolder(forgeDefinitionId, controllerId, ForgeControllerBlock::of));
+        GeneralPlatformUtils.INSTANCE.handleDefinitionEntry(new EntryHolder(forgeDefinitionId, controllerId, ForgeControllerBlock::of));
 
         store(forgeDefinitionId, definition);
     }
@@ -132,6 +120,5 @@ public class ForgeRegistry {
     private static void store(Identifier id, ForgeDefinition definition) {
         FORGE_DEFINITION_TO_ID.put(definition, id);
         ID_TO_FORGE_DEFINITION.put(id, definition);
-
     }
 }

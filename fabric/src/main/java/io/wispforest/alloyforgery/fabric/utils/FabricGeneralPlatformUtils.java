@@ -5,6 +5,7 @@ import io.wispforest.alloyforgery.data.providers.ResourceConditionHolder;
 import io.wispforest.alloyforgery.fabric.FluidHolderImpl;
 import io.wispforest.alloyforgery.fabric.data.FabricResourceConditionHolder;
 import io.wispforest.alloyforgery.fabric.data.IdentifiableResourceReloadListenerImpl;
+import io.wispforest.alloyforgery.forges.ForgeRegistry;
 import io.wispforest.alloyforgery.utils.FluidStorage;
 import io.wispforest.alloyforgery.utils.GeneralPlatformUtils;
 import io.wispforest.alloyforgery.utils.data.EndecDataLoader;
@@ -100,9 +101,16 @@ public final class FabricGeneralPlatformUtils implements GeneralPlatformUtils {
 
     //--
 
-
     @Override
     public ResourceConditionHolder createConditionsHolder() {
         return new FabricResourceConditionHolder(new ArrayList<>());
+    }
+
+    //--
+
+    @Override
+    public void handleDefinitionEntry(ForgeRegistry.EntryHolder holder) {
+        holder.registerBlock();
+        holder.registerItem();
     }
 }

@@ -4,7 +4,6 @@ import io.wispforest.alloyforgery.AlloyForgery;
 import io.wispforest.alloyforgery.block.ForgeControllerBlockEntity;
 import io.wispforest.alloyforgery.data.RecipeTagLoader;
 import io.wispforest.alloyforgery.forges.ForgeDefinition;
-import io.wispforest.alloyforgery.forges.ForgeRegistry;
 import io.wispforest.alloyforgery.forges.ForgeTierDataLoader;
 import io.wispforest.alloyforgery.neoforge.data.AlloyForgeryData;
 import io.wispforest.alloyforgery.neoforge.utils.NeoforgeGeneralPlatformUtils;
@@ -108,8 +107,8 @@ public class AlloyForgeryNeoforge {
             event.register(RegistryKeys.SCREEN_HANDLER, helper -> AlloyForgery.registerScreenHandlerType());
             event.register(RegistryKeys.SLOT_DISPLAY, helper -> AlloyForgery.registerSlotDisplays());
             event.register(RegistryKeys.ITEM_GROUP, helper -> AlloyForgery.registerItemGroup());
-            event.register(RegistryKeys.BLOCK, helper -> ForgeRegistry.handleLoadedEntries(true));
-            event.register(RegistryKeys.ITEM, helper -> ForgeRegistry.handleLoadedEntries(false));
+            event.register(RegistryKeys.BLOCK, helper -> NeoforgeGeneralPlatformUtils.handleLoadedEntries());
+            event.register(RegistryKeys.ITEM, helper -> NeoforgeGeneralPlatformUtils.handleLoadedEntries());
         });
 
         NeoForge.EVENT_BUS.<OnDatapackSyncEvent>addListener(event -> {

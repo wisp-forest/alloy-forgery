@@ -27,11 +27,6 @@ public class AlloyForgeryFabric implements ModInitializer {
 
     @Override
     public void onInitialize() {
-
-        ForgeDefinition.runDataLoaders();
-
-        AlloyForgery.init();
-
         AlloyForgery.registerBlockEntities();
         AlloyForgery.registerRecipeTypes();
         AlloyForgery.registerRecipeSerializers();
@@ -39,8 +34,9 @@ public class AlloyForgeryFabric implements ModInitializer {
         AlloyForgery.registerSlotDisplays();
         AlloyForgery.registerItemGroup();
 
-        ForgeRegistry.handleLoadedEntries(true);
-        ForgeRegistry.handleLoadedEntries(false);
+        ForgeDefinition.runDataLoaders();
+
+        AlloyForgery.init();
 
         ServerLifecycleEvents.SERVER_STARTED.register(RecipeInjector::injectRecipes);
 

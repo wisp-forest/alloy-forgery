@@ -3,6 +3,8 @@ package io.wispforest.alloyforgery.utils;
 import io.wispforest.alloyforgery.AlloyForgery;
 import io.wispforest.alloyforgery.block.ForgeControllerBlockEntity;
 import io.wispforest.alloyforgery.data.providers.ResourceConditionHolder;
+import io.wispforest.alloyforgery.forges.ForgeDefinition;
+import io.wispforest.alloyforgery.forges.ForgeRegistry;
 import io.wispforest.alloyforgery.utils.data.EndecDataLoader;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -94,5 +96,5 @@ public interface GeneralPlatformUtils {
 
     //--
 
-
+    void handleDefinitionEntry(ForgeRegistry.EntryHolder holder);
 }
