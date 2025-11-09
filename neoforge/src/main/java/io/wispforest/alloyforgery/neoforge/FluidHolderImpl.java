@@ -55,13 +55,13 @@ public final class FluidHolderImpl extends SingleVariantDropletStorage<FluidReso
     @Override
     public void readData(ReadView data) {
         this.amount = data.getLong("Amount", 0);
-        this.variant = data.read("Variant", FluidResource.CODEC).orElse(FluidResource.EMPTY);
+        this.variant = data.read("Variant", FluidResource.OPTIONAL_CODEC).orElse(FluidResource.EMPTY);
     }
 
     @Override
     public void writeData(WriteView data) {
         data.putLong("Amount", this.amount);
-        data.put("Variant", FluidResource.CODEC, this.variant);
+        data.put("Variant", FluidResource.OPTIONAL_CODEC, this.variant);
     }
 
     @Override

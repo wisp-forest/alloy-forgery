@@ -81,9 +81,13 @@ public abstract class SingleVariantDropletStorage<T extends Resource> extends Sn
             long insertedAmount = Math.min(maxAmount, getCapacity(insertedVariant) - amount);
 
             if (insertedAmount > 0) {
-                long overflowAmount = 81 - (insertedAmount % 81);
+                long remainder = insertedAmount % 81;
 
-                insertedAmount += overflowAmount;
+                if (remainder > 0) {
+                    long overflowAmount = 81 - remainder;
+
+                    insertedAmount += overflowAmount;
+                }
 
                 updateSnapshots(transaction);
 
