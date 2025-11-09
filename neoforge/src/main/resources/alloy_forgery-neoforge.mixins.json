@@ -5,8 +5,6 @@
   "minVersion": "0.8",
   "mixins": [
     "neoforge.BlockCapabilityMixin",
-    "owo.ModDataLoaderMixin",
-    "owo.OwoItemGroupMixin",
     "ItemGroupAccessor"
   ],
   "client": [],

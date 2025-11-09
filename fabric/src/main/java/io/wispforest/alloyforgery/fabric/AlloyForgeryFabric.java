@@ -2,7 +2,6 @@ package io.wispforest.alloyforgery.fabric;
 
 import io.wispforest.alloyforgery.AlloyForgery;
 import io.wispforest.alloyforgery.block.ForgeControllerBlockEntity;
-import io.wispforest.alloyforgery.fabric.data.IdentifiableResourceReloadListenerImpl;
 import io.wispforest.alloyforgery.forges.ForgeDefinition;
 import io.wispforest.alloyforgery.forges.ForgeRegistry;
 import io.wispforest.alloyforgery.forges.ForgeTierDataLoader;
@@ -14,6 +13,7 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import io.wispforest.alloyforgery.data.RecipeTagLoader;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
+import net.fabricmc.fabric.api.resource.v1.ResourceLoader;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
@@ -44,8 +44,7 @@ public class AlloyForgeryFabric implements ModInitializer {
 
         ServerLifecycleEvents.SERVER_STARTED.register(RecipeInjector::injectRecipes);
 
-        ResourceManagerHelper.get(ResourceType.SERVER_DATA)
-            .registerReloadListener(new IdentifiableResourceReloadListenerImpl(RecipeTagLoader.ID, RecipeTagLoader.INSTANCE));
+        ResourceLoader.get(ResourceType.SERVER_DATA).registerReloader(RecipeTagLoader.ID, RecipeTagLoader.INSTANCE);
 
         ItemStorage.SIDED.registerFallback((world, pos, state, blockEntity, context) -> {
             if (context == Direction.DOWN && world.getBlockEntity(pos.up()) instanceof ForgeControllerBlockEntity froge){

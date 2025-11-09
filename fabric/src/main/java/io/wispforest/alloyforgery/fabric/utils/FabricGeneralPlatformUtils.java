@@ -4,12 +4,11 @@ import io.wispforest.alloyforgery.block.ForgeControllerBlockEntity;
 import io.wispforest.alloyforgery.data.providers.ResourceConditionHolder;
 import io.wispforest.alloyforgery.fabric.FluidHolderImpl;
 import io.wispforest.alloyforgery.fabric.data.FabricResourceConditionHolder;
-import io.wispforest.alloyforgery.fabric.data.IdentifiableResourceReloadListenerImpl;
 import io.wispforest.alloyforgery.utils.FluidStorage;
 import io.wispforest.alloyforgery.utils.GeneralPlatformUtils;
 import io.wispforest.alloyforgery.utils.data.EndecDataLoader;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
-import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
+import net.fabricmc.fabric.api.resource.v1.ResourceLoader;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerType;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorageUtil;
 import net.fabricmc.fabric.impl.recipe.ingredient.builtin.ComponentsIngredient;
@@ -85,17 +84,11 @@ public final class FabricGeneralPlatformUtils implements GeneralPlatformUtils {
 
     @Override
     public void registerLoader(Identifier id, ResourceType packType, EndecDataLoader<?> loader, boolean requiresRegistries) {
-        var manager = ResourceManagerHelper.get(packType);
-        var listenerWithId = new IdentifiableResourceReloadListenerImpl(id, loader, loader.getDependencyIds());
-
-        if (ResourceType.SERVER_DATA.equals(packType) && requiresRegistries) {
-            manager.registerReloadListener(id, wrapperLookup -> {
-                loader.setupOps(wrapperLookup);
-                return listenerWithId;
-            });
-        } else {
-            manager.registerReloadListener(listenerWithId);
+        if (requiresRegistries) {
+            loader.setRegistryGetter(store -> store.getOrThrow(ResourceLoader.RELOADER_REGISTRY_LOOKUP_KEY));
         }
+
+        ResourceLoader.get(packType).registerReloader(id, loader);
     }
 
     //--

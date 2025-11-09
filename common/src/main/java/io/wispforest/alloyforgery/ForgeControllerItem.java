@@ -1,5 +1,6 @@
 package io.wispforest.alloyforgery;
 
+import net.minecraft.component.type.TooltipDisplayComponent;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.tooltip.TooltipType;
@@ -9,6 +10,7 @@ import net.minecraft.util.Identifier;
 import io.wispforest.alloyforgery.block.ForgeControllerBlock;
 import io.wispforest.alloyforgery.forges.ForgeTierDataLoader;
 import java.util.List;
+import java.util.function.Consumer;
 
 public class ForgeControllerItem extends BlockItem {
 
@@ -17,10 +19,10 @@ public class ForgeControllerItem extends BlockItem {
     }
 
     @Override
-    public void appendTooltip(ItemStack stack, TooltipContext context, List<Text> tooltip, TooltipType type) {
+    public void appendTooltip(ItemStack stack, TooltipContext context, TooltipDisplayComponent displayComponent, Consumer<Text> textConsumer, TooltipType type) {
         var tier = ForgeTierDataLoader.getForgeRegistry(true).getBoundForgeTier(getForgeDefinition());
 
-        if (tier != null) tier.tooltip(true, tooltip::add);
+        if (tier != null) tier.tooltip(true, textConsumer);
     }
 
     public Identifier getForgeDefinition() {

@@ -13,12 +13,12 @@ import net.fabricmc.fabric.api.transfer.v1.storage.base.SingleVariantStorage;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.storage.ReadView;
+import net.minecraft.storage.WriteView;
 
 import java.util.Iterator;
 
 public final class FluidHolderImpl extends SingleVariantStorage<FluidVariant> implements InsertionOnlyStorage<FluidVariant>, FluidStorage {
-    public static final Endec<FluidVariant> FLUID_VARIANT = CodecUtils.toEndec(FluidVariant.CODEC).catchErrors((ctx, deserializer, e) -> FluidVariant.blank());
-
     private final Runnable onCommitAction;
 
     public FluidHolderImpl(Runnable onCommitAction) {
@@ -58,15 +58,15 @@ public final class FluidHolderImpl extends SingleVariantStorage<FluidVariant> im
     //--
 
     @Override
-    public void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookupProvider) {
-        this.amount = nbt.getLong("Amount");
-        this.variant = FLUID_VARIANT.decodeFully(NbtDeserializer::of, nbt.getCompound("Variant"));
+    public void readData(ReadView data) {
+        this.amount = data.getLong("Amount", 0);
+        this.variant = data.read("Variant", FluidVariant.CODEC).orElse(FluidVariant.blank());
     }
 
     @Override
-    public void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup lookupProvider) {
-        nbt.putLong("Amount", this.amount);
-        nbt.put("Variant", FLUID_VARIANT.encodeFully(NbtSerializer::of, this.variant));
+    public void writeData(WriteView data) {
+        data.putLong("Amount", this.amount);
+        data.put("Variant", FluidVariant.CODEC, this.variant);
     }
 
     @Override

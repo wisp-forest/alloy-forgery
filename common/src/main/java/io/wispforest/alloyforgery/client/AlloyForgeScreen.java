@@ -1,5 +1,6 @@
 package io.wispforest.alloyforgery.client;
 
+import com.mojang.blaze3d.pipeline.RenderPipeline;
 import io.wispforest.alloyforgery.AlloyForgeScreenHandler;
 import io.wispforest.alloyforgery.AlloyForgery;
 import io.wispforest.alloyforgery.networking.AlloyForgeNetworking;
@@ -10,6 +11,7 @@ import io.wispforest.owo.ui.component.TextureComponent;
 import io.wispforest.owo.ui.container.Containers;
 import io.wispforest.owo.ui.container.FlowLayout;
 import io.wispforest.owo.ui.core.*;
+import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.client.render.RenderLayer;
@@ -116,9 +118,9 @@ public class AlloyForgeScreen extends BaseOwoHandledScreen<FlowLayout, AlloyForg
                                     BUTTON_RENDERER.draw(context, button, delta);
 
                                     context.push()
-                                        .translate(button.getX(), button.getY(), 0);
+                                        .translate(button.getX(), button.getY());
 
-                                    context.drawTexture(RenderLayer::getGuiTextured, textureID("slot_locks.png"),4, 3, this.allowSlotToggling ? 10 : 0, 0, 10, 12, 20, 12);
+                                    context.drawTexture(RenderPipelines.GUI_TEXTURED, textureID("slot_locks.png"),4, 3, this.allowSlotToggling ? 10 : 0, 0, 10, 12, 20, 12);
 
                                     context.pop();
                                 })
@@ -140,13 +142,13 @@ public class AlloyForgeScreen extends BaseOwoHandledScreen<FlowLayout, AlloyForg
                 .surface((context, component) -> {
                     var backgroundTexture = themedTextureID("forge_controller_base.png");
 
-                    context.push().translate(component.x(), component.y(), 0);
+                    context.push().translate(component.x(), component.y());
 
-                    context.drawTexture(RenderLayer::getGuiTextured, backgroundTexture, 0, 0, 0, 0, 176, 189, 176, 189);
+                    context.drawTexture(RenderPipelines.GUI_TEXTURED, backgroundTexture, 0, 0, 0, 0, 176, 189, 176, 189);
 
-                    context.drawTexture(RenderLayer::getGuiTextured, themedTextureID("fuel_meter.png"), 5, 22, 0, 0, 22, 48, 44, 48);
+                    context.drawTexture(RenderPipelines.GUI_TEXTURED, themedTextureID("fuel_meter.png"), 5, 22, 0, 0, 22, 48, 44, 48);
 
-                    context.drawTexture(RenderLayer::getGuiTextured, textureID("forging_status.png"), 143, 21, 0, 0, 20, 22, 40, 22);
+                    context.drawTexture(RenderPipelines.GUI_TEXTURED, textureID("forging_status.png"), 143, 21, 0, 0, 20, 22, 40, 22);
 
                     context.pop();
                 })
@@ -189,15 +191,11 @@ public class AlloyForgeScreen extends BaseOwoHandledScreen<FlowLayout, AlloyForg
             && !this.focusedSlot.hasStack()
             && !this.handler.player().isSpectator()) {
 
-            context.push().translate(0, 0, this.getLayerZOffset(HandledScreenLayer.ITEM_TOOLTIP));
-
             if (this.handler.isSlotDisabled(this.focusedSlot)) {
                 context.drawTooltip(this.textRenderer, DISABLED_SLOT_TEXT, x, y);
             } else {
                 context.drawTooltip(this.textRenderer, ENABLED_SLOT_TEXT, x, y);
             }
-
-            context.pop();
         }
     }
 

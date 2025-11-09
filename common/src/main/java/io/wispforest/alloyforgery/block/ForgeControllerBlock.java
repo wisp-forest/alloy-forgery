@@ -14,6 +14,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.*;
 import net.minecraft.text.Text;
@@ -60,7 +61,7 @@ public class ForgeControllerBlock extends BlockWithEntity {
     protected ActionResult onUseWithItem(ItemStack playerStack, BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
         var result = ActionResult.SUCCESS;
 
-        if (!world.isClient) {
+        if (!world.isClient()) {
             final var fuelDefinition = ForgeFuelDataLoader.getFuelForItem(playerStack.getItem());
             if (!(world.getBlockEntity(pos) instanceof ForgeControllerBlockEntity controller)) {
                 return ActionResult.PASS_TO_DEFAULT_BLOCK_ACTION;
@@ -94,15 +95,13 @@ public class ForgeControllerBlock extends BlockWithEntity {
     }
 
     @Override
-    public void onStateReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean moved) {
-        if (state.getBlock() == newState.getBlock()) return;
-
+    protected void onStateReplaced(BlockState state, ServerWorld world, BlockPos pos, boolean moved) {
         if (world.getBlockEntity(pos) instanceof ForgeControllerBlockEntity forgeController) {
             ItemScatterer.spawn(world, pos, forgeController);
             ItemScatterer.spawn(world, pos.getX(), pos.getY(), pos.getZ(), forgeController.getFuelStack());
         }
 
-        super.onStateReplaced(state, world, pos, newState, moved);
+        super.onStateReplaced(state, world, pos, moved);
     }
 
     @Override
@@ -140,7 +139,7 @@ public class ForgeControllerBlock extends BlockWithEntity {
     @Nullable
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
-        return world.isClient ? null : validateTicker(type, ForgeControllerBlockEntity.FORGE_CONTROLLER_BLOCK_ENTITY, (world1, pos, state1, blockEntity) -> blockEntity.tick());
+        return world.isClient() ? null : validateTicker(type, ForgeControllerBlockEntity.FORGE_CONTROLLER_BLOCK_ENTITY, (world1, pos, state1, blockEntity) -> blockEntity.tick());
     }
 
     @Nullable
@@ -150,7 +149,7 @@ public class ForgeControllerBlock extends BlockWithEntity {
     }
 
     @Override
-    public int getComparatorOutput(BlockState state, World world, BlockPos pos) {
+    protected int getComparatorOutput(BlockState state, World world, BlockPos pos, Direction direction) {
         return world.getBlockEntity(pos, ForgeControllerBlockEntity.FORGE_CONTROLLER_BLOCK_ENTITY)
             .map(ForgeControllerBlockEntity::getCompartorOutput)
             .orElse(0);

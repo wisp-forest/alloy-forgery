@@ -13,11 +13,11 @@ public final class NeoforgeLoaderPlatformUtils implements LoaderPlatformUtils {
 
     @Override
     public boolean isDevelopmentEnvironment() {
-        return !FMLLoader.isProduction();
+        return !FMLLoader.getCurrent().isProduction();
     }
 
     @Override
     public boolean isModLoaded(String modid) {
-        return LoadingModList.get().getModFileById(modid) != null;
+        return FMLLoader.getCurrent().getLoadingModList().getModFileById(modid) != null;
     }
 }

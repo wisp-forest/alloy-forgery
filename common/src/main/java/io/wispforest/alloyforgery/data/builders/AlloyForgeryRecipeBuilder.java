@@ -103,7 +103,7 @@ public class AlloyForgeryRecipeBuilder implements CraftingRecipeJsonBuilder {
 
     public AlloyForgeryRecipeBuilder input(RegistryEntryLookup<Item> registryLookup, TagKey<Item> input, int count) {
         this.inputTags.add(input);
-        this.inputs.put(Ingredient.fromTag(registryLookup.getOrThrow(input)), count);
+        this.inputs.put(Ingredient.ofTag(registryLookup.getOrThrow(input)), count);
         return this;
     }
 

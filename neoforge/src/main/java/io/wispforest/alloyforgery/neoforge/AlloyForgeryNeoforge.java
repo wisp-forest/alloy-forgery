@@ -6,7 +6,6 @@ import io.wispforest.alloyforgery.data.RecipeTagLoader;
 import io.wispforest.alloyforgery.forges.ForgeDefinition;
 import io.wispforest.alloyforgery.forges.ForgeRegistry;
 import io.wispforest.alloyforgery.forges.ForgeTierDataLoader;
-import io.wispforest.alloyforgery.neoforge.data.AlloyForgeryData;
 import io.wispforest.alloyforgery.neoforge.utils.NeoforgeGeneralPlatformUtils;
 import io.wispforest.alloyforgery.networking.AlloyForgeNetworking;
 import io.wispforest.alloyforgery.utils.RecipeInjector;
@@ -16,7 +15,6 @@ import net.minecraft.resource.ResourceReloader;
 import net.minecraft.resource.ResourceType;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.math.Direction;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
@@ -28,8 +26,8 @@ import net.neoforged.neoforge.event.AddServerReloadListenersEvent;
 import net.neoforged.neoforge.event.OnDatapackSyncEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.server.ServerStartedEvent;
-import net.neoforged.neoforge.items.wrapper.SidedInvWrapper;
 import net.neoforged.neoforge.registries.RegisterEvent;
+import net.neoforged.neoforge.transfer.item.WorldlyContainerWrapper;
 
 import java.util.Collection;
 
@@ -85,7 +83,7 @@ public class AlloyForgeryNeoforge {
         });
 
         modBus.<RegisterCapabilitiesEvent>addListener(capabilityEvent -> {
-            capabilityEvent.registerBlockEntity(Capabilities.FluidHandler.BLOCK, ForgeControllerBlockEntity.FORGE_CONTROLLER_BLOCK_ENTITY, (blockEntity, context) -> {
+            capabilityEvent.registerBlockEntity(Capabilities.Fluid.BLOCK, ForgeControllerBlockEntity.FORGE_CONTROLLER_BLOCK_ENTITY, (blockEntity, context) -> {
                 return blockEntity.<FluidHolderImpl>getFluidHolder();
             });
 
@@ -98,7 +96,7 @@ public class AlloyForgeryNeoforge {
 //                return null;
 //            });
 
-            capabilityEvent.registerBlockEntity(Capabilities.ItemHandler.BLOCK, ForgeControllerBlockEntity.FORGE_CONTROLLER_BLOCK_ENTITY, SidedInvWrapper::new);
+            capabilityEvent.registerBlockEntity(Capabilities.Item.BLOCK, ForgeControllerBlockEntity.FORGE_CONTROLLER_BLOCK_ENTITY, WorldlyContainerWrapper::new);
         });
 
         modBus.<RegisterEvent>addListener(event -> {

@@ -76,7 +76,7 @@ public class RecipeTagLoader extends SinglePreparationResourceReloader<Map<Ident
 
     @ApiStatus.Internal
     public void sendPlayerPacketAfterDataLoad(ServerPlayerEntity player) {
-        resolveEntries(player.server);
+        resolveEntries(player.getEntityWorld().getServer());
 
         sendTagPacket(player);
     }

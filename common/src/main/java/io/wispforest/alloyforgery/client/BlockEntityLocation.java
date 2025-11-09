@@ -29,7 +29,7 @@ public record BlockEntityLocation(BlockPos blockPos, RegistryKey<World> worldKey
     }
 
     public <T extends BlockEntity> T get(PlayerEntity player, BlockEntityType<T> blockEntityType) {
-        return get(player.getWorld(), blockEntityType);
+        return get(player.getEntityWorld(), blockEntityType);
     }
 
     public <T extends BlockEntity> T get(World world, BlockEntityType<T> blockEntityType) {

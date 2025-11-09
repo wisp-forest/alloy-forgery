@@ -1,5 +1,6 @@
 package io.wispforest.alloyforgery.client;
 
+import com.mojang.blaze3d.pipeline.RenderPipeline;
 import io.wispforest.alloyforgery.AlloyForgery;
 import io.wispforest.owo.ui.component.ButtonComponent;
 import io.wispforest.owo.ui.container.FlowLayout;
@@ -8,6 +9,7 @@ import io.wispforest.owo.ui.core.HorizontalAlignment;
 import io.wispforest.owo.ui.core.Insets;
 import io.wispforest.owo.ui.core.Sizing;
 import io.wispforest.owo.ui.util.NinePatchTexture;
+import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.util.Identifier;
 
@@ -61,7 +63,7 @@ public class ComponentUtils {
                         .surface((context, component) -> {
                             var slotTexture = themedTextureID("input_slot_background.png", isDarkMode);
 
-                            context.drawTexture(RenderLayer::getGuiTextured, slotTexture, component.x(), component.y(), isSlotDisabled.test(t) ? 18 : 0, 0,18, 18, 36, 18);
+                            context.drawTexture(RenderPipelines.GUI_TEXTURED, slotTexture, component.x(), component.y(), isSlotDisabled.test(t) ? 18 : 0, 0,18, 18, 36, 18);
                         }))
                     .toList();
 

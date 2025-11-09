@@ -18,6 +18,7 @@ import me.shedaniel.rei.api.common.category.CategoryIdentifier;
 import me.shedaniel.rei.api.common.entry.EntryStack;
 import me.shedaniel.rei.api.common.util.EntryIngredients;
 import me.shedaniel.rei.api.common.util.EntryStacks;
+import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.text.Text;
 import io.wispforest.alloyforgery.forges.ForgeRegistry;
@@ -115,7 +116,7 @@ public class AlloyForgingCategory implements DisplayCategory<AlloyForgingDisplay
                                             .surface((context, component) -> {
                                                 var backgroundTexture = ComponentUtils.themedTextureID("forge_controller_base.png", rei::isDarkThemeEnabled);
 
-                                                context.drawTexture(RenderLayer::getGuiTextured, backgroundTexture, component.x(), component.y(), 140, 45, 26, 26, 176, 189);
+                                                context.drawTexture(RenderPipelines.GUI_TEXTURED, backgroundTexture, component.x(), component.y(), 140, 45, 26, 26, 176, 189);
                                             })
                                             .margins(Insets.left(6))
                                     )

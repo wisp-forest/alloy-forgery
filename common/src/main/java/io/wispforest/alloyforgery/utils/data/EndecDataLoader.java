@@ -131,12 +131,26 @@ public abstract class EndecDataLoader<T> extends JsonDataLoader<T> {
     @Nullable
     private RegistryWrapper.WrapperLookup registries = null;
 
-    @ApiStatus.Internal
-    public EndecDataLoader<T> setupOps(RegistryWrapper.WrapperLookup registries) {
-        this.registries = registries;
+    @Nullable
+    private Function<Store, RegistryWrapper.WrapperLookup> registryGetter = null;
 
-        // Resets the given converted endec to grab new context with current registries
-        setupCodec();
+    @Override
+    public void prepareSharedState(Store store) {
+        if (requiresRegistries) {
+            Objects.requireNonNull(registryGetter, "Can not get the needed context for the ManagedEndecDataLoader: " + this.getLoaderId());
+
+            this.registries = registryGetter.apply(store);
+
+            registryGetter = null;
+
+            // Resets the given converted endec to grab new context with current registries
+            setupCodec();
+        }
+    }
+
+    @ApiStatus.Internal
+    public EndecDataLoader<T> setRegistryGetter(Function<Store, RegistryWrapper.WrapperLookup> registryGetter) {
+        this.registryGetter = registryGetter;
 
         return this;
     }

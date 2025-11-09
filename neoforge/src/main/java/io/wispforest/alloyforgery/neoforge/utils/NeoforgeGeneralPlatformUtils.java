@@ -32,8 +32,8 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
 import net.neoforged.neoforge.common.crafting.DataComponentIngredient;
-import net.neoforged.neoforge.fluids.FluidUtil;
 import net.neoforged.neoforge.network.IContainerFactory;
+import net.neoforged.neoforge.transfer.fluid.FluidUtil;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
@@ -68,7 +68,7 @@ public class NeoforgeGeneralPlatformUtils implements GeneralPlatformUtils {
 
     @Override
     public boolean interactWithFluidStorage(ForgeControllerBlockEntity controller, PlayerEntity player, Hand hand) {
-        return FluidUtil.interactWithFluidHandler(player, hand, controller.<FluidHolderImpl>getFluidHolder());
+        return FluidUtil.interactWithFluidHandler(player, hand, null, controller.<FluidHolderImpl>getFluidHolder());
     }
 
     @Override
@@ -121,7 +121,7 @@ public class NeoforgeGeneralPlatformUtils implements GeneralPlatformUtils {
     public static void registerEndecDataLoaders(ReloadListenerRegistration registration) {
         LOADER_MAP.getOrDefault(registration.getType(), Map.of()).forEach((identifier, loader) -> {
             if (loader.requiresRegistries()) {
-                loader.setupOps(registration.getRegistry());
+                loader.setRegistryGetter(store -> registration.getRegistry());
             }
 
             registration

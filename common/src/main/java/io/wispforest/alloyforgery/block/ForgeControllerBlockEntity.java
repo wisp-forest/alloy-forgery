@@ -24,6 +24,8 @@ import net.minecraft.screen.ScreenHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.storage.ReadView;
+import net.minecraft.storage.WriteView;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.ItemScatterer;
@@ -96,29 +98,27 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
     }
 
     @Override
-    protected void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
-        Inventories.readNbt(nbt, items, registryLookup);
+    protected void readData(ReadView view) {
+        Inventories.readData(view, items);
 
-        this.currentSmeltTime = nbt.getInt("CurrentSmeltTime");
-        this.fuel = nbt.getInt("Fuel");
+        this.currentSmeltTime = view.getInt("CurrentSmeltTime", 0);
+        this.fuel = view.getInt("Fuel", 0);
 
-        final var fluidNbt = nbt.getCompound("FuelFluidInput");
+        final var fluidData = view.getReadView("FuelFluidInput");
 
-        this.fluidHolder.readNbt(fluidNbt, registryLookup);
+        this.fluidHolder.readData(fluidData);
     }
 
     @Override
-    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
-        Inventories.writeNbt(nbt, items, registryLookup);
+    protected void writeData(WriteView view) {
+        Inventories.writeData(view, items);
 
-        nbt.putInt("Fuel", Math.round(fuel));
-        nbt.putInt("CurrentSmeltTime", currentSmeltTime);
+        view.putInt("Fuel", Math.round(fuel));
+        view.putInt("CurrentSmeltTime", currentSmeltTime);
 
-        final var fluidNbt = new NbtCompound();
+        final var fluidNbt = view.get("FuelFluidInput");
 
-        this.fluidHolder.writeNbt(fluidNbt, registryLookup);
-
-        nbt.put("FuelFluidInput", fluidNbt);
+        this.fluidHolder.writeData(fluidNbt);
     }
 
     public <F extends FluidStorage> F getFluidHolder() {

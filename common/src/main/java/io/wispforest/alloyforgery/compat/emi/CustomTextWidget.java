@@ -35,12 +35,12 @@ public class CustomTextWidget extends Widget {
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         var matrices = context.getMatrices();
-        matrices.push();
+        matrices.pushMatrix();
         int xOff = TextWidget.Alignment.START.offset(CLIENT.textRenderer.getWidth(text));
         int yOff = TextWidget.Alignment.START.offset(CLIENT.textRenderer.fontHeight);
-        matrices.translate(xOff, yOff, 300);
+        matrices.translate(xOff, yOff);
         context.drawText(CLIENT.textRenderer, text, x, y, color, shadow);
-        matrices.pop();
+        matrices.popMatrix();
     }
 
 }
