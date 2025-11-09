@@ -53,6 +53,7 @@ public class ForgeTierDataLoader {
             });
 
         EndecDataLoader.builder("alloy_forge/tier_binding", Endec.map(Identifier::toString, Identifier::tryParse, MinecraftEndecs.IDENTIFIER))
+            .addDependencies(TIER_LOADER)
             .create(TIER_BINDINGS_LOADER, ResourceType.SERVER_DATA, (data, manager, profiler) -> {
                 data.values().forEach((bindings) -> bindings.forEach(SERVER.forgeDefinitionToTier::putIfAbsent));
 
