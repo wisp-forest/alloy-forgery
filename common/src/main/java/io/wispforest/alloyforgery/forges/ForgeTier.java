@@ -75,7 +75,7 @@ public final class ForgeTier {
     }
 
     public Text name(boolean advancedName) {
-        return Text.translatable(id.toTranslationKey("alloy_forgery.tier." + (advancedName ? "advanced_" : "") + "name"), value);
+        return Text.translatable(id.toTranslationKey(AlloyForgery.translationKey("tier." + (advancedName ? "advanced_" : "") + "name")), value);
     }
 
     public static Text toName(boolean isClientSide, int value) {
@@ -85,10 +85,10 @@ public final class ForgeTier {
     }
 
     public void tooltip(boolean advancedName, Consumer<Text> tooltipCallback) {
-        tooltipCallback.accept(Text.translatable("tooltip.alloy_forgery.forge_tier", this.name(advancedName)).formatted(Formatting.GRAY));
-        tooltipCallback.accept(Text.translatable("tooltip.alloy_forgery.speed_multiplier", this.speedMultiplier()).formatted(Formatting.GRAY));
-        tooltipCallback.accept(Text.translatable("tooltip.alloy_forgery.fuel_consumption_multiplier", this.fuelConsumptionMultiplier()).formatted(Formatting.GRAY));
-        tooltipCallback.accept(Text.translatable("tooltip.alloy_forgery.fuel_capacity", this.fuelCapacity()).formatted(Formatting.GRAY));
+        tooltipCallback.accept(AlloyForgery.tooltipTranslation("forge_tier", this.name(advancedName)).formatted(Formatting.GRAY));
+        tooltipCallback.accept(AlloyForgery.tooltipTranslation("speed_multiplier", this.speedMultiplier()).formatted(Formatting.GRAY));
+        tooltipCallback.accept(AlloyForgery.tooltipTranslation("fuel_consumption_multiplier", this.fuelConsumptionMultiplier()).formatted(Formatting.GRAY));
+        tooltipCallback.accept(AlloyForgery.tooltipTranslation("fuel_capacity", this.fuelCapacity()).formatted(Formatting.GRAY));
     }
 
     @Override

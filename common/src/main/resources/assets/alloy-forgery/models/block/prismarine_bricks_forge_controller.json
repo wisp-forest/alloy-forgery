@@ -1,0 +1,8 @@
+{
+  "parent": "block/orientable",
+  "textures": {
+    "top": "alloy-forgery:block/prismarine_bricks_forge_controller_top",
+    "front": "alloy-forgery:block/prismarine_bricks_forge_controller_front",
+    "side": "alloy-forgery:block/prismarine_bricks_forge_controller_side"
+  }
+}

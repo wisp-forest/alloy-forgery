@@ -1,5 +1,6 @@
 package io.wispforest.alloyforgery.compat.rei;
 
+import io.wispforest.alloyforgery.AlloyForgery;
 import io.wispforest.alloyforgery.client.ComponentUtils;
 import io.wispforest.alloyforgery.forges.ForgeTier;
 import io.wispforest.owo.compat.rei.ReiUIAdapter;
@@ -53,7 +54,7 @@ public class AlloyForgingCategory implements DisplayCategory<AlloyForgingDisplay
 
     @Override
     public Text getTitle() {
-        return Text.translatable("container.alloy_forgery.rei.title");
+        return AlloyForgery.translation("title", "recipe");
     }
 
     @Override
@@ -87,14 +88,14 @@ public class AlloyForgingCategory implements DisplayCategory<AlloyForgingDisplay
                     .child(
                         verticalFlow(Sizing.content(), Sizing.content())
                             .child(
-                                label(Text.translatable("tooltip.alloy_forgery.recipe.min_tier", minForgeTierName))
+                                label(AlloyForgery.tooltipTranslation("recipe.min_tier", minForgeTierName))
                                     .color(Color.ofRgb(textColor))
                                     .shadow(false)
                                     .margins(Insets.top(3))
                                     .id("tier-label")
                             )
                             .child(
-                                label(Text.translatable("tooltip.alloy_forgery.recipe.fuel_per_tick", display.fuelPerTick()))
+                                label(AlloyForgery.tooltipTranslation("recipe.fuel_per_tick", display.fuelPerTick()))
                                     .color(Color.ofRgb(textColor))
                                     .shadow(false)
                                     .margins(Insets.top(3))
@@ -137,7 +138,7 @@ public class AlloyForgingCategory implements DisplayCategory<AlloyForgingDisplay
                                         var overrideTierName = overrideIndex == 0 ? minForgeTierName : overrides.get(overrideIndex - 1).toText(true);
 
                                         adapter.rootComponent().childById(LabelComponent.class, "tier-label")
-                                            .text(Text.translatable("tooltip.alloy_forgery.recipe.min_tier", overrideTierName));
+                                            .text(AlloyForgery.tooltipTranslation("recipe.min_tier", overrideTierName));
 
                                         slotEntries.getValue()
                                             .clearEntries()
@@ -148,7 +149,7 @@ public class AlloyForgingCategory implements DisplayCategory<AlloyForgingDisplay
                                     }
                                 }).active(!overrides.isEmpty())
                                     .renderer(createThemedButtonRenderer(rei::isDarkThemeEnabled))
-                                    .tooltip(Text.translatable("tooltip.alloy_forgery.recipe.button"));
+                                    .tooltip(AlloyForgery.tooltipTranslation("recipe.button"));
                             })
                             .sizing(Sizing.fixed(14))
                             .margins(Insets.of(0, 0, 0, 0))

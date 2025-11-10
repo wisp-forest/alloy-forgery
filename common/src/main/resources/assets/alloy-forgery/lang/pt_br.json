@@ -1,0 +1,46 @@
+{
+  "block.alloy-forgery.bricks_forge_controller": "Controlador de Forja de Tijolos",
+  "block.alloy-forgery.stone_bricks_forge_controller": "Controlador de Forja de Tijolos de Pedra",
+  "block.alloy-forgery.deepslate_bricks_forge_controller": "Controlador de Forja de Ardósia",
+  "block.alloy-forgery.end_stone_bricks_forge_controller": "Controlador de Forja de pedra do End",
+  "block.alloy-forgery.polished_blackstone_forge_controller": "Controlador de Forja de Pedra-Negra Polida",
+  "block.alloy-forgery.prismarine_bricks_forge_controller": "Controlador de Forja de Prismarinho",
+
+  "tooltip.alloy-forgery.forge_tier": "Nível: %d",
+  "tooltip.alloy-forgery.fuel_capacity": "Capacidade de combustível: %d",
+  "tooltip.alloy-forgery.invalid_tier": "Essa receita precisa de um Controlador de Forja de Nível %d",
+
+  "title.alloy-forgery.forge_controller": "Forja de Metais",
+
+  "title.alloy-forgery.recipe": "Forjamento de Ligas Metálicas",
+  "tooltip.alloy-forgery.recipe.min_tier": "Nível Necessário: %d",
+  "tooltip.alloy-forgery.recipe.fuel_per_tick": "Combustível por tick: %d",
+  "tooltip.alloy-forgery.recipe.button": "Ciclar Níveis de Forja",
+
+  "message.alloy-forgery.invalid_multiblock": "Configuração de Multibloco da Forja Inválido",
+  "itemGroup.alloy-forgery.main": "Forjamento de Ligas Metálicas",
+
+  "emi.category.alloy-forgery.alloy_forge": "Forjando Metais",
+
+  "tag.item.c.copper_ores": "Minérios de Cobre",
+  "tag.item.c.iron_ores": "Minérios de Ferro",
+  "tag.item.c.gold_ores": "Minérios de Ouro",
+  "tag.item.c.raw_copper_blocks": "Minérios de Cobre Brutos",
+  "tag.item.c.raw_iron_blocks": "Minérios de Ferro Brutos",
+  "tag.item.c.raw_gold_blocks": "Minérios de Ouro Brutos",
+
+  "text.config.alloy-forgery.title": "Configurações - Alloy Forgery",
+  "text.config.alloy-forgery.section.blasting_adaption": "Adaptação de Fundição",
+
+  "text.config.alloy-forgery.option.allowHigherTierOutput": "Permitir Produção de Nível Superior",
+  "text.config.alloy-forgery.option.allowHigherTierOutput.tooltip": "Alternar para ativar ou desativar a Produção de Nível Superior da Adaptação de Fundição para todas as Receitas",
+
+  "text.config.alloy-forgery.option.allowBlastingFurnaceAdaption": "Permitir Adaptação de Receitas do Alto-Forno",
+  "text.config.alloy-forgery.option.allowBlastingFurnaceAdaption.tooltip": "Alternar para ativar ou desativar a Adaptação de Receitas do Alto-Forno",
+
+  "text.config.alloy-forgery.option.baseInputAmount": "Quantidade Base de Entrada",
+  "text.config.alloy-forgery.option.baseInputAmount.tooltip": "Ajusta a quantidade base de entrada para receitas adaptadas.",
+
+  "text.config.alloy-forgery.option.higherTierOutputIncrease": "Quantidade de Saída por Nível Adicional",
+  "text.config.alloy-forgery.option.higherTierOutputIncrease.tooltip": "Ajusta a quantidade de saída ao alcançar o nível 3"
+}

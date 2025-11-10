@@ -499,7 +499,7 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
 
     @Override
     public Text getDisplayName() {
-        return Text.translatable("container.alloy_forgery.forge_controller");
+        return AlloyForgery.translation("title", "forge_controller");
     }
 
     @Nullable

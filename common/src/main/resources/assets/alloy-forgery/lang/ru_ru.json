@@ -1,0 +1,19 @@
+{
+  "block.alloy-forgery.bricks_forge_controller": "Контроллер кузницы из кирпичей",
+  "block.alloy-forgery.stone_bricks_forge_controller": "Контроллер кузницы из каменных кирпичей",
+  "block.alloy-forgery.deepslate_bricks_forge_controller": "Контроллер кузницы из глубинносланцевых кирпичей",
+  "block.alloy-forgery.end_stone_bricks_forge_controller": "Контроллер кузницы из эндерняковых кирпичей",
+  "block.alloy-forgery.polished_blackstone_forge_controller": "Контроллер кузницы из полированного чернита",
+
+  "tooltip.alloy-forgery.forge_tier": "Уровень: %d",
+  "tooltip.alloy-forgery.fuel_capacity": "Запас топлива: %d",
+
+  "title.alloy-forgery.forge_controller": "Контроллер кузницы",
+
+  "title.alloy-forgery.recipe": "Alloy Forgery",
+  "tooltip.alloy-forgery.recipe.min_tier": "Требуемый уровень: %d",
+  "tooltip.alloy-forgery.recipe.fuel_per_tick": "Расход топлива в тик: %d",
+
+  "message.alloy-forgery.invalid_multiblock": "Есть ошибки в составлении многоблочной структуры",
+  "itemGroup.alloy-forgery.main": "Alloy Forgery"
+}

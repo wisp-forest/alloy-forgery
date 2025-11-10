@@ -1,0 +1,20 @@
+{
+  "type": "alloy-forgery:forging",
+  "fuel_per_tick": 45,
+  "inputs": [
+    {
+      "count": 2,
+      "ingredient": "#c:storage_blocks/raw_gold"
+    }
+  ],
+  "min_forge_tier": 1,
+  "output": {
+    "count": 3,
+    "item": "minecraft:gold_block"
+  },
+  "overrides": {
+    "2+": {
+      "count": 4
+    }
+  }
+}

@@ -16,7 +16,7 @@
 //    private final int x, y;
 //    private final BooleanSupplier isActive;
 //    private final ButtonWidget.ClickAction action;
-//    private final List<TooltipComponent> tooltipComponent = List.of(TooltipComponent.of(Text.translatable("container.alloy_forgery.rei.button").asOrderedText()));
+//    private final List<TooltipComponent> tooltipComponent = List.of(TooltipComponent.of(Text.translatable("container.alloy-forgery.rei.button").asOrderedText()));
 //
 //    public CustomButtonWidget(int x, int y, BooleanSupplier isActive, ButtonWidget.ClickAction action) {
 //        this.x = x;

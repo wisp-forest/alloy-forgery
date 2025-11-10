@@ -1,0 +1,21 @@
+{
+  "type": "alloy-forgery:forging",
+  "inputs": [
+    {
+      "ingredient": "#c:raw_materials/copper",
+      "count": 2
+    }
+  ],
+  "output": {
+    "item": "minecraft:copper_ingot",
+    "count": 3
+  },
+  "overrides": {
+    "2+": {
+      "item": "minecraft:copper_ingot",
+      "count": 4
+    }
+  },
+  "min_forge_tier": 1,
+  "fuel_per_tick": 5
+}

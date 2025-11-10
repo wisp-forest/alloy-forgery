@@ -2,6 +2,7 @@ package io.wispforest.alloyforgery.data.builders;
 
 import com.google.common.collect.Streams;
 import com.mojang.logging.LogUtils;
+import io.wispforest.alloyforgery.AlloyForgery;
 import io.wispforest.alloyforgery.data.providers.RecipeExporterConditionWrapper;
 import io.wispforest.alloyforgery.data.providers.ResourceConditionHolder;
 import io.wispforest.alloyforgery.recipe.AlloyForgeRecipe;
@@ -192,7 +193,7 @@ public class AlloyForgeryRecipeBuilder implements CraftingRecipeJsonBuilder {
 
     @Override
     public void offerTo(RecipeExporter exporter, RegistryKey<Recipe<?>> recipeId) {
-        var advancementId = Identifier.of(recipeId.getValue().getNamespace(), "recipes/" + "alloy_forgery" + "/" + recipeId.getValue().getPath());
+        var advancementId = Identifier.of(recipeId.getValue().getNamespace(), "recipes/" + AlloyForgery.MOD_ID + "/" + recipeId.getValue().getPath());
 
         this.validate(recipeId.getValue());
 

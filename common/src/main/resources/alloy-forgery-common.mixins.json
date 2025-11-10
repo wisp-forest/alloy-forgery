@@ -1,0 +1,25 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "io.wispforest.alloyforgery.mixin",
+  "compatibilityLevel": "JAVA_8",
+  "mixins": [
+    "DataPackContentsMixin",
+    "registry.DefaultedRegistryMixin",
+    "registry.SimpleRegistryMixin",
+    "HopperBlockEntityAccessor",
+    "PreparedRecipesAccessor",
+    "ServerRecipeManagerAccessor",
+    "RecipeEntryMixin",
+    "PlayerManagerMixin",
+    "JsonDataLoaderAccessor",
+    "SingleStackRecipeAccessor",
+    "DataResultMixin",
+    "DataResultMixin$DataResultErrorMixin",
+    "RegistryEntryListNamedMixin"
+  ],
+  "client": [],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

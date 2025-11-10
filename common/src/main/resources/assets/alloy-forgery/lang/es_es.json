@@ -1,0 +1,39 @@
+{
+  "block.alloy-forgery.bricks_forge_controller": "Controlador de la forja de ladrillo",
+  "block.alloy-forgery.stone_bricks_forge_controller": "Controlador de la forja de ladrillo de piedra",
+  "block.alloy-forgery.deepslate_bricks_forge_controller": "Controlador de la forja de ladrillo de pizarra profund",
+  "block.alloy-forgery.end_stone_bricks_forge_controller": "Controlador de la forja de ladrillo de piedra del End",
+  "block.alloy-forgery.polished_blackstone_forge_controller": "Controlador de la forja de piedra negra pulida",
+  "block.alloy-forgery.prismarine_bricks_forge_controller": "Controlador de forja de ladrillos de prismarina",
+
+  "tooltip.alloy-forgery.forge_tier": [
+    { "text": "Grada", "color": "gray" },
+    { "text": ": ", "color": "dark_gray" },
+    { "index": 0, "color": "white" }
+  ],
+  "tooltip.alloy-forgery.fuel_capacity": [
+    { "text": "Capacidad del combustible", "color": "gray" },
+    { "text": ": ", "color": "dark_gray" },
+    { "index": 0, "color": "white" }
+  ],
+
+  "title.alloy-forgery.forge_controller": "Forja de aleación",
+
+  "title.alloy-forgery.recipe": "Forja de aleación",
+  "tooltip.alloy-forgery.recipe.min_tier": [
+    { "text": "Grada mínima" },
+    { "text": ": ", "color": "gray" },
+    { "index": 0 }
+  ],
+  "tooltip.alloy-forgery.recipe.fuel_per_tick":  [
+    { "text": "Combustible por tick" },
+    { "text": ": ", "color": "gray" },
+    { "index": 0 }
+  ],
+  "tooltip.alloy-forgery.recipe.button": "Desplácese por los grados",
+
+  "message.alloy-forgery.invalid_multiblock": "El configuración de multibloque no es válida",
+  "itemGroup.alloy-forgery.main": "Forja de aleación",
+
+  "emi.category.alloy-forgery.alloy_forge": "Forja de aleación"
+}

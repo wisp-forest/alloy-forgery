@@ -1,0 +1,34 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:tags_populated",
+      "registry": "minecraft:item",
+      "values": [
+        "c:ores/titanium",
+        "c:ingots/titanium"
+      ]
+    }
+  ],
+  "type": "alloy-forgery:forging",
+  "fuel_per_tick": 90,
+  "inputs": [
+    {
+      "count": 2,
+      "ingredient": "#c:ores/titanium"
+    }
+  ],
+  "min_forge_tier": 2,
+  "output": {
+    "count": 2,
+    "priority": [
+      "techreborn:titanium_ingot",
+      "modern_industrialization:titanium_ingot"
+    ],
+    "tag": "c:ingots/titanium"
+  },
+  "overrides": {
+    "3+": {
+      "count": 3
+    }
+  }
+}

@@ -18,6 +18,8 @@ import net.minecraft.particle.ParticleTypes;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.resource.ResourceType;
+import net.minecraft.text.MutableText;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
@@ -41,7 +43,7 @@ import static io.wispforest.alloyforgery.utils.GeneralPlatformUtils.INSTANCE;
 
 public class AlloyForgery {
 
-    public static final String MOD_ID = "alloy_forgery";
+    public static final String MOD_ID = "alloy-forgery";
 
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
@@ -132,5 +134,17 @@ public class AlloyForgery {
 
     public static Identifier id(String path) {
         return Identifier.of(MOD_ID, path);
+    }
+
+    public static String translationKey(String suffix) {
+        return MOD_ID + "." + suffix;
+    }
+
+    public static MutableText translation(String prefix, String suffix, Object... args) {
+        return Text.translatable(prefix + "." + MOD_ID + "." + suffix, args);
+    }
+
+    public static MutableText tooltipTranslation(String suffix, Object... args) {
+        return translation("tooltip", suffix, args);
     }
 }
