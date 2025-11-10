@@ -41,10 +41,20 @@ fun setupTask(targetTask: AbstractRemapJarTask, taskName: String, archiveClassif
     //targetTask.remapperIsolation = true
 
     targetTask.mustRunAfter(
-        tasks.named("generateMetadataFileForMavenCommonPublication"),
-        tasks.named("generateMetadataFileForMavenMojmapPublication"),
-        tasks.named("publishMavenCommonPublicationToMavenLocal"),
-        tasks.named("publishMavenCommonPublicationToMavenRepository"),
-        //tasks.named("publishMavenMojmapPublicationToMavenLocal")
+        mutableListOf(
+            tasks.namedOrNull("generateMetadataFileForMavenCommonPublication"),
+            tasks.namedOrNull("generateMetadataFileForMavenMojmapPublication"),
+            tasks.namedOrNull("publishMavenCommonPublicationToMavenLocal"),
+            tasks.namedOrNull("publishMavenCommonPublicationToMavenRepository"),
+            tasks.namedOrNull("publishMavenMojmapPublicationToMavenLocal")
+        ).filterNotNull()
     )
+}
+
+inline fun <reified T: Task> TaskCollection<T>.namedOrNull(name: String): TaskProvider<T>? {
+    return try {
+        this.named<T>(name)
+    } catch (_: UnknownTaskException) {
+        null
+    }
 }
