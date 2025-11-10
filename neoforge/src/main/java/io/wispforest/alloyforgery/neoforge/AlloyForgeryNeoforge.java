@@ -1,5 +1,7 @@
 package io.wispforest.alloyforgery.neoforge;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import io.wispforest.alloyforgery.AlloyForgery;
 import io.wispforest.alloyforgery.block.ForgeControllerBlockEntity;
 import io.wispforest.alloyforgery.data.RecipeTagLoader;
@@ -8,6 +10,7 @@ import io.wispforest.alloyforgery.forges.ForgeTierDataLoader;
 import io.wispforest.alloyforgery.neoforge.utils.NeoforgeGeneralPlatformUtils;
 import io.wispforest.alloyforgery.networking.AlloyForgeNetworking;
 import io.wispforest.alloyforgery.utils.RecipeInjector;
+import io.wispforest.owo.Owo;
 import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.resource.ResourceReloader;
@@ -18,6 +21,7 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.neoforged.fml.jarcontents.JarContents;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.common.NeoForge;
@@ -27,10 +31,14 @@ import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.server.ServerStartedEvent;
 import net.neoforged.neoforge.registries.RegisterEvent;
 import net.neoforged.neoforge.transfer.item.WorldlyContainerWrapper;
+import net.neoforged.neoforgespi.language.IModInfo;
+import org.apache.commons.io.FilenameUtils;
 
+import java.io.IOException;
 import java.util.Collection;
+import java.util.Map;
 
-@Mod(value = AlloyForgery.MOD_ID)
+@Mod(value = "alloy_forgery")
 public class AlloyForgeryNeoforge {
     private static IEventBus MOD_BUS = null;
 
