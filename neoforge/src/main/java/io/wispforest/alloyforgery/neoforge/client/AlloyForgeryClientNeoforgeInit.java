@@ -18,7 +18,7 @@ import net.neoforged.neoforge.common.NeoForge;
 
 import java.util.Collection;
 
-@Mod(value = AlloyForgery.MOD_ID, dist = Dist.CLIENT)
+@Mod(value = "alloy_forgery", dist = Dist.CLIENT)
 public class AlloyForgeryClientNeoforgeInit {
     public AlloyForgeryClientNeoforgeInit(IEventBus modBus) {
         modBus.<FMLCommonSetupEvent>addListener(event -> {

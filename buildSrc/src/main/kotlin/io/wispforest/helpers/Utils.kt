@@ -183,7 +183,7 @@ object Utils {
         keys.forEachIndexed { i: Int, key: String ->
             if (key.isBlank()) return@forEachIndexed
 
-            val contactKey = key.toLowerCase().replace(" ", "_");
+            val contactKey = key.lowercase().replace(" ", "_");
             val hasContact = rootProject.hasProperty(contactKey)
 
             if (hasContact) {

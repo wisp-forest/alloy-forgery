@@ -4,7 +4,7 @@ issueTrackerURL = "${mod_issuepage}"
 license = "${mod_license}"
 
 [[mods]]
-modId = "${mod_id}"
+modId = "${neoforge_mod_id}"
 version = "${mod_version}"
 displayName = "${mod_name}"
 provides = ["alloy-forgery"]

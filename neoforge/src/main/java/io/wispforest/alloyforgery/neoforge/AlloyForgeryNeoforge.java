@@ -32,7 +32,7 @@ import net.neoforged.neoforge.registries.RegisterEvent;
 
 import java.util.Collection;
 
-@Mod(value = AlloyForgery.MOD_ID)
+@Mod(value = "alloy_forgery")
 public class AlloyForgeryNeoforge {
     private static IEventBus MOD_BUS = null;
 

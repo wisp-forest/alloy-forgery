@@ -161,6 +161,7 @@ dependencies {
 
 tasks.processResources {
     val expandProps = mutableMapOf(
+        "neoforge_mod_id"                    to modid.replace("-", "_"),
         "mod_id"                             to modid,
         "mod_name"                           to rootProject.property("mod_name"),
         "mod_version"                        to rootProject.property("mod_version"),
