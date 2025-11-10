@@ -1,0 +1,33 @@
+{
+  "block.alloy_forgery.bricks_forge_controller": "Контролер плавильні з цегли",
+  "block.alloy_forgery.stone_bricks_forge_controller": "Контролер плавильні з кам'яної цегли",
+  "block.alloy_forgery.deepslate_bricks_forge_controller": "Контролер плавильні з глибокосланцю",
+  "block.alloy_forgery.end_stone_bricks_forge_controller": "Контролер плавильні з каменю Енду",
+  "block.alloy_forgery.polished_blackstone_forge_controller": "Контролер плавильні з полірованого чорнокаменю",
+
+  "tooltip.alloy_forgery.forge_tier": "Рівень: %d",
+  "tooltip.alloy_forgery.fuel_capacity": "Паливний бак: %d",
+
+  "container.alloy_forgery.forge_controller": "Плавильня",
+
+  "container.alloy_forgery.rei.title": "Плавильня",
+  "container.alloy_forgery.rei.min_tier": "Рівень: %d",
+  "container.alloy_forgery.rei.fuel_per_tick": "Паливо за тік: %d",
+  "container.alloy_forgery.rei.button": "Перевизначення рівнів",
+
+  "message.alloy_forgery.invalid_multiblock": "Неправильна багатоблокова структура",
+  "itemGroup.alloy_forgery.alloy_forgery": "Ковальська справа",
+  "itemGroup.alloy_forgery.alloy_forgery.button.discord": "Discord",
+  "itemGroup.alloy_forgery.alloy_forgery.button.curseforge": "CurseForge",
+  "itemGroup.alloy_forgery.alloy_forgery.button.modrinth": "Modrinth",
+  "itemGroup.alloy_forgery.alloy_forgery.button.github": "GitHub",
+
+  "emi.category.alloy_forgery.alloy_forge": "Плавильня",
+
+  "tag.item.c.copper_ores": "Мідні руди",
+  "tag.item.c.iron_ores": "Залізні друди",
+  "tag.item.c.gold_ores": "Золоті руди",
+  "tag.item.c.raw_copper_blocks": "Блоки сирої міді",
+  "tag.item.c.raw_iron_blocks": "Блоки сирого заліза",
+  "tag.item.c.raw_gold_blocks": "Блоки сирого золота"
+}
