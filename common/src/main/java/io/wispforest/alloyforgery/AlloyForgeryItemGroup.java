@@ -17,7 +17,7 @@ public class AlloyForgeryItemGroup {
 
     private static List<ItemStack> CONTROLLER_CACHE = null;
 
-    public static final OwoItemGroup GROUP = OwoItemGroup.builder(AlloyForgery.id("alloy_forgery"), () -> {
+    public static final OwoItemGroup GROUP = OwoItemGroup.builder(AlloyForgery.id("main"), () -> {
         if (CONTROLLER_CACHE == null) return null;
         return Icon.of(CONTROLLER_CACHE.isEmpty() ? Items.BARRIER.getDefaultStack() : CONTROLLER_CACHE.get(0));
     }).initializer(group -> {

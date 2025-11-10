@@ -1,0 +1,84 @@
+<owo-ui xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/wisp-forest/owo-lib/1.19/owo-ui.xsd">
+    <components>
+        <flow-layout direction="vertical">
+            <children>
+                <flow-layout direction="vertical" id="main-layout">
+                    <children>
+                        <texture texture="alloy-forgery:textures/gui/forge_controller.png" region-width="176" region-height="189"/>
+
+                        <texture texture="alloy-forgery:textures/gui/forge_controller.png" u="176" v="20" region-width="22" region-height="48" id="fuel-gauge">
+                            <positioning type="absolute">5,22</positioning>
+                            <visible-area>
+                                <height>0</height>
+                            </visible-area>
+                        </texture>
+
+                        <texture texture="alloy-forgery:textures/gui/forge_controller.png" u="176" v="0" region-width="15" region-height="19" id="progress-gauge">
+                            <positioning type="absolute">147,24</positioning>
+                            <visible-area>
+                                <height>0</height>
+                            </visible-area>
+                        </texture>
+
+                        <texture texture="alloy-forgery:textures/gui/forge_controller.png" u="241" v="1" region-width="14" region-height="14" id="invalid-cross">
+                            <positioning type="absolute">147,25</positioning>
+                            <visible-area>
+                                <height>0</height>
+                            </visible-area>
+                        </texture>
+
+                        <flow-layout direction="horizontal" id="lava-bar">
+                            <children>
+                                <sprite atlas="minecraft:textures/atlas/blocks.png" sprite="minecraft:block/lava_still"/>
+                                <sprite atlas="minecraft:textures/atlas/blocks.png" sprite="minecraft:block/lava_still"/>
+                                <sprite atlas="minecraft:textures/atlas/blocks.png" sprite="minecraft:block/lava_still"/>
+                                <sprite atlas="minecraft:textures/atlas/blocks.png" sprite="minecraft:block/lava_still"/>
+                            </children>
+
+                            <positioning type="absolute">63,4</positioning>
+
+                            <sizing>
+                                <vertical method="fixed">10</vertical>
+                                <horizontal method="fixed">0</horizontal>
+                            </sizing>
+                        </flow-layout>
+
+                        <label>
+                            <text translate="true">container.alloy-forgery.forge_controller</text>
+                            <color>#3f3f3f</color>
+                            <positioning type="relative">50,12</positioning>
+                        </label>
+                        <flow-layout direction="horizontal">
+                            <sizing>
+                                <vertical method="content"/>
+                                <horizontal method="fixed">26</horizontal>
+                            </sizing>
+                            <children>
+                                <button id="slot-toggle-btn">
+                                    <text/>
+                                    <tooltip-text translate="true">tooltip.alloy-forgery.slot_toggle_disable</tooltip-text>
+                                    <sizing>
+                                        <vertical method="fixed">14</vertical>
+                                        <horizontal method="fixed">14</horizontal>
+                                    </sizing>
+                                    <renderer>
+                                        <vanilla/>
+                                    </renderer>
+                                </button>
+                            </children>
+                            <horizontal-alignment>center</horizontal-alignment>
+                            <positioning type="absolute">140,75</positioning>
+                        </flow-layout>
+                    </children>
+                </flow-layout>
+            </children>
+
+            <vertical-alignment>center</vertical-alignment>
+            <horizontal-alignment>center</horizontal-alignment>
+
+            <surface>
+                <vanilla-translucent/>
+            </surface>
+        </flow-layout>
+    </components>
+</owo-ui>

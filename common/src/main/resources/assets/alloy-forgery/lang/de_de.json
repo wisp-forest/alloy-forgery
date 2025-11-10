@@ -1,0 +1,37 @@
+{
+  "block.alloy-forgery.bricks_forge_controller": "Schmelzensteuerung (Ziegelsteine)",
+  "block.alloy-forgery.stone_bricks_forge_controller": "Schmelzensteuerung (Steinziegel)",
+  "block.alloy-forgery.deepslate_bricks_forge_controller": "Schmelzensteuerung (Tiefenschieferziegel)",
+  "block.alloy-forgery.end_stone_bricks_forge_controller": "Schmelzensteuerung (Endstein)",
+  "block.alloy-forgery.polished_blackstone_forge_controller": "Schmelzensteuerung (Polierter Schwarzstein)",
+  "block.alloy-forgery.prismarine_bricks_forge_controller": "Schmelzensteuerung (Prismarinziegel)",
+
+  "tooltip.alloy-forgery.forge_tier": [
+    { "text": "Stufe", "color": "gray" },
+    { "text": ": ", "color": "dark_gray" },
+    { "index": 0, "color": "white" }
+  ],
+  "tooltip.alloy-forgery.fuel_capacity": [
+    { "text": "Brennstoffkapazität", "color": "gray" },
+    { "text": ": ", "color": "dark_gray" },
+    { "index": 0, "color": "white" }
+  ],
+
+  "title.alloy-forgery.forge_controller": "Legierungsschmelze",
+
+  "title.alloy-forgery.recipe": "Legieren",
+
+  "tooltip.alloy-forgery.recipe.min_tier": [
+    { "text": "Benötigte Stufe" },
+    { "text": ": ", "color": "gray" },
+    { "index": 0 }
+  ],
+  "tooltip.alloy-forgery.recipe.fuel_per_tick": [
+    { "text": "Brennstoff" },
+    { "text": ": ", "color": "gray" },
+    { "index": 0 }
+  ],
+
+  "message.alloy-forgery.invalid_multiblock": "Ungültige Multiblockstruktur",
+  "itemGroup.alloy-forgery.main": "Legieren"
+}

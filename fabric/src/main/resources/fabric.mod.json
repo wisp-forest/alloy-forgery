@@ -1,6 +1,9 @@
 {
   "schemaVersion": 1,
   "id": "${mod_id}",
+  "provides": [
+    "alloy_forgery"
+  ],
   "version": "${mod_version}",
   "name": "${mod_name}",
   "description": "${mod_description}",
@@ -23,7 +26,7 @@
     "client": [
       "io.wispforest.alloyforgery.fabric.client.AlloyForgeryClientFabric"
     ],
-    "fabric-datagen" : [
+    "fabric-datagen": [
       "io.wispforest.alloyforgery.fabric.data.AlloyForgeryData"
     ],
     "rei_common": [
@@ -43,5 +46,12 @@
     "fabric-api": "${fabric_api_version_range}",
     "minecraft": "${fabric_minecraft_version_range}",
     "owo": "${owo_fabric_version_range}"
+  },
+  "custom": {
+    "loom:injected_interfaces": {
+      "net/minecraft/class_8786": [
+        "io/wispforest/alloyforgery/pond/RecipeTagHelper"
+      ]
+    }
   }
 }

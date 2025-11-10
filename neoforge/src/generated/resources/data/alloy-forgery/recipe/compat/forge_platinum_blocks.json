@@ -1,0 +1,45 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:and",
+      "values": [
+        {
+          "type": "neoforge:not",
+          "value": {
+            "type": "neoforge:tag_empty",
+            "tag": "c:storage_blocks/raw_platinum"
+          }
+        },
+        {
+          "type": "neoforge:not",
+          "value": {
+            "type": "neoforge:tag_empty",
+            "tag": "c:storage_blocks/platinum"
+          }
+        }
+      ]
+    }
+  ],
+  "type": "alloy-forgery:forging",
+  "fuel_per_tick": 90,
+  "inputs": [
+    {
+      "count": 2,
+      "ingredient": "#c:storage_blocks/raw_platinum"
+    }
+  ],
+  "min_forge_tier": 2,
+  "output": {
+    "count": 2,
+    "priority": [
+      "mythicmetals:platinum_block",
+      "modern_industrialization:platinum_block"
+    ],
+    "tag": "c:storage_blocks/platinum"
+  },
+  "overrides": {
+    "3+": {
+      "count": 3
+    }
+  }
+}

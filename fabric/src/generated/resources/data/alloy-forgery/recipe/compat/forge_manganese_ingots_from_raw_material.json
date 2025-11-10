@@ -1,0 +1,34 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:tags_populated",
+      "registry": "minecraft:item",
+      "values": [
+        "c:raw_materials/manganese",
+        "c:ingots/manganese"
+      ]
+    }
+  ],
+  "type": "alloy-forgery:forging",
+  "fuel_per_tick": 45,
+  "inputs": [
+    {
+      "count": 2,
+      "ingredient": "#c:raw_materials/manganese"
+    }
+  ],
+  "min_forge_tier": 1,
+  "output": {
+    "count": 3,
+    "priority": [
+      "mythicmetals:manganese_ingot",
+      "modern_industrialization:manganese_ingot"
+    ],
+    "tag": "c:ingots/manganese"
+  },
+  "overrides": {
+    "2+": {
+      "count": 4
+    }
+  }
+}

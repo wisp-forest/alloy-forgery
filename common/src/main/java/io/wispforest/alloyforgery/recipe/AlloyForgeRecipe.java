@@ -358,16 +358,16 @@ public class AlloyForgeRecipe implements Recipe<AlloyForgeRecipeInput> {
 
             if (upperBound != lowerBound) {
                 if (upperBound == -1) {
-                    return Text.translatable("tooltip.alloy_forgery.override_range.greater_or_equal_to", lowerTierName);
+                    return AlloyForgery.tooltipTranslation("override_range.greater_or_equal_to", lowerTierName);
                 } else {
                     var to = " to ".chars().mapToObj(value -> (char) value).toArray(Character[]::new);
 
                     var upperTierName = ForgeTier.toName(isClientSide, lowerBound);
 
-                    return Text.translatable("tooltip.alloy_forgery.override_range.range", lowerTierName, upperTierName);
+                    return AlloyForgery.tooltipTranslation("override_range.range", lowerTierName, upperTierName);
                 }
             } else {
-                return Text.translatable("tooltip.alloy_forgery.override_range.equal_to", lowerTierName);
+                return AlloyForgery.tooltipTranslation("override_range.equal_to", lowerTierName);
             }
         }
 

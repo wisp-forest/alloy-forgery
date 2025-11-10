@@ -1,0 +1,52 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:and",
+      "values": [
+        {
+          "type": "neoforge:not",
+          "value": {
+            "type": "neoforge:tag_empty",
+            "tag": "c:ingots/copper"
+          }
+        },
+        {
+          "type": "neoforge:not",
+          "value": {
+            "type": "neoforge:tag_empty",
+            "tag": "c:ingots/zinc"
+          }
+        },
+        {
+          "type": "neoforge:not",
+          "value": {
+            "type": "neoforge:tag_empty",
+            "tag": "c:ingots/brass"
+          }
+        }
+      ]
+    }
+  ],
+  "type": "alloy-forgery:forging",
+  "fuel_per_tick": 5,
+  "inputs": [
+    {
+      "count": 2,
+      "ingredient": "#c:ingots/copper"
+    },
+    {
+      "count": 1,
+      "ingredient": "#c:ingots/zinc"
+    }
+  ],
+  "min_forge_tier": 1,
+  "output": {
+    "count": 3,
+    "priority": [
+      "create:brass_ingot",
+      "techreborn:brass_ingot"
+    ],
+    "tag": "c:ingots/brass"
+  },
+  "overrides": {}
+}

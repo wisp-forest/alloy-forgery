@@ -1,0 +1,36 @@
+{
+  "block.alloy-forgery.bricks_forge_controller": "Mechanical Implement Fabricated of Bricks for Incorporating Various Minerals",
+  "block.alloy-forgery.stone_bricks_forge_controller": "Mechanical Implement Fabricated of Stone Bricks for Incorporating Various Minerals",
+  "block.alloy-forgery.deepslate_bricks_forge_controller": "Mechanical Implement Fabricated of Deepethslate for Incorporating Various Minerals",
+  "block.alloy-forgery.end_stone_bricks_forge_controller": "Mechanical Implement Fabricated of End Stone for Incorporating Various Minerals",
+  "block.alloy-forgery.polished_blackstone_forge_controller": "Mechanical Implement Fabricated of Polish'd Blackstone for Incorporating Various Minerals",
+  "block.alloy-forgery.prismarine_bricks_forge_controller": "Mechanical Implement Fabricated of Prismarine Bricks for Incorporating Various Minerals",
+
+  "tooltip.alloy-forgery.forge_tier": [
+    { "text": "Grade", "color": "gray" },
+    { "text": ": ", "color": "dark_gray" },
+    { "index": 0, "color": "white" }
+  ],
+  "tooltip.alloy-forgery.fuel_capacity": [
+    { "text": "Combustible Archive", "color": "gray" },
+    { "text": ": ", "color": "dark_gray" },
+    { "index": 0, "color": "white" }
+  ],
+
+  "title.alloy-forgery.forge_controller": "Forgery of Alloys",
+
+  "title.alloy-forgery.recipe": "Alloy Forging",
+  "tooltip.alloy-forgery.recipe.min_tier": [
+    { "text": "Compulsory Grade" },
+    { "text": ": ", "color": "gray" },
+    { "index": 0 }
+  ],
+  "tooltip.alloy-forgery.recipe.fuel_per_tick": [
+    { "text": "\"Combustibles per tick" },
+    { "text": ": ", "color": "gray" },
+    { "index": 0 }
+  ],
+
+  "message.alloy-forgery.invalid_multiblock": "Unprecedented multiple-block construction",
+  "itemGroup.alloy-forgery.main": "Large Smelters for Forging"
+}

@@ -1,0 +1,34 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:tags_populated",
+      "registry": "minecraft:item",
+      "values": [
+        "c:raw_materials/platinum",
+        "c:ingots/platinum"
+      ]
+    }
+  ],
+  "type": "alloy-forgery:forging",
+  "fuel_per_tick": 90,
+  "inputs": [
+    {
+      "count": 2,
+      "ingredient": "#c:raw_materials/platinum"
+    }
+  ],
+  "min_forge_tier": 2,
+  "output": {
+    "count": 2,
+    "priority": [
+      "mythicmetals:platinum_ingot",
+      "modern_industrialization:platinum_ingot"
+    ],
+    "tag": "c:ingots/platinum"
+  },
+  "overrides": {
+    "3+": {
+      "count": 3
+    }
+  }
+}

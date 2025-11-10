@@ -1,1 +1,5 @@
-{}
+{
+  "net/minecraft/world/item/crafting/RecipeHolder": [
+    "io/wispforest/alloyforgery/pond/RecipeTagHelper"
+  ]
+}

@@ -68,7 +68,7 @@
 //        var tierTextWidget = widgets.add(new CustomTextWidget(minTierText(minForgeTier), 8, 7, 0x404040, false));
 //
 //        //the fuel required text
-//        widgets.addText(Text.translatable("container.alloy_forgery.rei.fuel_per_tick", requiredFuel).asOrderedText(), 8, 20, 0x404040, false);
+//        widgets.addText(Text.translatable("container.alloy-forgery.rei.fuel_per_tick", requiredFuel).asOrderedText(), 8, 20, 0x404040, false);
 //
 //        //the ten input slots background
 //        widgets.addTexture(GUI_TEXTURE, 6, 34, 92, 38, 42, 41);
@@ -113,7 +113,7 @@
 //    }
 //
 //    private static OrderedText minTierText(Object tierArg) {
-//        return Text.translatable("container.alloy_forgery.rei.min_tier", tierArg).asOrderedText();
+//        return Text.translatable("container.alloy-forgery.rei.min_tier", tierArg).asOrderedText();
 //    }
 //
 //    @Override

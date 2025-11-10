@@ -1,0 +1,44 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:and",
+      "values": [
+        {
+          "type": "neoforge:not",
+          "value": {
+            "type": "neoforge:tag_empty",
+            "tag": "c:storage_blocks/raw_osmium"
+          }
+        },
+        {
+          "type": "neoforge:not",
+          "value": {
+            "type": "neoforge:tag_empty",
+            "tag": "c:storage_blocks/osmium"
+          }
+        }
+      ]
+    }
+  ],
+  "type": "alloy-forgery:forging",
+  "fuel_per_tick": 90,
+  "inputs": [
+    {
+      "count": 2,
+      "ingredient": "#c:storage_blocks/raw_osmium"
+    }
+  ],
+  "min_forge_tier": 2,
+  "output": {
+    "count": 2,
+    "priority": [
+      "mythicmetals:osmium_block"
+    ],
+    "tag": "c:storage_blocks/osmium"
+  },
+  "overrides": {
+    "3+": {
+      "count": 3
+    }
+  }
+}

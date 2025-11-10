@@ -1,0 +1,58 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:and",
+      "values": [
+        {
+          "type": "neoforge:not",
+          "value": {
+            "type": "neoforge:tag_empty",
+            "tag": "c:storage_blocks/raw_copper"
+          }
+        },
+        {
+          "type": "neoforge:not",
+          "value": {
+            "type": "neoforge:tag_empty",
+            "tag": "c:storage_blocks/raw_tin"
+          }
+        },
+        {
+          "type": "neoforge:not",
+          "value": {
+            "type": "neoforge:tag_empty",
+            "tag": "c:storage_blocks/bronze"
+          }
+        }
+      ]
+    }
+  ],
+  "type": "alloy-forgery:forging",
+  "fuel_per_tick": 45,
+  "inputs": [
+    {
+      "count": 3,
+      "ingredient": "#c:storage_blocks/raw_copper"
+    },
+    {
+      "count": 1,
+      "ingredient": "#c:storage_blocks/raw_tin"
+    }
+  ],
+  "min_forge_tier": 1,
+  "output": {
+    "count": 4,
+    "priority": [
+      "mythicmetals:bronze_ingot",
+      "techreborn:bronze_ingot",
+      "indrev:bronze_ingot",
+      "modern_industrialization:bronze_ingot"
+    ],
+    "tag": "c:storage_blocks/bronze"
+  },
+  "overrides": {
+    "2+": {
+      "count": 5
+    }
+  }
+}

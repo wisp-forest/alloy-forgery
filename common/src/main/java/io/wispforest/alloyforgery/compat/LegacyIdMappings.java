@@ -2,6 +2,8 @@ package io.wispforest.alloyforgery.compat;
 
 import net.minecraft.util.Identifier;
 import io.wispforest.alloyforgery.AlloyForgery;
+import org.jetbrains.annotations.Nullable;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -17,7 +19,15 @@ public class LegacyIdMappings {
         MAPPINGS.put(id("stone_brick_forge_controller"), id("stone_bricks_forge_controller"));
     }
 
-    public static Identifier remap(Identifier original) {
+    public static final String MOD_ID = "alloy_forgery";
+
+    public static Identifier remap(@Nullable Identifier original) {
+        if (original == null) return null;
+
+        if (original.getNamespace().equals(MOD_ID)) {
+            original = Identifier.of(AlloyForgery.MOD_ID, original.getPath());
+        }
+
         return MAPPINGS.getOrDefault(original, original);
     }
 

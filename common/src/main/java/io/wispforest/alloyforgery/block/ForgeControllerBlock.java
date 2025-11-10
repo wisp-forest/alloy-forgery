@@ -1,6 +1,7 @@
 package io.wispforest.alloyforgery.block;
 
 import com.mojang.serialization.MapCodec;
+import io.wispforest.alloyforgery.AlloyForgery;
 import io.wispforest.alloyforgery.utils.GeneralPlatformUtils;
 import io.wispforest.endec.impl.StructEndecBuilder;
 import io.wispforest.owo.particles.ClientParticles;
@@ -79,7 +80,7 @@ public class ForgeControllerBlock extends BlockWithEntity {
                 controller.addFuel(fuelDefinition.fuel());
             } else if (!GeneralPlatformUtils.INSTANCE.interactWithFluidStorage(controller, player, hand)) {
                 if (!controller.verifyMultiblock()) {
-                    player.sendMessage(Text.translatable("message.alloy_forgery.invalid_multiblock").formatted(Formatting.GRAY), true);
+                    player.sendMessage(AlloyForgery.translation("message", "invalid_multiblock").formatted(Formatting.GRAY), true);
                     return ActionResult.SUCCESS;
                 }
 

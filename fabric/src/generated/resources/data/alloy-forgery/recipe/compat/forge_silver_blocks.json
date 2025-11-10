@@ -1,0 +1,36 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:tags_populated",
+      "registry": "minecraft:item",
+      "values": [
+        "c:storage_blocks/raw_silver",
+        "c:storage_blocks/silver"
+      ]
+    }
+  ],
+  "type": "alloy-forgery:forging",
+  "fuel_per_tick": 45,
+  "inputs": [
+    {
+      "count": 2,
+      "ingredient": "#c:storage_blocks/raw_silver"
+    }
+  ],
+  "min_forge_tier": 1,
+  "output": {
+    "count": 3,
+    "priority": [
+      "mythicmetals:silver_block",
+      "techreborn:silver_block",
+      "indrev:silver_block",
+      "modern_industrialization:silver_block"
+    ],
+    "tag": "c:storage_blocks/silver"
+  },
+  "overrides": {
+    "2+": {
+      "count": 4
+    }
+  }
+}

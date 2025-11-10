@@ -1,0 +1,6 @@
+{
+  "parent_tier": "alloy-forgery:common_tier",
+  "speed_multiplier": 1.5,
+  "fuel_consumption_multiplier": 1.65,
+  "fuel_capacity": 96000
+}

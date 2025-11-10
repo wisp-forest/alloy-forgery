@@ -1,0 +1,8 @@
+{
+  "alloy-forgery:bricks_forge": "alloy-forgery:common_tier",
+  "alloy-forgery:stone_bricks_forge": "alloy-forgery:common_tier",
+  "alloy-forgery:deepslate_bricks_forge": "alloy-forgery:common_plus_tier",
+  "alloy-forgery:prismarine_bricks_forge": "alloy-forgery:uncommon_tier",
+  "alloy-forgery:polished_blackstone_forge": "alloy-forgery:uncommon_tier",
+  "alloy-forgery:end_stone_bricks_forge": "alloy-forgery:rare_tier"
+}

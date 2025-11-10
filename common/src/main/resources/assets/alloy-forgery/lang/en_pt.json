@@ -1,0 +1,36 @@
+{
+  "block.alloy-forgery.bricks_forge_controller": "Metal Forgery o' Bricks o' Clay",
+  "block.alloy-forgery.stone_bricks_forge_controller": "Metal Forgery o' Bricks o' Rock",
+  "block.alloy-forgery.deepslate_bricks_forge_controller": "Metal Forgery o' Bricks o' tough rock",
+  "block.alloy-forgery.end_stone_bricks_forge_controller": "Metal Forgery o' Foreign Stone Bricks",
+  "block.alloy-forgery.polished_blackstone_forge_controller": "Metal Forgery o' Good lookin' Bricks o' Rock o' Black",
+  "block.alloy-forgery.prismarine_bricks_forge_controller": "Metal Forgery o' Bricks o' Prismarine",
+
+  "tooltip.alloy-forgery.forge_tier": [
+    { "text": "Level", "color": "gray" },
+    { "text": ": ", "color": "dark_gray" },
+    { "index": 0, "color": "white" }
+  ],
+  "tooltip.alloy-forgery.fuel_capacity": [
+    { "text": "Fuel Barrel", "color": "gray" },
+    { "text": ": ", "color": "dark_gray" },
+    { "index": 0, "color": "white" }
+  ],
+
+  "title.alloy-forgery.forge_controller": "Smithy's Menu",
+
+  "title.alloy-forgery.recipe": "Metal Forging",
+  "tooltip.alloy-forgery.recipe.min_tier": [
+    { "text": "Required Level" },
+    { "text": ": ", "color": "gray" },
+    { "index": 0 }
+  ],
+  "tooltip.alloy-forgery.recipe.fuel_per_tick": [
+    { "text": "Fuel per tick" },
+    { "text": ": ", "color": "gray" },
+    { "index": 0 }
+  ],
+
+  "message.alloy-forgery.invalid_multiblock": "Multiblock Be Shipwrecked",
+  "itemGroup.alloy-forgery.main": "Menu o' Metal Forgeries"
+}

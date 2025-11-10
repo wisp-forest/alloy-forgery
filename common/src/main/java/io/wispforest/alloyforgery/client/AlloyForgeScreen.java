@@ -33,8 +33,8 @@ public class AlloyForgeScreen extends BaseOwoHandledScreen<FlowLayout, AlloyForg
 
     private static final SpriteIdentifier LAVA_SPRITE = new SpriteIdentifier(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, Identifier.of("block/lava_still"));
 
-    private static final Text ENABLED_SLOT_TEXT = Text.translatable("tooltip.alloy_forgery.enabled_slot");
-    private static final Text DISABLED_SLOT_TEXT = Text.translatable("tooltip.alloy_forgery.disabled_slot");
+    private static final Text ENABLED_SLOT_TEXT = Text.translatable("tooltip.alloy-forgery.enabled_slot");
+    private static final Text DISABLED_SLOT_TEXT = Text.translatable("tooltip.alloy-forgery.disabled_slot");
 
     private TextureComponent fuelGauge;
     private TextureComponent progressGauge;
@@ -101,7 +101,7 @@ public class AlloyForgeScreen extends BaseOwoHandledScreen<FlowLayout, AlloyForg
                         })
                 )
                 .child(
-                    label(Text.translatable("container.alloy_forgery.forge_controller"))
+                    label(Text.translatable("title.alloy-forgery.forge_controller"))
                         .color(getThemedValue(Color.ofRgb(0x3f3f3f), Color.WHITE))
                         .positioning(Positioning.relative(50, 12))
                 )
@@ -111,7 +111,7 @@ public class AlloyForgeScreen extends BaseOwoHandledScreen<FlowLayout, AlloyForg
                             button(Text.empty(), btn -> {
                                 this.allowSlotToggling = !allowSlotToggling;
 
-                                btn.tooltip(Text.translatable("tooltip.alloy_forgery.slot_toggle_" + (this.allowSlotToggling ? "enable" : "disable")));
+                                btn.tooltip(Text.translatable("tooltip.alloy-forgery.slot_toggle_" + (this.allowSlotToggling ? "enable" : "disable")));
                             }).renderer((context, button, delta) -> {
                                     BUTTON_RENDERER.draw(context, button, delta);
 
@@ -122,7 +122,7 @@ public class AlloyForgeScreen extends BaseOwoHandledScreen<FlowLayout, AlloyForg
 
                                     context.pop();
                                 })
-                                .tooltip(Text.translatable("tooltip.alloy_forgery.slot_toggle_disable"))
+                                .tooltip(Text.translatable("tooltip.alloy-forgery.slot_toggle_disable"))
                                 .sizing(Sizing.fixed(18), Sizing.fixed(18))
                         ).horizontalAlignment(HorizontalAlignment.CENTER)
                         .positioning(Positioning.absolute(140, 75))
@@ -175,7 +175,7 @@ public class AlloyForgeScreen extends BaseOwoHandledScreen<FlowLayout, AlloyForg
         } else {
             this.invalidCross
                 .resetVisibleArea()
-                .tooltip(Text.translatable("tooltip.alloy_forgery.invalid_tier", requiredTier));
+                .tooltip(Text.translatable("tooltip.alloy-forgery.invalid_tier", requiredTier));
         }
     }
 
