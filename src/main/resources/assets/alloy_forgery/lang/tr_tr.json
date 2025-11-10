@@ -1,0 +1,50 @@
+{
+  "block.alloy_forgery.bricks_forge_controller": "Tuğla Tavlama Fırını Kontrolcüsü",
+  "block.alloy_forgery.stone_bricks_forge_controller": "Taş Tuğlası Tavlama Fırını Kontrolcüsü",
+  "block.alloy_forgery.deepslate_bricks_forge_controller": "Kayrak Taşı Tuğlası Tavlama Fırını Kontrolcüsü",
+  "block.alloy_forgery.end_stone_bricks_forge_controller": "End Taşı Tuğlası Tavlama Fırını Kontrolcüsü",
+  "block.alloy_forgery.polished_blackstone_forge_controller": "Cilalı Kara Taş Tavlama Fırını Kontrolcüsü",
+  "block.alloy_forgery.prismarine_bricks_forge_controller": "Prizmarin Tuğlası Tavlama Fırını Kontrolcüsü",
+
+  "tooltip.alloy_forgery.forge_tier": "Kademe: %d",
+  "tooltip.alloy_forgery.fuel_capacity": "Yakıt Kapasitesi: %d",
+  "tooltip.alloy_forgery.invalid_tier": "Bu tarif %d Kademesinde bir Tavlama Fırını Kontrolcüsü gerektirir",
+
+  "container.alloy_forgery.forge_controller": "Alaşım Tavlama Fırını",
+
+  "container.alloy_forgery.rei.title": "Alaşım Dövme",
+  "container.alloy_forgery.rei.min_tier": "Gerekli Kademe: %d",
+  "container.alloy_forgery.rei.fuel_per_tick": "Tik başına yakıt: %d",
+  "container.alloy_forgery.rei.button": "Çevrim Kademesi Geçersiz Kılması",
+
+  "message.alloy_forgery.invalid_multiblock": "Geçersiz Çoklu Blok Yapılandırması",
+  "itemGroup.alloy_forgery.alloy_forgery": "Alloy Forgery",
+  "itemGroup.alloy_forgery.alloy_forgery.button.discord": "Discord",
+  "itemGroup.alloy_forgery.alloy_forgery.button.curseforge": "CurseForge",
+  "itemGroup.alloy_forgery.alloy_forgery.button.modrinth": "Modrinth",
+  "itemGroup.alloy_forgery.alloy_forgery.button.github": "GitHub",
+
+  "emi.category.alloy_forgery.alloy_forge": "Alaşım Dövme",
+
+  "tag.item.c.copper_ores": "Bakır Cevherler",
+  "tag.item.c.iron_ores": "Demir Cevherler",
+  "tag.item.c.gold_ores": "Altın Cevherler",
+  "tag.item.c.raw_copper_blocks": "Ham Bakır Cevher Blokları",
+  "tag.item.c.raw_iron_blocks": "Ham Demir Cevher Blokları",
+  "tag.item.c.raw_gold_blocks": "Ham Altın Cevher Blokları",
+
+  "text.config.alloy_forgery.title": "Alloy Forgery Yapılandırması",
+  "text.config.alloy_forgery.section.blasting_adaption": "Maden Eritme Uyumu",
+
+  "text.config.alloy_forgery.option.allowHigherTierOutput": "Daha Yüksek Kademe Çıktıya İzin Ver",
+  "text.config.alloy_forgery.option.allowHigherTierOutput.tooltip": "Tüm Tarifler için Maden Eritme Uyumunun Yüksek Seviye Çıktısını açmak veya kapatmak için değiştirme",
+
+  "text.config.alloy_forgery.option.allowBlastingFurnaceAdaption": "Maden Eritme Ocağı Tarifinin Uyumuna İzin Ver",
+  "text.config.alloy_forgery.option.allowBlastingFurnaceAdaption.tooltip": "Tüm Maden Eritme Tariflerinde Maden Eritme Uyumunu açmak veya kapatmak için değiştirme",
+
+  "text.config.alloy_forgery.option.baseInputAmount": "Temel Girdi Miktarı",
+  "text.config.alloy_forgery.option.baseInputAmount.tooltip": "Adapte edilmiş tarifler için temel girdi sayısını ayarlar",
+
+  "text.config.alloy_forgery.option.higherTierOutputIncrease": "İlave Kademe Çıktı Miktarı",
+  "text.config.alloy_forgery.option.higherTierOutputAmount.tooltip": "Kademe 3'e ulaşıldığında artırılan ek miktarı ayarlar"
+}
