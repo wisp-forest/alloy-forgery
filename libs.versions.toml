@@ -54,8 +54,8 @@ arch_api = "18.0.6"               # https://modrinth.com/mod/architectury-api/ve
 
 emi = "1.1.18+1.21.1"
 
-# Types: none, rei, emi
-item_viewer_type = "none"
+jei_minecraft="1.21.10"
+jei="26.1.0.16"
 
 [libraries]
 
@@ -73,9 +73,12 @@ jankson = { module = "blue.endless:jankson", version.ref = "jankson" }
 mixin_extras_common = { module = "io.github.llamalad7:mixinextras-common", version.ref = "mixinextras" }
 
 rei_common_api            = { module = "me.shedaniel:RoughlyEnoughItems-api", version.ref = "rei" }
-rei_common_default_plugin = { module = "me.shedaniel:RoughlyEnoughItems-default-plugin", version.ref = "rei" }
+rei_common = { module = "me.shedaniel:RoughlyEnoughItems-default-plugin", version.ref = "rei" }
 
 emi_common = { group = "dev.emi", name = "emi-xplat-intermediary", version.ref = "emi"}
+
+jei_common_api = { group = "mezz.jei", name = "jei-${jei_minecraft}-common-api", version.ref = "jei"}
+jei_common = { group = "mezz.jei", name = "jei-${jei_minecraft}-common", version.ref = "jei"}
 
 # Fabric
 
@@ -90,6 +93,9 @@ rei_fabric     = { module = "me.shedaniel:RoughlyEnoughItems-fabric", version.re
 
 emi_fabric     = { group = "dev.emi", name = "emi-fabric", version.ref = "emi" }
 
+jei_fabric_api = { group = "mezz.jei", name = "jei-${jei_minecraft}-fabric-api", version.ref = "jei"}
+jei_fabric = { group = "mezz.jei", name = "jei-${jei_minecraft}-fabric", version.ref = "jei"}
+
 # Neoforge
 
 owolib_neo = { module = "io.wispforest:owo-lib-neoforge", version.ref = "owo_neoforge" }
@@ -103,7 +109,5 @@ rei_neoforge     = { module = "me.shedaniel:RoughlyEnoughItems-neoforge", versio
 
 emi_neoforge =     { group = "dev.emi", name = "emi-neoforge", version.ref = "emi" }
 
-[bundles]
-
-# Common
-rei_common = ["rei_common_api", "rei_common_default_plugin"]
+jei_neoforge_api = { group = "mezz.jei", name = "jei-${jei_minecraft}-neoforge-api", version.ref = "jei"}
+jei_neoforge = { group = "mezz.jei", name = "jei-${jei_minecraft}-neoforge", version.ref = "jei"}
