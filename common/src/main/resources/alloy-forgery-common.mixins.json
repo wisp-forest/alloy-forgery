@@ -2,6 +2,7 @@
   "required": true,
   "minVersion": "0.8",
   "package": "io.wispforest.alloyforgery.mixin",
+  "refmap": "${mod_id}-common-common-refmap.json",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
     "DataPackContentsMixin",

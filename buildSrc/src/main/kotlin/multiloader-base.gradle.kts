@@ -1,6 +1,9 @@
 import io.wispforest.helpers.Extensions.currentPlatform
 import io.wispforest.helpers.Extensions.libs
-import io.wispforest.helpers.Utils
+import io.wispforest.helpers.Extensions.modId
+import io.wispforest.helpers.ItemViewerUtils.setupItemViewerDependencies
+import io.wispforest.helpers.ResourceProcessingUtils
+import io.wispforest.helpers.RunConfigurationUtils.createExtraRunConfigs
 import io.wispforest.helpers.UtilsJava
 
 plugins {
@@ -11,7 +14,7 @@ plugins {
     id("java-library")
 }
 
-val modid = Utils.modId(rootProject)
+val modid = project.modId
 
 base {
     archivesName = "${modid}${(if(project.name.isEmpty()) "" else "-${project.name.replace("-mojmap", "")}")}"
@@ -35,33 +38,7 @@ if (projectPlatform != "common" && enabledTestmodPlatforms.contains(projectPlatf
 loom {
     silentMojangMappingsLicense()
 
-    if (project.path != ":common") {
-        mods {
-            try {
-                named("main") {
-                    this@named.sourceSet("main", project)
-                    this@named.sourceSet("main", project(":common"))
-                }
-            } catch (e: UnknownDomainObjectException) {
-                register("main") {
-                    this@register.sourceSet("main", project)
-                    this@register.sourceSet("main", project(":common"))
-                }
-            }
-        }
-
-        accessWidenerPath = project(":common").loom.accessWidenerPath
-
-        runs (Utils.getSetupRunsAction(project))
-
-        if (currentPlatform == "neoforge") {
-            println("Setup for Neoforge")
-            neoForge {}
-        } else if(currentPlatform == "forge") {
-            println("Setup for Forge")
-            forge {}
-        }
-    } else {
+    if (project.path == ":common") {
         val awPath = "src/main/resources/${modid}.accesswidener"
         val awFile = file(awPath);
 
@@ -70,6 +47,36 @@ loom {
         }
 
         accessWidenerPath = awFile;
+
+        return@loom
+    }
+
+    mods {
+        try {
+            named("main") {
+                this@named.sourceSet("main", project)
+                this@named.sourceSet("main", project(":common"))
+            }
+        } catch (e: UnknownDomainObjectException) {
+            register("main") {
+                this@register.sourceSet("main", project)
+                this@register.sourceSet("main", project(":common"))
+            }
+        }
+    }
+
+    accessWidenerPath = project(":common").loom.accessWidenerPath
+
+    runs {
+        this.createExtraRunConfigs(project)
+    }
+
+    if (currentPlatform == "neoforge") {
+        println("Setup for Neoforge")
+        neoForge {}
+    } else if(currentPlatform == "forge") {
+        println("Setup for Forge")
+        forge {}
     }
 }
 
@@ -94,6 +101,10 @@ repositories {
 
     // Modrinth Maven
     maven("https://api.modrinth.com/maven")
+
+    // JEI Item Viewer
+    maven("https://maven.blamejared.com/")
+    maven("https://modmaven.dev") // Backup
 
     mavenCentral()
     gradlePluginPortal()
@@ -136,31 +147,11 @@ dependencies {
     //--
 
     // Item Viewer Libs
-    val enabledItemViewers = (rootProject.property("enabled_item_viewers") as String).split(",")
-    val selectedItemViewer = (rootProject.property("selected_item_viewers") as String)
-
-    if (projectPlatform == "common") {
-        if (enabledItemViewers.contains("rei")) modCompileOnly(libs.bundles.rei.common)
-        if (enabledItemViewers.contains("emi")) modCompileOnly("${libs.emi.common.get()}:api")
-    } else {
-        if (selectedItemViewer != "none" && !enabledItemViewers.contains(selectedItemViewer)) {
-            throw IllegalStateException("Can not use $selectedItemViewer as given item viewer as such is not enabled!")
-        }
-
-        if (enabledItemViewers.contains("rei")) modCompileOnly(libs.create("rei.$projectPlatform.api").get())
-        if (enabledItemViewers.contains("emi")) modCompileOnly("${libs.create("emi.$projectPlatform").get()}:api")
-        when (selectedItemViewer) {
-            "rei" -> modLocalRuntime(libs.create("rei.$projectPlatform").get())
-            "emi" -> modLocalRuntime(libs.create("emi.$projectPlatform").get())
-            "none" -> println("[Info]: No Item Viewer selected meaning none will be loaded in game!")
-            else -> throw IllegalStateException("Selected '$selectedItemViewer' as item viewer but such was not found within the list of viewers: $enabledItemViewers");
-        }
-    }
-    // --
+    project.setupItemViewerDependencies(modCompileOnly = this::modCompileOnly, modLocalRuntime = this::modLocalRuntime)
 }
 
 tasks.processResources {
-    val expandProps = mutableMapOf(
+    val baseProperties = mutableMapOf(
         "neoforge_mod_id"                    to modid.replace("-", "_"),
         "mod_id"                             to modid,
         "mod_name"                           to rootProject.property("mod_name"),
@@ -190,23 +181,28 @@ tasks.processResources {
         "java_version"                       to libs.versions.java.get()
     )
 
-    // Fabric: More Info about contacts like links
-    expandProps["contact_entry"] = Utils.buildMapEntry(project, "homepage", "sourcepage", "issuepage")
-
-    expandProps["list_of_authors"] = Utils.buildListEntry(project, (rootProject.property("mod_authors") as String).split(","))
-    expandProps["list_of_contributors"] = Utils.buildListEntry(project, (rootProject.property("mod_contributors") as String).split(","))
-    // --
-
-    filesMatching(listOf("pack.mcmeta", "fabric.mod.json", "META-INF/neoforge.mods.toml")) {
-        expand(expandProps)
+    filesMatching(listOf("pack.mcmeta", "META-INF/neoforge.mods.toml")) {
+        expand(baseProperties)
     }
 
-    // Fabric: Remove various entries that are there due to inability to properly add string data without breaking FMJ before looms reading
-    // Note: Stupid Cast to remove error that is wrong
-    filesMatching(listOf("fabric.mod.json")) { filter(UtilsJava.removeLineTransformer())  }
+    // Fabric: More Info about contacts like links
+    val fabricExtraProperties = baseProperties.toMutableMap();
+
+    fabricExtraProperties["contact_entry"] = ResourceProcessingUtils.buildProjectContactMapEntry(project, "homepage", "sourcepage", "issuepage")
+
+    fabricExtraProperties["list_of_authors"] = ResourceProcessingUtils.buildContactListEntry(project, (rootProject.property("mod_authors") as String).split(","))
+    fabricExtraProperties["list_of_contributors"] = ResourceProcessingUtils.buildContactListEntry(project, (rootProject.property("mod_contributors") as String).split(","))
+
+    filesMatching(listOf("fabric.mod.json")) {
+        expand(fabricExtraProperties)
+
+        // Note: Remove various entries that are there due to inability to properly add string data without breaking FMJ before looms reading
+        // Note: Stupid Cast to remove error that is wrong
+        filter(UtilsJava.removeLineTransformer())
+    }
     // --
 
-    inputs.properties(expandProps)
+    inputs.properties(baseProperties)
 }
 
 tasks.withType<JavaCompile> {
