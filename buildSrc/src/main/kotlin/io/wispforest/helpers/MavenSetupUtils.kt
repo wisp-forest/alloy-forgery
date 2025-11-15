@@ -22,7 +22,8 @@ object MavenSetupUtils {
     }
 
     fun setupMavenRepo(id: String, repoHandler: RepositoryHandler) {
-        val mavenCredentials = System.getenv()["${id}_maven_credentials"] ?: return
+        val env = System.getenv();
+        val mavenCredentials = env["${id}_maven_credentials"] ?: env["${id}-maven-credentials"] ?: return
         val json = Json.decodeFromString<JsonObject>("{${mavenCredentials}}")
 
         fun getContent(obj: JsonObject, key: String): String? {
