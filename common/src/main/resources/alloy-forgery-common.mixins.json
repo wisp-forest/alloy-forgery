@@ -15,8 +15,7 @@
     "PlayerManagerMixin",
     "JsonDataLoaderAccessor",
     "SingleStackRecipeAccessor",
-    "DataResultMixin",
-    "DataResultMixin$DataResultErrorMixin",
+    "DataResultErrorMixin",
     "RegistryEntryListNamedMixin"
   ],
   "client": [
