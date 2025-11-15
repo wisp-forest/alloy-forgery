@@ -54,8 +54,8 @@ arch_api = "15.0.3"               # https://modrinth.com/mod/architectury-api/ve
 
 emi = "1.1.18+1.21.1"
 
-jei_minecraft="1.21.10"
-jei="26.1.0.16"
+jei_minecraft="1.21.4"
+jei="20.0.0.4"
 
 [libraries]
 
