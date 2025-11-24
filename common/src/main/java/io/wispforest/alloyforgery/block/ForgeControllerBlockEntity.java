@@ -4,6 +4,8 @@ import com.google.common.collect.ImmutableList;
 import io.wispforest.alloyforgery.forges.*;
 import io.wispforest.alloyforgery.utils.FluidStorage;
 import io.wispforest.alloyforgery.utils.GeneralPlatformUtils;
+import io.wispforest.endec.Endec;
+import io.wispforest.endec.impl.KeyedEndec;
 import io.wispforest.owo.ops.ItemOps;
 import io.wispforest.owo.util.ImplementedInventory;
 import net.minecraft.block.BlockState;
@@ -24,6 +26,8 @@ import net.minecraft.screen.ScreenHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.storage.ReadView;
+import net.minecraft.storage.WriteView;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.ItemScatterer;
@@ -50,6 +54,7 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
     public static BlockEntityType<ForgeControllerBlockEntity> FORGE_CONTROLLER_BLOCK_ENTITY;
     private final DefaultedList<ItemStack> items = DefaultedList.ofSize(INVENTORY_SIZE, ItemStack.EMPTY);
 
+    private static final KeyedEndec<Set<Integer>> DISABLED_SLOT_KEY = Endec.INT.setOf().keyed("disabled_slots", HashSet::new);
     public final ExtObservable<Set<Integer>> disabledSlots = ExtObservable.of(new HashSet<>());
 
     private final DefaultedList<ItemStack> previousItems = DefaultedList.of();
@@ -98,6 +103,7 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
     @Override
     protected void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
         Inventories.readNbt(nbt, items, registryLookup);
+        this.disabledSlots.set(nbt.get(DISABLED_SLOT_KEY));
 
         this.currentSmeltTime = nbt.getInt("CurrentSmeltTime");
         this.fuel = nbt.getInt("Fuel");
@@ -110,6 +116,7 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
     @Override
     protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
         Inventories.writeNbt(nbt, items, registryLookup);
+        nbt.put(DISABLED_SLOT_KEY, this.disabledSlots.get());
 
         nbt.putInt("Fuel", Math.round(fuel));
         nbt.putInt("CurrentSmeltTime", currentSmeltTime);
