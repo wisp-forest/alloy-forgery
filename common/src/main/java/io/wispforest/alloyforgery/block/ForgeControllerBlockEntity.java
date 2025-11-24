@@ -4,6 +4,8 @@ import com.google.common.collect.ImmutableList;
 import io.wispforest.alloyforgery.forges.*;
 import io.wispforest.alloyforgery.utils.FluidStorage;
 import io.wispforest.alloyforgery.utils.GeneralPlatformUtils;
+import io.wispforest.endec.Endec;
+import io.wispforest.endec.impl.KeyedEndec;
 import io.wispforest.owo.ops.ItemOps;
 import io.wispforest.owo.util.ImplementedInventory;
 import net.minecraft.block.BlockState;
@@ -52,6 +54,7 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
     public static BlockEntityType<ForgeControllerBlockEntity> FORGE_CONTROLLER_BLOCK_ENTITY;
     private final DefaultedList<ItemStack> items = DefaultedList.ofSize(INVENTORY_SIZE, ItemStack.EMPTY);
 
+    private static final KeyedEndec<Set<Integer>> DISABLED_SLOT_KEY = Endec.INT.setOf().keyed("disabled_slots", HashSet::new);
     public final ExtObservable<Set<Integer>> disabledSlots = ExtObservable.of(new HashSet<>());
 
     private final DefaultedList<ItemStack> previousItems = DefaultedList.of();
@@ -100,6 +103,7 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
     @Override
     protected void readData(ReadView view) {
         Inventories.readData(view, items);
+        this.disabledSlots.set(view.get(DISABLED_SLOT_KEY));
 
         this.currentSmeltTime = view.getInt("CurrentSmeltTime", 0);
         this.fuel = view.getInt("Fuel", 0);
@@ -112,6 +116,7 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
     @Override
     protected void writeData(WriteView view) {
         Inventories.writeData(view, items);
+        view.put(DISABLED_SLOT_KEY, this.disabledSlots.get());
 
         view.putInt("Fuel", Math.round(fuel));
         view.putInt("CurrentSmeltTime", currentSmeltTime);
