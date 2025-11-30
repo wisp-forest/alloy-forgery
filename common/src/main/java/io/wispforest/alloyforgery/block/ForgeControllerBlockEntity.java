@@ -26,8 +26,6 @@ import net.minecraft.screen.ScreenHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.ItemScatterer;
@@ -43,7 +41,6 @@ import io.wispforest.alloyforgery.recipe.AlloyForgeRecipeInput;
 import io.wispforest.alloyforgery.utils.ExtObservable;
 import java.util.*;
 
-@SuppressWarnings("UnstableApiUsage")
 public class ForgeControllerBlockEntity extends BlockEntity implements ImplementedInventory, SidedInventory, NamedScreenHandlerFactory {
 
     private static final int[] DOWN_SLOTS = new int[]{10, 11};
