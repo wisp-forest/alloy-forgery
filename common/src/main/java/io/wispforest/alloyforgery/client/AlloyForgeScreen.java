@@ -25,6 +25,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
+import static io.wispforest.alloyforgery.client.FixedSpriteComponent.fixedSprite;
 import static io.wispforest.owo.ui.container.Containers.*;
 import static io.wispforest.owo.ui.component.Components.*;
 import static io.wispforest.alloyforgery.client.ComponentUtils.*;
@@ -91,10 +92,10 @@ public class AlloyForgeScreen extends BaseOwoHandledScreen<FlowLayout, AlloyForg
                 )
                 .child(
                     lavaBar = horizontalFlow(Sizing.fixed(0), Sizing.fixed(10))
-                        .child(sprite(LAVA_SPRITE))
-                        .child(sprite(LAVA_SPRITE))
-                        .child(sprite(LAVA_SPRITE))
-                        .child(sprite(LAVA_SPRITE))
+                        .child(fixedSprite(LAVA_SPRITE))
+                        .child(fixedSprite(LAVA_SPRITE))
+                        .child(fixedSprite(LAVA_SPRITE))
+                        .child(fixedSprite(LAVA_SPRITE))
                         .configure(layout -> {
                             layout.positioning(Positioning.absolute(63, 4))
                                 .id("lava-bar");

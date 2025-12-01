@@ -18,9 +18,6 @@
     "DataResultErrorMixin",
     "RegistryEntryListNamedMixin"
   ],
-  "client": [
-    "owo.SpriteComponentMixin"
-  ],
   "injectors": {
     "defaultRequire": 1
   }
