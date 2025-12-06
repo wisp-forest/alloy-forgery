@@ -18,7 +18,6 @@ import net.minecraft.registry.RegistryKeys;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.*;
-import net.minecraft.text.Text;
 import net.minecraft.util.*;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
@@ -60,39 +59,36 @@ public class ForgeControllerBlock extends BlockWithEntity {
 
     @Override
     protected ActionResult onUseWithItem(ItemStack playerStack, BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
-        var result = ActionResult.SUCCESS;
-
-        if (!world.isClient()) {
-            final var fuelDefinition = ForgeFuelDataLoader.getFuelForItem(playerStack.getItem());
-            if (!(world.getBlockEntity(pos) instanceof ForgeControllerBlockEntity controller)) {
-                return ActionResult.PASS_TO_DEFAULT_BLOCK_ACTION;
-            }
-
-            if (fuelDefinition.hasReturnType() && controller.canAddFuel(fuelDefinition.fuel())) {
-                if (!player.getAbilities().creativeMode) {
-                    player.getInventory().offerOrDrop(new ItemStack(fuelDefinition.returnType()));
-
-                    var newStack = playerStack.copy();
-
-                    newStack.decrement(1);
-
-                    result = ActionResult.SUCCESS.withNewHandStack(newStack);
-                }
-                controller.addFuel(fuelDefinition.fuel());
-            } else if (!GeneralPlatformUtils.INSTANCE.interactWithFluidStorage(controller, player, hand)) {
-                if (!controller.verifyMultiblock()) {
-                    player.sendMessage(AlloyForgery.translation("message", "invalid_multiblock").formatted(Formatting.GRAY), true);
-                    return ActionResult.SUCCESS;
-                }
-
-                final var screenHandlerFactory = state.createScreenHandlerFactory(world, pos);
-                if (screenHandlerFactory != null) {
-                    GeneralPlatformUtils.INSTANCE.openHandledScreen(player, controller, screenHandlerFactory);
-                }
-            }
+        if (world.isClient()) {
+            return ActionResult.SUCCESS;
         }
 
-        return result;
+        if (!(world.getBlockEntity(pos) instanceof ForgeControllerBlockEntity controller)) {
+            return ActionResult.PASS_TO_DEFAULT_BLOCK_ACTION;
+        }
+
+        if (!controller.verifyMultiblock()) {
+            player.sendMessage(AlloyForgery.translation("message", "invalid_multiblock").formatted(Formatting.GRAY), true);
+            return ActionResult.SUCCESS;
+        }
+
+        final var fuelDefinition = ForgeFuelDataLoader.getFuelForItem(playerStack.getItem());
+
+        if (fuelDefinition.hasReturnType() && controller.canAddFuel(fuelDefinition)) {
+            var returnStack = new ItemStack(fuelDefinition.returnType());
+            controller.addFuel(fuelDefinition.fuel());
+            if (!player.getAbilities().creativeMode) {
+                playerStack.decrement(1);
+                player.getInventory().offerOrDrop(returnStack);
+                return ActionResult.SUCCESS.withNewHandStack(returnStack);
+            }
+        } else if (!GeneralPlatformUtils.INSTANCE.interactWithFluidStorage(controller, player, hand)) {
+            final var screenHandlerFactory = state.createScreenHandlerFactory(world, pos);
+            if (screenHandlerFactory != null) {
+                GeneralPlatformUtils.INSTANCE.openHandledScreen(player, controller, screenHandlerFactory);
+            }
+        }
+        return ActionResult.SUCCESS;
     }
 
     @Override

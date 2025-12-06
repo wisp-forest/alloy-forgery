@@ -139,6 +139,10 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
         return getStack(11);
     }
 
+    public boolean canAddFuel(ForgeFuelDataLoader.ForgeFuelDefinition definition) {
+        return canAddFuel(definition.fuel());
+    }
+
     public boolean canAddFuel(int fuel) {
         return this.fuel + fuel <= forgeTier().fuelCapacity();
     }
