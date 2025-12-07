@@ -49,8 +49,8 @@ owo_neoforge_range = "[0.12.26+1.21.9,)"
 jankson = "1.2.2"
 
 # Item Viewer Info 
-rei      = "20.0.811"
-arch_api = "18.0.6"               # https://modrinth.com/mod/architectury-api/versions
+rei      = "21.9.812"
+arch_api = "18.0.8"               # https://modrinth.com/mod/architectury-api/versions
 
 emi = "1.1.18+1.21.1"
 
@@ -71,6 +71,9 @@ endec_jankson = { group = "io.wispforest.endec", name = "jankson", version.ref =
 jankson = { module = "blue.endless:jankson", version.ref = "jankson" }
 
 mixin_extras_common = { module = "io.github.llamalad7:mixinextras-common", version.ref = "mixinextras" }
+
+architechtury_fabric = { module = "dev.architectury:architectury-fabric", version.ref = "arch_api" }
+architechtury_neo = { module = "dev.architectury:architectury-neoforge", version.ref = "arch_api" }
 
 rei_common_api            = { module = "me.shedaniel:RoughlyEnoughItems-api", version.ref = "rei" }
 rei_common = { module = "me.shedaniel:RoughlyEnoughItems-default-plugin", version.ref = "rei" }

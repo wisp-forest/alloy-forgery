@@ -23,6 +23,10 @@ object ItemViewerUtils {
 
         // Item Viewer Libs
         setupViewerDependency("rei", libs.create("rei.$projectPlatform.api").get(), libs.create("rei.$projectPlatform").get())
+        if ("rei" in enabledViewers) {
+            if (projectPlatform == "neoforge") modLocalRuntime(libs.architechtury.neo.get())
+            if (projectPlatform == "fabric") modLocalRuntime(libs.architechtury.fabric.get())
+        }
 
         setupViewerDependency("emi", "${libs.create("emi.$projectPlatform").get()}:api", libs.create("emi.$projectPlatform").get())
 

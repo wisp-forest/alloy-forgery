@@ -10,8 +10,6 @@ import me.shedaniel.rei.api.client.registry.transfer.TransferHandlerRegistry;
 import me.shedaniel.rei.api.client.registry.transfer.simple.SimpleTransferHandler;
 import me.shedaniel.rei.api.common.util.EntryStacks;
 import io.wispforest.alloyforgery.forges.ForgeRegistry;
-import me.shedaniel.rei.plugin.common.BuiltinPlugin;
-import net.minecraft.screen.FurnaceScreenHandler;
 
 public class AlloyForgeryClientPlugin implements REIClientPlugin {
 

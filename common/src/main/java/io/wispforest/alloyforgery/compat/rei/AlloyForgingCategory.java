@@ -20,7 +20,6 @@ import me.shedaniel.rei.api.common.entry.EntryStack;
 import me.shedaniel.rei.api.common.util.EntryIngredients;
 import me.shedaniel.rei.api.common.util.EntryStacks;
 import net.minecraft.client.gl.RenderPipelines;
-import net.minecraft.client.render.RenderLayer;
 import net.minecraft.text.Text;
 import io.wispforest.alloyforgery.forges.ForgeRegistry;
 import io.wispforest.alloyforgery.recipe.AlloyForgeRecipe;
