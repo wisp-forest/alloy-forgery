@@ -1,0 +1,149 @@
+{
+  "block.alloy-forgery.bricks_forge_controller": "レンガの鍛冶コントローラー",
+  "block.alloy-forgery.stone_bricks_forge_controller": "石レンガの鍛冶コントローラー",
+  "block.alloy-forgery.deepslate_bricks_forge_controller": "深層岩レンガの鍛冶コントローラー",
+  "block.alloy-forgery.end_stone_bricks_forge_controller": "エンドストーンレンガの鍛冶コントローラー",
+  "block.alloy-forgery.polished_blackstone_forge_controller": "磨かれたブラックストーンの鍛冶コントローラー",
+  "block.alloy-forgery.prismarine_bricks_forge_controller": "プリズマリンレンガの鍛冶コントローラー",
+
+  "tooltip.alloy-forgery.forge_tier": [
+    { "text": "ティア", "color": "gray" },
+    { "text": "：", "color": "dark_gray" },
+    { "index": 0, "color": "white" }
+  ],
+  "tooltip.alloy-forgery.speed_multiplier": [
+    { "text": "速さ", "color": "gray" },
+    { "text": "：", "color": "dark_gray" },
+    { "index": 0, "color": "white"},
+    { "text": "x", "color": "gray" }
+  ],
+  "tooltip.alloy-forgery.fuel_consumption_multiplier": [
+    { "text": "燃費", "color": "gray" },
+    { "text": "：", "color": "dark_gray" },
+    { "index": 0, "color": "white"},
+    { "text": "x", "color": "gray" }
+  ],
+  "tooltip.alloy-forgery.fuel_capacity": [
+    { "text": "燃料容量", "color": "gray" },
+    { "text": "：", "color": "dark_gray" },
+    { "index": 0, "color": "white" }
+  ],
+
+  "alloy-forgery.tier.name.alloy-forgery.common_tier": [
+    { "text": "コモン", "color": "gray"}
+  ],
+  "alloy-forgery.tier.name.alloy-forgery.common_plus_tier": [
+    { "text": "コモン+", "color": "white"}
+  ],
+  "alloy-forgery.tier.name.alloy-forgery.uncommon_tier": [
+    { "text": "アンコモン", "color": "green"}
+  ],
+  "alloy-forgery.tier.name.alloy-forgery.rare_tier": [
+    { "text": "レア", "color": "yellow"}
+  ],
+
+  "alloy-forgery.tier.advanced_name.alloy-forgery.common_tier": [
+    { "text": "コモン", "color": "gray"},
+    { "text": "［", "color": "gray"},
+    { "index": 0, "color": "white"},
+    { "text": "］", "color": "gray"}
+  ],
+  "alloy-forgery.tier.advanced_name.alloy-forgery.common_plus_tier": [
+    { "text": "コモン+", "color": "white"},
+    { "text": "［", "color": "gray"},
+    { "index": 0, "color": "white"},
+    { "text": "］", "color": "gray"}
+  ],
+  "alloy-forgery.tier.advanced_name.alloy-forgery.uncommon_tier": [
+    { "text": "アンコモン", "color": "green"},
+    { "text": "［", "color": "gray"},
+    { "index": 0, "color": "white"},
+    { "text": "］", "color": "gray"}
+  ],
+  "alloy-forgery.tier.advanced_name.alloy-forgery.rare_tier": [
+    { "text": "レア", "color": "yellow"},
+    { "text": "［", "color": "gray"},
+    { "index": 0, "color": "white"},
+    { "text": "］", "color": "gray"}
+  ],
+
+  "tooltip.alloy-forgery.override_range.equal_to": [
+    { "index": 0 }
+  ],
+
+  "tooltip.alloy-forgery.override_range.greater_or_equal_to": [
+    { "index": 0 },
+    { "text": "+" }
+  ],
+
+  "tooltip.alloy-forgery.override_range.range": [
+    { "index": 0 },
+    { "text": "から" },
+    { "index": 1 }
+  ],
+
+  "tooltip.alloy-forgery.invalid_tier": "このレシピにはティア%dの鍛冶コントローラーが必要です",
+
+  "tooltip.alloy-forgery.slot_toggle_enable": "スロットの切り替えを無効化",
+  "tooltip.alloy-forgery.slot_toggle_disable": "スロットの切り替えを有効化",
+
+  "tooltip.alloy-forgery.enabled_slot": "クリックしてスロットを無効化",
+  "tooltip.alloy-forgery.disabled_slot": "クリックしてスロットを有効化",
+
+  "title.alloy-forgery.forge_controller": "Alloy Forge",
+
+  "title.alloy-forgery.recipe": "合金鍛造",
+  "tooltip.alloy-forgery.recipe.min_tier": [
+    { "text": "ティア" },
+    { "text": "：", "color": "gray" },
+    { "index": 0 }
+  ],
+  "tooltip.alloy-forgery.recipe.fuel_per_tick": [
+    { "text": "ティックあたりの燃料" },
+    { "text": "：", "color": "gray" },
+    { "index": 0 }
+  ],
+  "tooltip.alloy-forgery.recipe.button": "循環してティアを置き換える",
+
+  "message.alloy-forgery.invalid_multiblock": "無効なマルチブロック構成です",
+  "itemGroup.alloy-forgery.main": "Alloy Forgery",
+  "itemGroup.alloy-forgery.main.button.discord": "Discord",
+  "itemGroup.alloy-forgery.main.button.curseforge": "CurseForge",
+  "itemGroup.alloy-forgery.main.button.modrinth": "Modrinth",
+  "itemGroup.alloy-forgery.main.button.github": "GitHub",
+
+  "emi.category.alloy-forgery.alloy_forge": "合金鍛造",
+
+  "tag.item.c.copper_ores": "銅鉱石",
+  "tag.item.c.iron_ores": "鉄鉱石",
+  "tag.item.c.gold_ores": "金鉱石",
+  "tag.item.c.raw_copper_blocks": "銅の原石ブロック",
+  "tag.item.c.raw_iron_blocks": "鉄の原石ブロック",
+  "tag.item.c.raw_gold_blocks": "金の原石ブロック",
+
+  "text.config.alloy-forgery.title": "Alloy Forgery の設定",
+
+  "text.config.alloy-forgery.section.blasting_adaption": "溶鉱の適応",
+
+  "text.config.alloy-forgery.option.allowHigherTierOutput": "上位ティアでの出力を許可する",
+  "text.config.alloy-forgery.option.allowHigherTierOutput.tooltip": "すべてのレシピの溶鉱の適応について、上位ティアでの出力のオン/オフを切り替えます",
+
+  "text.config.alloy-forgery.option.allowBlastingFurnaceAdaption": "溶鉱炉レシピの適応を許可する",
+  "text.config.alloy-forgery.option.allowBlastingFurnaceAdaption.tooltip": "全ての溶鉱炉レシピの溶鉱の適応のオン/オフを切り替えます",
+
+  "text.config.alloy-forgery.option.baseInputAmount": "基本入力量",
+  "text.config.alloy-forgery.option.baseInputAmount.tooltip": "適応レシピの基本入力数を調整します",
+
+  "text.config.alloy-forgery.option.higherTierOutputIncrease": "追加ティア出力量",
+  "text.config.alloy-forgery.option.higherTierOutputAmount.tooltip": "ティア3に到達した際に増加する追加量を調整します",
+
+  "text.config.alloy-forgery.section.screen": "画面設定",
+
+  "text.config.alloy-forgery.option.darkModeTheme": "ダークモード",
+  "text.config.alloy-forgery.option.darkModeTheme.tooltip": "合金画面をダークモードテクスチャを使用するように変更します",
+
+  "text.config.alloy-forgery.section.debug": "デバッグ値",
+
+  "text.config.alloy-forgery.option.strictRecipeChecks": "厳格なレシピチェック",
+  "text.config.alloy-forgery.option.strictRecipeChecks.tooltip": "鍛冶レシピのレシピ入力値を検証する際の厳密さを調整するために使用されます"
+}
