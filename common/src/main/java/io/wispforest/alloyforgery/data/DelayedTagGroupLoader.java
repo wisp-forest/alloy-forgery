@@ -2,11 +2,13 @@ package io.wispforest.alloyforgery.data;
 
 import com.google.common.collect.Maps;
 import com.mojang.logging.LogUtils;
-import net.minecraft.registry.tag.TagEntry;
-import net.minecraft.registry.tag.TagGroupLoader;
-import net.minecraft.resource.DependencyTracker;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.Pair;
+import net.minecraft.tags.TagEntry;
+import net.minecraft.tags.TagLoader;
+import net.minecraft.tags.TagLoader.EntryWithSource;
+import net.minecraft.tags.TagLoader.SortingEntry;
+import net.minecraft.util.DependencySorter;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Tuple;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import java.util.*;
@@ -14,15 +16,15 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
- * Version of {@link TagGroupLoader} but with tweaks for delayed use and without entire tags being thrown out
+ * Version of {@link TagLoader} but with tweaks for delayed use and without entire tags being thrown out
  *
  * @param <T>
  */
-public class DelayedTagGroupLoader<T> extends TagGroupLoader<T> {
+public class DelayedTagGroupLoader<T> extends TagLoader<T> {
 
     private static final Logger LOGGER = LogUtils.getLogger();
 
-    private Function<Identifier, Optional<? extends T>> registryGetter = null;
+    private Function<ResourceLocation, Optional<? extends T>> registryGetter = null;
     private final String dataType;
 
     public DelayedTagGroupLoader(String dataType) {
@@ -31,56 +33,56 @@ public class DelayedTagGroupLoader<T> extends TagGroupLoader<T> {
         this.dataType = dataType;
     }
 
-    public DelayedTagGroupLoader<T> setGetter(Function<Identifier, Optional<? extends T>> registryGetter) {
+    public DelayedTagGroupLoader<T> setGetter(Function<ResourceLocation, Optional<? extends T>> registryGetter) {
         this.registryGetter = registryGetter;
 
         return this;
     }
 
     // Copy of vanilla but returns both the error list and the tag resolved to its best effort
-    private Pair<List<TrackedEntry>, List<T>> resolveAll(TagEntry.ValueGetter<T> valueGetter, List<TagGroupLoader.TrackedEntry> entries) {
+    private Tuple<List<EntryWithSource>, List<T>> resolveAll(TagEntry.Lookup<T> valueGetter, List<TagLoader.EntryWithSource> entries) {
         SequencedSet<T> sequencedSet = new LinkedHashSet();
-        List<TagGroupLoader.TrackedEntry> list = new ArrayList();
+        List<TagLoader.EntryWithSource> list = new ArrayList();
 
-        for (TagGroupLoader.TrackedEntry trackedEntry : entries) {
-            if (!trackedEntry.entry().resolve(valueGetter, sequencedSet::add)) {
+        for (TagLoader.EntryWithSource trackedEntry : entries) {
+            if (!trackedEntry.entry().build(valueGetter, sequencedSet::add)) {
                 list.add(trackedEntry);
             }
         }
 
-        return new Pair<>(list, List.copyOf(sequencedSet));
+        return new Tuple<>(list, List.copyOf(sequencedSet));
     }
 
     // Copy to vanilla but checks if this versions registeryGetter is set and adjusts
     // error handling to log the error without throwing the entire tag out
     @Override
-    public Map<Identifier, List<T>> buildGroup(Map<Identifier, List<TrackedEntry>> tags) {
+    public Map<ResourceLocation, List<T>> build(Map<ResourceLocation, List<EntryWithSource>> tags) {
         if (registryGetter == null)
             throw new RuntimeException("DelayedTagGroupLoader did not have the required registeryGetter set to resolve! [Type: " + this.dataType + "]");
 
-        final Map<Identifier, List<T>> map = Maps.newHashMap();
+        final Map<ResourceLocation, List<T>> map = Maps.newHashMap();
 
-        TagEntry.ValueGetter<T> valueGetter = new TagEntry.ValueGetter<>() {
+        TagEntry.Lookup<T> valueGetter = new TagEntry.Lookup<>() {
             @Override
-            public @Nullable T direct(Identifier id, boolean required) {
+            public @Nullable T element(ResourceLocation id, boolean required) {
                 return registryGetter.apply(id).orElse(null);
             }
 
             @Nullable
             @Override
-            public Collection<T> tag(Identifier id) {
+            public Collection<T> tag(ResourceLocation id) {
                 return map.get(id);
             }
         };
 
-        DependencyTracker<Identifier, TagDependencies> dependencyTracker = new DependencyTracker<>();
+        DependencySorter<ResourceLocation, SortingEntry> dependencyTracker = new DependencySorter<>();
 
-        tags.forEach((id, entries) -> dependencyTracker.add(id, new TagDependencies(entries)));
+        tags.forEach((id, entries) -> dependencyTracker.addEntry(id, new SortingEntry(entries)));
 
-        dependencyTracker.traverse((id, dependencies) -> {
+        dependencyTracker.orderByDependencies((id, dependencies) -> {
             var pair = this.resolveAll(valueGetter, dependencies.entries());
 
-            var missingReferences = pair.getLeft();
+            var missingReferences = pair.getA();
 
             if (!missingReferences.isEmpty()) {
                 LOGGER.error(
@@ -90,7 +92,7 @@ public class DelayedTagGroupLoader<T> extends TagGroupLoader<T> {
                 );
             }
 
-            map.put(id, pair.getRight());
+            map.put(id, pair.getB());
         });
 
         return map;

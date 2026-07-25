@@ -1,13 +1,13 @@
 package io.wispforest.alloyforgery.neoforge.data;
 
 import io.wispforest.alloyforgery.data.providers.AlloyForgeryRecipeProvider;
-import net.minecraft.advancement.Advancement;
-import net.minecraft.advancement.AdvancementEntry;
-import net.minecraft.data.recipe.RecipeExporter;
-import net.minecraft.data.recipe.RecipeGenerator;
-import net.minecraft.recipe.Recipe;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.advancements.Advancement;
+import net.minecraft.advancements.AdvancementHolder;
+import net.minecraft.data.recipes.RecipeOutput;
+import net.minecraft.data.recipes.RecipeProvider;
+import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.core.HolderLookup;
 import net.neoforged.neoforge.common.conditions.ICondition;
 import net.neoforged.neoforge.common.crafting.ConditionalRecipeOutput;
 import net.neoforged.neoforge.data.event.GatherDataEvent;
@@ -17,9 +17,9 @@ public class AlloyForgeryData {
 
     public static void onInitializeDataGenerator(GatherDataEvent.Client event) {
         event.createProvider((output, registriesFuture) -> {
-            return new RecipeGenerator.RecipeProvider(output, registriesFuture) {
+            return new RecipeProvider.Runner(output, registriesFuture) {
                 @Override
-                protected RecipeGenerator getRecipeGenerator(RegistryWrapper.WrapperLookup registryLookup, RecipeExporter exporter) {
+                protected RecipeProvider createRecipeProvider(HolderLookup.Provider registryLookup, RecipeOutput exporter) {
                     return new NeoforgeAlloyForgeryRecipeProvider(event.getModContainer().getModId(), registryLookup, exporter);
                 }
 

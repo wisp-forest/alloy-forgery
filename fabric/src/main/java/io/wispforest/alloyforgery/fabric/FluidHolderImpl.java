@@ -10,11 +10,11 @@ import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.StorageView;
 import net.fabricmc.fabric.api.transfer.v1.storage.base.InsertionOnlyStorage;
 import net.fabricmc.fabric.api.transfer.v1.storage.base.SingleVariantStorage;
-import net.minecraft.fluid.Fluids;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
+import net.minecraft.world.level.material.Fluids;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 import java.util.Iterator;
 
@@ -58,15 +58,15 @@ public final class FluidHolderImpl extends SingleVariantStorage<FluidVariant> im
     //--
 
     @Override
-    public void readData(ReadView data) {
-        this.amount = data.getLong("Amount", 0);
+    public void readData(ValueInput data) {
+        this.amount = data.getLongOr("Amount", 0);
         this.variant = data.read("Variant", FluidVariant.CODEC).orElse(FluidVariant.blank());
     }
 
     @Override
-    public void writeData(WriteView data) {
+    public void writeData(ValueOutput data) {
         data.putLong("Amount", this.amount);
-        data.put("Variant", FluidVariant.CODEC, this.variant);
+        data.store("Variant", FluidVariant.CODEC, this.variant);
     }
 
     @Override

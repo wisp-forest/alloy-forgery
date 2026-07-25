@@ -12,17 +12,17 @@ import io.wispforest.owo.particles.systems.ParticleSystem;
 import io.wispforest.owo.particles.systems.ParticleSystemController;
 import io.wispforest.owo.serialization.CodecUtils;
 import io.wispforest.owo.serialization.endec.MinecraftEndecs;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.particle.ParticleTypes;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.Registry;
-import net.minecraft.resource.ResourceType;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.Registry;
+import net.minecraft.server.packs.PackType;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.core.Direction;
+import net.minecraft.world.phys.Vec3;
 import io.wispforest.alloyforgery.block.ForgeControllerBlockEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,16 +63,16 @@ public class AlloyForgery {
 
     private static final ParticleSystemController CONTROLLER = new ParticleSystemController(id("particles"));
     public static final ParticleSystem<Direction> FORGE_PARTICLES = CONTROLLER.register(Direction.class, (world, pos, facing) -> {
-        final Vec3d particleSide = pos.add(0.5 + facing.getOffsetX() * 0.515, 0.25, 0.5 + facing.getOffsetZ() * 0.515);
+        final Vec3 particleSide = pos.add(0.5 + facing.getStepX() * 0.515, 0.25, 0.5 + facing.getStepZ() * 0.515);
         ClientParticles.spawnPrecise(ParticleTypes.FLAME, world, particleSide,
-            facing.getOffsetZ() * 0.65,
+            facing.getStepZ() * 0.65,
             0.175,
-            facing.getOffsetX() * 0.65);
+            facing.getStepX() * 0.65);
 
         ClientParticles.spawnPrecise(ParticleTypes.SMOKE, world, particleSide,
-            facing.getOffsetZ() * 0.65,
+            facing.getStepZ() * 0.65,
             0.175,
-            facing.getOffsetX() * 0.65);
+            facing.getStepX() * 0.65);
     });
 
     @SuppressWarnings("UnstableApiUsage")
@@ -80,14 +80,14 @@ public class AlloyForgery {
         AlloyForgeNetworking.init();
 
         Endec<Map<Item, ItemStack>> remaindersEndec = Endec.map(
-                item -> Registries.ITEM.getId(item).toString(),
-                id -> Registries.ITEM.get(Identifier.of(id)),
-                CodecUtils.eitherEndec(CodecUtils.toEndec(ItemStack.VALIDATED_CODEC), MinecraftEndecs.ofRegistry(Registries.ITEM))
-                        .xmap(either -> Either.unwrap(either.mapRight(Item::getDefaultStack)), Either::left)
+                item -> BuiltInRegistries.ITEM.getKey(item).toString(),
+                id -> BuiltInRegistries.ITEM.getValue(ResourceLocation.parse(id)),
+                CodecUtils.eitherEndec(CodecUtils.toEndec(ItemStack.STRICT_CODEC), MinecraftEndecs.ofRegistry(BuiltInRegistries.ITEM))
+                        .xmap(either -> Either.unwrap(either.mapRight(Item::getDefaultInstance)), Either::left)
         );
 
         EndecDataLoader.builder("forge_remainder", remaindersEndec)
-            .create(Identifier.of(MOD_ID, "forge_remainder"), ResourceType.SERVER_DATA, (data, manager, profiler) -> {
+            .create(ResourceLocation.fromNamespaceAndPath(MOD_ID, "forge_remainder"), PackType.SERVER_DATA, (data, manager, profiler) -> {
                 data.values().forEach(AlloyForgeRecipe::addRemainders);
             });
 
@@ -104,7 +104,7 @@ public class AlloyForgery {
 
     public static void registerScreenHandlerType() {
         AlloyForgeScreenHandler.ALLOY_FORGE_SCREEN_HANDLER_TYPE = Registry.register(
-            Registries.SCREEN_HANDLER,
+            BuiltInRegistries.MENU,
             id("alloy_forge"),
             INSTANCE.createScreenHandlerType(
                 (syncId, inventory, location) -> new AlloyForgeScreenHandler(syncId, inventory, location.get(inventory.player, ForgeControllerBlockEntity.FORGE_CONTROLLER_BLOCK_ENTITY)),
@@ -113,38 +113,38 @@ public class AlloyForgery {
     }
 
     public static void registerBlockEntities() {
-        ForgeControllerBlockEntity.FORGE_CONTROLLER_BLOCK_ENTITY = Registry.register(Registries.BLOCK_ENTITY_TYPE, id("forge_controller"), INSTANCE.createBlockEntityType(ForgeControllerBlockEntity::new));
+        ForgeControllerBlockEntity.FORGE_CONTROLLER_BLOCK_ENTITY = Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, id("forge_controller"), INSTANCE.createBlockEntityType(ForgeControllerBlockEntity::new));
     }
 
     public static void registerRecipeTypes() {
-        Registry.register(Registries.RECIPE_TYPE, AlloyForgeRecipe.Type.ID, AlloyForgeRecipe.Type.INSTANCE);
+        Registry.register(BuiltInRegistries.RECIPE_TYPE, AlloyForgeRecipe.Type.ID, AlloyForgeRecipe.Type.INSTANCE);
     }
 
     public static void registerRecipeSerializers() {
-        Registry.register(Registries.RECIPE_SERIALIZER, AlloyForgeRecipe.Type.ID, AlloyForgeRecipeSerializer.INSTANCE);
+        Registry.register(BuiltInRegistries.RECIPE_SERIALIZER, AlloyForgeRecipe.Type.ID, AlloyForgeRecipeSerializer.INSTANCE);
     }
 
     public static void registerSlotDisplays() {
-        Registry.register(Registries.SLOT_DISPLAY, id("counted_ingredient"), CountedIngredientDisplay.SERIALIZER);
+        Registry.register(BuiltInRegistries.SLOT_DISPLAY, id("counted_ingredient"), CountedIngredientDisplay.SERIALIZER);
     }
 
     public static void registerItemGroup() {
         AlloyForgeryItemGroup.GROUP.initialize();
     }
 
-    public static Identifier id(String path) {
-        return Identifier.of(MOD_ID, path);
+    public static ResourceLocation id(String path) {
+        return ResourceLocation.fromNamespaceAndPath(MOD_ID, path);
     }
 
     public static String translationKey(String suffix) {
         return MOD_ID + "." + suffix;
     }
 
-    public static MutableText translation(String prefix, String suffix, Object... args) {
-        return Text.translatable(prefix + "." + MOD_ID + "." + suffix, args);
+    public static MutableComponent translation(String prefix, String suffix, Object... args) {
+        return Component.translatable(prefix + "." + MOD_ID + "." + suffix, args);
     }
 
-    public static MutableText tooltipTranslation(String suffix, Object... args) {
+    public static MutableComponent tooltipTranslation(String suffix, Object... args) {
         return translation("tooltip", suffix, args);
     }
 }

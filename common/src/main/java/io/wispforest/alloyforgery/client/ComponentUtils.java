@@ -9,9 +9,9 @@ import io.wispforest.owo.ui.core.HorizontalAlignment;
 import io.wispforest.owo.ui.core.Insets;
 import io.wispforest.owo.ui.core.Sizing;
 import io.wispforest.owo.ui.util.NinePatchTexture;
-import net.minecraft.client.gl.RenderPipelines;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.util.Identifier;
+import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.resources.ResourceLocation;
 
 import java.util.List;
 import java.util.function.Function;
@@ -24,15 +24,15 @@ import static io.wispforest.owo.ui.container.Containers.verticalFlow;
 public class ComponentUtils {
     public static final ButtonComponent.Renderer BUTTON_RENDERER = createThemedButtonRenderer(AlloyForgery.CONFIG::darkModeTheme);
 
-    public static Identifier themedTextureID(String suffix) {
+    public static ResourceLocation themedTextureID(String suffix) {
         return themedTextureID(suffix, AlloyForgery.CONFIG::darkModeTheme);
     }
 
-    public static Identifier themedTextureID(String suffix, Supplier<Boolean> isDarkMode) {
+    public static ResourceLocation themedTextureID(String suffix, Supplier<Boolean> isDarkMode) {
         return AlloyForgery.id("textures/gui/theme/" + (isDarkMode.get() ? "dark" : "light") + "/" + suffix);
     }
 
-    public static Identifier textureID(String suffix) {
+    public static ResourceLocation textureID(String suffix) {
         return AlloyForgery.id("textures/gui/" + suffix);
     }
 
@@ -46,7 +46,7 @@ public class ComponentUtils {
         };
     }
 
-    private static Identifier getBtnTexture(ButtonComponent btn, Supplier<Boolean> isDarkMode) {
+    private static ResourceLocation getBtnTexture(ButtonComponent btn, Supplier<Boolean> isDarkMode) {
         var btnType = (btn.active() ? (btn.isHovered() ? "hovered" : "active") : "disabled");
         var themeType = isDarkMode.get() ? "dark" : "light";
 
@@ -63,7 +63,7 @@ public class ComponentUtils {
                         .surface((context, component) -> {
                             var slotTexture = themedTextureID("input_slot_background.png", isDarkMode);
 
-                            context.drawTexture(RenderPipelines.GUI_TEXTURED, slotTexture, component.x(), component.y(), isSlotDisabled.test(t) ? 18 : 0, 0,18, 18, 36, 18);
+                            context.blit(RenderPipelines.GUI_TEXTURED, slotTexture, component.x(), component.y(), isSlotDisabled.test(t) ? 18 : 0, 0,18, 18, 36, 18);
                         }))
                     .toList();
 

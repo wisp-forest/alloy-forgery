@@ -3,14 +3,14 @@ package io.wispforest.alloyforgery.utils;
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.PlayerManager;
+import net.minecraft.server.players.PlayerList;
 
 public class DataPackEvents {
 
     /**
      * Called before the Minecraft Server is about to sync tags and recipes to players. Similar to
      * `ServerLifecycleEvents#SYNC_DATA_PACK_CONTENTS` as such is but only once at the head
-     * of {@link PlayerManager#onDataPacksReloaded()}
+     * of {@link PlayerList#reloadResources()}
      */
     public static final Event<BeforeSync> BEFORE_SYNC = EventFactory.createArrayBacked(BeforeSync.class, callbacks -> (server) -> {
         for (BeforeSync callback : callbacks) {
@@ -21,7 +21,7 @@ public class DataPackEvents {
     public interface BeforeSync {
         /**
          * Called right before tags and recipes are sent to players
-         * when {@link PlayerManager#onDataPacksReloaded()} method
+         * when {@link PlayerList#reloadResources()} method
          * is invoked due to a /reload command call
          *
          * <p>For example, this event can be used to sync data loaded with custom resource reloaders.

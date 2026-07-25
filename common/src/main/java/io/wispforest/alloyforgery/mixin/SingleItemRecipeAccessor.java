@@ -1,12 +1,12 @@
 package io.wispforest.alloyforgery.mixin;
 
-import net.minecraft.item.ItemStack;
-import net.minecraft.recipe.SingleStackRecipe;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.SingleItemRecipe;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
-@Mixin(SingleStackRecipe.class)
-public interface SingleStackRecipeAccessor {
+@Mixin(SingleItemRecipe.class)
+public interface SingleItemRecipeAccessor {
     @Accessor("result")
     ItemStack result();
 }

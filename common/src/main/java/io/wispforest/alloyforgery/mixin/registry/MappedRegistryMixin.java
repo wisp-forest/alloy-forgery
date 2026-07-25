@@ -1,20 +1,20 @@
 package io.wispforest.alloyforgery.mixin.registry;
 
 import io.wispforest.alloyforgery.compat.LegacyIdMappings;
-import net.minecraft.registry.SimpleRegistry;
-import net.minecraft.util.Identifier;
+import net.minecraft.core.MappedRegistry;
+import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 
-@Mixin(SimpleRegistry.class)
-public abstract class SimpleRegistryMixin {
+@Mixin(MappedRegistry.class)
+public abstract class MappedRegistryMixin {
     @ModifyVariable(at = @At("HEAD"), method = {
-        "get(Lnet/minecraft/util/Identifier;)Ljava/lang/Object;",
-        "getEntry(Lnet/minecraft/util/Identifier;)Ljava/util/Optional;"
+        "getValue(Lnet/minecraft/resources/ResourceLocation;)Ljava/lang/Object;",
+        "get(Lnet/minecraft/resources/ResourceLocation;)Ljava/util/Optional;"
     }, ordinal = 0, argsOnly = true)
-    private Identifier fixMissingFromRegistry(@Nullable Identifier id) {
+    private ResourceLocation fixMissingFromRegistry(@Nullable ResourceLocation id) {
         return LegacyIdMappings.remap(id);
     }
 }

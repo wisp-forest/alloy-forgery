@@ -7,13 +7,13 @@ import io.wispforest.alloyforgery.utils.GeneralPlatformUtils;
 import io.wispforest.endec.Endec;
 import io.wispforest.owo.serialization.endec.MinecraftEndecs;
 import io.wispforest.owo.util.TagInjector;
-import net.minecraft.block.Block;
-import net.minecraft.item.Item;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.Registry;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.util.Identifier;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.item.Item;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.Registry;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceLocation;
 import io.wispforest.alloyforgery.AlloyForgery;
 import io.wispforest.alloyforgery.ForgeControllerItem;
 import io.wispforest.alloyforgery.block.ForgeControllerBlock;
@@ -38,19 +38,19 @@ public class ForgeRegistry {
     );
 
     public static final Gson GSON = new Gson();
-    private static final Identifier MINEABLE_PICKAXE = Identifier.of("mineable/pickaxe");
+    private static final ResourceLocation MINEABLE_PICKAXE = ResourceLocation.parse("mineable/pickaxe");
 
-    private static final Map<Identifier, ForgeDefinition> ID_TO_FORGE_DEFINITION = new LinkedHashMap<>();
-    private static final Map<ForgeDefinition, Identifier> FORGE_DEFINITION_TO_ID = new LinkedHashMap<>();
+    private static final Map<ResourceLocation, ForgeDefinition> ID_TO_FORGE_DEFINITION = new LinkedHashMap<>();
+    private static final Map<ForgeDefinition, ResourceLocation> FORGE_DEFINITION_TO_ID = new LinkedHashMap<>();
 
-    private static final Map<Identifier, Block> CONTROLLER_BLOCK_REGISTRY = new LinkedHashMap<>();
+    private static final Map<ResourceLocation, Block> CONTROLLER_BLOCK_REGISTRY = new LinkedHashMap<>();
 
     public static final class EntryHolder {
-        public final Identifier controllerId;
-        public final Identifier forgeDefinitionId;
+        public final ResourceLocation controllerId;
+        public final ResourceLocation forgeDefinitionId;
         private final Supplier<ForgeControllerBlock> controllerBlock;
 
-        private EntryHolder(Identifier forgeDefinitionId, Identifier controllerId, BiFunction<Identifier, Identifier, ForgeControllerBlock> controllerBlock) {
+        private EntryHolder(ResourceLocation forgeDefinitionId, ResourceLocation controllerId, BiFunction<ResourceLocation, ResourceLocation, ForgeControllerBlock> controllerBlock) {
             this.forgeDefinitionId = forgeDefinitionId;
             this.controllerId = controllerId;
             this.controllerBlock = Suppliers.memoize(() -> controllerBlock.apply(forgeDefinitionId, controllerId));
@@ -59,22 +59,22 @@ public class ForgeRegistry {
         private Item createItem() {
             return new ForgeControllerItem(
                 controllerBlock(),
-                new Item.Settings()
-                    .registryKey(RegistryKey.of(RegistryKeys.ITEM, controllerId))
-                    .useBlockPrefixedTranslationKey()
+                new Item.Properties()
+                    .setId(ResourceKey.create(Registries.ITEM, controllerId))
+                    .useBlockDescriptionPrefix()
             );
         }
 
         public void registerItem() {
-            Registry.register(Registries.ITEM, controllerId, createItem());
+            Registry.register(BuiltInRegistries.ITEM, controllerId, createItem());
         }
 
         public void registerBlock() {
             var controllerBlock = controllerBlock();
 
-            Registry.register(Registries.BLOCK, controllerId, controllerBlock);
+            Registry.register(BuiltInRegistries.BLOCK, controllerId, controllerBlock);
 
-            TagInjector.inject(Registries.BLOCK, MINEABLE_PICKAXE, controllerBlock);
+            TagInjector.inject(BuiltInRegistries.BLOCK, MINEABLE_PICKAXE, controllerBlock);
 
             CONTROLLER_BLOCK_REGISTRY.put(forgeDefinitionId, controllerBlock);
             GeneralPlatformUtils.INSTANCE.addToBlockEntity(ForgeControllerBlockEntity.FORGE_CONTROLLER_BLOCK_ENTITY, controllerBlock);
@@ -85,31 +85,31 @@ public class ForgeRegistry {
         }
     }
 
-    static void registerDefinition(Identifier forgeDefinitionId, ForgeDefinition definition) {
-        final var controllerId = AlloyForgery.id(Registries.BLOCK.getId(definition.material()).getPath() + "_forge_controller");
+    static void registerDefinition(ResourceLocation forgeDefinitionId, ForgeDefinition definition) {
+        final var controllerId = AlloyForgery.id(BuiltInRegistries.BLOCK.getKey(definition.material()).getPath() + "_forge_controller");
 
         GeneralPlatformUtils.INSTANCE.handleDefinitionEntry(new EntryHolder(forgeDefinitionId, controllerId, ForgeControllerBlock::of));
 
         store(forgeDefinitionId, definition);
     }
 
-    public static Optional<ForgeDefinition> getForgeDefinition(Identifier id) {
+    public static Optional<ForgeDefinition> getForgeDefinition(ResourceLocation id) {
         return ID_TO_FORGE_DEFINITION.containsKey(id) ? Optional.of(ID_TO_FORGE_DEFINITION.get(id)) : Optional.empty();
     }
 
-    public static Optional<Block> getControllerBlock(Identifier id) {
+    public static Optional<Block> getControllerBlock(ResourceLocation id) {
         return ID_TO_FORGE_DEFINITION.containsKey(id) ? Optional.of(CONTROLLER_BLOCK_REGISTRY.get(id)) : Optional.empty();
     }
 
-    public static Optional<Identifier> getId(ForgeDefinition definition) {
+    public static Optional<ResourceLocation> getId(ForgeDefinition definition) {
         return FORGE_DEFINITION_TO_ID.containsKey(definition) ? Optional.of(FORGE_DEFINITION_TO_ID.get(definition)) : Optional.empty();
     }
 
-    public static Set<Map.Entry<Identifier, ForgeDefinition>> getForgeEntries() {
+    public static Set<Map.Entry<ResourceLocation, ForgeDefinition>> getForgeEntries() {
         return ID_TO_FORGE_DEFINITION.entrySet();
     }
 
-    public static Set<Identifier> getForgeIds() {
+    public static Set<ResourceLocation> getForgeIds() {
         return ID_TO_FORGE_DEFINITION.keySet();
     }
 
@@ -117,7 +117,7 @@ public class ForgeRegistry {
         return CONTROLLER_BLOCK_REGISTRY.values().stream().toList();
     }
 
-    private static void store(Identifier id, ForgeDefinition definition) {
+    private static void store(ResourceLocation id, ForgeDefinition definition) {
         FORGE_DEFINITION_TO_ID.put(definition, id);
         ID_TO_FORGE_DEFINITION.put(id, definition);
     }

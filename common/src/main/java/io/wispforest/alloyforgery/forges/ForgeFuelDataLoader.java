@@ -6,10 +6,10 @@ import io.wispforest.endec.annotations.NullableComponent;
 import io.wispforest.endec.impl.StructEndecBuilder;
 import io.wispforest.owo.serialization.endec.MinecraftEndecs;
 import it.unimi.dsi.fastutil.Pair;
-import net.minecraft.item.Item;
-import net.minecraft.registry.Registries;
-import net.minecraft.resource.ResourceType;
-import net.minecraft.util.Identifier;
+import net.minecraft.world.item.Item;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.server.packs.PackType;
+import net.minecraft.resources.ResourceLocation;
 import io.wispforest.alloyforgery.AlloyForgery;
 import io.wispforest.alloyforgery.utils.data.EndecDataLoader;
 
@@ -20,16 +20,16 @@ import java.util.Map;
 public class ForgeFuelDataLoader {
 
     public static final StructEndec<Pair<Item, ForgeFuelDefinition>> FUEL_ENTRY = StructEndecBuilder.of(
-        MinecraftEndecs.ofRegistry(Registries.ITEM).fieldOf("item", Pair::first),
+        MinecraftEndecs.ofRegistry(BuiltInRegistries.ITEM).fieldOf("item", Pair::first),
         ForgeFuelDefinition.ENDEC.flatFieldOf(Pair::second),
         Pair::of
     );
 
-    public static final Identifier LOADER_ID = AlloyForgery.id("forge_fuel_loader");
+    public static final ResourceLocation LOADER_ID = AlloyForgery.id("forge_fuel_loader");
 
     public static void init() {
         EndecDataLoader.builder("alloy_forge_fuels", FUEL_ENTRY.listOf().structOf("fuels"))
-            .create(LOADER_ID, ResourceType.SERVER_DATA, (data, manager, profiler) -> {
+            .create(LOADER_ID, PackType.SERVER_DATA, (data, manager, profiler) -> {
                 data.values().stream()
                     .flatMap(Collection::stream)
                     .forEach(entry -> ForgeFuelDataLoader.register(entry.first(), entry.second()));
@@ -60,7 +60,7 @@ public class ForgeFuelDataLoader {
 
         public static StructEndec<ForgeFuelDefinition> ENDEC = StructEndecBuilder.of(
             Endec.INT.fieldOf("fuel", ForgeFuelDefinition::fuel),
-            MinecraftEndecs.ofRegistry(Registries.ITEM).optionalFieldOf("return_item", ForgeFuelDefinition::returnType, () -> null),
+            MinecraftEndecs.ofRegistry(BuiltInRegistries.ITEM).optionalFieldOf("return_item", ForgeFuelDefinition::returnType, () -> null),
             ForgeFuelDefinition::new
         );
 

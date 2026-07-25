@@ -1,27 +1,27 @@
 package io.wispforest.alloyforgery.utils;
 
-import net.minecraft.inventory.Inventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.screen.slot.Slot;
+import net.minecraft.world.Container;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.inventory.Slot;
 import io.wispforest.alloyforgery.AlloyForgeScreenHandler;
 
 public class ForgeInputSlot extends Slot {
     private final AlloyForgeScreenHandler handler;
 
-    public ForgeInputSlot(Inventory inventory, int index, int x, int y, AlloyForgeScreenHandler handler) {
+    public ForgeInputSlot(Container inventory, int index, int x, int y, AlloyForgeScreenHandler handler) {
         super(inventory, index, x, y);
 
         this.handler = handler;
     }
 
     @Override
-    public boolean canInsert(ItemStack stack) {
-        return !this.handler.isSlotDisabled(this) && super.canInsert(stack);
+    public boolean mayPlace(ItemStack stack) {
+        return !this.handler.isSlotDisabled(this) && super.mayPlace(stack);
     }
 
     @Override
-    public void markDirty() {
-        super.markDirty();
-        this.handler.onContentChanged(this.inventory);
+    public void setChanged() {
+        super.setChanged();
+        this.handler.slotsChanged(this.container);
     }
 }

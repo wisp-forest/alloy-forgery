@@ -1,12 +1,12 @@
 package io.wispforest.alloyforgery.data.providers;
 
-import net.minecraft.data.recipe.RecipeExporter;
-import net.minecraft.item.Items;
-import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.data.recipes.RecipeOutput;
+import net.minecraft.world.item.Items;
+import net.minecraft.core.HolderLookup;
 
 public class AlloyForgeryRecipeProvider extends AlloyForgeryBaseRecipeProvider {
 
-    public AlloyForgeryRecipeProvider(RecipeExporter recipeExporter, RegistryWrapper.WrapperLookup registryLookup, RecipeExporterConditionWrapper withConditionsWrapper) {
+    public AlloyForgeryRecipeProvider(RecipeOutput recipeExporter, HolderLookup.Provider registryLookup, RecipeExporterConditionWrapper withConditionsWrapper) {
         super(recipeExporter, registryLookup, withConditionsWrapper);
     }
 
@@ -16,13 +16,13 @@ public class AlloyForgeryRecipeProvider extends AlloyForgeryBaseRecipeProvider {
 
         // Vanilla recipes
         createRawBlockRecipe("copper", Items.COPPER_BLOCK, STORAGE_BLOCKS_RAW_COPPER)
-            .offerTo(exporter);
+            .save(output);
 
         createRawBlockRecipe("iron", Items.IRON_BLOCK, STORAGE_BLOCKS_RAW_IRON)
-            .offerTo(exporter);
+            .save(output);
 
         createRawBlockRecipe("gold", Items.GOLD_BLOCK, STORAGE_BLOCKS_RAW_GOLD)
-            .offerTo(exporter);
+            .save(output);
 
         this.createAlloyingRecipes("bronze",
                 4,

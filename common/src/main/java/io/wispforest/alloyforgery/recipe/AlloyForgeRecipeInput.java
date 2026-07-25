@@ -1,18 +1,18 @@
 package io.wispforest.alloyforgery.recipe;
 
-import net.minecraft.inventory.Inventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.recipe.input.RecipeInput;
+import net.minecraft.world.Container;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeInput;
 
-public record AlloyForgeRecipeInput(Inventory inventory) implements RecipeInput {
+public record AlloyForgeRecipeInput(Container inventory) implements RecipeInput {
     @Override
-    public ItemStack getStackInSlot(int slot) {
-        return this.inventory.getStack(slot);
+    public ItemStack getItem(int slot) {
+        return this.inventory.getItem(slot);
     }
 
     @Override
     public int size() {
-        return this.inventory.size();
+        return this.inventory.getContainerSize();
     }
 
     @Override

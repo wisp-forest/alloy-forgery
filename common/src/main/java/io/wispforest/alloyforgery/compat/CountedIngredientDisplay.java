@@ -4,26 +4,28 @@ import io.wispforest.endec.Endec;
 import io.wispforest.endec.StructEndec;
 import io.wispforest.endec.impl.StructEndecBuilder;
 import io.wispforest.owo.serialization.CodecUtils;
-import net.minecraft.recipe.display.DisplayedItemFactory;
-import net.minecraft.recipe.display.SlotDisplay;
-import net.minecraft.util.context.ContextParameterMap;
+import net.minecraft.world.item.crafting.display.DisplayContentsFactory;
+import net.minecraft.world.item.crafting.display.SlotDisplay;
+import net.minecraft.util.context.ContextMap;
+import net.minecraft.world.item.crafting.display.SlotDisplay.ItemStackContentsFactory;
+import net.minecraft.world.item.crafting.display.SlotDisplay.Type;
 
 import java.util.stream.Stream;
 
 public record CountedIngredientDisplay(SlotDisplay ingredient, int amount) implements SlotDisplay {
     public static final StructEndec<CountedIngredientDisplay> ENDEC = StructEndecBuilder.of(
-            CodecUtils.toEndecWithRegistries(SlotDisplay.CODEC, SlotDisplay.PACKET_CODEC).fieldOf("ingredient", CountedIngredientDisplay::ingredient),
+            CodecUtils.toEndecWithRegistries(SlotDisplay.CODEC, SlotDisplay.STREAM_CODEC).fieldOf("ingredient", CountedIngredientDisplay::ingredient),
             Endec.INT.fieldOf("amount", CountedIngredientDisplay::amount),
             CountedIngredientDisplay::new
     );
 
-    public static final Serializer<CountedIngredientDisplay> SERIALIZER = new Serializer(CodecUtils.toMapCodec(ENDEC), CodecUtils.toPacketCodec(ENDEC));
+    public static final Type<CountedIngredientDisplay> SERIALIZER = new Type(CodecUtils.toMapCodec(ENDEC), CodecUtils.toPacketCodec(ENDEC));
 
     @Override
-    public <T> Stream<T> appendStacks(ContextParameterMap parameters, DisplayedItemFactory<T> factory) {
-        if (factory instanceof SlotDisplay.NoopDisplayedItemFactory) {
+    public <T> Stream<T> resolve(ContextMap parameters, DisplayContentsFactory<T> factory) {
+        if (factory instanceof SlotDisplay.ItemStackContentsFactory) {
             return (Stream<T>) ingredient
-                    .appendStacks(parameters, NoopDisplayedItemFactory.INSTANCE)
+                    .resolve(parameters, ItemStackContentsFactory.INSTANCE)
                     .map(t -> {
                         var stack = t.copy();
 
@@ -37,7 +39,7 @@ public record CountedIngredientDisplay(SlotDisplay ingredient, int amount) imple
     }
 
     @Override
-    public Serializer<CountedIngredientDisplay> serializer() {
+    public Type<CountedIngredientDisplay> type() {
         return SERIALIZER;
     }
 }

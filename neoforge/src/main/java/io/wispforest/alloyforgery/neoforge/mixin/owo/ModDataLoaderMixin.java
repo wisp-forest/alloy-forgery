@@ -7,7 +7,7 @@ import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import io.wispforest.owo.Owo;
 import io.wispforest.owo.moddata.ModDataConsumer;
 import io.wispforest.owo.moddata.ModDataLoader;
-import net.minecraft.util.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.neoforged.fml.jarcontents.JarContents;
 import net.neoforged.neoforgespi.language.IModInfo;
 import org.apache.commons.io.FilenameUtils;
@@ -28,7 +28,7 @@ public class ModDataLoaderMixin {
     private static Gson GSON;
 
     @WrapMethod(method = "lambda$load$0")
-    private static void adjustOutput(ModDataConsumer consumer, Map<Identifier, JsonObject> foundFiles, IModInfo container, Operation<Void> original) {
+    private static void adjustOutput(ModDataConsumer consumer, Map<ResourceLocation, JsonObject> foundFiles, IModInfo container, Operation<Void> original) {
         var modids = new ArrayList<>(container.getConfig().<List<String>>getConfigElement("provides").orElse(List.of()));
 
         modids.add(container.getModId());
@@ -41,7 +41,7 @@ public class ModDataLoaderMixin {
     }
 
     @Unique
-    private static void tryLoadJarContentsFrom(Gson GSON, Map<Identifier, JsonObject> foundFiles, String namespace, JarContents jarContents, String relativePath) {
+    private static void tryLoadJarContentsFrom(Gson GSON, Map<ResourceLocation, JsonObject> foundFiles, String namespace, JarContents jarContents, String relativePath) {
         try {
             jarContents.visitContent(relativePath, (path, resource) -> {
                 if (!path.endsWith(".json")) return;
@@ -50,7 +50,7 @@ public class ModDataLoaderMixin {
                     try (final var reader = resource.bufferedReader()) {
                         var idPath = path.replace(relativePath + "/",  "");
 
-                        foundFiles.put(Identifier.of(namespace, FilenameUtils.removeExtension(idPath)), GSON.fromJson(reader, JsonObject.class));
+                        foundFiles.put(ResourceLocation.fromNamespaceAndPath(namespace, FilenameUtils.removeExtension(idPath)), GSON.fromJson(reader, JsonObject.class));
                     }
                 } catch (IOException e) {
                     Owo.LOGGER.warn("### Unable to open data file {} ++ Stacktrace below ###", path, e);

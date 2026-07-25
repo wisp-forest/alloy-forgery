@@ -11,12 +11,12 @@ import io.wispforest.alloyforgery.neoforge.utils.NeoforgeGeneralPlatformUtils;
 import io.wispforest.alloyforgery.networking.AlloyForgeNetworking;
 import io.wispforest.alloyforgery.utils.RecipeInjector;
 import io.wispforest.owo.Owo;
-import net.minecraft.registry.DynamicRegistryManager;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.resource.ResourceReloader;
-import net.minecraft.resource.ResourceType;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.Identifier;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.server.packs.resources.PreparableReloadListener;
+import net.minecraft.server.packs.PackType;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.resources.ResourceLocation;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
@@ -52,24 +52,24 @@ public class AlloyForgeryNeoforge {
 
             NeoforgeGeneralPlatformUtils.registerEndecDataLoaders(new NeoforgeGeneralPlatformUtils.ReloadListenerRegistration() {
                 @Override
-                public ResourceType getType() {
-                    return ResourceType.SERVER_DATA;
+                public PackType getType() {
+                    return PackType.SERVER_DATA;
                 }
 
                 @Override
-                public DynamicRegistryManager getRegistry() {
+                public RegistryAccess getRegistry() {
                     return event.getRegistryAccess();
                 }
 
                 @Override
-                public NeoforgeGeneralPlatformUtils.ReloadListenerRegistration addListener(Identifier id, ResourceReloader listener) {
+                public NeoforgeGeneralPlatformUtils.ReloadListenerRegistration addListener(ResourceLocation id, PreparableReloadListener listener) {
                     event.addListener(id, listener);
 
                     return this;
                 }
 
                 @Override
-                public NeoforgeGeneralPlatformUtils.ReloadListenerRegistration addDependency(Identifier id, Collection<Identifier> dependencies) {
+                public NeoforgeGeneralPlatformUtils.ReloadListenerRegistration addDependency(ResourceLocation id, Collection<ResourceLocation> dependencies) {
                     for (var dependency : dependencies) {
                         event.addDependency(dependency, id);
                     }
@@ -107,14 +107,14 @@ public class AlloyForgeryNeoforge {
         });
 
         modBus.<RegisterEvent>addListener(event -> {
-            event.register(RegistryKeys.BLOCK_ENTITY_TYPE, helper -> AlloyForgery.registerBlockEntities());
-            event.register(RegistryKeys.RECIPE_TYPE, helper -> AlloyForgery.registerRecipeTypes());
-            event.register(RegistryKeys.RECIPE_SERIALIZER, helper -> AlloyForgery.registerRecipeSerializers());
-            event.register(RegistryKeys.SCREEN_HANDLER, helper -> AlloyForgery.registerScreenHandlerType());
-            event.register(RegistryKeys.SLOT_DISPLAY, helper -> AlloyForgery.registerSlotDisplays());
-            event.register(RegistryKeys.ITEM_GROUP, helper -> AlloyForgery.registerItemGroup());
-            event.register(RegistryKeys.BLOCK, helper -> NeoforgeGeneralPlatformUtils.handleLoadedEntries());
-            event.register(RegistryKeys.ITEM, helper -> NeoforgeGeneralPlatformUtils.handleLoadedEntries());
+            event.register(Registries.BLOCK_ENTITY_TYPE, helper -> AlloyForgery.registerBlockEntities());
+            event.register(Registries.RECIPE_TYPE, helper -> AlloyForgery.registerRecipeTypes());
+            event.register(Registries.RECIPE_SERIALIZER, helper -> AlloyForgery.registerRecipeSerializers());
+            event.register(Registries.MENU, helper -> AlloyForgery.registerScreenHandlerType());
+            event.register(Registries.SLOT_DISPLAY, helper -> AlloyForgery.registerSlotDisplays());
+            event.register(Registries.CREATIVE_MODE_TAB, helper -> AlloyForgery.registerItemGroup());
+            event.register(Registries.BLOCK, helper -> NeoforgeGeneralPlatformUtils.handleLoadedEntries());
+            event.register(Registries.ITEM, helper -> NeoforgeGeneralPlatformUtils.handleLoadedEntries());
         });
 
         NeoForge.EVENT_BUS.<OnDatapackSyncEvent>addListener(event -> {
@@ -132,7 +132,7 @@ public class AlloyForgeryNeoforge {
         NeoForge.EVENT_BUS.<OnDatapackSyncEvent>addListener(event -> event.getRelevantPlayers().forEach(RecipeTagLoader.INSTANCE::sendPlayerPacketAfterDataLoad));
         NeoForge.EVENT_BUS.<ServerStartedEvent>addListener(event -> RecipeTagLoader.INSTANCE.onServerStarted(event.getServer()));
 
-        NeoForge.EVENT_BUS.<PlayerEvent.PlayerLoggedInEvent>addListener(event -> RecipeTagLoader.INSTANCE.sendTagPacket((ServerPlayerEntity) event.getEntity()));
+        NeoForge.EVENT_BUS.<PlayerEvent.PlayerLoggedInEvent>addListener(event -> RecipeTagLoader.INSTANCE.sendTagPacket((ServerPlayer) event.getEntity()));
 
     }
 

@@ -20,8 +20,8 @@ import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.fabricmc.fabric.api.transfer.v1.storage.base.InsertionOnlyStorage;
 import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
-import net.minecraft.resource.ResourceType;
-import net.minecraft.util.math.Direction;
+import net.minecraft.server.packs.PackType;
+import net.minecraft.core.Direction;
 
 public class AlloyForgeryFabric implements ModInitializer {
 
@@ -40,10 +40,10 @@ public class AlloyForgeryFabric implements ModInitializer {
 
         ServerLifecycleEvents.SERVER_STARTED.register(RecipeInjector::injectRecipes);
 
-        ResourceLoader.get(ResourceType.SERVER_DATA).registerReloader(RecipeTagLoader.ID, RecipeTagLoader.INSTANCE);
+        ResourceLoader.get(PackType.SERVER_DATA).registerReloader(RecipeTagLoader.ID, RecipeTagLoader.INSTANCE);
 
         ItemStorage.SIDED.registerFallback((world, pos, state, blockEntity, context) -> {
-            if (context == Direction.DOWN && world.getBlockEntity(pos.up()) instanceof ForgeControllerBlockEntity froge){
+            if (context == Direction.DOWN && world.getBlockEntity(pos.above()) instanceof ForgeControllerBlockEntity froge){
                 return InventoryStorage.of(froge, Direction.DOWN);
             }
 

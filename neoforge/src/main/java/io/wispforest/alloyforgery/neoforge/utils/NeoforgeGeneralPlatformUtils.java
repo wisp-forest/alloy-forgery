@@ -10,28 +10,31 @@ import io.wispforest.alloyforgery.utils.FluidStorage;
 import io.wispforest.alloyforgery.utils.GeneralPlatformUtils;
 import io.wispforest.alloyforgery.utils.data.EndecDataLoader;
 import io.wispforest.endec.format.bytebuf.ByteBufSerializer;
-import net.minecraft.block.Block;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.component.ComponentMap;
-import net.minecraft.component.ComponentType;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
+import net.minecraft.world.item.crafting.*;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.RecipeManager;
+import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.core.component.DataComponentMap;
+import net.minecraft.core.component.DataComponentType;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.recipe.*;
-import net.minecraft.recipe.input.RecipeInput;
-import net.minecraft.registry.DynamicRegistryManager;
-import net.minecraft.resource.ResourceReloader;
-import net.minecraft.resource.ResourceType;
-import net.minecraft.resource.featuretoggle.FeatureFlags;
-import net.minecraft.screen.NamedScreenHandlerFactory;
-import net.minecraft.screen.ScreenHandler;
-import net.minecraft.screen.ScreenHandlerType;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.Hand;
-import net.minecraft.util.Identifier;
-import net.minecraft.world.World;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.server.packs.resources.PreparableReloadListener;
+import net.minecraft.server.packs.PackType;
+import net.minecraft.world.flag.FeatureFlags;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.MenuType;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.common.crafting.DataComponentIngredient;
 import net.neoforged.neoforge.network.IContainerFactory;
 import net.neoforged.neoforge.transfer.fluid.FluidUtil;
@@ -42,10 +45,10 @@ import java.util.stream.Stream;
 
 public class NeoforgeGeneralPlatformUtils implements GeneralPlatformUtils {
     @Override
-    public <T extends ScreenHandler, D> ScreenHandlerType<T> createScreenHandlerType(ExtendedFactory<T, D> factory, PacketCodec<? super RegistryByteBuf, D> packetCodec) {
-        return new ScreenHandlerType<>(
+    public <T extends AbstractContainerMenu, D> MenuType<T> createScreenHandlerType(ExtendedFactory<T, D> factory, StreamCodec<? super RegistryFriendlyByteBuf, D> packetCodec) {
+        return new MenuType<>(
             (IContainerFactory<T>) (i, inv, buf) -> factory.create(i, inv, packetCodec.decode(buf)),
-            FeatureFlags.VANILLA_FEATURES
+            FeatureFlags.VANILLA_SET
         );
     }
 
@@ -68,48 +71,48 @@ public class NeoforgeGeneralPlatformUtils implements GeneralPlatformUtils {
     //--
 
     @Override
-    public boolean interactWithFluidStorage(ForgeControllerBlockEntity controller, PlayerEntity player, Hand hand) {
+    public boolean interactWithFluidStorage(ForgeControllerBlockEntity controller, Player player, InteractionHand hand) {
         return FluidUtil.interactWithFluidHandler(player, hand, null, controller.<FluidHolderImpl>getFluidHolder());
     }
 
     @Override
     public FluidStorage createStorage(ForgeControllerBlockEntity controller) {
-        return new FluidHolderImpl(controller::markDirty);
+        return new FluidHolderImpl(controller::setChanged);
     }
 
     //--
 
     @Override
-    public <I extends RecipeInput, T extends Recipe<I>> Stream<RecipeEntry<T>> getAllMatches(ServerRecipeManager manager, RecipeType<T> type, I input, World world) {
-        return manager.recipeMap().find(type, input, world);
+    public <I extends RecipeInput, T extends Recipe<I>> Stream<RecipeHolder<T>> getAllMatches(RecipeManager manager, RecipeType<T> type, I input, Level world) {
+        return manager.recipeMap().getRecipesFor(type, input, world);
     }
 
     @Override
-    public <I extends RecipeInput, T extends Recipe<I>> Collection<RecipeEntry<T>> getAllOfType(ServerRecipeManager manager, RecipeType<T> type) {
-        return manager.recipeMap().getAll(type);
+    public <I extends RecipeInput, T extends Recipe<I>> Collection<RecipeHolder<T>> getAllOfType(RecipeManager manager, RecipeType<T> type) {
+        return manager.recipeMap().byType(type);
     }
 
     @Override
     public Ingredient createStackIngredient(ItemStack stack) {
-        var builder = ComponentMap.builder();
+        var builder = DataComponentMap.builder();
 
-        for (var entry : stack.getComponentChanges().entrySet()) {
+        for (var entry : stack.getComponentsPatch().entrySet()) {
             addUnsafe(builder, entry.getKey(), entry.getValue());
         }
 
-        return DataComponentIngredient.of(false, builder.build(), stack.getRegistryEntry());
+        return DataComponentIngredient.of(false, builder.build(), stack.getItemHolder());
     }
 
-    private static <T> void addUnsafe(ComponentMap.Builder builder, ComponentType<T> type, Optional<?> data) {
-        builder.add(type, (T) data.orElse(null));
+    private static <T> void addUnsafe(DataComponentMap.Builder builder, DataComponentType<T> type, Optional<?> data) {
+        builder.set(type, (T) data.orElse(null));
     }
 
     //--
 
-    private static final Map<ResourceType, Map<Identifier, EndecDataLoader<?>>> LOADER_MAP = new HashMap<>();
+    private static final Map<PackType, Map<ResourceLocation, EndecDataLoader<?>>> LOADER_MAP = new HashMap<>();
 
     @Override
-    public void registerLoader(Identifier id, ResourceType packType, EndecDataLoader<?> loader, boolean requiresRegistries) {
+    public void registerLoader(ResourceLocation id, PackType packType, EndecDataLoader<?> loader, boolean requiresRegistries) {
         var map = LOADER_MAP.computeIfAbsent(packType, resourceType -> new LinkedHashMap<>());
 
         if (map.containsKey(id)) {
@@ -132,22 +135,22 @@ public class NeoforgeGeneralPlatformUtils implements GeneralPlatformUtils {
     }
 
     public interface ReloadListenerRegistration {
-        ResourceType getType();
+        PackType getType();
 
-        default DynamicRegistryManager getRegistry() {
+        default RegistryAccess getRegistry() {
             throw new IllegalStateException("Unable to get DynamicRegistryManager on the Client!");
         }
 
-        ReloadListenerRegistration addListener(Identifier id, ResourceReloader listener);
+        ReloadListenerRegistration addListener(ResourceLocation id, PreparableReloadListener listener);
 
-        ReloadListenerRegistration addDependency(Identifier id, Collection<Identifier> dependencies);
+        ReloadListenerRegistration addDependency(ResourceLocation id, Collection<ResourceLocation> dependencies);
     }
 
     //--
 
     @Override
-    public OptionalInt openHandledScreen(PlayerEntity player, ForgeControllerBlockEntity blockEntity, @Nullable NamedScreenHandlerFactory factory) {
-        if (player instanceof ServerPlayerEntity serverPlayer) {
+    public OptionalInt openHandledScreen(Player player, ForgeControllerBlockEntity blockEntity, @Nullable MenuProvider factory) {
+        if (player instanceof ServerPlayer serverPlayer) {
             return serverPlayer.openMenu(factory, registryByteBuf -> {
                 BlockEntityLocation.ENDEC.encodeFully(() -> ByteBufSerializer.of(registryByteBuf), blockEntity.getExtraScreenData(serverPlayer));
             });
@@ -178,7 +181,7 @@ public class NeoforgeGeneralPlatformUtils implements GeneralPlatformUtils {
 
 
     private static boolean isFrozen = true;
-    private static final Map<Identifier, ForgeRegistry.EntryHolder> REGISTERED_ENTRIES = new LinkedHashMap<>();
+    private static final Map<ResourceLocation, ForgeRegistry.EntryHolder> REGISTERED_ENTRIES = new LinkedHashMap<>();
 
     public static void handleLoadedEntries() {
         if (!REGISTERED_ENTRIES.isEmpty()) {

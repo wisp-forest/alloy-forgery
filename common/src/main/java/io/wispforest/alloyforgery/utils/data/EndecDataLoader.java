@@ -10,17 +10,18 @@ import io.wispforest.endec.Endec;
 import io.wispforest.endec.SerializationContext;
 import io.wispforest.owo.serialization.CodecUtils;
 import io.wispforest.owo.serialization.RegistriesAttribute;
-import net.minecraft.registry.RegistryOps;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.resource.JsonDataLoader;
-import net.minecraft.resource.ResourceFinder;
-import net.minecraft.resource.ResourceManager;
-import net.minecraft.resource.ResourceType;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.profiler.Profiler;
+import net.minecraft.resources.RegistryOps;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.server.packs.resources.PreparableReloadListener.SharedState;
+import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
+import net.minecraft.resources.FileToIdConverter;
+import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.server.packs.PackType;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.profiling.ProfilerFiller;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
-import io.wispforest.alloyforgery.mixin.JsonDataLoaderAccessor;
+import io.wispforest.alloyforgery.mixin.SimpleJsonResourceReloadListenerAccessor;
 
 import java.util.*;
 import java.util.function.Function;
@@ -28,21 +29,21 @@ import java.util.function.Supplier;
 
 
 // TODO: 1.21.4 ADJUSTMENTS SHOULD BE MADE TO USE LESS DIRECT CODE ANYWAYS
-public abstract class EndecDataLoader<T> extends JsonDataLoader<T> {
+public abstract class EndecDataLoader<T> extends SimpleJsonResourceReloadListener<T> {
 
     protected final String type;
 
-    protected final Identifier id;
+    protected final ResourceLocation id;
     protected final Endec<T> endec;
 
-    protected final Set<Identifier> dependencies;
+    protected final Set<ResourceLocation> dependencies;
 
     protected final SerializationContext context;
 
     protected final boolean requiresRegistries;
 
-    private EndecDataLoader(Identifier id, String type, Endec<T> endec, SerializationContext context, boolean requiresRegistries, Set<Identifier> value) {
-        super(new DelayedRecursiveCodec<>(), ResourceFinder.json(type));
+    private EndecDataLoader(ResourceLocation id, String type, Endec<T> endec, SerializationContext context, boolean requiresRegistries, Set<ResourceLocation> value) {
+        super(new DelayedRecursiveCodec<>(), FileToIdConverter.json(type));
 
         this.id = id;
         this.type = type;
@@ -64,7 +65,7 @@ public abstract class EndecDataLoader<T> extends JsonDataLoader<T> {
 
         //--
 
-        protected final Set<Identifier> dependencies = new HashSet<>();
+        protected final Set<ResourceLocation> dependencies = new HashSet<>();
 
         protected SerializationContext context = SerializationContext.empty();
 
@@ -75,11 +76,11 @@ public abstract class EndecDataLoader<T> extends JsonDataLoader<T> {
             this.endec = endec;
         }
 
-        public Builder<T> addDependencies(Identifier ...dependencies) {
+        public Builder<T> addDependencies(ResourceLocation...dependencies) {
             return addDependencies(List.of(dependencies));
         }
 
-        public Builder<T> addDependencies(Collection<Identifier> dependencies) {
+        public Builder<T> addDependencies(Collection<ResourceLocation> dependencies) {
             this.dependencies.addAll(dependencies);
 
             return this;
@@ -97,10 +98,10 @@ public abstract class EndecDataLoader<T> extends JsonDataLoader<T> {
             return this;
         }
 
-        public EndecDataLoader<T> create(Identifier id, ResourceType packType, LoadedDataHandler<T> handler) {
+        public EndecDataLoader<T> create(ResourceLocation id, PackType packType, LoadedDataHandler<T> handler) {
             var loader = new EndecDataLoader<T>(id, this.type, this.endec, this.context, this.requiresRegistries, this.dependencies) {
                 @Override
-                protected void apply(Map<Identifier, T> prepared, ResourceManager manager, Profiler profiler) {
+                protected void apply(Map<ResourceLocation, T> prepared, ResourceManager manager, ProfilerFiller profiler) {
                     handler.handleData(prepared, manager, profiler);
                 }
             };
@@ -111,11 +112,11 @@ public abstract class EndecDataLoader<T> extends JsonDataLoader<T> {
         }
     }
 
-    public Identifier getLoaderId() {
+    public ResourceLocation getLoaderId() {
         return id;
     }
 
-    public Set<Identifier> getDependencyIds() {
+    public Set<ResourceLocation> getDependencyIds() {
         return dependencies;
     }
 
@@ -124,18 +125,18 @@ public abstract class EndecDataLoader<T> extends JsonDataLoader<T> {
     }
 
     protected void setupCodec() {
-        ((DelayedRecursiveCodec<T>) ((JsonDataLoaderAccessor<T>) this).codec())
+        ((DelayedRecursiveCodec<T>) ((SimpleJsonResourceReloadListenerAccessor<T>) this).codec())
                 .setup(this.endec.toString(), codec -> CodecUtils.toCodec(endec, this.getContext()));
     }
 
     @Nullable
-    private RegistryWrapper.WrapperLookup registries = null;
+    private HolderLookup.Provider registries = null;
 
     @Nullable
-    private Function<Store, RegistryWrapper.WrapperLookup> registryGetter = null;
+    private Function<SharedState, HolderLookup.Provider> registryGetter = null;
 
     @Override
-    public void prepareSharedState(Store store) {
+    public void prepareSharedState(SharedState store) {
         if (requiresRegistries) {
             Objects.requireNonNull(registryGetter, "Can not get the needed context for the ManagedEndecDataLoader: " + this.getLoaderId());
 
@@ -149,7 +150,7 @@ public abstract class EndecDataLoader<T> extends JsonDataLoader<T> {
     }
 
     @ApiStatus.Internal
-    public EndecDataLoader<T> setRegistryGetter(Function<Store, RegistryWrapper.WrapperLookup> registryGetter) {
+    public EndecDataLoader<T> setRegistryGetter(Function<SharedState, HolderLookup.Provider> registryGetter) {
         this.registryGetter = registryGetter;
 
         return this;
@@ -159,14 +160,14 @@ public abstract class EndecDataLoader<T> extends JsonDataLoader<T> {
         if (requiresRegistries) {
             Objects.requireNonNull(registries, "Can not build the needed context for the ManagedEndecDataLoader: " + this.getLoaderId());
 
-            return this.context.withAttributes(RegistriesAttribute.fromCachedInfoGetter(new RegistryOps.CachedRegistryInfoGetter(registries)));
+            return this.context.withAttributes(RegistriesAttribute.fromCachedInfoGetter(new RegistryOps.HolderLookupAdapter(registries)));
         }
 
         return this.context;
     }
 
     @Override
-    protected Map<Identifier, T> prepare(ResourceManager resourceManager, Profiler profiler) {
+    protected Map<ResourceLocation, T> prepare(ResourceManager resourceManager, ProfilerFiller profiler) {
         if (requiresRegistries && registries == null) {
             throw new IllegalStateException("Unable to prepare files as the given Registry access has not been setup on the server! [Id: " + this.getLoaderId() + "]");
         }
@@ -204,6 +205,6 @@ public abstract class EndecDataLoader<T> extends JsonDataLoader<T> {
     }
 
     public interface LoadedDataHandler<T> {
-        void handleData(Map<Identifier, T> data, ResourceManager manager, Profiler profiler);
+        void handleData(Map<ResourceLocation, T> data, ResourceManager manager, ProfilerFiller profiler);
     }
 }

@@ -10,10 +10,10 @@ import me.shedaniel.rei.api.common.display.Display;
 import me.shedaniel.rei.api.common.display.DisplaySerializer;
 import me.shedaniel.rei.api.common.entry.EntryIngredient;
 import me.shedaniel.rei.api.common.util.EntryIngredients;
-import net.minecraft.item.ItemStack;
-import net.minecraft.recipe.Ingredient;
-import net.minecraft.recipe.RecipeEntry;
-import net.minecraft.util.Identifier;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
 import io.wispforest.alloyforgery.compat.CountedIngredientDisplay;
 import io.wispforest.alloyforgery.recipe.AlloyForgeRecipe;
@@ -21,9 +21,9 @@ import java.util.*;
 
 public record AlloyForgingDisplay(List<EntryIngredient> inputs, EntryIngredient output,
                                   int minForgeTier, int fuelPerTick,
-                                  Map<AlloyForgeRecipe.OverrideRange, ItemStack> overrides, Optional<Identifier> recipeID) implements Display {
+                                  Map<AlloyForgeRecipe.OverrideRange, ItemStack> overrides, Optional<ResourceLocation> recipeID) implements Display {
 
-    public static AlloyForgingDisplay of(RecipeEntry<AlloyForgeRecipe> recipeEntry) {
+    public static AlloyForgingDisplay of(RecipeHolder<AlloyForgeRecipe> recipeEntry) {
         List<EntryIngredient> convertedInputs = new ArrayList<>();
 
         var recipe = recipeEntry.value();
@@ -33,7 +33,7 @@ public record AlloyForgingDisplay(List<EntryIngredient> inputs, EntryIngredient 
                 int stackCount = Math.min(i, 64);
 
                 convertedInputs.add(
-                    EntryIngredients.ofSlotDisplay(new CountedIngredientDisplay(entry.getKey().toDisplay(), stackCount))
+                    EntryIngredients.ofSlotDisplay(new CountedIngredientDisplay(entry.getKey().display(), stackCount))
                 );
 
                 i -= stackCount;
@@ -46,7 +46,7 @@ public record AlloyForgingDisplay(List<EntryIngredient> inputs, EntryIngredient 
             recipe.getMinForgeTier(),
             recipe.getFuelPerTick(),
             recipe.getTierOverrides(),
-            recipe.secondaryID().or(() -> Optional.of(recipeEntry.id().getValue())));
+            recipe.secondaryID().or(() -> Optional.of(recipeEntry.id().location())));
     }
 
     @Override
@@ -65,7 +65,7 @@ public record AlloyForgingDisplay(List<EntryIngredient> inputs, EntryIngredient 
     }
 
     @Override
-    public Optional<Identifier> getDisplayLocation() {
+    public Optional<ResourceLocation> getDisplayLocation() {
         return recipeID;
     }
 

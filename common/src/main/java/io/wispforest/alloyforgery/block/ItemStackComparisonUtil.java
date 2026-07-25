@@ -1,6 +1,6 @@
 package io.wispforest.alloyforgery.block;
 
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.ItemStack;
 import java.util.List;
 
 public class ItemStackComparisonUtil {
@@ -15,7 +15,7 @@ public class ItemStackComparisonUtil {
             var stack1 = list1.get(i);
             var stack2 = list2.get(i);
 
-            if (!ItemStack.areEqual(stack1, stack2)) return true;
+            if (!ItemStack.matches(stack1, stack2)) return true;
         }
 
         return false;

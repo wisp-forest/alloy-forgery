@@ -6,19 +6,21 @@ import com.mojang.logging.LogUtils;
 import io.wispforest.endec.SerializationContext;
 import io.wispforest.endec.format.gson.GsonDeserializer;
 import io.wispforest.owo.serialization.RegistriesAttribute;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.recipe.*;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.registry.RegistryOps;
-import net.minecraft.registry.tag.TagKey;
-import net.minecraft.util.Identifier;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.RegistryOps;
+import net.minecraft.tags.TagKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.crafting.*;
+import net.minecraft.world.item.crafting.Recipe;
 import org.slf4j.Logger;
 import io.wispforest.alloyforgery.AlloyForgery;
 import io.wispforest.alloyforgery.data.RecipeTagLoader;
 import io.wispforest.alloyforgery.forges.ForgeTier;
-import io.wispforest.alloyforgery.mixin.SingleStackRecipeAccessor;
+import io.wispforest.alloyforgery.mixin.SingleItemRecipeAccessor;
 import io.wispforest.alloyforgery.utils.RecipeInjector;
 import java.util.*;
 
@@ -32,17 +34,17 @@ public class BlastFurnaceRecipeAdapter implements RecipeInjector.AddRecipes {
 
     private static final Gson GSON = new GsonBuilder().setStrictness(Strictness.LENIENT).create();
 
-    private static final TagKey<Item> DUSTS_TAG = TagKey.of(RegistryKeys.ITEM, Identifier.of("c", "dusts"));
+    private static final TagKey<Item> DUSTS_TAG = TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath("c", "dusts"));
 
     /**
      * Recipe tag for all {@link RecipeType#BLASTING} recipes to be disallowed for adaption
      */
-    public static final Identifier BLACKLISTED_BLASTING_RECIPES = AlloyForgery.id("blacklisted_blasting_recipes");
+    public static final ResourceLocation BLACKLISTED_BLASTING_RECIPES = AlloyForgery.id("blacklisted_blasting_recipes");
 
     /**
      * Recipe tag for all {@link RecipeType#BLASTING} recipes to be disallowed for output increase at higher tiers
      */
-    public static final Identifier BLACKLISTED_INCREASED_OUTPUT = AlloyForgery.id("blacklisted_increased_blasting_outputs");
+    public static final ResourceLocation BLACKLISTED_INCREASED_OUTPUT = AlloyForgery.id("blacklisted_increased_blasting_outputs");
 
     @Override
     public void addRecipes(RecipeInjector instance) {
@@ -50,22 +52,22 @@ public class BlastFurnaceRecipeAdapter implements RecipeInjector.AddRecipes {
 
         var manager = instance.manager();
 
-        Collection<RecipeEntry<AlloyForgeRecipe>> alloyForgeryRecipes = instance.getAllOfType(AlloyForgeRecipe.Type.INSTANCE);
+        Collection<RecipeHolder<AlloyForgeRecipe>> alloyForgeryRecipes = instance.getAllOfType(AlloyForgeRecipe.Type.INSTANCE);
 
-        for (RecipeEntry<BlastingRecipe> recipeEntry : instance.getAllOfType(RecipeType.BLASTING)) {
+        for (RecipeHolder<BlastingRecipe> recipeEntry : instance.getAllOfType(RecipeType.BLASTING)) {
             var recipe = recipeEntry.value();
 
             if (!isUniqueRecipe(instance, alloyForgeryRecipes, recipe) || RecipeTagLoader.isWithinTag(false, BLACKLISTED_BLASTING_RECIPES, recipeEntry))
                 continue;
 
-            var secondaryID = recipeEntry.id().getValue();
+            var secondaryID = recipeEntry.id().location();
             var path = secondaryID.getPath();
 
             if (path.contains("blasting")) {
                 path = path.replace("blasting", "forging");
             }
 
-            var mainOutput = ((SingleStackRecipeAccessor)recipe).result().copy();
+            var mainOutput = ((SingleItemRecipeAccessor)recipe).result().copy();
 
             mainOutput.setCount(AlloyForgery.CONFIG.baseInputAmount());
 
@@ -74,7 +76,7 @@ public class BlastFurnaceRecipeAdapter implements RecipeInjector.AddRecipes {
             if (AlloyForgery.CONFIG.allowHigherTierOutput() && !RecipeTagLoader.isWithinTag(false, BLACKLISTED_INCREASED_OUTPUT, recipeEntry) && !isDustRecipe(instance, recipeEntry)) {
                 var increasedOutput = mainOutput.copy();
 
-                increasedOutput.increment(AlloyForgery.CONFIG.higherTierOutputIncrease());
+                increasedOutput.grow(AlloyForgery.CONFIG.higherTierOutputIncrease());
 
                 extraOutput.put(new AlloyForgeRecipe.OverrideRange(3), increasedOutput);
             }
@@ -82,7 +84,7 @@ public class BlastFurnaceRecipeAdapter implements RecipeInjector.AddRecipes {
             var recipeId = AlloyForgery.id(path);
 
             var convertRecipe = new AlloyForgeRecipe(
-                Map.of(recipe.getIngredientPlacement().getIngredients().get(0), AlloyForgery.CONFIG.baseInputAmount()),
+                Map.of(recipe.placementInfo().ingredients().get(0), AlloyForgery.CONFIG.baseInputAmount()),
                 mainOutput,
                 1,
                 Math.round(getFuelPerTick(recipe)),
@@ -94,7 +96,7 @@ public class BlastFurnaceRecipeAdapter implements RecipeInjector.AddRecipes {
 
         try {
             var funny = AlloyForgeRecipeSerializer.RECIPE_ENDEC.decodeFully(
-                SerializationContext.attributes(RegistriesAttribute.fromCachedInfoGetter(new RegistryOps.CachedRegistryInfoGetter(instance.lookup()))),
+                SerializationContext.attributes(RegistriesAttribute.fromCachedInfoGetter(new RegistryOps.HolderLookupAdapter(instance.lookup()))),
                 GsonDeserializer::of,
                 GSON.fromJson(new String(Base64.getDecoder().decode(ExtraRecipe)), JsonElement.class));
 
@@ -105,21 +107,21 @@ public class BlastFurnaceRecipeAdapter implements RecipeInjector.AddRecipes {
     }
 
     private static float getFuelPerTick(BlastingRecipe recipe) {
-        return ((recipe.getCookingTime() / (float) ForgeTier.BASE_MAX_SMELT_TIME) * 10);
+        return ((recipe.cookingTime() / (float) ForgeTier.BASE_MAX_SMELT_TIME) * 10);
     }
 
     // Checks if the given blast recipe has unique inputs to prevent overlapping recipes leading to confliction
-    private static boolean isUniqueRecipe(RecipeInjector instance, Collection<RecipeEntry<AlloyForgeRecipe>> alloyForgeryRecipes, Recipe<?> blastRecipe) {
-        List<ItemStack> stacks = instance.getStacks(blastRecipe.getIngredientPlacement().getIngredients().get(0));
+    private static boolean isUniqueRecipe(RecipeInjector instance, Collection<RecipeHolder<AlloyForgeRecipe>> alloyForgeryRecipes, Recipe<?> blastRecipe) {
+        List<ItemStack> stacks = instance.getStacks(blastRecipe.placementInfo().ingredients().get(0));
 
-        List<RecipeEntry<AlloyForgeRecipe>> matchedRecipes = alloyForgeryRecipes.stream()
+        List<RecipeHolder<AlloyForgeRecipe>> matchedRecipes = alloyForgeryRecipes.stream()
             .filter(recipeEntry -> {
                 var recipe = recipeEntry.value();
 
                 if (recipe.getIngredientsMap().size() > 1) return false;
 
                 for (ItemStack stack : stacks) {
-                    if (recipe.getIngredientPlacement().getIngredients().get(0).test(stack)) {
+                    if (recipe.placementInfo().ingredients().get(0).test(stack)) {
                         return true;
                     }
                 }
@@ -134,17 +136,17 @@ public class BlastFurnaceRecipeAdapter implements RecipeInjector.AddRecipes {
     // 1. Check if recipe name contains "dust"
     // 2. Check if the item is within the "c:dusts" tag
     // 3. Check if any input items have Identifiers containing "dust" within the path
-    private static boolean isDustRecipe(RecipeInjector instance, RecipeEntry<BlastingRecipe> blastingRecipeEntry) {
-        if (blastingRecipeEntry.id().getValue().getPath().contains("dust")) return true;
+    private static boolean isDustRecipe(RecipeInjector instance, RecipeHolder<BlastingRecipe> blastingRecipeEntry) {
+        if (blastingRecipeEntry.id().location().getPath().contains("dust")) return true;
 
         var blastRecipe = blastingRecipeEntry.value();
 
-        List<ItemStack> stacks = instance.getStacks(blastRecipe.getIngredientPlacement().getIngredients().get(0));
+        List<ItemStack> stacks = instance.getStacks(blastRecipe.placementInfo().ingredients().get(0));
 
         for (ItemStack stack : stacks) {
-            if (stack.isIn(DUSTS_TAG)) return true;
+            if (stack.is(DUSTS_TAG)) return true;
 
-            Identifier id = Registries.ITEM.getId(stack.getItem());
+            ResourceLocation id = BuiltInRegistries.ITEM.getKey(stack.getItem());
 
             if (id.getPath().contains("dust")) return true;
         }

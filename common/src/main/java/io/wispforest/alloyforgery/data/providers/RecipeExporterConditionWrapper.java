@@ -1,7 +1,7 @@
 package io.wispforest.alloyforgery.data.providers;
 
-import net.minecraft.data.recipe.RecipeExporter;
+import net.minecraft.data.recipes.RecipeOutput;
 
 public interface RecipeExporterConditionWrapper {
-    RecipeExporter withConditions(RecipeExporter exporter, ResourceConditionHolder conditions);
+    RecipeOutput withConditions(RecipeOutput exporter, ResourceConditionHolder conditions);
 }

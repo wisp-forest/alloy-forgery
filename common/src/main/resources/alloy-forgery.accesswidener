@@ -1,9 +1,9 @@
 accessWidener v2 official
 
-accessible class net/minecraft/registry/tag/TagGroupLoader$TagDependencies
-accessible method net/minecraft/registry/tag/TagGroupLoader$TagDependencies <init> (Ljava/util/List;)V
+accessible class net/minecraft/tags/TagLoader$SortingEntry
+accessible method net/minecraft/tags/TagLoader$SortingEntry <init> (Ljava/util/List;)V
 
-accessible class net/minecraft/registry/RegistryOps$CachedRegistryInfoGetter
+accessible class net/minecraft/resources/RegistryOps$HolderLookupAdapter
 
-accessible	class	net/minecraft/client/gui/screen/ingame/HandledScreens$Provider
-accessible	method	net/minecraft/client/gui/screen/ingame/HandledScreens	register	(Lnet/minecraft/screen/ScreenHandlerType;Lnet/minecraft/client/gui/screen/ingame/HandledScreens$Provider;)V
+accessible	class	net/minecraft/client/gui/screens/MenuScreens$ScreenConstructor
+accessible	method	net/minecraft/client/gui/screens/MenuScreens	register	(Lnet/minecraft/world/inventory/MenuType;Lnet/minecraft/client/gui/screens/MenuScreens$ScreenConstructor;)V

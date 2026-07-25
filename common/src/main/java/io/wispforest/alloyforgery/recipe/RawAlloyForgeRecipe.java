@@ -12,11 +12,11 @@ import io.wispforest.endec.impl.StructEndecBuilder;
 import io.wispforest.owo.serialization.CodecUtils;
 import io.wispforest.owo.serialization.endec.MinecraftEndecs;
 import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
-import net.minecraft.component.ComponentChanges;
-import net.minecraft.item.ItemStack;
-import net.minecraft.recipe.Ingredient;
-import net.minecraft.registry.Registries;
-import net.minecraft.util.Pair;
+import net.minecraft.core.component.DataComponentPatch;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.util.Tuple;
 import org.apache.commons.lang3.mutable.MutableInt;
 import io.wispforest.alloyforgery.AlloyForgery;
 import io.wispforest.alloyforgery.utils.EndecUtils;
@@ -57,10 +57,10 @@ public record RawAlloyForgeRecipe(Map<Ingredient, Integer> inputs, OutputData ou
     });
 
     public static Endec<AlloyForgeRecipe.PendingOverride> PENDING_OVERRIDE = StructEndecBuilder.of(
-        MinecraftEndecs.ofRegistry(Registries.ITEM).optionalFieldOf("item", AlloyForgeRecipe.PendingOverride::item, () -> null),
-        MinecraftEndecs.ofRegistry(Registries.ITEM).optionalFieldOf("id", orderride -> null, () -> null), //TODO: REMOVE LATER
+        MinecraftEndecs.ofRegistry(BuiltInRegistries.ITEM).optionalFieldOf("item", AlloyForgeRecipe.PendingOverride::item, () -> null),
+        MinecraftEndecs.ofRegistry(BuiltInRegistries.ITEM).optionalFieldOf("id", orderride -> null, () -> null), //TODO: REMOVE LATER
         Endec.INT.fieldOf("count", AlloyForgeRecipe.PendingOverride::count),
-        EndecUtils.optionalFieldOf("components", CodecUtils.toEndec(ComponentChanges.CODEC), AlloyForgeRecipe.PendingOverride::components, () -> ComponentChanges.EMPTY),
+        EndecUtils.optionalFieldOf("components", CodecUtils.toEndec(DataComponentPatch.CODEC), AlloyForgeRecipe.PendingOverride::components, () -> DataComponentPatch.EMPTY),
         (item, item2, count, components) -> {
             if (item == null) item = item2;
 
@@ -97,8 +97,8 @@ public record RawAlloyForgeRecipe(Map<Ingredient, Integer> inputs, OutputData ou
         RawAlloyForgeRecipe::new
     );
 
-    public Pair<ItemStack, ImmutableMap<AlloyForgeRecipe.OverrideRange, ItemStack>> finalOutputData(Map<AlloyForgeRecipe.OverrideRange, AlloyForgeRecipe.PendingOverride> overridesBuilder) {
-        if (outputData.outputItem() == null) return new Pair<>(ItemStack.EMPTY, ImmutableMap.of());
+    public Tuple<ItemStack, ImmutableMap<AlloyForgeRecipe.OverrideRange, ItemStack>> finalOutputData(Map<AlloyForgeRecipe.OverrideRange, AlloyForgeRecipe.PendingOverride> overridesBuilder) {
+        if (outputData.outputItem() == null) return new Tuple<>(ItemStack.EMPTY, ImmutableMap.of());
 
         final var builder = ImmutableMap.<AlloyForgeRecipe.OverrideRange, ItemStack>builder();
 
@@ -115,13 +115,13 @@ public record RawAlloyForgeRecipe(Map<Ingredient, Integer> inputs, OutputData ou
             }
 
             if (!entry.getValue().components().isEmpty()) {
-                stack.applyChanges(entry.getValue().components());
+                stack.applyComponentsAndValidate(entry.getValue().components());
             }
 
             builder.put(entry.getKey(), stack);
         }
 
-        return new Pair<>(outputStack, builder.build());
+        return new Tuple<>(outputStack, builder.build());
     }
 
     public AlloyForgeRecipe generateRecipe() {
@@ -131,10 +131,10 @@ public record RawAlloyForgeRecipe(Map<Ingredient, Integer> inputs, OutputData ou
     public AlloyForgeRecipe generateRecipe(boolean isDataGenerated) {
         var outputData = this.finalOutputData(this.overrideData);
 
-        final var recipe = new AlloyForgeRecipe(Optional.of(this), this.inputs, outputData.getLeft(), minForgeTier, requiredFuel, outputData.getRight());
+        final var recipe = new AlloyForgeRecipe(Optional.of(this), this.inputs, outputData.getA(), minForgeTier, requiredFuel, outputData.getB());
 
         if (!isDataGenerated && this.outputData.prioritisedOutput()) {
-            AlloyForgeRecipe.PENDING_RECIPES.put(recipe, new AlloyForgeRecipe.PendingRecipeData(new Pair<>(this.outputData.defaultTag(), this.outputData.count()), this.overrideData));
+            AlloyForgeRecipe.PENDING_RECIPES.put(recipe, new AlloyForgeRecipe.PendingRecipeData(new Tuple<>(this.outputData.defaultTag(), this.outputData.count()), this.overrideData));
         }
 
         return recipe;

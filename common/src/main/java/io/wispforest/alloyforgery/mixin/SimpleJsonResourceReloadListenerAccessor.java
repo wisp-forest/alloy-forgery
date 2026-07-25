@@ -1,12 +1,12 @@
 package io.wispforest.alloyforgery.mixin;
 
 import com.mojang.serialization.Codec;
-import net.minecraft.resource.JsonDataLoader;
+import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
-@Mixin(JsonDataLoader.class)
-public interface JsonDataLoaderAccessor<T> {
+@Mixin(SimpleJsonResourceReloadListener.class)
+public interface SimpleJsonResourceReloadListenerAccessor<T> {
     @Accessor("codec")
     Codec<T> codec();
 }

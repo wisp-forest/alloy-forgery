@@ -1,15 +1,15 @@
 package io.wispforest.alloyforgery.mixin;
 
-import net.minecraft.block.entity.HopperBlockEntity;
+import net.minecraft.world.level.block.entity.HopperBlockEntity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Invoker;
 
 @Mixin(HopperBlockEntity.class)
 public interface HopperBlockEntityAccessor {
 
-    @Invoker("setTransferCooldown")
+    @Invoker("setCooldown")
     void alloyForge$setTransferCooldown(int transferCooldown);
 
-    @Invoker("isDisabled")
+    @Invoker("isOnCustomCooldown")
     boolean alloyForge$isDisabled();
 }

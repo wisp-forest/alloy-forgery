@@ -11,18 +11,18 @@ import io.wispforest.owo.ui.component.TextureComponent;
 import io.wispforest.owo.ui.container.Containers;
 import io.wispforest.owo.ui.container.FlowLayout;
 import io.wispforest.owo.ui.core.*;
-import net.minecraft.client.gl.RenderPipelines;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.tooltip.TooltipComponent;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.texture.SpriteAtlasTexture;
-import net.minecraft.client.util.SpriteIdentifier;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.screen.slot.Slot;
-import net.minecraft.screen.slot.SlotActionType;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
+import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.texture.TextureAtlas;
+import net.minecraft.client.resources.model.Material;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.inventory.ClickType;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -33,10 +33,10 @@ import static io.wispforest.alloyforgery.client.ComponentUtils.*;
 
 public class AlloyForgeScreen extends BaseOwoHandledScreen<FlowLayout, AlloyForgeScreenHandler> {
 
-    private static final SpriteIdentifier LAVA_SPRITE = new SpriteIdentifier(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, Identifier.of("block/lava_still"));
+    private static final Material LAVA_SPRITE = new Material(TextureAtlas.LOCATION_BLOCKS, ResourceLocation.parse("block/lava_still"));
 
-    private static final Text ENABLED_SLOT_TEXT = Text.translatable("tooltip.alloy-forgery.enabled_slot");
-    private static final Text DISABLED_SLOT_TEXT = Text.translatable("tooltip.alloy-forgery.disabled_slot");
+    private static final Component ENABLED_SLOT_TEXT = Component.translatable("tooltip.alloy-forgery.enabled_slot");
+    private static final Component DISABLED_SLOT_TEXT = Component.translatable("tooltip.alloy-forgery.disabled_slot");
 
     private TextureComponent fuelGauge;
     private TextureComponent progressGauge;
@@ -45,14 +45,14 @@ public class AlloyForgeScreen extends BaseOwoHandledScreen<FlowLayout, AlloyForg
 
     private boolean allowSlotToggling = false;
 
-    public AlloyForgeScreen(AlloyForgeScreenHandler handler, PlayerInventory inventory, Text title) {
+    public AlloyForgeScreen(AlloyForgeScreenHandler handler, Inventory inventory, Component title) {
         super(handler, inventory, title);
 
-        this.backgroundWidth = 176;
-        this.backgroundHeight = 189;
+        this.imageWidth = 176;
+        this.imageHeight = 189;
 
-        this.titleY = 69420;
-        this.playerInventoryTitleY = this.backgroundHeight - 93;
+        this.titleLabelY = 69420;
+        this.inventoryLabelY = this.imageHeight - 93;
     }
 
     @Override
@@ -103,40 +103,40 @@ public class AlloyForgeScreen extends BaseOwoHandledScreen<FlowLayout, AlloyForg
                         })
                 )
                 .child(
-                    label(Text.translatable("title.alloy-forgery.forge_controller"))
+                    label(Component.translatable("title.alloy-forgery.forge_controller"))
                         .color(getThemedValue(Color.ofRgb(0x3f3f3f), Color.WHITE))
                         .positioning(Positioning.relative(50, 12))
                 )
                 .child(
                     horizontalFlow(Sizing.fixed(26), Sizing.content())
                         .child(
-                            button(Text.empty(), btn -> {
+                            button(Component.empty(), btn -> {
                                 this.allowSlotToggling = !allowSlotToggling;
 
-                                btn.tooltip(Text.translatable("tooltip.alloy-forgery.slot_toggle_" + (this.allowSlotToggling ? "enable" : "disable")));
+                                btn.tooltip(Component.translatable("tooltip.alloy-forgery.slot_toggle_" + (this.allowSlotToggling ? "enable" : "disable")));
                             }).renderer((context, button, delta) -> {
                                     BUTTON_RENDERER.draw(context, button, delta);
 
                                     context.push()
                                         .translate(button.getX(), button.getY());
 
-                                    context.drawTexture(RenderPipelines.GUI_TEXTURED, textureID("slot_locks.png"),4, 3, this.allowSlotToggling ? 10 : 0, 0, 10, 12, 20, 12);
+                                    context.blit(RenderPipelines.GUI_TEXTURED, textureID("slot_locks.png"),4, 3, this.allowSlotToggling ? 10 : 0, 0, 10, 12, 20, 12);
 
                                     context.pop();
                                 })
-                                .tooltip(Text.translatable("tooltip.alloy-forgery.slot_toggle_disable"))
+                                .tooltip(Component.translatable("tooltip.alloy-forgery.slot_toggle_disable"))
                                 .sizing(Sizing.fixed(18), Sizing.fixed(18))
                         ).horizontalAlignment(HorizontalAlignment.CENTER)
                         .positioning(Positioning.absolute(140, 75))
                 )
                 .child(
-                    makeInputSlots(this.getScreenHandler().getInputSlots(), 1, AlloyForgery.CONFIG::darkModeTheme, slot -> new SlotComponent(slot.id){
+                    makeInputSlots(this.getMenu().getInputSlots(), 1, AlloyForgery.CONFIG::darkModeTheme, slot -> new SlotComponent(slot.index){
                         // TODO: REMOVE AS THIS IS Used to resolve clipping item text and other effects due to how rendering is more buffered and uses the wrong scissor
                         @Override
                         public void draw(OwoUIDrawContext context, int mouseX, int mouseY, float partialTicks, float delta) {
                             this.didDraw = true;
                         }
-                    }, this.handler::isSlotDisabled)
+                    }, this.menu::isSlotDisabled)
                         .positioning(Positioning.absolute(42, 41))
                 )
                 .surface((context, component) -> {
@@ -144,11 +144,11 @@ public class AlloyForgeScreen extends BaseOwoHandledScreen<FlowLayout, AlloyForg
 
                     context.push().translate(component.x(), component.y());
 
-                    context.drawTexture(RenderPipelines.GUI_TEXTURED, backgroundTexture, 0, 0, 0, 0, 176, 189, 176, 189);
+                    context.blit(RenderPipelines.GUI_TEXTURED, backgroundTexture, 0, 0, 0, 0, 176, 189, 176, 189);
 
-                    context.drawTexture(RenderPipelines.GUI_TEXTURED, themedTextureID("fuel_meter.png"), 5, 22, 0, 0, 22, 48, 44, 48);
+                    context.blit(RenderPipelines.GUI_TEXTURED, themedTextureID("fuel_meter.png"), 5, 22, 0, 0, 22, 48, 44, 48);
 
-                    context.drawTexture(RenderPipelines.GUI_TEXTURED, textureID("forging_status.png"), 143, 21, 0, 0, 20, 22, 40, 22);
+                    context.blit(RenderPipelines.GUI_TEXTURED, textureID("forging_status.png"), 143, 21, 0, 0, 20, 22, 40, 22);
 
                     context.pop();
                 })
@@ -162,78 +162,78 @@ public class AlloyForgeScreen extends BaseOwoHandledScreen<FlowLayout, AlloyForg
     }
 
     @Override
-    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+    public void render(GuiGraphics context, int mouseX, int mouseY, float delta) {
         super.render(context, mouseX, mouseY, delta);
-        this.fuelGauge.visibleArea(PositionedRectangle.of(0, this.fuelGauge.height() - this.handler.getFuelProgress(), this.fuelGauge.fullSize()));
-        this.progressGauge.visibleArea(PositionedRectangle.of(0, 0, this.progressGauge.width(), this.handler.getSmeltProgress()));
-        this.lavaBar.horizontalSizing(Sizing.fixed(this.handler.getLavaProgress()));
+        this.fuelGauge.visibleArea(PositionedRectangle.of(0, this.fuelGauge.height() - this.menu.getFuelProgress(), this.fuelGauge.fullSize()));
+        this.progressGauge.visibleArea(PositionedRectangle.of(0, 0, this.progressGauge.width(), this.menu.getSmeltProgress()));
+        this.lavaBar.horizontalSizing(Sizing.fixed(this.menu.getLavaProgress()));
 
-        int requiredTier = this.handler.getRequiredTierData();
+        int requiredTier = this.menu.getRequiredTierData();
 
         if (requiredTier <= -1) {
             this.invalidCross
                 .visibleArea(PositionedRectangle.of(0, 0, 0, 0))
-                .tooltip(List.<TooltipComponent>of());
+                .tooltip(List.<ClientTooltipComponent>of());
         } else {
             this.invalidCross
                 .resetVisibleArea()
-                .tooltip(Text.translatable("tooltip.alloy-forgery.invalid_tier", requiredTier));
+                .tooltip(Component.translatable("tooltip.alloy-forgery.invalid_tier", requiredTier));
         }
     }
 
     @Override
-    protected void drawMouseoverTooltip(DrawContext context, int x, int y) {
-        super.drawMouseoverTooltip(context, x, y);
+    protected void renderTooltip(GuiGraphics context, int x, int y) {
+        super.renderTooltip(context, x, y);
 
         if (this.allowSlotToggling
-            && this.focusedSlot instanceof ForgeInputSlot
-            && this.handler.getCursorStack().isEmpty()
-            && !this.focusedSlot.hasStack()
-            && !this.handler.player().isSpectator()) {
+            && this.hoveredSlot instanceof ForgeInputSlot
+            && this.menu.getCarried().isEmpty()
+            && !this.hoveredSlot.hasItem()
+            && !this.menu.player().isSpectator()) {
 
-            if (this.handler.isSlotDisabled(this.focusedSlot)) {
-                context.drawTooltip(this.textRenderer, DISABLED_SLOT_TEXT, x, y);
+            if (this.menu.isSlotDisabled(this.hoveredSlot)) {
+                context.setTooltipForNextFrame(this.font, DISABLED_SLOT_TEXT, x, y);
             } else {
-                context.drawTooltip(this.textRenderer, ENABLED_SLOT_TEXT, x, y);
+                context.setTooltipForNextFrame(this.font, ENABLED_SLOT_TEXT, x, y);
             }
         }
     }
 
     @Override
-    protected void onMouseClick(Slot slot, int slotId, int button, SlotActionType actionType) {
-        var player = this.handler.player();
+    protected void slotClicked(Slot slot, int slotId, int button, ClickType actionType) {
+        var player = this.menu.player();
 
-        if (allowSlotToggling && slot instanceof ForgeInputSlot && !slot.hasStack() && !player.isSpectator()) {
-            if (actionType == net.minecraft.screen.slot.SlotActionType.PICKUP) {
-                if (this.handler.isSlotDisabled(slot)) {
+        if (allowSlotToggling && slot instanceof ForgeInputSlot && !slot.hasItem() && !player.isSpectator()) {
+            if (actionType == net.minecraft.world.inventory.ClickType.PICKUP) {
+                if (this.menu.isSlotDisabled(slot)) {
                     this.setSlotEnabled(slot, true);
                 } else /*if (this.handler.getCursorStack().isEmpty())*/ {
                     this.setSlotEnabled(slot, false);
                 }
-            } else if(actionType == SlotActionType.SWAP) {
-                var itemStack = player.getInventory().getStack(button);
-                if (this.handler.isSlotDisabled(slot) && !itemStack.isEmpty()) {
+            } else if(actionType == ClickType.SWAP) {
+                var itemStack = player.getInventory().getItem(button);
+                if (this.menu.isSlotDisabled(slot) && !itemStack.isEmpty()) {
                     this.setSlotEnabled(slot, true);
                 }
             }
         }
 
-        super.onMouseClick(slot, slotId, button, actionType);
+        super.slotClicked(slot, slotId, button, actionType);
     }
 
     private void setSlotEnabled(Slot slot, boolean enabled) {
-        AlloyForgeNetworking.CHANNEL.clientHandle().send(new DisableSlotToggle(this.handler.forge, slot.getIndex(), !enabled));
+        AlloyForgeNetworking.CHANNEL.clientHandle().send(new DisableSlotToggle(this.menu.forge, slot.getContainerSlot(), !enabled));
 
-        super.onSlotChangedState(slot.id, this.handler.syncId, enabled);
+        super.handleSlotStateChanged(slot.index, this.menu.containerId, enabled);
         float f = enabled ? 1.0F : 0.75F;
-        this.handler.player().playSound(SoundEvents.UI_BUTTON_CLICK.value(), 0.4F, f);
+        this.menu.player().playSound(SoundEvents.UI_BUTTON_CLICK.value(), 0.4F, f);
     }
 
     public int rootX() {
-        return this.x;
+        return this.leftPos;
     }
 
     public int rootY() {
-        return this.y;
+        return this.topPos;
     }
 }

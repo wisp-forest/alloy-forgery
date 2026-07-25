@@ -7,69 +7,83 @@ import io.wispforest.endec.impl.StructEndecBuilder;
 import io.wispforest.owo.particles.ClientParticles;
 import io.wispforest.owo.serialization.CodecUtils;
 import io.wispforest.owo.serialization.endec.MinecraftEndecs;
+import net.minecraft.ChatFormatting;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.*;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.particle.ParticleTypes;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.state.StateManager;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.*;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.block.*;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.block.state.BlockBehaviour.Properties;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.state.property.*;
 import net.minecraft.util.*;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.random.Random;
-import net.minecraft.world.World;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 import io.wispforest.alloyforgery.forges.ForgeFuelDataLoader;
 
-public class ForgeControllerBlock extends BlockWithEntity {
+public class ForgeControllerBlock extends BaseEntityBlock {
 
-    public static final BooleanProperty LIT = Properties.LIT;
-    public static final EnumProperty<Direction> FACING = Properties.HORIZONTAL_FACING;
+    public static final BooleanProperty LIT = BlockStateProperties.LIT;
+    public static final EnumProperty<Direction> FACING = BlockStateProperties.HORIZONTAL_FACING;
 
-    public final Identifier forgeDefinitionId;
+    public final ResourceLocation forgeDefinitionId;
 
-    public ForgeControllerBlock(Identifier forgeDefinitionId, Settings settings) {
+    public ForgeControllerBlock(ResourceLocation forgeDefinitionId, Properties settings) {
         super(settings);
 
         this.forgeDefinitionId = forgeDefinitionId;
-        this.setDefaultState(this.getStateManager().getDefaultState().with(LIT, false));
+        this.registerDefaultState(this.getStateDefinition().any().setValue(LIT, false));
     }
 
-    public static ForgeControllerBlock of(Identifier forgeDefinitionId, Identifier blockId) {
-        return new ForgeControllerBlock(forgeDefinitionId, Settings.copy(Blocks.BLACKSTONE).registryKey(RegistryKey.of(RegistryKeys.BLOCK, blockId)));
+    public static ForgeControllerBlock of(ResourceLocation forgeDefinitionId, ResourceLocation blockId) {
+        return new ForgeControllerBlock(forgeDefinitionId, Properties.ofFullCopy(Blocks.BLACKSTONE).setId(ResourceKey.create(Registries.BLOCK, blockId)));
     }
 
     @Override
-    protected MapCodec<? extends BlockWithEntity> getCodec() {
+    protected MapCodec<? extends BaseEntityBlock> codec() {
         return CodecUtils.toMapCodec(
             StructEndecBuilder.of(
                 MinecraftEndecs.IDENTIFIER.fieldOf("forge_definition", s -> forgeDefinitionId),
-                CodecUtils.toEndec(AbstractBlock.Settings.CODEC).fieldOf("properties", AbstractBlock::getSettings),
+                CodecUtils.toEndec(BlockBehaviour.Properties.CODEC).fieldOf("properties", BlockBehaviour::properties),
                 ForgeControllerBlock::new
             )
         );
     }
 
     @Override
-    protected ActionResult onUseWithItem(ItemStack playerStack, BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
-        if (world.isClient()) {
-            return ActionResult.SUCCESS;
+    protected InteractionResult useItemOn(ItemStack playerStack, BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+        if (world.isClientSide()) {
+            return InteractionResult.SUCCESS;
         }
 
         if (!(world.getBlockEntity(pos) instanceof ForgeControllerBlockEntity controller)) {
-            return ActionResult.PASS_TO_DEFAULT_BLOCK_ACTION;
+            return InteractionResult.TRY_WITH_EMPTY_HAND;
         }
 
         if (!controller.verifyMultiblock()) {
-            player.sendMessage(AlloyForgery.translation("message", "invalid_multiblock").formatted(Formatting.GRAY), true);
-            return ActionResult.SUCCESS;
+            player.displayClientMessage(AlloyForgery.translation("message", "invalid_multiblock").withStyle(ChatFormatting.GRAY), true);
+            return InteractionResult.SUCCESS;
         }
 
         final var fuelDefinition = ForgeFuelDataLoader.getFuelForItem(playerStack.getItem());
@@ -77,89 +91,89 @@ public class ForgeControllerBlock extends BlockWithEntity {
         if (fuelDefinition.hasReturnType() && controller.canAddFuel(fuelDefinition)) {
             var returnStack = new ItemStack(fuelDefinition.returnType());
             controller.addFuel(fuelDefinition.fuel());
-            if (!player.getAbilities().creativeMode) {
-                playerStack.decrement(1);
-                player.getInventory().offerOrDrop(returnStack);
-                return ActionResult.SUCCESS.withNewHandStack(returnStack);
+            if (!player.getAbilities().instabuild) {
+                playerStack.shrink(1);
+                player.getInventory().placeItemBackInInventory(returnStack);
+                return InteractionResult.SUCCESS.heldItemTransformedTo(returnStack);
             }
         } else if (!GeneralPlatformUtils.INSTANCE.interactWithFluidStorage(controller, player, hand)) {
-            final var screenHandlerFactory = state.createScreenHandlerFactory(world, pos);
+            final var screenHandlerFactory = state.getMenuProvider(world, pos);
             if (screenHandlerFactory != null) {
                 GeneralPlatformUtils.INSTANCE.openHandledScreen(player, controller, screenHandlerFactory);
             }
         }
-        return ActionResult.SUCCESS;
+        return InteractionResult.SUCCESS;
     }
 
     @Override
-    protected void onStateReplaced(BlockState state, ServerWorld world, BlockPos pos, boolean moved) {
+    protected void affectNeighborsAfterRemoval(BlockState state, ServerLevel world, BlockPos pos, boolean moved) {
         if (world.getBlockEntity(pos) instanceof ForgeControllerBlockEntity forgeController) {
-            ItemScatterer.spawn(world, pos, forgeController);
-            ItemScatterer.spawn(world, pos.getX(), pos.getY(), pos.getZ(), forgeController.getFuelStack());
+            Containers.dropContents(world, pos, forgeController);
+            Containers.dropItemStack(world, pos.getX(), pos.getY(), pos.getZ(), forgeController.getFuelStack());
         }
 
-        super.onStateReplaced(state, world, pos, moved);
+        super.affectNeighborsAfterRemoval(state, world, pos, moved);
     }
 
     @Override
     //@Environment(EnvType.CLIENT)
-    public void randomDisplayTick(BlockState state, World world, BlockPos pos, Random random) {
-        if (!state.get(LIT)) return;
+    public void animateTick(BlockState state, Level world, BlockPos pos, RandomSource random) {
+        if (!state.getValue(LIT)) return;
 
-        final BlockPos center = pos.offset(state.get(FACING).getOpposite());
+        final BlockPos center = pos.relative(state.getValue(FACING).getOpposite());
 
         ClientParticles.setParticleCount(2);
-        ClientParticles.setVelocity(new Vec3d(0, 0.1, 0));
+        ClientParticles.setVelocity(new Vec3(0, 0.1, 0));
         ClientParticles.spawnWithinBlock(ParticleTypes.CAMPFIRE_COSY_SMOKE, world, center);
 
         ClientParticles.setParticleCount(5);
-        ClientParticles.setVelocity(new Vec3d(0, 0.1, 0));
+        ClientParticles.setVelocity(new Vec3(0, 0.1, 0));
         ClientParticles.spawnWithinBlock(ParticleTypes.LARGE_SMOKE, world, center);
 
         if (random.nextDouble() > 0.65) {
             ClientParticles.setParticleCount(1);
-            ClientParticles.setVelocity(new Vec3d(0, 0.01, 0));
+            ClientParticles.setVelocity(new Vec3(0, 0.01, 0));
             ClientParticles.spawnWithinBlock(ParticleTypes.CAMPFIRE_COSY_SMOKE, world, center);
         }
     }
 
     @Override
-    public BlockRenderType getRenderType(BlockState state) {
-        return BlockRenderType.MODEL;
+    public RenderShape getRenderShape(BlockState state) {
+        return RenderShape.MODEL;
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(LIT, FACING);
     }
 
     @Nullable
     @Override
-    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
-        return world.isClient() ? null : validateTicker(type, ForgeControllerBlockEntity.FORGE_CONTROLLER_BLOCK_ENTITY, (world1, pos, state1, blockEntity) -> blockEntity.tick());
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level world, BlockState state, BlockEntityType<T> type) {
+        return world.isClientSide() ? null : createTickerHelper(type, ForgeControllerBlockEntity.FORGE_CONTROLLER_BLOCK_ENTITY, (world1, pos, state1, blockEntity) -> blockEntity.tick());
     }
 
     @Nullable
     @Override
-    public BlockState getPlacementState(ItemPlacementContext ctx) {
-        return getDefaultState().with(FACING, ctx.getHorizontalPlayerFacing().getOpposite());
+    public BlockState getStateForPlacement(BlockPlaceContext ctx) {
+        return defaultBlockState().setValue(FACING, ctx.getHorizontalDirection().getOpposite());
     }
 
     @Override
-    protected int getComparatorOutput(BlockState state, World world, BlockPos pos, Direction direction) {
+    protected int getAnalogOutputSignal(BlockState state, Level world, BlockPos pos, Direction direction) {
         return world.getBlockEntity(pos, ForgeControllerBlockEntity.FORGE_CONTROLLER_BLOCK_ENTITY)
             .map(ForgeControllerBlockEntity::getCompartorOutput)
             .orElse(0);
     }
 
     @Override
-    public boolean hasComparatorOutput(BlockState state) {
+    public boolean hasAnalogOutputSignal(BlockState state) {
         return true;
     }
 
     @Nullable
     @Override
-    public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         return new ForgeControllerBlockEntity(pos, state);
     }
 }

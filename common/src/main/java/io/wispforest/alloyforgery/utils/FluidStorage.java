@@ -1,19 +1,19 @@
 package io.wispforest.alloyforgery.utils;
 
 import io.wispforest.alloyforgery.block.ForgeControllerBlockEntity;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 ///
 /// A simple abstraction used to allow for multiplatform fluid handling within [ForgeControllerBlockEntity]
 ///
 public interface FluidStorage {
 
-    void readData(ReadView view);
+    void readData(ValueInput view);
 
-    void writeData(WriteView view);
+    void writeData(ValueOutput view);
 
     ///
     /// Basically the tanks amount minus a single 1/1000 unit value for the given platforms bucket

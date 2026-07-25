@@ -19,8 +19,8 @@ import me.shedaniel.rei.api.common.category.CategoryIdentifier;
 import me.shedaniel.rei.api.common.entry.EntryStack;
 import me.shedaniel.rei.api.common.util.EntryIngredients;
 import me.shedaniel.rei.api.common.util.EntryStacks;
-import net.minecraft.client.gl.RenderPipelines;
-import net.minecraft.text.Text;
+import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.network.chat.Component;
 import io.wispforest.alloyforgery.forges.ForgeRegistry;
 import io.wispforest.alloyforgery.recipe.AlloyForgeRecipe;
 import org.apache.commons.lang3.mutable.MutableObject;
@@ -52,7 +52,7 @@ public class AlloyForgingCategory implements DisplayCategory<AlloyForgingDisplay
     }
 
     @Override
-    public Text getTitle() {
+    public Component getTitle() {
         return AlloyForgery.translation("title", "recipe");
     }
 
@@ -116,7 +116,7 @@ public class AlloyForgingCategory implements DisplayCategory<AlloyForgingDisplay
                                             .surface((context, component) -> {
                                                 var backgroundTexture = ComponentUtils.themedTextureID("forge_controller_base.png", rei::isDarkThemeEnabled);
 
-                                                context.drawTexture(RenderPipelines.GUI_TEXTURED, backgroundTexture, component.x(), component.y(), 140, 45, 26, 26, 176, 189);
+                                                context.blit(RenderPipelines.GUI_TEXTURED, backgroundTexture, component.x(), component.y(), 140, 45, 26, 26, 176, 189);
                                             })
                                             .margins(Insets.left(6))
                                     )
@@ -125,7 +125,7 @@ public class AlloyForgingCategory implements DisplayCategory<AlloyForgingDisplay
                             ).margins(Insets.left(4))
                     )
                     .child(
-                        button(Text.of("..."), buttonComponent -> {})
+                        button(Component.nullToEmpty("..."), buttonComponent -> {})
                             .<ButtonComponent>configure(btn -> {
                                 final List<AlloyForgeRecipe.OverrideRange> overrides = new ArrayList<>(display.overrides().keySet());
 

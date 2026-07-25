@@ -9,17 +9,24 @@ import io.wispforest.endec.impl.StructEndecBuilder;
 import io.wispforest.owo.util.RecipeRemainderStorage;
 import it.unimi.dsi.fastutil.ints.Int2IntLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.ints.Int2IntMap;
-import net.minecraft.component.ComponentChanges;
+import net.minecraft.core.*;
+import net.minecraft.core.component.DataComponentPatch;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.item.*;
 import net.minecraft.recipe.*;
-import net.minecraft.recipe.book.RecipeBookCategory;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.*;
 import net.minecraft.registry.*;
-import net.minecraft.registry.tag.TagKey;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.Pair;
-import net.minecraft.util.collection.DefaultedList;
-import net.minecraft.world.World;
+import net.minecraft.tags.TagKey;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Tuple;
+import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 import io.wispforest.alloyforgery.AlloyForgery;
@@ -47,7 +54,7 @@ public class AlloyForgeRecipe implements Recipe<AlloyForgeRecipeInput> {
      * Used for Recipes that were adapted to Alloy Forge Recipes instead of created from scratch.
      * Such serves as a holder for the original Identifier of the Recipe for Item Viewer Mods like REI and EMI
      */
-    private Optional<Identifier> secondaryID = Optional.empty();
+    private Optional<ResourceLocation> secondaryID = Optional.empty();
 
     private final Map<Ingredient, Integer> inputs;
     private ItemStack output;
@@ -68,25 +75,25 @@ public class AlloyForgeRecipe implements Recipe<AlloyForgeRecipeInput> {
         this.tierOverrides = ImmutableMap.copyOf(overrides);
     }
 
-    public AlloyForgeRecipe(Map<Ingredient, Integer> inputs, ItemStack output, int minForgeTier, int fuelPerTick, Map<OverrideRange, ItemStack> overrides, Optional<Identifier> secondaryID) {
+    public AlloyForgeRecipe(Map<Ingredient, Integer> inputs, ItemStack output, int minForgeTier, int fuelPerTick, Map<OverrideRange, ItemStack> overrides, Optional<ResourceLocation> secondaryID) {
         this(Optional.empty(), inputs, output, minForgeTier, fuelPerTick, overrides);
 
         this.secondaryID = secondaryID;
     }
 
-    public Optional<Identifier> secondaryID() {
+    public Optional<ResourceLocation> secondaryID() {
         return this.secondaryID;
     }
 
-    public void finishRecipe(RegistryEntryLookup.RegistryLookup registryLookup, PendingRecipeData pendingData, Function<AlloyForgeRecipe, Identifier> lookup) {
+    public void finishRecipe(HolderGetter.Provider registryLookup, PendingRecipeData pendingData, Function<AlloyForgeRecipe, ResourceLocation> lookup) {
         if (pendingData.defaultTag() != null) {
-            final var itemEntryList = registryLookup.getOrThrow(RegistryKeys.ITEM).getOptional(pendingData.defaultTag().getLeft());
+            final var itemEntryList = registryLookup.lookupOrThrow(Registries.ITEM).get(pendingData.defaultTag().getA());
 
             itemEntryList.ifPresentOrElse(registryEntries -> {
-                this.output = registryEntries.get(0).value().getDefaultStack();
-                this.output.setCount(pendingData.defaultTag().getRight());
+                this.output = registryEntries.get(0).value().getDefaultInstance();
+                this.output.setCount(pendingData.defaultTag().getB());
             }, () -> {
-                throw new InvalidTagException("Default tag " + pendingData.defaultTag().getLeft().id() + " of recipe " + lookup.apply(this) + " must not be empty");
+                throw new InvalidTagException("Default tag " + pendingData.defaultTag().getA().location() + " of recipe " + lookup.apply(this) + " must not be empty");
             });
         }
 
@@ -98,7 +105,7 @@ public class AlloyForgeRecipe implements Recipe<AlloyForgeRecipeInput> {
                 stack.setCount(override.count());
 
                 if (!override.components().isEmpty()) {
-                    stack.applyChanges(override.components());
+                    stack.applyComponentsAndValidate(override.components());
                 }
 
                 overrides.put(range, stack);
@@ -115,12 +122,12 @@ public class AlloyForgeRecipe implements Recipe<AlloyForgeRecipeInput> {
     }
 
     @Override
-    public boolean isIgnoredInRecipeBook() {
+    public boolean isSpecial() {
         return true;
     }
 
     @Override
-    public boolean matches(AlloyForgeRecipeInput input, World world) {
+    public boolean matches(AlloyForgeRecipeInput input, Level world) {
         return tryBind(input) != null;
     }
 
@@ -132,7 +139,7 @@ public class AlloyForgeRecipe implements Recipe<AlloyForgeRecipeInput> {
             int remaining = ingredient.getValue();
 
             for (int index : indices) {
-                var stack = input.getStackInSlot(index);
+                var stack = input.getItem(index);
 
                 if (ingredient.getKey().test(stack)) {
                     boundSlots.put(index, Math.min(stack.getCount(), remaining));
@@ -150,7 +157,7 @@ public class AlloyForgeRecipe implements Recipe<AlloyForgeRecipeInput> {
 
         verification:
         for (int index : indices) {
-            var stack = input.getStackInSlot(index);
+            var stack = input.getItem(index);
             if (stack.isEmpty()) continue;
 
             for (var ingredient : this.inputs.keySet()) {
@@ -167,12 +174,12 @@ public class AlloyForgeRecipe implements Recipe<AlloyForgeRecipeInput> {
 
     @SuppressWarnings("SuspiciousToArrayCall")
     @Nullable
-    private IngredientPlacement ingredientPlacement;
+    private PlacementInfo ingredientPlacement;
 
     @Override
-    public IngredientPlacement getIngredientPlacement() {
+    public PlacementInfo placementInfo() {
         if (this.ingredientPlacement == null) {
-            this.ingredientPlacement = IngredientPlacement.forMultipleSlots(
+            this.ingredientPlacement = PlacementInfo.createFromOptionals(
                     getIngredientsMap().keySet()
                             .stream()
                             .map(Optional::of)
@@ -189,7 +196,7 @@ public class AlloyForgeRecipe implements Recipe<AlloyForgeRecipeInput> {
     // Attempt to test if the passed inventory is a Controller to try and get the forgeTier
     // Better to use the getOutput though other means rather than this if not a controller
     @Override
-    public ItemStack craft(AlloyForgeRecipeInput input, RegistryWrapper.WrapperLookup lookup) {
+    public ItemStack assemble(AlloyForgeRecipeInput input, net.minecraft.core.HolderLookup.Provider lookup) {
         return (input.inventory() instanceof ForgeControllerBlockEntity controller)
             ? getResult(controller.forgeTier().value())
             : getBaseResult();
@@ -197,14 +204,14 @@ public class AlloyForgeRecipe implements Recipe<AlloyForgeRecipeInput> {
 
     public void consumeIngredients(AlloyForgeRecipeInput input) {
         var inventory = input.inventory();
-        this.tryBind(input).forEach(inventory::removeStack);
+        this.tryBind(input).forEach(inventory::removeItem);
     }
 
     @Nullable
-    public static DefaultedList<ItemStack> gatherRemainders(RecipeEntry<AlloyForgeRecipe> recipeEntry, AlloyForgeRecipeInput input) {
-        final var id = recipeEntry.id().getValue();
+    public static NonNullList<ItemStack> gatherRemainders(RecipeHolder<AlloyForgeRecipe> recipeEntry, AlloyForgeRecipeInput input) {
+        final var id = recipeEntry.id().location();
         final var recipe = recipeEntry.value();
-        final var remainders = DefaultedList.ofSize(input.size(), ItemStack.EMPTY);
+        final var remainders = NonNullList.withSize(input.size(), ItemStack.EMPTY);
         //noinspection UnstableApiUsage
         final var owoRemainders = RecipeRemainderStorage.has(id) ? RecipeRemainderStorage.get(id) : Map.<Item, ItemStack>of();
 
@@ -213,7 +220,7 @@ public class AlloyForgeRecipe implements Recipe<AlloyForgeRecipeInput> {
         var setAnyRemainders = false;
 
         for (int i : recipe.tryBind(input).keySet()) {
-            var item = input.getStackInSlot(i).getItem();
+            var item = input.getItem(i).getItem();
 
             if (!owoRemainders.isEmpty()) {
                 if (!owoRemainders.containsKey(item)) continue;
@@ -268,7 +275,7 @@ public class AlloyForgeRecipe implements Recipe<AlloyForgeRecipeInput> {
     }
 
     @Override
-    public RecipeBookCategory getRecipeBookCategory() {
+    public RecipeBookCategory recipeBookCategory() {
         return null;
     }
 
@@ -287,29 +294,29 @@ public class AlloyForgeRecipe implements Recipe<AlloyForgeRecipeInput> {
     public static class Type implements RecipeType<AlloyForgeRecipe> {
         private Type() {}
 
-        public static final Identifier ID = AlloyForgery.id("forging");
+        public static final ResourceLocation ID = AlloyForgery.id("forging");
         public static final Type INSTANCE = new Type();
     }
 
-    public record PendingRecipeData(@Nullable Pair<TagKey<Item>, Integer> defaultTag, Map<OverrideRange, PendingOverride> unfinishedTierOverrides) { }
+    public record PendingRecipeData(@Nullable Tuple<TagKey<Item>, Integer> defaultTag, Map<OverrideRange, PendingOverride> unfinishedTierOverrides) { }
 
-    public record PendingOverride(@Nullable Item item, int count, ComponentChanges components) {
+    public record PendingOverride(@Nullable Item item, int count, DataComponentPatch components) {
         public boolean isCountOnly() {
             return this.item == null;
         }
 
         public static PendingOverride onlyCount(int count) {
-            return new PendingOverride(null, count, ComponentChanges.EMPTY);
+            return new PendingOverride(null, count, DataComponentPatch.EMPTY);
         }
 
         public static PendingOverride ofItem(Item item, int count) {
-            return new PendingOverride(item, count, ComponentChanges.EMPTY);
+            return new PendingOverride(item, count, DataComponentPatch.EMPTY);
         }
 
         public ItemStack stack() {
             var stack = new ItemStack(item, count);
 
-            stack.applyChanges(components);
+            stack.applyComponentsAndValidate(components);
 
             return new ItemStack(item, count);
         }
@@ -353,7 +360,7 @@ public class AlloyForgeRecipe implements Recipe<AlloyForgeRecipeInput> {
             return overrideRange;
         }
 
-        public Text toText(boolean isClientSide) {
+        public Component toText(boolean isClientSide) {
             var lowerTierName = ForgeTier.toName(isClientSide, lowerBound);
 
             if (upperBound != lowerBound) {

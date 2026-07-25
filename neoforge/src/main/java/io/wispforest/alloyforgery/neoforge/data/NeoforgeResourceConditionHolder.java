@@ -2,11 +2,11 @@ package io.wispforest.alloyforgery.neoforge.data;
 
 import io.wispforest.alloyforgery.data.providers.RecipeExporterConditionWrapper;
 import io.wispforest.alloyforgery.data.providers.ResourceConditionHolder;
-import net.minecraft.data.recipe.RecipeExporter;
-import net.minecraft.item.ItemConvertible;
-import net.minecraft.registry.Registry;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.registry.tag.TagKey;
+import net.minecraft.data.recipes.RecipeOutput;
+import net.minecraft.world.level.ItemLike;
+import net.minecraft.core.Registry;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.tags.TagKey;
 import net.neoforged.neoforge.common.conditions.ICondition;
 import net.neoforged.neoforge.common.conditions.NeoForgeConditions;
 
@@ -16,7 +16,7 @@ import java.util.function.BiFunction;
 
 public record NeoforgeResourceConditionHolder(List<ICondition> conditions) implements ResourceConditionHolder {
 
-    public static RecipeExporterConditionWrapper createWrapper(BiFunction<RecipeExporter, ICondition[], RecipeExporter> providerConditionWrapper) {
+    public static RecipeExporterConditionWrapper createWrapper(BiFunction<RecipeOutput, ICondition[], RecipeOutput> providerConditionWrapper) {
         return (recipeExporter, holder) -> {
             if (holder instanceof NeoforgeResourceConditionHolder(List<ICondition> conditions1)) {
                 return providerConditionWrapper.apply(recipeExporter, conditions1.toArray(ICondition[]::new));
@@ -27,7 +27,7 @@ public record NeoforgeResourceConditionHolder(List<ICondition> conditions) imple
     }
 
     @Override
-    public <T extends ItemConvertible> ResourceConditionHolder withTags(RegistryKey<Registry<T>> key, TagKey<T>... tags) {
+    public <T extends ItemLike> ResourceConditionHolder withTags(ResourceKey<Registry<T>> key, TagKey<T>... tags) {
         this.conditions.add(NeoForgeConditions.and(Arrays.stream(tags).map(NeoForgeConditions::tagEmpty).map(NeoForgeConditions::not).toArray(ICondition[]::new)));
 
         return this;

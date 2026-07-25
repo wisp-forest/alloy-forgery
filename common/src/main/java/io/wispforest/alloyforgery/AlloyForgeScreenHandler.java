@@ -3,15 +3,15 @@ package io.wispforest.alloyforgery;
 import io.wispforest.endec.Endec;
 import io.wispforest.owo.client.screens.*;
 import io.wispforest.owo.util.EventStream;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.inventory.SimpleInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.screen.ScreenHandler;
-import net.minecraft.screen.ScreenHandlerType;
-import net.minecraft.screen.slot.Slot;
-import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.Container;
+import net.minecraft.world.SimpleContainer;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.server.level.ServerPlayer;
 import org.jetbrains.annotations.Nullable;
 import io.wispforest.alloyforgery.block.ForgeControllerBlockEntity;
 import io.wispforest.alloyforgery.forges.ForgeFuelDataLoader;
@@ -23,10 +23,10 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
-public class AlloyForgeScreenHandler extends ScreenHandler {
+public class AlloyForgeScreenHandler extends AbstractContainerMenu {
 
-    public static ScreenHandlerType<AlloyForgeScreenHandler> ALLOY_FORGE_SCREEN_HANDLER_TYPE;
-    private final Inventory controllerInventory;
+    public static MenuType<AlloyForgeScreenHandler> ALLOY_FORGE_SCREEN_HANDLER_TYPE;
+    private final Container controllerInventory;
 
     private final boolean isServer;
 
@@ -41,14 +41,14 @@ public class AlloyForgeScreenHandler extends ScreenHandler {
 
     private final List<Slot> inputSlots;
 
-    public AlloyForgeScreenHandler(int syncId, PlayerInventory playerInventory, ForgeControllerBlockEntity forge) {
+    public AlloyForgeScreenHandler(int syncId, Inventory playerInventory, ForgeControllerBlockEntity forge) {
         super(ALLOY_FORGE_SCREEN_HANDLER_TYPE, syncId);
 
-        this.isServer = playerInventory.player instanceof ServerPlayerEntity;
+        this.isServer = playerInventory.player instanceof ServerPlayer;
 
         this.forge = forge;
 
-        this.controllerInventory = (forge != null) ? forge : new SimpleInventory(ForgeControllerBlockEntity.INVENTORY_SIZE);
+        this.controllerInventory = (forge != null) ? forge : new SimpleContainer(ForgeControllerBlockEntity.INVENTORY_SIZE);
 
         this.smeltProgress = createProperty(Integer.class, forge, (provider) -> provider.smeltProgress, 0);
         this.fuelProgress = createProperty(Integer.class, forge, (provider) -> provider.fuelProgress, 0);
@@ -60,7 +60,7 @@ public class AlloyForgeScreenHandler extends ScreenHandler {
         //Fuel Slot
         this.addSlot(new Slot(controllerInventory, 11, 8, 74) {
             @Override
-            public boolean canInsert(ItemStack stack) {
+            public boolean mayPlace(ItemStack stack) {
                 return ForgeFuelDataLoader.hasFuel(stack.getItem());
             }
         });
@@ -68,7 +68,7 @@ public class AlloyForgeScreenHandler extends ScreenHandler {
         //Recipe Output
         this.addSlot(new Slot(controllerInventory, 10, 145, 50) {
             @Override
-            public boolean canInsert(ItemStack stack) {
+            public boolean mayPlace(ItemStack stack) {
                 return false;
             }
         });
@@ -150,8 +150,8 @@ public class AlloyForgeScreenHandler extends ScreenHandler {
     }
 
     @Override
-    public void onClosed(PlayerEntity player) {
-        super.onClosed(player);
+    public void removed(Player player) {
+        super.removed(player);
 
         this.onClosedEvent.sink().run();
     }
@@ -159,8 +159,8 @@ public class AlloyForgeScreenHandler extends ScreenHandler {
     //--
 
     @Override
-    public ItemStack quickMove(PlayerEntity player, int invSlot) {
-        return ScreenUtils.handleSlotTransfer(this, invSlot, this.controllerInventory.size());
+    public ItemStack quickMoveStack(Player player, int invSlot) {
+        return ScreenUtils.handleSlotTransfer(this, invSlot, this.controllerInventory.getContainerSize());
     }
 
     public int getSmeltProgress() {
@@ -180,15 +180,15 @@ public class AlloyForgeScreenHandler extends ScreenHandler {
     }
 
     public boolean isSlotDisabled(Slot slot) {
-        return this.disabledSlots.get().contains(slot.getIndex());
+        return this.disabledSlots.get().contains(slot.getContainerSlot());
     }
 
     @Override
-    public boolean canUse(PlayerEntity player) {
-        return this.controllerInventory.canPlayerUse(player);
+    public boolean stillValid(Player player) {
+        return this.controllerInventory.stillValid(player);
     }
 
-    public Inventory getControllerInventory() {
+    public Container getControllerInventory() {
         return this.controllerInventory;
     }
 

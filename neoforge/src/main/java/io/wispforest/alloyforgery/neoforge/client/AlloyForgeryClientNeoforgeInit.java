@@ -4,10 +4,10 @@ import io.wispforest.alloyforgery.AlloyForgery;
 import io.wispforest.alloyforgery.client.AlloyForgeryClient;
 import io.wispforest.alloyforgery.neoforge.data.AlloyForgeryData;
 import io.wispforest.alloyforgery.neoforge.utils.NeoforgeGeneralPlatformUtils;
-import net.minecraft.registry.DynamicRegistryManager;
-import net.minecraft.resource.ResourceReloader;
-import net.minecraft.resource.ResourceType;
-import net.minecraft.util.Identifier;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.server.packs.resources.PreparableReloadListener;
+import net.minecraft.server.packs.PackType;
+import net.minecraft.resources.ResourceLocation;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
@@ -30,19 +30,19 @@ public class AlloyForgeryClientNeoforgeInit {
         modBus.<AddClientReloadListenersEvent>addListener(event -> {
             NeoforgeGeneralPlatformUtils.registerEndecDataLoaders(new NeoforgeGeneralPlatformUtils.ReloadListenerRegistration() {
                 @Override
-                public ResourceType getType() {
-                    return ResourceType.CLIENT_RESOURCES;
+                public PackType getType() {
+                    return PackType.CLIENT_RESOURCES;
                 }
 
                 @Override
-                public NeoforgeGeneralPlatformUtils.ReloadListenerRegistration addListener(Identifier id, ResourceReloader listener) {
+                public NeoforgeGeneralPlatformUtils.ReloadListenerRegistration addListener(ResourceLocation id, PreparableReloadListener listener) {
                     event.addListener(id, listener);
 
                     return this;
                 }
 
                 @Override
-                public NeoforgeGeneralPlatformUtils.ReloadListenerRegistration addDependency(Identifier id, Collection<Identifier> dependencies) {
+                public NeoforgeGeneralPlatformUtils.ReloadListenerRegistration addDependency(ResourceLocation id, Collection<ResourceLocation> dependencies) {
                     for (var dependency : dependencies) {
                         event.addDependency(dependency, id);
                     }

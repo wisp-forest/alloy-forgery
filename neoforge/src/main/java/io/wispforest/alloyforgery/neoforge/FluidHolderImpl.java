@@ -2,9 +2,9 @@ package io.wispforest.alloyforgery.neoforge;
 
 import io.wispforest.alloyforgery.neoforge.api.SingleVariantDropletStorage;
 import io.wispforest.alloyforgery.utils.FluidStorage;
-import net.minecraft.fluid.Fluids;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
+import net.minecraft.world.level.material.Fluids;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.neoforged.neoforge.transfer.fluid.FluidResource;
 import net.neoforged.neoforge.transfer.transaction.TransactionContext;
 
@@ -53,15 +53,15 @@ public final class FluidHolderImpl extends SingleVariantDropletStorage<FluidReso
     //--
 
     @Override
-    public void readData(ReadView data) {
-        this.amount = data.getLong("Amount", 0);
+    public void readData(ValueInput data) {
+        this.amount = data.getLongOr("Amount", 0);
         this.variant = data.read("Variant", FluidResource.OPTIONAL_CODEC).orElse(FluidResource.EMPTY);
     }
 
     @Override
-    public void writeData(WriteView data) {
+    public void writeData(ValueOutput data) {
         data.putLong("Amount", this.amount);
-        data.put("Variant", FluidResource.OPTIONAL_CODEC, this.variant);
+        data.store("Variant", FluidResource.OPTIONAL_CODEC, this.variant);
     }
 
     @Override

@@ -5,22 +5,22 @@ import io.wispforest.endec.Endec;
 import io.wispforest.endec.impl.StructEndecBuilder;
 import io.wispforest.owo.serialization.CodecUtils;
 import io.wispforest.owo.serialization.endec.MinecraftEndecs;
-import net.minecraft.component.ComponentChanges;
-import net.minecraft.item.Item;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.registry.tag.TagKey;
-import net.minecraft.util.Identifier;
+import net.minecraft.core.component.DataComponentPatch;
+import net.minecraft.world.item.Item;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.tags.TagKey;
+import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import io.wispforest.alloyforgery.utils.EndecUtils;
 
 import java.util.List;
 
-public record OutputData(Integer count, ComponentChanges components, @Nullable Item outputItem, @Nullable List<Identifier> items, @Nullable TagKey<Item> defaultTag) {
+public record OutputData(Integer count, DataComponentPatch components, @Nullable Item outputItem, @Nullable List<ResourceLocation> items, @Nullable TagKey<Item> defaultTag) {
 
-    public OutputData(Integer count, @Nullable Item outputItem, @Nullable List<Identifier> items, @Nullable TagKey<Item> defaultTag) {
-        this(count, ComponentChanges.EMPTY, outputItem, items, defaultTag);
+    public OutputData(Integer count, @Nullable Item outputItem, @Nullable List<ResourceLocation> items, @Nullable TagKey<Item> defaultTag) {
+        this(count, DataComponentPatch.EMPTY, outputItem, items, defaultTag);
     }
 
     private static final Logger LOGGER = LogUtils.getLogger();
@@ -28,18 +28,18 @@ public record OutputData(Integer count, ComponentChanges components, @Nullable I
     @Deprecated(forRemoval = true)
     private static final Endec<OutputData> OLD_FORMAT_ENDEC = StructEndecBuilder.of(
         Endec.INT.fieldOf("count", OutputData::count),
-        MinecraftEndecs.ofRegistry(Registries.ITEM).optionalFieldOf("id", OutputData::outputItem, () -> null),
+        MinecraftEndecs.ofRegistry(BuiltInRegistries.ITEM).optionalFieldOf("id", OutputData::outputItem, () -> null),
         MinecraftEndecs.IDENTIFIER.listOf().optionalFieldOf("priority", OutputData::items, () -> null),
-        MinecraftEndecs.unprefixedTagKey(RegistryKeys.ITEM).optionalFieldOf("default", OutputData::defaultTag, () -> null),
+        MinecraftEndecs.unprefixedTagKey(Registries.ITEM).optionalFieldOf("default", OutputData::defaultTag, () -> null),
         OutputData::new
     );
 
     private static final Endec<OutputData> NEW_FORMAT_ENDEC = StructEndecBuilder.of(
         Endec.INT.fieldOf("count", OutputData::count),
-        EndecUtils.optionalFieldOf("components", CodecUtils.toEndec(ComponentChanges.CODEC), OutputData::components, () -> ComponentChanges.EMPTY),
-        MinecraftEndecs.ofRegistry(Registries.ITEM).optionalFieldOf("item", OutputData::outputItem, () -> null),
+        EndecUtils.optionalFieldOf("components", CodecUtils.toEndec(DataComponentPatch.CODEC), OutputData::components, () -> DataComponentPatch.EMPTY),
+        MinecraftEndecs.ofRegistry(BuiltInRegistries.ITEM).optionalFieldOf("item", OutputData::outputItem, () -> null),
         MinecraftEndecs.IDENTIFIER.listOf().optionalFieldOf("priority", OutputData::items, () -> null),
-        MinecraftEndecs.unprefixedTagKey(RegistryKeys.ITEM).optionalFieldOf("tag", OutputData::defaultTag, () -> null),
+        MinecraftEndecs.unprefixedTagKey(Registries.ITEM).optionalFieldOf("tag", OutputData::defaultTag, () -> null),
         OutputData::new
     );
 

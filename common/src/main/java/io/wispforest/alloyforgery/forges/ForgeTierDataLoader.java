@@ -6,8 +6,8 @@ import io.wispforest.endec.impl.StructField;
 import io.wispforest.owo.serialization.endec.MinecraftEndecs;
 import it.unimi.dsi.fastutil.ints.Int2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
-import net.minecraft.resource.ResourceType;
-import net.minecraft.util.Identifier;
+import net.minecraft.server.packs.PackType;
+import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 import io.wispforest.alloyforgery.AlloyForgery;
@@ -22,13 +22,13 @@ public class ForgeTierDataLoader {
     private static final ForgeTierDataLoader SERVER = new ForgeTierDataLoader();
     private static final ForgeTierDataLoader CLIENT = new ForgeTierDataLoader();
 
-    public static final Identifier TIER_LOADER = AlloyForgery.id("forge_tier");
-    public static final Identifier TIER_BINDINGS_LOADER = AlloyForgery.id("forge_tier_bindings");
+    public static final ResourceLocation TIER_LOADER = AlloyForgery.id("forge_tier");
+    public static final ResourceLocation TIER_BINDINGS_LOADER = AlloyForgery.id("forge_tier_bindings");
 
     public static void init() {
         EndecDataLoader.builder("alloy_forge/tier", RawForgeTier.ENDEC)
-            .create(TIER_LOADER, ResourceType.SERVER_DATA, (data, manager, profiler) -> {
-                var waitingChildrenTiers = new LinkedHashMap<Identifier, Map<Identifier, RawForgeTier>>();
+            .create(TIER_LOADER, PackType.SERVER_DATA, (data, manager, profiler) -> {
+                var waitingChildrenTiers = new LinkedHashMap<ResourceLocation, Map<ResourceLocation, RawForgeTier>>();
 
                 data.forEach((identifier, rawForgeTier) -> {
                     var wasAdded = SERVER.registerTier(identifier, rawForgeTier);
@@ -43,7 +43,7 @@ public class ForgeTierDataLoader {
                     }
                 });
 
-                ForgeDefinition.legacyForgeDefinitionIdToTier.forEach((id, forgeTier) -> SERVER.registerTier(id.withSuffixedPath("_legacy_tier"), forgeTier));
+                ForgeDefinition.legacyForgeDefinitionIdToTier.forEach((id, forgeTier) -> SERVER.registerTier(id.withSuffix("_legacy_tier"), forgeTier));
 
                 waitingChildrenTiers.forEach((parentId, childrenTiers) -> {
                     AlloyForgery.LOGGER.error("Unable to register the given children ForgeTier's as the parent '{}' was never registered: [{}]", parentId, childrenTiers.keySet());
@@ -52,23 +52,23 @@ public class ForgeTierDataLoader {
                 SERVER.buildSortedIndexToTiersMap();
             });
 
-        EndecDataLoader.builder("alloy_forge/tier_binding", Endec.map(Identifier::toString, Identifier::tryParse, MinecraftEndecs.IDENTIFIER))
+        EndecDataLoader.builder("alloy_forge/tier_binding", Endec.map(ResourceLocation::toString, ResourceLocation::tryParse, MinecraftEndecs.IDENTIFIER))
             .addDependencies(TIER_LOADER)
-            .create(TIER_BINDINGS_LOADER, ResourceType.SERVER_DATA, (data, manager, profiler) -> {
+            .create(TIER_BINDINGS_LOADER, PackType.SERVER_DATA, (data, manager, profiler) -> {
                 data.values().forEach((bindings) -> bindings.forEach(SERVER.forgeDefinitionToTier::putIfAbsent));
 
-                ForgeDefinition.legacyForgeDefinitionIdToTier.keySet().forEach(id -> SERVER.forgeDefinitionToTier.putIfAbsent(id, id.withSuffixedPath("_legacy_tier")));
+                ForgeDefinition.legacyForgeDefinitionIdToTier.keySet().forEach(id -> SERVER.forgeDefinitionToTier.putIfAbsent(id, id.withSuffix("_legacy_tier")));
             });
     }
 
-    private final Map<Identifier, ForgeTier> idToForgeTier = new HashMap<>();
-    private final Map<ForgeTier, Identifier> forgeTierToId = new IdentityHashMap<>();
+    private final Map<ResourceLocation, ForgeTier> idToForgeTier = new HashMap<>();
+    private final Map<ForgeTier, ResourceLocation> forgeTierToId = new IdentityHashMap<>();
 
-    private final Map<Identifier, Set<Identifier>> parentTierToChildrenTier = new HashMap<>();
+    private final Map<ResourceLocation, Set<ResourceLocation>> parentTierToChildrenTier = new HashMap<>();
 
-    private final Map<Identifier, Identifier> forgeDefinitionToTier = new HashMap<>();
+    private final Map<ResourceLocation, ResourceLocation> forgeDefinitionToTier = new HashMap<>();
 
-    private final Int2ObjectMap<List<Identifier>> tierIndexToTiers = new Int2ObjectLinkedOpenHashMap<>();
+    private final Int2ObjectMap<List<ResourceLocation>> tierIndexToTiers = new Int2ObjectLinkedOpenHashMap<>();
 
     private void buildSortedIndexToTiersMap() {
         tierIndexToTiers.clear();
@@ -88,32 +88,32 @@ public class ForgeTierDataLoader {
     }
 
     @Nullable
-    public static Identifier getForgeTierId(boolean isClientSide, ForgeTier forgeTier) {
+    public static ResourceLocation getForgeTierId(boolean isClientSide, ForgeTier forgeTier) {
         return getForgeRegistry(isClientSide).forgeTierToId.get(forgeTier);
     }
 
     @Nullable
-    public static ForgeTier getForgeTier(boolean isClientSide, Identifier tierId) {
+    public static ForgeTier getForgeTier(boolean isClientSide, ResourceLocation tierId) {
         return getForgeRegistry(isClientSide).idToForgeTier.get(tierId);
     }
 
     @Nullable
-    public ForgeTier getBoundForgeTier(Identifier forgeDefinitionId) {
+    public ForgeTier getBoundForgeTier(ResourceLocation forgeDefinitionId) {
         return Optional.of(forgeDefinitionId)
             .map(forgeDefinitionToTier::get)
             .map(idToForgeTier::get)
             .orElse(null);
     }
 
-    public Map<Identifier, ForgeTier> idToForgeTier() {
+    public Map<ResourceLocation, ForgeTier> idToForgeTier() {
         return Collections.unmodifiableMap(idToForgeTier);
     }
 
-    public Map<ForgeTier, Identifier> forgeTierToId() {
+    public Map<ForgeTier, ResourceLocation> forgeTierToId() {
         return Collections.unmodifiableMap(forgeTierToId);
     }
 
-    public Map<Identifier, Identifier> forgeDefinitionToTier() {
+    public Map<ResourceLocation, ResourceLocation> forgeDefinitionToTier() {
         return Collections.unmodifiableMap(forgeDefinitionToTier);
     }
 
@@ -132,7 +132,7 @@ public class ForgeTierDataLoader {
     }
 
     @ApiStatus.Internal
-    public void setTierData(Map<Identifier, ForgeTier> idToForgeTier, Map<Identifier, Identifier> forgeDefinitionToTier) {
+    public void setTierData(Map<ResourceLocation, ForgeTier> idToForgeTier, Map<ResourceLocation, ResourceLocation> forgeDefinitionToTier) {
         this.forgeDefinitionToTier.clear();
         this.forgeDefinitionToTier.putAll(forgeDefinitionToTier);
 
@@ -149,7 +149,7 @@ public class ForgeTierDataLoader {
         return new TierDataSync(SERVER.idToForgeTier(), SERVER.forgeDefinitionToTier());
     }
 
-    private boolean registerTier(Identifier id, RawForgeTier tier) {
+    private boolean registerTier(ResourceLocation id, RawForgeTier tier) {
         var parentId = tier.parentIdentifier().orElse(null);
 
         var parentTier = (parentId != null)
@@ -170,14 +170,14 @@ public class ForgeTierDataLoader {
         return true;
     }
 
-    private void registerTier(Identifier id, ForgeTier tier) {
+    private void registerTier(ResourceLocation id, ForgeTier tier) {
         if (SERVER.idToForgeTier.containsKey(id)) return;
 
         SERVER.idToForgeTier.put(id, tier);
         SERVER.forgeTierToId.put(tier, id);
     }
 
-    public record RawForgeTier(Optional<Identifier> parentIdentifier, Optional<Integer> value, Optional<Float> speedMultiplier, Optional<Float> fuelConsumptionMultiplier, Optional<Integer> fuelCapacity) {
+    public record RawForgeTier(Optional<ResourceLocation> parentIdentifier, Optional<Integer> value, Optional<Float> speedMultiplier, Optional<Float> fuelConsumptionMultiplier, Optional<Integer> fuelCapacity) {
 
         public static final Endec<RawForgeTier> ENDEC = StructEndecBuilder.of(
             optionalFieldOf(MinecraftEndecs.IDENTIFIER.optionalOf(),"parent_tier", RawForgeTier::parentIdentifier),
@@ -192,7 +192,7 @@ public class ForgeTierDataLoader {
             return new StructField<S, Optional<T>>(name, endec, getter, Optional::empty);
         }
 
-        public ForgeTier buildTier(Identifier id, Optional<ForgeTier> parentTier) {
+        public ForgeTier buildTier(ResourceLocation id, Optional<ForgeTier> parentTier) {
             var speedMultiplierValue = speedMultiplier().or(() -> parentTier.map(ForgeTier::speedMultiplier)).orElse(1f);
 
             return new ForgeTier(

@@ -13,21 +13,24 @@ import net.fabricmc.fabric.api.resource.v1.ResourceLoader;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerType;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorageUtil;
 import net.fabricmc.fabric.impl.recipe.ingredient.builtin.ComponentsIngredient;
-import net.minecraft.block.Block;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
+import net.minecraft.world.item.crafting.*;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.RecipeManager;
+import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.recipe.*;
-import net.minecraft.recipe.input.RecipeInput;
-import net.minecraft.resource.ResourceType;
-import net.minecraft.screen.ScreenHandler;
-import net.minecraft.screen.ScreenHandlerType;
-import net.minecraft.util.Hand;
-import net.minecraft.util.Identifier;
-import net.minecraft.world.World;
+import net.minecraft.server.packs.PackType;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.Level;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -35,7 +38,7 @@ import java.util.stream.Stream;
 
 public final class FabricGeneralPlatformUtils implements GeneralPlatformUtils {
     @Override
-    public <T extends ScreenHandler, D> ScreenHandlerType<T> createScreenHandlerType(ExtendedFactory<T, D> factory, PacketCodec<? super RegistryByteBuf, D> packetCodec) {
+    public <T extends AbstractContainerMenu, D> MenuType<T> createScreenHandlerType(ExtendedFactory<T, D> factory, StreamCodec<? super RegistryFriendlyByteBuf, D> packetCodec) {
         return new ExtendedScreenHandlerType<>(factory::create, packetCodec);
     }
 
@@ -54,39 +57,39 @@ public final class FabricGeneralPlatformUtils implements GeneralPlatformUtils {
     //--
 
     @Override
-    public boolean interactWithFluidStorage(ForgeControllerBlockEntity controller, PlayerEntity player, Hand hand) {
+    public boolean interactWithFluidStorage(ForgeControllerBlockEntity controller, Player player, InteractionHand hand) {
         return FluidStorageUtil.interactWithFluidStorage(controller.<FluidHolderImpl>getFluidHolder(), player, hand);
     }
 
     @Override
     public FluidStorage createStorage(ForgeControllerBlockEntity controller) {
-        return new FluidHolderImpl(controller::markDirty);
+        return new FluidHolderImpl(controller::setChanged);
     }
 
     //--
 
     @Override
-    public <I extends RecipeInput, T extends Recipe<I>> Stream<RecipeEntry<T>> getAllMatches(ServerRecipeManager manager, RecipeType<T> type, I input, World world) {
+    public <I extends RecipeInput, T extends Recipe<I>> Stream<RecipeHolder<T>> getAllMatches(RecipeManager manager, RecipeType<T> type, I input, Level world) {
         return manager.getAllMatches(type, input, world);
     }
 
     @Override
-    public <I extends RecipeInput, T extends Recipe<I>> Collection<RecipeEntry<T>> getAllOfType(ServerRecipeManager manager, RecipeType<T> type) {
+    public <I extends RecipeInput, T extends Recipe<I>> Collection<RecipeHolder<T>> getAllOfType(RecipeManager manager, RecipeType<T> type) {
         return manager.getAllOfType(type);
     }
 
     @Override
     public Ingredient createStackIngredient(ItemStack stack) {
-        return new ComponentsIngredient(Ingredient.ofItem(stack.getItem()), stack.getComponentChanges())
+        return new ComponentsIngredient(Ingredient.of(stack.getItem()), stack.getComponentsPatch())
             .toVanilla();
     }
 
     //--
 
     @Override
-    public void registerLoader(Identifier id, ResourceType packType, EndecDataLoader<?> loader, boolean requiresRegistries) {
+    public void registerLoader(ResourceLocation id, PackType packType, EndecDataLoader<?> loader, boolean requiresRegistries) {
         if (requiresRegistries) {
-            loader.setRegistryGetter(store -> store.getOrThrow(ResourceLoader.RELOADER_REGISTRY_LOOKUP_KEY));
+            loader.setRegistryGetter(store -> store.get(ResourceLoader.RELOADER_REGISTRY_LOOKUP_KEY));
         }
 
         ResourceLoader.get(packType).registerReloader(id, loader);

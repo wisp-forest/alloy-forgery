@@ -10,31 +10,38 @@ import io.wispforest.alloyforgery.recipe.OutputData;
 import io.wispforest.alloyforgery.recipe.RawAlloyForgeRecipe;
 import io.wispforest.alloyforgery.utils.GeneralPlatformUtils;
 import net.minecraft.advancement.*;
-import net.minecraft.advancement.AdvancementRequirements.CriterionMerger;
-import net.minecraft.advancement.criterion.RecipeUnlockedCriterion;
-import net.minecraft.component.ComponentChanges;
-import net.minecraft.data.recipe.CraftingRecipeJsonBuilder;
-import net.minecraft.data.recipe.RecipeExporter;
+import net.minecraft.advancements.Advancement;
+import net.minecraft.advancements.AdvancementRequirements.Strategy;
+import net.minecraft.advancements.AdvancementRewards;
+import net.minecraft.advancements.Criterion;
+import net.minecraft.advancements.critereon.RecipeUnlockedTrigger;
+import net.minecraft.core.component.DataComponentPatch;
+import net.minecraft.data.recipes.RecipeBuilder;
+import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.item.*;
-import net.minecraft.recipe.Ingredient;
-import net.minecraft.recipe.Recipe;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.RegistryEntryLookup;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.registry.tag.TagKey;
-import net.minecraft.util.Identifier;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.HolderGetter;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.tags.TagKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.ItemLike;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
-public class AlloyForgeryRecipeBuilder implements CraftingRecipeJsonBuilder {
+public class AlloyForgeryRecipeBuilder implements RecipeBuilder {
 
     private static final Logger LOGGER = LogUtils.getLogger();
 
-    private final Map<String, AdvancementCriterion<?>> advancementBuilder = new LinkedHashMap<>();
+    private final Map<String, Criterion<?>> advancementBuilder = new LinkedHashMap<>();
     private String group = "";
 
     private final Set<TagKey<Item>> inputTags = new LinkedHashSet<>();
@@ -42,7 +49,7 @@ public class AlloyForgeryRecipeBuilder implements CraftingRecipeJsonBuilder {
     @Nullable
     private final TagKey<Item> outputTag;
     @Nullable
-    private final ItemConvertible outputItem;
+    private final ItemLike outputItem;
 
     //private final Ingredient output;
     private final int outputCount;
@@ -51,12 +58,12 @@ public class AlloyForgeryRecipeBuilder implements CraftingRecipeJsonBuilder {
 
     private final Map<AlloyForgeRecipe.OverrideRange, AlloyForgeRecipe.PendingOverride> ranges = new LinkedHashMap<>();
 
-    private final List<Identifier> priorities = new ArrayList<>();
+    private final List<ResourceLocation> priorities = new ArrayList<>();
 
     private int minimumTier = 1;
     private int fuelPerTick = 5;
 
-    private AlloyForgeryRecipeBuilder(@Nullable TagKey<Item> outputTag, @Nullable ItemConvertible outputItem, int outputCount) {
+    private AlloyForgeryRecipeBuilder(@Nullable TagKey<Item> outputTag, @Nullable ItemLike outputItem, int outputCount) {
         this.outputTag = outputTag;
         this.outputItem = outputItem;
 
@@ -65,11 +72,11 @@ public class AlloyForgeryRecipeBuilder implements CraftingRecipeJsonBuilder {
 
     //--------------------------------------------------------------------
 
-    public static AlloyForgeryRecipeBuilder create(ItemConvertible output) {
+    public static AlloyForgeryRecipeBuilder create(ItemLike output) {
         return create(output, 1);
     }
 
-    public static AlloyForgeryRecipeBuilder create(ItemConvertible output, int outputCount) {
+    public static AlloyForgeryRecipeBuilder create(ItemLike output, int outputCount) {
         return new AlloyForgeryRecipeBuilder(null, output, outputCount);
     }
 
@@ -83,39 +90,39 @@ public class AlloyForgeryRecipeBuilder implements CraftingRecipeJsonBuilder {
 
     //--------------------------------------------------------------------
 
-    public AlloyForgeryRecipeBuilder addPriorityOutput(ItemConvertible... outputs) {
-        return this.addPriorityOutput(Arrays.stream(outputs).map(output -> Registries.ITEM.getId(output.asItem())).toArray(Identifier[]::new));
+    public AlloyForgeryRecipeBuilder addPriorityOutput(ItemLike... outputs) {
+        return this.addPriorityOutput(Arrays.stream(outputs).map(output -> BuiltInRegistries.ITEM.getKey(output.asItem())).toArray(ResourceLocation[]::new));
     }
 
-    public AlloyForgeryRecipeBuilder addPriorityOutput(Identifier... outputId) {
+    public AlloyForgeryRecipeBuilder addPriorityOutput(ResourceLocation... outputId) {
         return addPriorityOutput(List.of(outputId));
     }
 
-    public AlloyForgeryRecipeBuilder addPriorityOutput(List<Identifier> outputIds) {
+    public AlloyForgeryRecipeBuilder addPriorityOutput(List<ResourceLocation> outputIds) {
         priorities.addAll(outputIds);
         return this;
     }
 
-    public AlloyForgeryRecipeBuilder tagInputs(RegistryEntryLookup<Item> registryLookup, Map<TagKey<Item>, Integer> inputs) {
+    public AlloyForgeryRecipeBuilder tagInputs(HolderGetter<Item> registryLookup, Map<TagKey<Item>, Integer> inputs) {
         inputs.forEach((itemTagKey, integer) -> this.input(registryLookup, itemTagKey, integer));
 
         return this;
     }
 
-    public AlloyForgeryRecipeBuilder input(RegistryEntryLookup<Item> registryLookup, TagKey<Item> input, int count) {
+    public AlloyForgeryRecipeBuilder input(HolderGetter<Item> registryLookup, TagKey<Item> input, int count) {
         this.inputTags.add(input);
-        this.inputs.put(Ingredient.ofTag(registryLookup.getOrThrow(input)), count);
+        this.inputs.put(Ingredient.of(registryLookup.getOrThrow(input)), count);
         return this;
     }
 
-    public AlloyForgeryRecipeBuilder itemInputs(Map<ItemConvertible, Integer> inputs) {
+    public AlloyForgeryRecipeBuilder itemInputs(Map<ItemLike, Integer> inputs) {
         inputs.forEach(this::input);
 
         return this;
     }
 
-    public AlloyForgeryRecipeBuilder input(ItemConvertible input, int count) {
-        this.inputs.put(Ingredient.ofItems(input), count);
+    public AlloyForgeryRecipeBuilder input(ItemLike input, int count) {
+        this.inputs.put(Ingredient.of(input), count);
         return this;
     }
 
@@ -135,9 +142,9 @@ public class AlloyForgeryRecipeBuilder implements CraftingRecipeJsonBuilder {
         return this.overrideRange(start, end, null, outputCount);
     }
 
-    public AlloyForgeryRecipeBuilder overrideRange(int start, int end, @Nullable ItemConvertible output, int outputCount) {
+    public AlloyForgeryRecipeBuilder overrideRange(int start, int end, @Nullable ItemLike output, int outputCount) {
         this.ranges.put(new AlloyForgeRecipe.OverrideRange(start, end),
-            new AlloyForgeRecipe.PendingOverride(output != null ? output.asItem() : null, outputCount, ComponentChanges.EMPTY));
+            new AlloyForgeRecipe.PendingOverride(output != null ? output.asItem() : null, outputCount, DataComponentPatch.EMPTY));
 
         return this;
     }
@@ -150,9 +157,9 @@ public class AlloyForgeryRecipeBuilder implements CraftingRecipeJsonBuilder {
         return this.overrideRange(index, includeUpperValues, null, outputCount);
     }
 
-    public AlloyForgeryRecipeBuilder overrideRange(int index, boolean includeUpperValues, @Nullable ItemConvertible output, int outputCount) {
+    public AlloyForgeryRecipeBuilder overrideRange(int index, boolean includeUpperValues, @Nullable ItemLike output, int outputCount) {
         this.ranges.put(new AlloyForgeRecipe.OverrideRange(index, includeUpperValues ? -1 : index),
-            new AlloyForgeRecipe.PendingOverride(output != null ? output.asItem() : null, outputCount, ComponentChanges.EMPTY));
+            new AlloyForgeRecipe.PendingOverride(output != null ? output.asItem() : null, outputCount, DataComponentPatch.EMPTY));
 
         return this;
     }
@@ -168,13 +175,13 @@ public class AlloyForgeryRecipeBuilder implements CraftingRecipeJsonBuilder {
     }
 
     @Override
-    public AlloyForgeryRecipeBuilder criterion(String string, AdvancementCriterion criterion) {
+    public AlloyForgeryRecipeBuilder unlockedBy(String string, Criterion criterion) {
         this.advancementBuilder.put(string, criterion);
         return this;
     }
 
-    public <T> AlloyForgeryRecipeBuilder criterion(String string, Map<T, Integer> inputs, Function<T, AdvancementCriterion> criterionMaker) {
-        inputs.keySet().forEach(itemTagKey -> this.criterion(string, criterionMaker.apply(itemTagKey)));
+    public <T> AlloyForgeryRecipeBuilder criterion(String string, Map<T, Integer> inputs, Function<T, Criterion> criterionMaker) {
+        inputs.keySet().forEach(itemTagKey -> this.unlockedBy(string, criterionMaker.apply(itemTagKey)));
 
         return this;
     }
@@ -186,23 +193,23 @@ public class AlloyForgeryRecipeBuilder implements CraftingRecipeJsonBuilder {
     }
 
     @Override
-    public Item getOutputItem() {
+    public Item getResult() {
         //TODO: Maybe not air, idk
         return Items.AIR;
     }
 
     @Override
-    public void offerTo(RecipeExporter exporter, RegistryKey<Recipe<?>> recipeId) {
-        var advancementId = Identifier.of(recipeId.getValue().getNamespace(), "recipes/" + AlloyForgery.MOD_ID + "/" + recipeId.getValue().getPath());
+    public void save(RecipeOutput exporter, ResourceKey<Recipe<?>> recipeId) {
+        var advancementId = ResourceLocation.fromNamespaceAndPath(recipeId.location().getNamespace(), "recipes/" + AlloyForgery.MOD_ID + "/" + recipeId.location().getPath());
 
-        this.validate(recipeId.getValue());
+        this.validate(recipeId.location());
 
-        Advancement.Builder builder = exporter.getAdvancementBuilder()
-                .criterion("has_the_recipe", RecipeUnlockedCriterion.create(recipeId))
-                .rewards(AdvancementRewards.Builder.recipe(recipeId))
-                .criteriaMerger(CriterionMerger.OR);
+        Advancement.Builder builder = exporter.advancement()
+                .addCriterion("has_the_recipe", RecipeUnlockedTrigger.unlocked(recipeId))
+                .rewards(net.minecraft.advancements.AdvancementRewards.Builder.recipe(recipeId))
+                .requirements(Strategy.OR);
 
-        this.advancementBuilder.forEach(builder::criterion);
+        this.advancementBuilder.forEach(builder::addCriterion);
 
         var recipe = new RawAlloyForgeRecipe(
                 inputs,
@@ -220,18 +227,18 @@ public class AlloyForgeryRecipeBuilder implements CraftingRecipeJsonBuilder {
         exporter.accept(recipeId, recipe.generateRecipe(true), builder.build(advancementId));
     }
 
-    public void offerTo(RecipeExporter exporter, Identifier recipeId) { //Consumer<RecipeJsonProvider> exporter
-        offerTo(exporter, RegistryKey.of(RegistryKeys.RECIPE, recipeId));
+    public void offerTo(RecipeOutput exporter, ResourceLocation recipeId) { //Consumer<RecipeJsonProvider> exporter
+        save(exporter, ResourceKey.create(Registries.RECIPE, recipeId));
     }
 
     @Override
-    public void offerTo(RecipeExporter exporter) {
+    public void save(RecipeOutput exporter) {
         this.offerTo(exporter, this.getOutputId());
     }
 
     @Override
-    public void offerTo(RecipeExporter exporter, String recipePath) {
-        Identifier identifier2 = Identifier.of(recipePath);
+    public void save(RecipeOutput exporter, String recipePath) {
+        ResourceLocation identifier2 = ResourceLocation.parse(recipePath);
 
         if (identifier2.equals(this.getOutputId())) {
             throw new IllegalStateException("Recipe " + recipePath + " should remove its 'save' argument as it is equal to default one");
@@ -241,15 +248,15 @@ public class AlloyForgeryRecipeBuilder implements CraftingRecipeJsonBuilder {
     }
 
     // TODO: HANDLE SOMEHOW.....
-    public void offerToWithConditions(RecipeExporter exporter, String recipePath, RecipeExporterConditionWrapper withConditionsWrapper) {
+    public void offerToWithConditions(RecipeOutput exporter, String recipePath, RecipeExporterConditionWrapper withConditionsWrapper) {
         var tags = (TagKey<Item>[]) Streams.concat(inputTags.stream(), Stream.of(this.outputTag)).toArray(TagKey[]::new);
 
-        exporter = withConditionsWrapper.withConditions(exporter, ResourceConditionHolder.createConditions().withTags(RegistryKeys.ITEM, tags));
+        exporter = withConditionsWrapper.withConditions(exporter, ResourceConditionHolder.createConditions().withTags(Registries.ITEM, tags));
 
-        offerTo(exporter, recipePath);
+        save(exporter, recipePath);
     }
 
-    public void validate(Identifier recipeId) {
+    public void validate(ResourceLocation recipeId) {
         if (this.advancementBuilder.isEmpty()) {
             throw new IllegalStateException("No way of obtaining recipe " + recipeId);
         } else if (this.inputs.isEmpty()) {
@@ -257,8 +264,8 @@ public class AlloyForgeryRecipeBuilder implements CraftingRecipeJsonBuilder {
         }
     }
 
-    private Identifier getOutputId() {
-        return (outputTag != null) ? outputTag.id() : Registries.ITEM.getId(outputItem.asItem());
+    private ResourceLocation getOutputId() {
+        return (outputTag != null) ? outputTag.location() : BuiltInRegistries.ITEM.getKey(outputItem.asItem());
     }
 
     //----------------------------------------------------
