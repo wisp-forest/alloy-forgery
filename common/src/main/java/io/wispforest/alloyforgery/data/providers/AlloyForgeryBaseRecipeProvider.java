@@ -3,12 +3,13 @@ package io.wispforest.alloyforgery.data.providers;
 import io.wispforest.alloyforgery.data.builders.AlloyForgeryRecipeBuilder;
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.data.recipes.RecipeProvider;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.util.Util;
 import net.minecraft.world.item.Item;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.tags.TagKey;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.Util;
+import net.minecraft.resources.Identifier;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -56,7 +57,7 @@ public class AlloyForgeryBaseRecipeProvider extends RecipeProvider {
     public static final TagKey<Item> STORAGE_BLOCKS_RAW_IRON = register("storage_blocks/raw_iron");
 
     private static TagKey<Item> register(String tagId) {
-        return TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath("c", tagId));
+        return TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath("c", tagId));
     }
 
     public void generateAlloyForgeryRecipes() {
@@ -195,7 +196,7 @@ public class AlloyForgeryBaseRecipeProvider extends RecipeProvider {
      * @param overrideIndex  which tier to use for the recipe override
      * @param overrideAmount how many items are return when crafting with the override
      * @param fuelPerTick    how much fuel is consumed per tick for the recipe
-     * @return an AlloyForgeryRecipeBuilder which should be passed to {@link AlloyForgeryRecipeProvider#exportCompatRecipe(AFRBuilderMethod, String, TagKey, TagKey, ResourceLocation...)}
+     * @return an AlloyForgeryRecipeBuilder which should be passed to {@link AlloyForgeryRecipeProvider#exportCompatRecipe(AFRBuilderMethod, String, TagKey, TagKey, Identifier...)}
      */
     public AlloyForgeryRecipeBuilder createAFRecipeWithOverride(String inputCriterionName, TagKey<Item> output, TagKey<Item> input, int inputAmount, int outputAmount, int overrideIndex, int overrideAmount, int fuelPerTick) {
 
@@ -231,8 +232,8 @@ public class AlloyForgeryBaseRecipeProvider extends RecipeProvider {
 
     //-------------------------------------------
 
-    public void exportCompatRecipe(AFRBuilderMethod builder, String materialName, String recipeTemplate, String inputTagTemplate, String outputTagTemplate, String priorityTemplate, List<String> modids, List<ResourceLocation> additionalPriorities) {
-        var priorities = modids.stream().map(modid -> ResourceLocation.fromNamespaceAndPath(modid, materialName + priorityTemplate)).collect(Collectors.toList());
+    public void exportCompatRecipe(AFRBuilderMethod builder, String materialName, String recipeTemplate, String inputTagTemplate, String outputTagTemplate, String priorityTemplate, List<String> modids, List<Identifier> additionalPriorities) {
+        var priorities = modids.stream().map(modid -> Identifier.fromNamespaceAndPath(modid, materialName + priorityTemplate)).collect(Collectors.toList());
 
         priorities.addAll(additionalPriorities);
 
@@ -240,7 +241,7 @@ public class AlloyForgeryBaseRecipeProvider extends RecipeProvider {
             materialName + recipeTemplate,
             common(inputTagTemplate + materialName),
             common(outputTagTemplate + materialName),
-            priorities.toArray(ResourceLocation[]::new)
+            priorities.toArray(Identifier[]::new)
         );
     }
 
@@ -252,9 +253,9 @@ public class AlloyForgeryBaseRecipeProvider extends RecipeProvider {
      * @param input      the item tag for valid recipe inputs
      * @param output     the item tag for what the recipe outputs
      * @param priorities a list which specify decides which items take priority when using a tagged output. E.G. if "mythicmetals:steel_ingot" is provided, and is present in the recipe output, then the recipe always outputs this item
-     * @see ResourceConditionHolder#tagsPopulated(net.minecraft.resources.ResourceKey, TagKey[])
+     * @see ResourceConditionHolder#withTags(ResourceKey, TagKey[]) (net.minecraft.resources.ResourceKey, TagKey[])
      */
-    public void exportCompatRecipe(AFRBuilderMethod builder, String name, TagKey<Item> input, TagKey<Item> output, ResourceLocation... priorities) {
+    public void exportCompatRecipe(AFRBuilderMethod builder, String name, TagKey<Item> input, TagKey<Item> output, Identifier... priorities) {
         exportCompatRecipe(name, builder.build(name, output, input).addPriorityOutput(priorities));
     }
 
@@ -276,7 +277,7 @@ public class AlloyForgeryBaseRecipeProvider extends RecipeProvider {
         exportStandardRawBlockRecipe(materialName, Arrays.stream(modids).toList(), List.of());
     }
 
-    public void exportStandardRawBlockRecipe(String materialName, List<String> modids, List<ResourceLocation> additionalPriorities) {
+    public void exportStandardRawBlockRecipe(String materialName, List<String> modids, List<Identifier> additionalPriorities) {
         this.exportCompatRecipe(
             this::createStandardRawBlockRecipe,
             materialName,
@@ -290,7 +291,7 @@ public class AlloyForgeryBaseRecipeProvider extends RecipeProvider {
         exportAdvancedRawBlockRecipe(materialName, Arrays.stream(modids).toList(), List.of());
     }
 
-    public void exportAdvancedRawBlockRecipe(String materialName, List<String> modids, List<ResourceLocation> additionalPriorities) {
+    public void exportAdvancedRawBlockRecipe(String materialName, List<String> modids, List<Identifier> additionalPriorities) {
         this.exportCompatRecipe(
             this::createAdvancedRawBlockRecipe,
             materialName,
@@ -304,7 +305,7 @@ public class AlloyForgeryBaseRecipeProvider extends RecipeProvider {
         exportExtremeRawBlockRecipe(materialName, Arrays.stream(modids).toList(), List.of());
     }
 
-    public void exportExtremeRawBlockRecipe(String materialName, List<String> modids, List<ResourceLocation> additionalPriorities) {
+    public void exportExtremeRawBlockRecipe(String materialName, List<String> modids, List<Identifier> additionalPriorities) {
         this.exportCompatRecipe(
             this::createExtremeRawBlockRecipe,
             materialName,
@@ -320,7 +321,7 @@ public class AlloyForgeryBaseRecipeProvider extends RecipeProvider {
         exportStandardRawOreRecipe(materialName, Arrays.stream(modids).toList(), List.of());
     }
 
-    public void exportStandardRawOreRecipe(String materialName, List<String> modids, List<ResourceLocation> additionalPriorities) {
+    public void exportStandardRawOreRecipe(String materialName, List<String> modids, List<Identifier> additionalPriorities) {
         this.exportCompatRecipe(
             this::createStandardRawOreRecipe,
             materialName,
@@ -334,7 +335,7 @@ public class AlloyForgeryBaseRecipeProvider extends RecipeProvider {
         exportAdvancedRawOreRecipe(materialName, Arrays.stream(modids).toList(), List.of());
     }
 
-    public void exportAdvancedRawOreRecipe(String materialName, List<String> modids, List<ResourceLocation> additionalPriorities) {
+    public void exportAdvancedRawOreRecipe(String materialName, List<String> modids, List<Identifier> additionalPriorities) {
         this.exportCompatRecipe(
             this::createAdvancedRawOreRecipe,
             materialName,
@@ -348,7 +349,7 @@ public class AlloyForgeryBaseRecipeProvider extends RecipeProvider {
         exportExtremeRawOreRecipe(materialName, Arrays.stream(modids).toList(), List.of());
     }
 
-    public void exportExtremeRawOreRecipe(String materialName, List<String> modids, List<ResourceLocation> additionalPriorities) {
+    public void exportExtremeRawOreRecipe(String materialName, List<String> modids, List<Identifier> additionalPriorities) {
         this.exportCompatRecipe(
             this::createExtremeRawOreRecipe,
             materialName,
@@ -367,7 +368,7 @@ public class AlloyForgeryBaseRecipeProvider extends RecipeProvider {
     /**
      * Preset recipe builder for tier 1 recipes, specifically for smelting ore blocks.
      */
-    public void exportStandardOreRecipe(String materialName, List<String> modids, List<ResourceLocation> additionalPriorities) {
+    public void exportStandardOreRecipe(String materialName, List<String> modids, List<Identifier> additionalPriorities) {
         this.exportCompatRecipe(
             this::createStandardOreRecipe,
             materialName,
@@ -381,7 +382,7 @@ public class AlloyForgeryBaseRecipeProvider extends RecipeProvider {
         exportAdvancedOreRecipe(materialName, Arrays.stream(modids).toList(), List.of());
     }
 
-    public void exportAdvancedOreRecipe(String materialName, List<String> modids, List<ResourceLocation> additionalPriorities) {
+    public void exportAdvancedOreRecipe(String materialName, List<String> modids, List<Identifier> additionalPriorities) {
         this.exportCompatRecipe(
             this::createAdvancedOreRecipe,
             materialName,
@@ -395,7 +396,7 @@ public class AlloyForgeryBaseRecipeProvider extends RecipeProvider {
         exportExtremeOreRecipe(materialName, Arrays.stream(modids).toList(), List.of());
     }
 
-    public void exportExtremeOreRecipe(String materialName, List<String> modids, List<ResourceLocation> additionalPriorities) {
+    public void exportExtremeOreRecipe(String materialName, List<String> modids, List<Identifier> additionalPriorities) {
         this.exportCompatRecipe(
             this::createExtremeOreRecipe,
             materialName,
@@ -411,7 +412,7 @@ public class AlloyForgeryBaseRecipeProvider extends RecipeProvider {
         createAlloyingRecipes(materialName, outputAmount, materialInputs, overridesMap, forgeTier, fuelPerTick, Arrays.stream(modids).toList(), List.of());
     }
 
-    public void createAlloyingRecipes(String materialName, int outputAmount, Consumer<SequencedMap<String, Integer>> materialInputs, Consumer<SequencedMap<Integer, Integer>> overridesMap, int forgeTier, int fuelPerTick, List<String> modids, List<ResourceLocation> additionalPriorities) {
+    public void createAlloyingRecipes(String materialName, int outputAmount, Consumer<SequencedMap<String, Integer>> materialInputs, Consumer<SequencedMap<Integer, Integer>> overridesMap, int forgeTier, int fuelPerTick, List<String> modids, List<Identifier> additionalPriorities) {
         Function<String, SequencedMap<TagKey<Item>, Integer>> inputBuilder = (materialType) -> {
             return Util.make(new LinkedHashMap<>(), materialInputs).entrySet().stream()
                 .map(entry -> {
@@ -439,7 +440,7 @@ public class AlloyForgeryBaseRecipeProvider extends RecipeProvider {
 
         var priorities = new ArrayList<>(additionalPriorities);
 
-        priorities.addAll(modids.stream().map(modid -> ResourceLocation.fromNamespaceAndPath(modid, materialName + "_ingot")).toList());
+        priorities.addAll(modids.stream().map(modid -> Identifier.fromNamespaceAndPath(modid, materialName + "_ingot")).toList());
 
         this.exportAlloyCompatRecipe(
             materialName + "_from_ingots",
@@ -489,7 +490,7 @@ public class AlloyForgeryBaseRecipeProvider extends RecipeProvider {
             for (var value : MaterialRecipeType.values()) createMaterialRecipe(value, modids);
         }
 
-        public void createMaterialRecipes(ResourceLocation... additionalPriorities) {
+        public void createMaterialRecipes(Identifier... additionalPriorities) {
             for (var value : MaterialRecipeType.values()) createMaterialRecipe(value, additionalPriorities);
         }
 
@@ -500,11 +501,11 @@ public class AlloyForgeryBaseRecipeProvider extends RecipeProvider {
             for (String modid : modids) holder.addModid(modid);
         }
 
-        public void createMaterialRecipe(MaterialRecipeType recipeType, ResourceLocation... additionalPriorities) {
+        public void createMaterialRecipe(MaterialRecipeType recipeType, Identifier... additionalPriorities) {
             var holder = compatibilityRecipes.computeIfAbsent(recipeType, type -> new HashMap<>())
                 .computeIfAbsent(materialName, name -> new MaterialRecipe(name, this.rank, recipeType));
 
-            for (ResourceLocation id : additionalPriorities) holder.addPriority(id);
+            for (Identifier id : additionalPriorities) holder.addPriority(id);
         }
     }
 
@@ -514,7 +515,7 @@ public class AlloyForgeryBaseRecipeProvider extends RecipeProvider {
         private final MaterialRecipeType recipeTypes;
 
         private final List<String> modids = new ArrayList<>();
-        private final List<ResourceLocation> additionalPriorities = new ArrayList<>();
+        private final List<Identifier> additionalPriorities = new ArrayList<>();
 
         public MaterialRecipe(String materialName, RecipeRank rank, MaterialRecipeType recipeTypes) {
             this.materialName = materialName;
@@ -526,7 +527,7 @@ public class AlloyForgeryBaseRecipeProvider extends RecipeProvider {
             this.modids.add(modid);
         }
 
-        public void addPriority(ResourceLocation id) {
+        public void addPriority(Identifier id) {
             this.additionalPriorities.add(id);
         }
     }

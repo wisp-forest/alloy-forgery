@@ -8,7 +8,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.ChatFormatting;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import io.wispforest.alloyforgery.block.ForgeControllerBlock;
 import io.wispforest.alloyforgery.forges.ForgeTierDataLoader;
 import java.util.List;
@@ -27,7 +27,7 @@ public class ForgeControllerItem extends BlockItem {
         if (tier != null) tier.tooltip(true, textConsumer);
     }
 
-    public ResourceLocation getForgeDefinition() {
+    public Identifier getForgeDefinition() {
         return ((ForgeControllerBlock) getBlock()).forgeDefinitionId;
     }
 }

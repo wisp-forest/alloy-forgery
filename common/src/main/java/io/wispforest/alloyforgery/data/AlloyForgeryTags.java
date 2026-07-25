@@ -3,7 +3,7 @@ package io.wispforest.alloyforgery.data;
 import net.minecraft.world.item.Item;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.tags.TagKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import io.wispforest.alloyforgery.AlloyForgery;
 
 public class AlloyForgeryTags {
@@ -133,16 +133,16 @@ public class AlloyForgeryTags {
             return createItemTag(AlloyForgeryTags.alloyForgery(path));
         }
 
-        private static TagKey<Item> createItemTag(ResourceLocation id) {
+        private static TagKey<Item> createItemTag(Identifier id) {
             return TagKey.create(Registries.ITEM, id);
         }
     }
 
-    private static ResourceLocation common(String path) {
-        return ResourceLocation.fromNamespaceAndPath(COMMON_NAMESPACE, path);
+    private static Identifier common(String path) {
+        return Identifier.fromNamespaceAndPath(COMMON_NAMESPACE, path);
     }
 
-    private static ResourceLocation alloyForgery(String path) {
+    private static Identifier alloyForgery(String path) {
         return AlloyForgery.id(path);
     }
 }

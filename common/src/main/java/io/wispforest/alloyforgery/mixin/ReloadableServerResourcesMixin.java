@@ -4,7 +4,7 @@ import io.wispforest.alloyforgery.utils.GeneralPlatformUtils;
 import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraft.server.ReloadableServerRegistries;
 import net.minecraft.server.ReloadableServerResources;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.gen.Accessor;
 import org.spongepowered.asm.mixin.injection.At;
@@ -22,13 +22,13 @@ public abstract class ReloadableServerResourcesMixin {
 
         var recipeEntries = GeneralPlatformUtils.INSTANCE.getAllOfType(contents.getRecipeManager(), AlloyForgeRecipe.Type.INSTANCE);
 
-        var map = new HashMap<AlloyForgeRecipe, ResourceLocation>();
+        var map = new HashMap<AlloyForgeRecipe, Identifier>();
 
         for (var entry : recipeEntries) {
-            map.put(entry.value(), entry.id().location());
+            map.put(entry.value(), entry.id().identifier());
         }
 
-        AlloyForgeRecipe.PENDING_RECIPES.forEach((recipe, pendingRecipeData) -> recipe.finishRecipe(contents.fullRegistries().lookup(), pendingRecipeData, key -> map.getOrDefault(key, ResourceLocation.fromNamespaceAndPath(AlloyForgery.MOD_ID, "unknown_recipe"))));
+        AlloyForgeRecipe.PENDING_RECIPES.forEach((recipe, pendingRecipeData) -> recipe.finishRecipe(contents.fullRegistries().lookup(), pendingRecipeData, key -> map.getOrDefault(key, Identifier.fromNamespaceAndPath(AlloyForgery.MOD_ID, "unknown_recipe"))));
 
         AlloyForgeRecipe.PENDING_RECIPES.clear();
     }

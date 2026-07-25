@@ -16,7 +16,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.Level;
 import org.slf4j.Logger;
 import io.wispforest.alloyforgery.mixin.RecipeMapAccessor;
@@ -53,7 +53,7 @@ public final class RecipeInjector {
     private final Level world;
 
     private final Multimap<RecipeType<?>, RecipeHolder<?>> recipes = HashMultimap.create();
-    private final Map<ResourceLocation, RecipeHolder<?>> recipesById = new HashMap<>();
+    private final Map<Identifier, RecipeHolder<?>> recipesById = new HashMap<>();
 
     public RecipeInjector(RecipeManager manager, Level world) {
         this.manager = manager;
@@ -68,7 +68,7 @@ public final class RecipeInjector {
      * @param recipe The Recipe
      * @param <T>    Type of the given Recipe
      */
-    public <R extends Recipe<T>, T extends RecipeInput> void addRecipe(ResourceLocation id, R recipe) {
+    public <R extends Recipe<T>, T extends RecipeInput> void addRecipe(Identifier id, R recipe) {
         if (BuiltInRegistries.RECIPE_TYPE.getKey(recipe.getType()) == null) {
             throw new IllegalStateException("Unable to add Recipe for a RecipeType not registered!");
         }
@@ -77,7 +77,7 @@ public final class RecipeInjector {
 
         var bl = getAllOfType(type)
             .stream()
-            .anyMatch(recipeEntry -> id.equals(recipeEntry.id().location()));
+            .anyMatch(recipeEntry -> id.equals(recipeEntry.id().identifier()));
 
         if (bl) {
             LOGGER.error("[RecipeInjector]: Unable to add a given recipe due to being the same Identifier with the given Type. [ID: {}]", id);

@@ -1,6 +1,6 @@
 package io.wispforest.alloyforgery.compat;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import io.wispforest.alloyforgery.AlloyForgery;
 import org.jetbrains.annotations.Nullable;
 
@@ -9,7 +9,7 @@ import java.util.Map;
 
 public class LegacyIdMappings {
 
-    private static final Map<ResourceLocation, ResourceLocation> MAPPINGS = new HashMap<>();
+    private static final Map<Identifier, Identifier> MAPPINGS = new HashMap<>();
 
     static {
         MAPPINGS.put(id("blackstone_forge_controller"), id("polished_blackstone_forge_controller"));
@@ -21,17 +21,17 @@ public class LegacyIdMappings {
 
     public static final String MOD_ID = "alloy_forgery";
 
-    public static ResourceLocation remap(@Nullable ResourceLocation original) {
+    public static Identifier remap(@Nullable Identifier original) {
         if (original == null) return null;
 
         if (original.getNamespace().equals(MOD_ID)) {
-            original = ResourceLocation.fromNamespaceAndPath(AlloyForgery.MOD_ID, original.getPath());
+            original = Identifier.fromNamespaceAndPath(AlloyForgery.MOD_ID, original.getPath());
         }
 
         return MAPPINGS.getOrDefault(original, original);
     }
 
-    private static ResourceLocation id(String path) {
-        return ResourceLocation.fromNamespaceAndPath(AlloyForgery.MOD_ID, path);
+    private static Identifier id(String path) {
+        return Identifier.fromNamespaceAndPath(AlloyForgery.MOD_ID, path);
     }
 }

@@ -1,39 +1,36 @@
 package io.wispforest.alloyforgery.client;
 
-import com.mojang.blaze3d.pipeline.RenderPipeline;
 import io.wispforest.alloyforgery.AlloyForgeScreenHandler;
 import io.wispforest.alloyforgery.AlloyForgery;
 import io.wispforest.alloyforgery.networking.AlloyForgeNetworking;
 import io.wispforest.alloyforgery.networking.DisableSlotToggle;
 import io.wispforest.alloyforgery.utils.ForgeInputSlot;
-import io.wispforest.owo.ui.base.BaseOwoHandledScreen;
+import io.wispforest.owo.ui.base.BaseOwoContainerScreen;
 import io.wispforest.owo.ui.component.TextureComponent;
-import io.wispforest.owo.ui.container.Containers;
 import io.wispforest.owo.ui.container.FlowLayout;
+import io.wispforest.owo.ui.container.UIContainers;
 import io.wispforest.owo.ui.core.*;
 import net.minecraft.client.renderer.RenderPipelines;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.texture.TextureAtlas;
-import net.minecraft.client.resources.model.Material;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.Slot;
-import net.minecraft.world.inventory.ClickType;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-import static io.wispforest.owo.ui.container.Containers.*;
-import static io.wispforest.owo.ui.component.Components.*;
 import static io.wispforest.alloyforgery.client.ComponentUtils.*;
+import static io.wispforest.owo.ui.component.UIComponents.*;
+import static io.wispforest.owo.ui.container.UIContainers.horizontalFlow;
+import static io.wispforest.owo.ui.container.UIContainers.verticalFlow;
 
-public class AlloyForgeScreen extends BaseOwoHandledScreen<FlowLayout, AlloyForgeScreenHandler> {
+public class AlloyForgeScreen extends BaseOwoContainerScreen<FlowLayout, AlloyForgeScreenHandler> {
 
-    private static final Material LAVA_SPRITE = new Material(TextureAtlas.LOCATION_BLOCKS, ResourceLocation.parse("block/lava_still"));
+    private static final TextureAtlasSprite LAVA_SPRITE = new TextureAtlasSprite(TextureAtlas.LOCATION_BLOCKS, Identifier.parse("block/lava_still"));
 
     private static final Component ENABLED_SLOT_TEXT = Component.translatable("tooltip.alloy-forgery.enabled_slot");
     private static final Component DISABLED_SLOT_TEXT = Component.translatable("tooltip.alloy-forgery.disabled_slot");
@@ -57,7 +54,7 @@ public class AlloyForgeScreen extends BaseOwoHandledScreen<FlowLayout, AlloyForg
 
     @Override
     protected @NotNull OwoUIAdapter<FlowLayout> createAdapter() {
-        return OwoUIAdapter.create(this, Containers::verticalFlow);
+        return OwoUIAdapter.create(this, UIContainers::verticalFlow);
     }
 
     @Override

@@ -8,7 +8,7 @@ import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.core.HolderLookup;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.neoforged.neoforge.common.conditions.ICondition;
 import net.neoforged.neoforge.common.crafting.ConditionalRecipeOutput;
 import org.jetbrains.annotations.Nullable;
@@ -34,7 +34,7 @@ public class NeoforgeAlloyForgeryRecipeProvider extends AlloyForgeryRecipeProvid
             @Override
             public void accept(ResourceKey<Recipe<?>> arg, Recipe<?> arg2, @Nullable AdvancementHolder arg3, ICondition... iConditions) {
                 if (overrideModid != null) {
-                    arg = ResourceKey.create(arg.registryKey(), ResourceLocation.fromNamespaceAndPath(overrideModid, arg.location().getPath()));
+                    arg = ResourceKey.create(arg.registryKey(), Identifier.fromNamespaceAndPath(overrideModid, arg.location().getPath()));
                 }
 
                 recipeExporter.accept(arg, arg2, arg3, iConditions);

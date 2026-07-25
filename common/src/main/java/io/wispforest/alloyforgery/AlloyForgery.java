@@ -20,7 +20,7 @@ import net.minecraft.core.Registry;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.core.Direction;
 import net.minecraft.world.phys.Vec3;
 import io.wispforest.alloyforgery.block.ForgeControllerBlockEntity;
@@ -81,13 +81,13 @@ public class AlloyForgery {
 
         Endec<Map<Item, ItemStack>> remaindersEndec = Endec.map(
                 item -> BuiltInRegistries.ITEM.getKey(item).toString(),
-                id -> BuiltInRegistries.ITEM.getValue(ResourceLocation.parse(id)),
+                id -> BuiltInRegistries.ITEM.getValue(Identifier.parse(id)),
                 CodecUtils.eitherEndec(CodecUtils.toEndec(ItemStack.STRICT_CODEC), MinecraftEndecs.ofRegistry(BuiltInRegistries.ITEM))
                         .xmap(either -> Either.unwrap(either.mapRight(Item::getDefaultInstance)), Either::left)
         );
 
         EndecDataLoader.builder("forge_remainder", remaindersEndec)
-            .create(ResourceLocation.fromNamespaceAndPath(MOD_ID, "forge_remainder"), PackType.SERVER_DATA, (data, manager, profiler) -> {
+            .create(Identifier.fromNamespaceAndPath(MOD_ID, "forge_remainder"), PackType.SERVER_DATA, (data, manager, profiler) -> {
                 data.values().forEach(AlloyForgeRecipe::addRemainders);
             });
 
@@ -132,8 +132,8 @@ public class AlloyForgery {
         AlloyForgeryItemGroup.GROUP.initialize();
     }
 
-    public static ResourceLocation id(String path) {
-        return ResourceLocation.fromNamespaceAndPath(MOD_ID, path);
+    public static Identifier id(String path) {
+        return Identifier.fromNamespaceAndPath(MOD_ID, path);
     }
 
     public static String translationKey(String suffix) {

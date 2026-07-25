@@ -8,9 +8,7 @@ import io.wispforest.owo.particles.ClientParticles;
 import io.wispforest.owo.serialization.CodecUtils;
 import io.wispforest.owo.serialization.endec.MinecraftEndecs;
 import net.minecraft.ChatFormatting;
-import net.minecraft.block.*;
-import net.minecraft.block.entity.*;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.*;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -25,10 +23,8 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
-import net.minecraft.world.level.block.state.BlockBehaviour.Properties;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
-import net.minecraft.state.property.*;
 import net.minecraft.util.*;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
@@ -47,16 +43,16 @@ public class ForgeControllerBlock extends BaseEntityBlock {
     public static final BooleanProperty LIT = BlockStateProperties.LIT;
     public static final EnumProperty<Direction> FACING = BlockStateProperties.HORIZONTAL_FACING;
 
-    public final ResourceLocation forgeDefinitionId;
+    public final Identifier forgeDefinitionId;
 
-    public ForgeControllerBlock(ResourceLocation forgeDefinitionId, Properties settings) {
+    public ForgeControllerBlock(Identifier forgeDefinitionId, Properties settings) {
         super(settings);
 
         this.forgeDefinitionId = forgeDefinitionId;
         this.registerDefaultState(this.getStateDefinition().any().setValue(LIT, false));
     }
 
-    public static ForgeControllerBlock of(ResourceLocation forgeDefinitionId, ResourceLocation blockId) {
+    public static ForgeControllerBlock of(Identifier forgeDefinitionId, Identifier blockId) {
         return new ForgeControllerBlock(forgeDefinitionId, Properties.ofFullCopy(Blocks.BLACKSTONE).setId(ResourceKey.create(Registries.BLOCK, blockId)));
     }
 
@@ -82,7 +78,7 @@ public class ForgeControllerBlock extends BaseEntityBlock {
         }
 
         if (!controller.verifyMultiblock()) {
-            player.displayClientMessage(AlloyForgery.translation("message", "invalid_multiblock").withStyle(ChatFormatting.GRAY), true);
+            player.sendOverlayMessage(AlloyForgery.translation("message", "invalid_multiblock").withStyle(ChatFormatting.GRAY));
             return InteractionResult.SUCCESS;
         }
 

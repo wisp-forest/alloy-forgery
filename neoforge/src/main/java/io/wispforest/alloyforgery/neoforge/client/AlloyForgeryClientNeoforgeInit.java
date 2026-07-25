@@ -7,7 +7,7 @@ import io.wispforest.alloyforgery.neoforge.utils.NeoforgeGeneralPlatformUtils;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.server.packs.PackType;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
@@ -35,14 +35,14 @@ public class AlloyForgeryClientNeoforgeInit {
                 }
 
                 @Override
-                public NeoforgeGeneralPlatformUtils.ReloadListenerRegistration addListener(ResourceLocation id, PreparableReloadListener listener) {
+                public NeoforgeGeneralPlatformUtils.ReloadListenerRegistration addListener(Identifier id, PreparableReloadListener listener) {
                     event.addListener(id, listener);
 
                     return this;
                 }
 
                 @Override
-                public NeoforgeGeneralPlatformUtils.ReloadListenerRegistration addDependency(ResourceLocation id, Collection<ResourceLocation> dependencies) {
+                public NeoforgeGeneralPlatformUtils.ReloadListenerRegistration addDependency(Identifier id, Collection<Identifier> dependencies) {
                     for (var dependency : dependencies) {
                         event.addDependency(dependency, id);
                     }

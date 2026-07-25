@@ -7,9 +7,10 @@ import io.wispforest.alloyforgery.utils.GeneralPlatformUtils;
 import io.wispforest.endec.Endec;
 import io.wispforest.endec.impl.KeyedEndec;
 import io.wispforest.owo.ops.ItemOps;
-import io.wispforest.owo.util.ImplementedInventory;
+import io.wispforest.owo.util.ImplementedContainer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -20,9 +21,7 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.WorldlyContainer;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.crafting.RecipeHolder;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.server.level.ServerPlayer;
@@ -31,10 +30,8 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.Containers;
 import net.minecraft.core.NonNullList;
-import net.minecraft.util.math.*;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 import io.wispforest.alloyforgery.AlloyForgeScreenHandler;
@@ -47,7 +44,7 @@ import io.wispforest.alloyforgery.utils.ExtObservable;
 import java.util.*;
 
 @SuppressWarnings("UnstableApiUsage")
-public class ForgeControllerBlockEntity extends BlockEntity implements ImplementedInventory, WorldlyContainer, MenuProvider {
+public class ForgeControllerBlockEntity extends BlockEntity implements ImplementedContainer, WorldlyContainer, MenuProvider {
 
     private static final int[] DOWN_SLOTS = new int[]{10, 11};
     private static final Integer[] RIGHT_SLOTS = new Integer[]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
@@ -69,7 +66,7 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
 
     private final FluidStorage fluidHolder = GeneralPlatformUtils.INSTANCE.createStorage(this);
 
-    private final ResourceLocation forgeDefinitionId;
+    private final Identifier forgeDefinitionId;
     private final ImmutableList<BlockPos> multiblockPositions;
     private final Direction facing;
 
@@ -197,7 +194,7 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
 
     @Override
     public void setItem(int slot, ItemStack stack) {
-        ImplementedInventory.super.setItem(slot, stack);
+        ImplementedContainer.super.setItem(slot, stack);
 
         this.setChanged();
     }
@@ -311,7 +308,7 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
             this.currentSmeltTime++;
             this.fuel -= fuelRequirement;
 
-            if (this.level.random.nextDouble() > 0.75) {
+            if (this.level.getRandom().nextDouble() > 0.75) {
                 AlloyForgery.FORGE_PARTICLES.spawn(this.level, Vec3.atLowerCornerOf(this.worldPosition), this.facing);
             }
         } else {

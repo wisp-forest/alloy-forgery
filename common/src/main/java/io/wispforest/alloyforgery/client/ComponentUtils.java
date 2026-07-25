@@ -1,38 +1,33 @@
 package io.wispforest.alloyforgery.client;
 
-import com.mojang.blaze3d.pipeline.RenderPipeline;
 import io.wispforest.alloyforgery.AlloyForgery;
 import io.wispforest.owo.ui.component.ButtonComponent;
 import io.wispforest.owo.ui.container.FlowLayout;
-import io.wispforest.owo.ui.core.Component;
-import io.wispforest.owo.ui.core.HorizontalAlignment;
-import io.wispforest.owo.ui.core.Insets;
-import io.wispforest.owo.ui.core.Sizing;
+import io.wispforest.owo.ui.core.*;
 import io.wispforest.owo.ui.util.NinePatchTexture;
 import net.minecraft.client.renderer.RenderPipelines;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import java.util.List;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
-import static io.wispforest.owo.ui.container.Containers.horizontalFlow;
-import static io.wispforest.owo.ui.container.Containers.verticalFlow;
+import static io.wispforest.owo.ui.container.UIContainers.horizontalFlow;
+import static io.wispforest.owo.ui.container.UIContainers.verticalFlow;
 
 public class ComponentUtils {
     public static final ButtonComponent.Renderer BUTTON_RENDERER = createThemedButtonRenderer(AlloyForgery.CONFIG::darkModeTheme);
 
-    public static ResourceLocation themedTextureID(String suffix) {
+    public static Identifier themedTextureID(String suffix) {
         return themedTextureID(suffix, AlloyForgery.CONFIG::darkModeTheme);
     }
 
-    public static ResourceLocation themedTextureID(String suffix, Supplier<Boolean> isDarkMode) {
+    public static Identifier themedTextureID(String suffix, Supplier<Boolean> isDarkMode) {
         return AlloyForgery.id("textures/gui/theme/" + (isDarkMode.get() ? "dark" : "light") + "/" + suffix);
     }
 
-    public static ResourceLocation textureID(String suffix) {
+    public static Identifier textureID(String suffix) {
         return AlloyForgery.id("textures/gui/" + suffix);
     }
 
@@ -46,14 +41,14 @@ public class ComponentUtils {
         };
     }
 
-    private static ResourceLocation getBtnTexture(ButtonComponent btn, Supplier<Boolean> isDarkMode) {
+    private static Identifier getBtnTexture(ButtonComponent btn, Supplier<Boolean> isDarkMode) {
         var btnType = (btn.active() ? (btn.isHovered() ? "hovered" : "active") : "disabled");
         var themeType = isDarkMode.get() ? "dark" : "light";
 
         return AlloyForgery.id("theme/" + themeType + "/button/" + btnType);
     }
 
-    public static <T> Component makeInputSlots(List<T> entries, int paddingInset, Supplier<Boolean> isDarkMode, Function<T, Component> slotBuilder, Predicate<T> isSlotDisabled) {
+    public static <T> UIComponent makeInputSlots(List<T> entries, int paddingInset, Supplier<Boolean> isDarkMode, Function<T, UIComponent> slotBuilder, Predicate<T> isSlotDisabled) {
         return verticalFlow(Sizing.content(), Sizing.content())
             .<FlowLayout>configure(layout -> {
                 var inputSlots = entries.stream()

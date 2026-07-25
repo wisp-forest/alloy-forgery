@@ -1,7 +1,6 @@
 package io.wispforest.alloyforgery.recipe;
 
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Streams;
 import com.google.gson.JsonSyntaxException;
 import io.wispforest.alloyforgery.forges.ForgeTier;
 import io.wispforest.endec.Endec;
@@ -12,16 +11,13 @@ import it.unimi.dsi.fastutil.ints.Int2IntMap;
 import net.minecraft.core.*;
 import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.item.*;
-import net.minecraft.recipe.*;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.*;
-import net.minecraft.registry.*;
 import net.minecraft.tags.TagKey;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Tuple;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeSerializer;
@@ -54,7 +50,7 @@ public class AlloyForgeRecipe implements Recipe<AlloyForgeRecipeInput> {
      * Used for Recipes that were adapted to Alloy Forge Recipes instead of created from scratch.
      * Such serves as a holder for the original Identifier of the Recipe for Item Viewer Mods like REI and EMI
      */
-    private Optional<ResourceLocation> secondaryID = Optional.empty();
+    private Optional<Identifier> secondaryID = Optional.empty();
 
     private final Map<Ingredient, Integer> inputs;
     private ItemStack output;
@@ -75,17 +71,17 @@ public class AlloyForgeRecipe implements Recipe<AlloyForgeRecipeInput> {
         this.tierOverrides = ImmutableMap.copyOf(overrides);
     }
 
-    public AlloyForgeRecipe(Map<Ingredient, Integer> inputs, ItemStack output, int minForgeTier, int fuelPerTick, Map<OverrideRange, ItemStack> overrides, Optional<ResourceLocation> secondaryID) {
+    public AlloyForgeRecipe(Map<Ingredient, Integer> inputs, ItemStack output, int minForgeTier, int fuelPerTick, Map<OverrideRange, ItemStack> overrides, Optional<Identifier> secondaryID) {
         this(Optional.empty(), inputs, output, minForgeTier, fuelPerTick, overrides);
 
         this.secondaryID = secondaryID;
     }
 
-    public Optional<ResourceLocation> secondaryID() {
+    public Optional<Identifier> secondaryID() {
         return this.secondaryID;
     }
 
-    public void finishRecipe(HolderGetter.Provider registryLookup, PendingRecipeData pendingData, Function<AlloyForgeRecipe, ResourceLocation> lookup) {
+    public void finishRecipe(HolderGetter.Provider registryLookup, PendingRecipeData pendingData, Function<AlloyForgeRecipe, Identifier> lookup) {
         if (pendingData.defaultTag() != null) {
             final var itemEntryList = registryLookup.lookupOrThrow(Registries.ITEM).get(pendingData.defaultTag().getA());
 
@@ -196,7 +192,7 @@ public class AlloyForgeRecipe implements Recipe<AlloyForgeRecipeInput> {
     // Attempt to test if the passed inventory is a Controller to try and get the forgeTier
     // Better to use the getOutput though other means rather than this if not a controller
     @Override
-    public ItemStack assemble(AlloyForgeRecipeInput input, net.minecraft.core.HolderLookup.Provider lookup) {
+    public ItemStack assemble(AlloyForgeRecipeInput input, HolderLookup.Provider lookup) {
         return (input.inventory() instanceof ForgeControllerBlockEntity controller)
             ? getResult(controller.forgeTier().value())
             : getBaseResult();
@@ -209,7 +205,7 @@ public class AlloyForgeRecipe implements Recipe<AlloyForgeRecipeInput> {
 
     @Nullable
     public static NonNullList<ItemStack> gatherRemainders(RecipeHolder<AlloyForgeRecipe> recipeEntry, AlloyForgeRecipeInput input) {
-        final var id = recipeEntry.id().location();
+        final var id = recipeEntry.id().identifier();
         final var recipe = recipeEntry.value();
         final var remainders = NonNullList.withSize(input.size(), ItemStack.EMPTY);
         //noinspection UnstableApiUsage
@@ -294,7 +290,7 @@ public class AlloyForgeRecipe implements Recipe<AlloyForgeRecipeInput> {
     public static class Type implements RecipeType<AlloyForgeRecipe> {
         private Type() {}
 
-        public static final ResourceLocation ID = AlloyForgery.id("forging");
+        public static final Identifier ID = AlloyForgery.id("forging");
         public static final Type INSTANCE = new Type();
     }
 

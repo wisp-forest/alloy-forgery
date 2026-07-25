@@ -10,16 +10,16 @@ import net.minecraft.world.item.Item;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.tags.TagKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import io.wispforest.alloyforgery.utils.EndecUtils;
 
 import java.util.List;
 
-public record OutputData(Integer count, DataComponentPatch components, @Nullable Item outputItem, @Nullable List<ResourceLocation> items, @Nullable TagKey<Item> defaultTag) {
+public record OutputData(Integer count, DataComponentPatch components, @Nullable Item outputItem, @Nullable List<Identifier> items, @Nullable TagKey<Item> defaultTag) {
 
-    public OutputData(Integer count, @Nullable Item outputItem, @Nullable List<ResourceLocation> items, @Nullable TagKey<Item> defaultTag) {
+    public OutputData(Integer count, @Nullable Item outputItem, @Nullable List<Identifier> items, @Nullable TagKey<Item> defaultTag) {
         this(count, DataComponentPatch.EMPTY, outputItem, items, defaultTag);
     }
 

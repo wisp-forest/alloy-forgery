@@ -1,7 +1,7 @@
 package io.wispforest.alloyforgery.pond;
 
 import net.minecraft.world.item.crafting.Recipe;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import io.wispforest.alloyforgery.data.RecipeTagLoader;
 import io.wispforest.alloyforgery.mixin.RecipeHolderMixin;
 
@@ -11,7 +11,7 @@ import io.wispforest.alloyforgery.mixin.RecipeHolderMixin;
  */
 public interface RecipeTagHelper {
 
-    default boolean isIn(ResourceLocation tag) {
+    default boolean isIn(Identifier tag) {
         throw new UnsupportedOperationException("RecipeTagHelper 'isIn' method not implememnted!");
     }
 }

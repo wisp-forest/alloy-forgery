@@ -4,10 +4,8 @@ import com.google.common.collect.Maps;
 import com.mojang.logging.LogUtils;
 import net.minecraft.tags.TagEntry;
 import net.minecraft.tags.TagLoader;
-import net.minecraft.tags.TagLoader.EntryWithSource;
-import net.minecraft.tags.TagLoader.SortingEntry;
 import net.minecraft.util.DependencySorter;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Tuple;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -24,7 +22,7 @@ public class DelayedTagGroupLoader<T> extends TagLoader<T> {
 
     private static final Logger LOGGER = LogUtils.getLogger();
 
-    private Function<ResourceLocation, Optional<? extends T>> registryGetter = null;
+    private Function<Identifier, Optional<? extends T>> registryGetter = null;
     private final String dataType;
 
     public DelayedTagGroupLoader(String dataType) {
@@ -33,7 +31,7 @@ public class DelayedTagGroupLoader<T> extends TagLoader<T> {
         this.dataType = dataType;
     }
 
-    public DelayedTagGroupLoader<T> setGetter(Function<ResourceLocation, Optional<? extends T>> registryGetter) {
+    public DelayedTagGroupLoader<T> setGetter(Function<Identifier, Optional<? extends T>> registryGetter) {
         this.registryGetter = registryGetter;
 
         return this;
@@ -56,26 +54,26 @@ public class DelayedTagGroupLoader<T> extends TagLoader<T> {
     // Copy to vanilla but checks if this versions registeryGetter is set and adjusts
     // error handling to log the error without throwing the entire tag out
     @Override
-    public Map<ResourceLocation, List<T>> build(Map<ResourceLocation, List<EntryWithSource>> tags) {
+    public Map<Identifier, List<T>> build(Map<Identifier, List<EntryWithSource>> tags) {
         if (registryGetter == null)
             throw new RuntimeException("DelayedTagGroupLoader did not have the required registeryGetter set to resolve! [Type: " + this.dataType + "]");
 
-        final Map<ResourceLocation, List<T>> map = Maps.newHashMap();
+        final Map<Identifier, List<T>> map = Maps.newHashMap();
 
         TagEntry.Lookup<T> valueGetter = new TagEntry.Lookup<>() {
             @Override
-            public @Nullable T element(ResourceLocation id, boolean required) {
+            public @Nullable T element(Identifier id, boolean required) {
                 return registryGetter.apply(id).orElse(null);
             }
 
             @Nullable
             @Override
-            public Collection<T> tag(ResourceLocation id) {
+            public Collection<T> tag(Identifier id) {
                 return map.get(id);
             }
         };
 
-        DependencySorter<ResourceLocation, SortingEntry> dependencyTracker = new DependencySorter<>();
+        DependencySorter<Identifier, SortingEntry> dependencyTracker = new DependencySorter<>();
 
         tags.forEach((id, entries) -> dependencyTracker.addEntry(id, new SortingEntry(entries)));
 

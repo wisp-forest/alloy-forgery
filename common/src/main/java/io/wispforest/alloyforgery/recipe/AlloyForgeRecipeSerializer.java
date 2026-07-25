@@ -5,8 +5,9 @@ import io.wispforest.endec.impl.StructEndecBuilder;
 import io.wispforest.owo.serialization.EndecRecipeSerializer;
 import io.wispforest.owo.serialization.endec.MinecraftEndecs;
 import io.wispforest.alloyforgery.utils.EndecUtils;
+import net.minecraft.world.item.crafting.RecipeSerializer;
 
-public class AlloyForgeRecipeSerializer extends EndecRecipeSerializer<AlloyForgeRecipe> {
+public class AlloyForgeRecipeSerializer {
 
     public static final StructEndec<AlloyForgeRecipe> RECIPE_ENDEC = new StructEndec<>() {
         @Override
@@ -37,9 +38,5 @@ public class AlloyForgeRecipeSerializer extends EndecRecipeSerializer<AlloyForge
             )
         );
 
-    public static final AlloyForgeRecipeSerializer INSTANCE = new AlloyForgeRecipeSerializer(RECIPE_ENDEC, ENDEC);
-
-    protected AlloyForgeRecipeSerializer(StructEndec<AlloyForgeRecipe> endec, Endec<AlloyForgeRecipe> networkEndec) {
-        super(endec, networkEndec);
-    }
+    public static final RecipeSerializer<AlloyForgeRecipe> INSTANCE = EndecRecipeSerializer.create(RECIPE_ENDEC, ENDEC);
 }

@@ -9,19 +9,15 @@ import io.wispforest.alloyforgery.recipe.AlloyForgeRecipe;
 import io.wispforest.alloyforgery.recipe.OutputData;
 import io.wispforest.alloyforgery.recipe.RawAlloyForgeRecipe;
 import io.wispforest.alloyforgery.utils.GeneralPlatformUtils;
-import net.minecraft.advancement.*;
 import net.minecraft.advancements.Advancement;
 import net.minecraft.advancements.AdvancementRequirements.Strategy;
-import net.minecraft.advancements.AdvancementRewards;
 import net.minecraft.advancements.Criterion;
-import net.minecraft.advancements.critereon.RecipeUnlockedTrigger;
+import net.minecraft.advancements.criterion.RecipeUnlockedTrigger;
 import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.data.recipes.RecipeBuilder;
 import net.minecraft.data.recipes.RecipeOutput;
-import net.minecraft.item.*;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -29,7 +25,7 @@ import net.minecraft.core.HolderGetter;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.tags.TagKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.ItemLike;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -58,7 +54,7 @@ public class AlloyForgeryRecipeBuilder implements RecipeBuilder {
 
     private final Map<AlloyForgeRecipe.OverrideRange, AlloyForgeRecipe.PendingOverride> ranges = new LinkedHashMap<>();
 
-    private final List<ResourceLocation> priorities = new ArrayList<>();
+    private final List<Identifier> priorities = new ArrayList<>();
 
     private int minimumTier = 1;
     private int fuelPerTick = 5;
@@ -91,14 +87,14 @@ public class AlloyForgeryRecipeBuilder implements RecipeBuilder {
     //--------------------------------------------------------------------
 
     public AlloyForgeryRecipeBuilder addPriorityOutput(ItemLike... outputs) {
-        return this.addPriorityOutput(Arrays.stream(outputs).map(output -> BuiltInRegistries.ITEM.getKey(output.asItem())).toArray(ResourceLocation[]::new));
+        return this.addPriorityOutput(Arrays.stream(outputs).map(output -> BuiltInRegistries.ITEM.getKey(output.asItem())).toArray(Identifier[]::new));
     }
 
-    public AlloyForgeryRecipeBuilder addPriorityOutput(ResourceLocation... outputId) {
+    public AlloyForgeryRecipeBuilder addPriorityOutput(Identifier... outputId) {
         return addPriorityOutput(List.of(outputId));
     }
 
-    public AlloyForgeryRecipeBuilder addPriorityOutput(List<ResourceLocation> outputIds) {
+    public AlloyForgeryRecipeBuilder addPriorityOutput(List<Identifier> outputIds) {
         priorities.addAll(outputIds);
         return this;
     }
@@ -193,16 +189,15 @@ public class AlloyForgeryRecipeBuilder implements RecipeBuilder {
     }
 
     @Override
-    public Item getResult() {
-        //TODO: Maybe not air, idk
-        return Items.AIR;
+    public ResourceKey<Recipe<?>> defaultId() {
+        return null;
     }
 
     @Override
     public void save(RecipeOutput exporter, ResourceKey<Recipe<?>> recipeId) {
-        var advancementId = ResourceLocation.fromNamespaceAndPath(recipeId.location().getNamespace(), "recipes/" + AlloyForgery.MOD_ID + "/" + recipeId.location().getPath());
+        var advancementId = Identifier.fromNamespaceAndPath(recipeId.identifier().getNamespace(), "recipes/" + AlloyForgery.MOD_ID + "/" + recipeId.identifier().getPath());
 
-        this.validate(recipeId.location());
+        this.validate(recipeId.identifier());
 
         Advancement.Builder builder = exporter.advancement()
                 .addCriterion("has_the_recipe", RecipeUnlockedTrigger.unlocked(recipeId))
@@ -227,7 +222,7 @@ public class AlloyForgeryRecipeBuilder implements RecipeBuilder {
         exporter.accept(recipeId, recipe.generateRecipe(true), builder.build(advancementId));
     }
 
-    public void offerTo(RecipeOutput exporter, ResourceLocation recipeId) { //Consumer<RecipeJsonProvider> exporter
+    public void offerTo(RecipeOutput exporter, Identifier recipeId) { //Consumer<RecipeJsonProvider> exporter
         save(exporter, ResourceKey.create(Registries.RECIPE, recipeId));
     }
 
@@ -238,7 +233,7 @@ public class AlloyForgeryRecipeBuilder implements RecipeBuilder {
 
     @Override
     public void save(RecipeOutput exporter, String recipePath) {
-        ResourceLocation identifier2 = ResourceLocation.parse(recipePath);
+        Identifier identifier2 = Identifier.parse(recipePath);
 
         if (identifier2.equals(this.getOutputId())) {
             throw new IllegalStateException("Recipe " + recipePath + " should remove its 'save' argument as it is equal to default one");
@@ -256,7 +251,7 @@ public class AlloyForgeryRecipeBuilder implements RecipeBuilder {
         save(exporter, recipePath);
     }
 
-    public void validate(ResourceLocation recipeId) {
+    public void validate(Identifier recipeId) {
         if (this.advancementBuilder.isEmpty()) {
             throw new IllegalStateException("No way of obtaining recipe " + recipeId);
         } else if (this.inputs.isEmpty()) {
@@ -264,7 +259,7 @@ public class AlloyForgeryRecipeBuilder implements RecipeBuilder {
         }
     }
 
-    private ResourceLocation getOutputId() {
+    private Identifier getOutputId() {
         return (outputTag != null) ? outputTag.location() : BuiltInRegistries.ITEM.getKey(outputItem.asItem());
     }
 

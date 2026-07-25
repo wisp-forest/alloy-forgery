@@ -15,7 +15,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.RegistryOps;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.GsonHelper;
 import org.jetbrains.annotations.ApiStatus;
 import org.slf4j.Logger;
@@ -42,16 +42,16 @@ public record ForgeDefinition(Block material, ImmutableList<Block> additionalMat
         }
     );
 
-    public Optional<ResourceLocation> id() {
+    public Optional<Identifier> id() {
         return ForgeRegistry.getId(this);
     }
 
     @ApiStatus.Internal
-    public static final Map<ResourceLocation, ForgeTier> legacyForgeDefinitionIdToTier = new HashMap<>();
+    public static final Map<Identifier, ForgeTier> legacyForgeDefinitionIdToTier = new HashMap<>();
 
     @Deprecated
     @ApiStatus.Internal
-    public static void loadAndEnqueue(ResourceLocation id, JsonObject json) {
+    public static void loadAndEnqueue(Identifier id, JsonObject json) {
         LOGGER.warn("A given Forge Definition '{}' has been loaded though a deprecated manor, please bug the author to switch over to the new system.", id);
         final int forgeTier = GsonHelper.getAsInt(json, "tier");
         final float speedMultiplier = GsonHelper.getAsFloat(json, "speed_multiplier", 1);
@@ -62,16 +62,16 @@ public record ForgeDefinition(Block material, ImmutableList<Block> additionalMat
 
         legacyForgeDefinitionIdToTier.put(id, tier);
 
-        final var mainMaterialId = ResourceLocation.tryParse(GsonHelper.getAsString(json, "material"));
+        final var mainMaterialId = Identifier.tryParse(GsonHelper.getAsString(json, "material"));
 
-        final var additionalMaterialIds = new ArrayList<ResourceLocation>();
-        GsonHelper.getAsJsonArray(json, "additional_materials", new JsonArray()).forEach(jsonElement -> additionalMaterialIds.add(ResourceLocation.tryParse(jsonElement.getAsString())));
+        final var additionalMaterialIds = new ArrayList<Identifier>();
+        GsonHelper.getAsJsonArray(json, "additional_materials", new JsonArray()).forEach(jsonElement -> additionalMaterialIds.add(Identifier.tryParse(jsonElement.getAsString())));
 
         loadAndEnqueue(id, new RawForgeDefinition(mainMaterialId, additionalMaterialIds, false));
     }
 
     @ApiStatus.Internal
-    private static void loadAndEnqueue(ResourceLocation id, RawForgeDefinition rawForgeDefinition) {
+    private static void loadAndEnqueue(Identifier id, RawForgeDefinition rawForgeDefinition) {
         final var action = ComplexRegistryAction.Builder.create(() -> {
             final var mainMaterial = BuiltInRegistries.BLOCK.getValue(rawForgeDefinition.materialId());
             final var additionalMaterialsBuilder = new ImmutableList.Builder<Block>();
@@ -111,7 +111,7 @@ public record ForgeDefinition(Block material, ImmutableList<Block> additionalMat
             }
             """;
 
-    public JsonElement generateRecipe(ResourceLocation id) {
+    public JsonElement generateRecipe(Identifier id) {
         String recipe = RECIPE_PATTERN.replace("{material}", BuiltInRegistries.ITEM.getKey(material.asItem()).toString());
         recipe = recipe.replace("{controller}", BuiltInRegistries.ITEM.getKey(ForgeRegistry.getControllerBlock(id).get().asItem()).toString());
 
@@ -154,7 +154,7 @@ public record ForgeDefinition(Block material, ImmutableList<Block> additionalMat
         });
     }
 
-    private record RawForgeDefinition(ResourceLocation materialId, List<ResourceLocation> additionalMaterialIds, boolean isBlockEntity) {
+    private record RawForgeDefinition(Identifier materialId, List<Identifier> additionalMaterialIds, boolean isBlockEntity) {
         public static final StructEndec<RawForgeDefinition> ENDEC = StructEndecBuilder.of(
             MinecraftEndecs.IDENTIFIER.fieldOf("material", RawForgeDefinition::materialId),
             MinecraftEndecs.IDENTIFIER.listOf().optionalFieldOf("additional_materials", RawForgeDefinition::additionalMaterialIds, List.of()),
@@ -162,7 +162,7 @@ public record ForgeDefinition(Block material, ImmutableList<Block> additionalMat
             RawForgeDefinition::new
         );
 
-        public List<ResourceLocation> blockIds() {
+        public List<Identifier> blockIds() {
             var list = new ArrayList<>(additionalMaterialIds);
             list.addFirst(materialId);
             return list;

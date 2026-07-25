@@ -33,7 +33,7 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.common.crafting.DataComponentIngredient;
 import net.neoforged.neoforge.network.IContainerFactory;
@@ -109,10 +109,10 @@ public class NeoforgeGeneralPlatformUtils implements GeneralPlatformUtils {
 
     //--
 
-    private static final Map<PackType, Map<ResourceLocation, EndecDataLoader<?>>> LOADER_MAP = new HashMap<>();
+    private static final Map<PackType, Map<Identifier, EndecDataLoader<?>>> LOADER_MAP = new HashMap<>();
 
     @Override
-    public void registerLoader(ResourceLocation id, PackType packType, EndecDataLoader<?> loader, boolean requiresRegistries) {
+    public void registerLoader(Identifier id, PackType packType, EndecDataLoader<?> loader, boolean requiresRegistries) {
         var map = LOADER_MAP.computeIfAbsent(packType, resourceType -> new LinkedHashMap<>());
 
         if (map.containsKey(id)) {
@@ -141,9 +141,9 @@ public class NeoforgeGeneralPlatformUtils implements GeneralPlatformUtils {
             throw new IllegalStateException("Unable to get DynamicRegistryManager on the Client!");
         }
 
-        ReloadListenerRegistration addListener(ResourceLocation id, PreparableReloadListener listener);
+        ReloadListenerRegistration addListener(Identifier id, PreparableReloadListener listener);
 
-        ReloadListenerRegistration addDependency(ResourceLocation id, Collection<ResourceLocation> dependencies);
+        ReloadListenerRegistration addDependency(Identifier id, Collection<Identifier> dependencies);
     }
 
     //--
@@ -181,7 +181,7 @@ public class NeoforgeGeneralPlatformUtils implements GeneralPlatformUtils {
 
 
     private static boolean isFrozen = true;
-    private static final Map<ResourceLocation, ForgeRegistry.EntryHolder> REGISTERED_ENTRIES = new LinkedHashMap<>();
+    private static final Map<Identifier, ForgeRegistry.EntryHolder> REGISTERED_ENTRIES = new LinkedHashMap<>();
 
     public static void handleLoadedEntries() {
         if (!REGISTERED_ENTRIES.isEmpty()) {

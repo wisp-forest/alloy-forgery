@@ -9,7 +9,7 @@ import it.unimi.dsi.fastutil.Pair;
 import net.minecraft.world.item.Item;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.server.packs.PackType;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import io.wispforest.alloyforgery.AlloyForgery;
 import io.wispforest.alloyforgery.utils.data.EndecDataLoader;
 
@@ -25,7 +25,7 @@ public class ForgeFuelDataLoader {
         Pair::of
     );
 
-    public static final ResourceLocation LOADER_ID = AlloyForgery.id("forge_fuel_loader");
+    public static final Identifier LOADER_ID = AlloyForgery.id("forge_fuel_loader");
 
     public static void init() {
         EndecDataLoader.builder("alloy_forge_fuels", FUEL_ENTRY.listOf().structOf("fuels"))

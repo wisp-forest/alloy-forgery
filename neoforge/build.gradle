@@ -8,7 +8,8 @@ dependencies {
     implementation(project(":common"))
     minecraft "com.mojang:minecraft:${project.minecraft_version}"
     forgeUserdev "net.neoforged:neoforge:${project.neoforge_version}:userdev"
-    compileOnly("io.wispforest:owo-lib:${owo_lib_version}")
+    compileOnly("io.wispforest:owo-lib:${owo_lib_neo_version}")
+    //neoForgeInterfaceInjections("io.wispforest:owo-lib:${owo_lib_neo_version}")
 }
 
 configurations {

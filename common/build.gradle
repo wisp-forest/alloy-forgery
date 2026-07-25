@@ -11,7 +11,10 @@ dependencies {
     // https://github.com/neoforged/NeoForge/blob/26.1.x/gradle.properties#L37
     // https://github.com/FabricMC/fabric-loader/blob/master/gradle.properties#L12
     //compileOnly('net.fabricmc:sponge-mixin:0.17.3+mixin.0.8.7')
-    annotationProcessor compileOnly("io.github.llamalad7:mixinextras-common:${project.mixin_extras_version}")
+    annotationProcessor compileOnly("io.github.llamalad7:mixinextras-common:${mixin_extras_version}")
+    annotationProcessor implementation("io.wispforest:owo-lib:${owo_lib_version}") {
+        exclude "group": "net.fabricmc.fabric-api"
+    }
 }
 
 configurations {
@@ -25,6 +28,9 @@ configurations {
     }
 }
 
+loom {
+    accessWidenerPath = file("src/main/resources/alloy-forgery.accesswidener")
+}
 artifacts {
     commonJava sourceSets.main.java.sourceDirectories.singleFile
     commonResources sourceSets.main.resources.sourceDirectories.singleFile

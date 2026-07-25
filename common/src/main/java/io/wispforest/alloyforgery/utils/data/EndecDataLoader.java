@@ -17,7 +17,7 @@ import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
 import net.minecraft.resources.FileToIdConverter;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.PackType;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.profiling.ProfilerFiller;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
@@ -33,16 +33,16 @@ public abstract class EndecDataLoader<T> extends SimpleJsonResourceReloadListene
 
     protected final String type;
 
-    protected final ResourceLocation id;
+    protected final Identifier id;
     protected final Endec<T> endec;
 
-    protected final Set<ResourceLocation> dependencies;
+    protected final Set<Identifier> dependencies;
 
     protected final SerializationContext context;
 
     protected final boolean requiresRegistries;
 
-    private EndecDataLoader(ResourceLocation id, String type, Endec<T> endec, SerializationContext context, boolean requiresRegistries, Set<ResourceLocation> value) {
+    private EndecDataLoader(Identifier id, String type, Endec<T> endec, SerializationContext context, boolean requiresRegistries, Set<Identifier> value) {
         super(new DelayedRecursiveCodec<>(), FileToIdConverter.json(type));
 
         this.id = id;
@@ -65,7 +65,7 @@ public abstract class EndecDataLoader<T> extends SimpleJsonResourceReloadListene
 
         //--
 
-        protected final Set<ResourceLocation> dependencies = new HashSet<>();
+        protected final Set<Identifier> dependencies = new HashSet<>();
 
         protected SerializationContext context = SerializationContext.empty();
 
@@ -76,11 +76,11 @@ public abstract class EndecDataLoader<T> extends SimpleJsonResourceReloadListene
             this.endec = endec;
         }
 
-        public Builder<T> addDependencies(ResourceLocation...dependencies) {
+        public Builder<T> addDependencies(Identifier...dependencies) {
             return addDependencies(List.of(dependencies));
         }
 
-        public Builder<T> addDependencies(Collection<ResourceLocation> dependencies) {
+        public Builder<T> addDependencies(Collection<Identifier> dependencies) {
             this.dependencies.addAll(dependencies);
 
             return this;
@@ -98,10 +98,10 @@ public abstract class EndecDataLoader<T> extends SimpleJsonResourceReloadListene
             return this;
         }
 
-        public EndecDataLoader<T> create(ResourceLocation id, PackType packType, LoadedDataHandler<T> handler) {
+        public EndecDataLoader<T> create(Identifier id, PackType packType, LoadedDataHandler<T> handler) {
             var loader = new EndecDataLoader<T>(id, this.type, this.endec, this.context, this.requiresRegistries, this.dependencies) {
                 @Override
-                protected void apply(Map<ResourceLocation, T> prepared, ResourceManager manager, ProfilerFiller profiler) {
+                protected void apply(Map<Identifier, T> prepared, ResourceManager manager, ProfilerFiller profiler) {
                     handler.handleData(prepared, manager, profiler);
                 }
             };
@@ -112,11 +112,11 @@ public abstract class EndecDataLoader<T> extends SimpleJsonResourceReloadListene
         }
     }
 
-    public ResourceLocation getLoaderId() {
+    public Identifier getLoaderId() {
         return id;
     }
 
-    public Set<ResourceLocation> getDependencyIds() {
+    public Set<Identifier> getDependencyIds() {
         return dependencies;
     }
 
@@ -167,7 +167,7 @@ public abstract class EndecDataLoader<T> extends SimpleJsonResourceReloadListene
     }
 
     @Override
-    protected Map<ResourceLocation, T> prepare(ResourceManager resourceManager, ProfilerFiller profiler) {
+    protected Map<Identifier, T> prepare(ResourceManager resourceManager, ProfilerFiller profiler) {
         if (requiresRegistries && registries == null) {
             throw new IllegalStateException("Unable to prepare files as the given Registry access has not been setup on the server! [Id: " + this.getLoaderId() + "]");
         }
@@ -205,6 +205,6 @@ public abstract class EndecDataLoader<T> extends SimpleJsonResourceReloadListene
     }
 
     public interface LoadedDataHandler<T> {
-        void handleData(Map<ResourceLocation, T> data, ResourceManager manager, ProfilerFiller profiler);
+        void handleData(Map<Identifier, T> data, ResourceManager manager, ProfilerFiller profiler);
     }
 }

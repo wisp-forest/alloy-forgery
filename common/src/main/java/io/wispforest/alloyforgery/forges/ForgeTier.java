@@ -6,14 +6,14 @@ import io.wispforest.endec.impl.StructEndecBuilder;
 import io.wispforest.owo.serialization.endec.MinecraftEndecs;
 import net.minecraft.network.chat.Component;
 import net.minecraft.ChatFormatting;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import java.util.Optional;
 import java.util.function.Consumer;
 
 public final class ForgeTier {
 
-    public static final ResourceLocation DEFAULT_ID = AlloyForgery.id("default");
+    public static final Identifier DEFAULT_ID = AlloyForgery.id("default");
     public static final ForgeTier DEFAULT = new ForgeTier(DEFAULT_ID, 1, 1f, 48000);
 
     public static final Endec<ForgeTier> ENDEC = StructEndecBuilder.of(
@@ -27,13 +27,13 @@ public final class ForgeTier {
 
     public static final int BASE_MAX_SMELT_TIME = 200;
 
-    private final ResourceLocation id;
+    private final Identifier id;
     private final int value;
     private final float speedMultiplier;
     private final float fuelConsumptionMultiplier;
     private final int fuelCapacity;
 
-    public ForgeTier(ResourceLocation id, int value, float speedMultiplier, float fuelConsumptionMultiplier, int fuelCapacity) {
+    public ForgeTier(Identifier id, int value, float speedMultiplier, float fuelConsumptionMultiplier, int fuelCapacity) {
         this.id = id;
         this.value = value;
         this.speedMultiplier = speedMultiplier;
@@ -41,16 +41,16 @@ public final class ForgeTier {
         this.fuelCapacity = fuelCapacity;
     }
 
-    public ForgeTier(ResourceLocation id, int value, float speedMultiplier, int fuelCapacity) {
+    public ForgeTier(Identifier id, int value, float speedMultiplier, int fuelCapacity) {
         this(id, value, speedMultiplier, speedMultiplier, fuelCapacity);
     }
 
     @Deprecated(forRemoval = true)
-    public ForgeTier(ResourceLocation id, int forgeTier, float speedMultiplier, int fuelCapacity, Optional<Integer> maxSmeltTime) {
+    public ForgeTier(Identifier id, int forgeTier, float speedMultiplier, int fuelCapacity, Optional<Integer> maxSmeltTime) {
         this(id, forgeTier, maxSmeltTime.map(integer -> integer / (float) BASE_MAX_SMELT_TIME).orElse(speedMultiplier), speedMultiplier, fuelCapacity);
     }
 
-    public ResourceLocation id() {
+    public Identifier id() {
         return id;
     }
 

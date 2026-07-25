@@ -19,13 +19,12 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.recipe.*;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
@@ -73,7 +72,7 @@ public interface GeneralPlatformUtils {
 
     //--
 
-    void registerLoader(ResourceLocation id, PackType packType, EndecDataLoader<?> loader, boolean requiresRegistries);
+    void registerLoader(Identifier id, PackType packType, EndecDataLoader<?> loader, boolean requiresRegistries);
 
     //--
 

@@ -29,7 +29,7 @@ import net.minecraft.server.packs.PackType;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.Level;
 
 import java.util.ArrayList;
@@ -87,7 +87,7 @@ public final class FabricGeneralPlatformUtils implements GeneralPlatformUtils {
     //--
 
     @Override
-    public void registerLoader(ResourceLocation id, PackType packType, EndecDataLoader<?> loader, boolean requiresRegistries) {
+    public void registerLoader(Identifier id, PackType packType, EndecDataLoader<?> loader, boolean requiresRegistries) {
         if (requiresRegistries) {
             loader.setRegistryGetter(store -> store.get(ResourceLoader.RELOADER_REGISTRY_LOOKUP_KEY));
         }
