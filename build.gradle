@@ -1,0 +1,53 @@
+plugins {
+    id 'maven-publish'
+    id 'org.relativitymc.neo-loom' version '1.17-SNAPSHOT' apply false
+    id 'com.gradleup.shadow' version '9.3.0' apply false
+}
+
+publishing {
+    // TODO
+}
+
+subprojects {
+    apply plugin: 'java'
+
+    group = "io.wispforest"
+
+    java.toolchain.languageVersion = JavaLanguageVersion.of(25)
+
+    repositories {
+        mavenCentral()
+        maven {
+            name = "Terraformers (Mod Menu)"
+            url = "https://maven.terraformersmc.com/"
+        }
+        maven {
+            name = "Wisp Forest Maven"
+            url = "https://maven.wispforest.io/releases"
+        }
+        maven {
+            name = "Jitpack"
+            url = "https://jitpack.io"
+        }
+        exclusiveContent {
+            forRepository {
+                maven {
+                    name = "Modrinth"
+                    url = "https://api.modrinth.com/maven"
+                }
+            }
+            filter {
+                includeGroup "maven.modrinth"
+            }
+        }
+    }
+
+    tasks.withType(JavaCompile).configureEach {
+        it.options.encoding = "UTF-8"
+        it.options.release.set(25)
+    }
+
+    java {
+        withSourcesJar()
+    }
+}

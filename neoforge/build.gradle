@@ -1,0 +1,22 @@
+plugins {
+    id 'multiloader-loader'
+    id 'org.relativitymc.neo-loom'
+    id 'com.gradleup.shadow'
+}
+
+dependencies {
+    implementation(project(":common"))
+    minecraft "com.mojang:minecraft:${project.minecraft_version}"
+    forgeUserdev "net.neoforged:neoforge:${project.neoforge_version}:userdev"
+    compileOnly("io.wispforest:owo-lib:${owo_lib_version}")
+}
+
+configurations {
+    shadow
+}
+
+loom {
+    accessWidenerPath = project(":common").file("src/main/resources/alloy-forgery.accesswidener")
+}
+
+sourceSets.main.resources { srcDir 'src/generated/resources' }

@@ -1,0 +1,18 @@
+plugins {
+    id 'multiloader-loader'
+    id 'org.relativitymc.neo-loom'
+}
+dependencies {
+    minecraft "com.mojang:minecraft:${project.minecraft_version}"
+    implementation("net.fabricmc:fabric-loader:${fabric_loader_version}")
+    implementation("net.fabricmc.fabric-api:fabric-api:${fabric_version}")
+    runtimeOnly compileOnly("com.terraformersmc:modmenu:${modmenu_version}")
+    implementation("io.wispforest:owo-lib:${owo_lib_version}")
+}
+
+loom {
+    def aw = project(':common').file("src/main/resources/alloy-forgery.accesswidener")
+    if (aw.exists()) {
+        accessWidenerPath.set(aw)
+    }
+}
