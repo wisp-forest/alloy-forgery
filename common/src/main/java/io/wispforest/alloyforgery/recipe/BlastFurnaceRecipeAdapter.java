@@ -49,8 +49,6 @@ public class BlastFurnaceRecipeAdapter implements RecipeInjector.AddRecipes {
     public void addRecipes(RecipeInjector instance) {
         if (!AlloyForgery.CONFIG.allowBlastingFurnaceAdaption()) return;
 
-        var manager = instance.manager();
-
         Collection<RecipeHolder<AlloyForgeRecipe>> alloyForgeryRecipes = instance.getAllOfType(AlloyForgeRecipe.Type.INSTANCE);
 
         for (RecipeHolder<BlastingRecipe> recipeEntry : instance.getAllOfType(RecipeType.BLASTING)) {
@@ -66,7 +64,7 @@ public class BlastFurnaceRecipeAdapter implements RecipeInjector.AddRecipes {
                 path = path.replace("blasting", "forging");
             }
 
-            var mainOutput = ((SingleItemRecipeAccessor)recipe).result().copy();
+            var mainOutput = ((SingleItemRecipeAccessor)recipe).result().create();
 
             mainOutput.setCount(AlloyForgery.CONFIG.baseInputAmount());
 
@@ -83,7 +81,7 @@ public class BlastFurnaceRecipeAdapter implements RecipeInjector.AddRecipes {
             var recipeId = AlloyForgery.id(path);
 
             var convertRecipe = new AlloyForgeRecipe(
-                Map.of(recipe.placementInfo().ingredients().get(0), AlloyForgery.CONFIG.baseInputAmount()),
+                Map.of(recipe.placementInfo().ingredients().getFirst(), AlloyForgery.CONFIG.baseInputAmount()),
                 mainOutput,
                 1,
                 Math.round(getFuelPerTick(recipe)),
@@ -111,7 +109,7 @@ public class BlastFurnaceRecipeAdapter implements RecipeInjector.AddRecipes {
 
     // Checks if the given blast recipe has unique inputs to prevent overlapping recipes leading to confliction
     private static boolean isUniqueRecipe(RecipeInjector instance, Collection<RecipeHolder<AlloyForgeRecipe>> alloyForgeryRecipes, Recipe<?> blastRecipe) {
-        List<ItemStack> stacks = instance.getStacks(blastRecipe.placementInfo().ingredients().get(0));
+        List<ItemStack> stacks = instance.getStacks(blastRecipe.placementInfo().ingredients().getFirst());
 
         List<RecipeHolder<AlloyForgeRecipe>> matchedRecipes = alloyForgeryRecipes.stream()
             .filter(recipeEntry -> {
@@ -120,7 +118,7 @@ public class BlastFurnaceRecipeAdapter implements RecipeInjector.AddRecipes {
                 if (recipe.getIngredientsMap().size() > 1) return false;
 
                 for (ItemStack stack : stacks) {
-                    if (recipe.placementInfo().ingredients().get(0).test(stack)) {
+                    if (recipe.placementInfo().ingredients().getFirst().test(stack)) {
                         return true;
                     }
                 }
@@ -140,7 +138,7 @@ public class BlastFurnaceRecipeAdapter implements RecipeInjector.AddRecipes {
 
         var blastRecipe = blastingRecipeEntry.value();
 
-        List<ItemStack> stacks = instance.getStacks(blastRecipe.placementInfo().ingredients().get(0));
+        List<ItemStack> stacks = instance.getStacks(blastRecipe.placementInfo().ingredients().getFirst());
 
         for (ItemStack stack : stacks) {
             if (stack.is(DUSTS_TAG)) return true;

@@ -3,6 +3,7 @@ plugins {
     id 'org.relativitymc.neo-loom'
 }
 dependencies {
+    implementation(project(":common"))
     minecraft "com.mojang:minecraft:${project.minecraft_version}"
     implementation("net.fabricmc:fabric-loader:${fabric_loader_version}")
     implementation("net.fabricmc.fabric-api:fabric-api:${fabric_version}")
