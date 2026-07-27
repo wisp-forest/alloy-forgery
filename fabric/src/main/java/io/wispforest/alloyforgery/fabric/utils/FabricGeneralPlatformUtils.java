@@ -8,9 +8,9 @@ import io.wispforest.alloyforgery.forges.ForgeRegistry;
 import io.wispforest.alloyforgery.utils.FluidStorage;
 import io.wispforest.alloyforgery.utils.GeneralPlatformUtils;
 import io.wispforest.alloyforgery.utils.data.EndecDataLoader;
+import net.fabricmc.fabric.api.menu.v1.ExtendedMenuType;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
 import net.fabricmc.fabric.api.resource.v1.ResourceLoader;
-import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerType;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorageUtil;
 import net.fabricmc.fabric.impl.recipe.ingredient.builtin.ComponentsIngredient;
 import net.minecraft.world.item.crafting.*;
@@ -24,7 +24,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.recipe.*;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
@@ -39,7 +38,7 @@ import java.util.stream.Stream;
 public final class FabricGeneralPlatformUtils implements GeneralPlatformUtils {
     @Override
     public <T extends AbstractContainerMenu, D> MenuType<T> createScreenHandlerType(ExtendedFactory<T, D> factory, StreamCodec<? super RegistryFriendlyByteBuf, D> packetCodec) {
-        return new ExtendedScreenHandlerType<>(factory::create, packetCodec);
+        return new ExtendedMenuType<>(factory::create, packetCodec);
     }
 
     //--
@@ -51,7 +50,7 @@ public final class FabricGeneralPlatformUtils implements GeneralPlatformUtils {
 
     @Override
     public void addToBlockEntity(BlockEntityType<ForgeControllerBlockEntity> type, Block... blocks) {
-        for (var block : blocks) type.addSupportedBlock(block);
+        for (var block : blocks) type.addValidBlock(block);
     }
 
     //--
@@ -89,10 +88,10 @@ public final class FabricGeneralPlatformUtils implements GeneralPlatformUtils {
     @Override
     public void registerLoader(Identifier id, PackType packType, EndecDataLoader<?> loader, boolean requiresRegistries) {
         if (requiresRegistries) {
-            loader.setRegistryGetter(store -> store.get(ResourceLoader.RELOADER_REGISTRY_LOOKUP_KEY));
+            loader.setRegistryGetter(store -> store.get(ResourceLoader.REGISTRY_LOOKUP_KEY));
         }
 
-        ResourceLoader.get(packType).registerReloader(id, loader);
+        ResourceLoader.get(packType).registerReloadListener(id, loader);
     }
 
     //--

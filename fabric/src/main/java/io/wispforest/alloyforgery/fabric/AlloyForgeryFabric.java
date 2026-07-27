@@ -2,8 +2,8 @@ package io.wispforest.alloyforgery.fabric;
 
 import io.wispforest.alloyforgery.AlloyForgery;
 import io.wispforest.alloyforgery.block.ForgeControllerBlockEntity;
+import io.wispforest.alloyforgery.data.RecipeTagLoader;
 import io.wispforest.alloyforgery.forges.ForgeDefinition;
-import io.wispforest.alloyforgery.forges.ForgeRegistry;
 import io.wispforest.alloyforgery.forges.ForgeTierDataLoader;
 import io.wispforest.alloyforgery.networking.AlloyForgeNetworking;
 import io.wispforest.alloyforgery.utils.RecipeInjector;
@@ -11,17 +11,11 @@ import io.wispforest.owo.util.OwoFreezer;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
-import io.wispforest.alloyforgery.data.RecipeTagLoader;
-import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.fabricmc.fabric.api.resource.v1.ResourceLoader;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage;
-import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
-import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
-import net.fabricmc.fabric.api.transfer.v1.storage.base.InsertionOnlyStorage;
-import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
-import net.minecraft.server.packs.PackType;
 import net.minecraft.core.Direction;
+import net.minecraft.server.packs.PackType;
 
 public class AlloyForgeryFabric implements ModInitializer {
 
@@ -40,11 +34,11 @@ public class AlloyForgeryFabric implements ModInitializer {
 
         ServerLifecycleEvents.SERVER_STARTED.register(RecipeInjector::injectRecipes);
 
-        ResourceLoader.get(PackType.SERVER_DATA).registerReloader(RecipeTagLoader.ID, RecipeTagLoader.INSTANCE);
+        ResourceLoader.get(PackType.SERVER_DATA).registerReloadListener(RecipeTagLoader.ID, RecipeTagLoader.INSTANCE);
 
-        ItemStorage.SIDED.registerFallback((world, pos, state, blockEntity, context) -> {
-            if (context == Direction.DOWN && world.getBlockEntity(pos.above()) instanceof ForgeControllerBlockEntity froge){
-                return InventoryStorage.of(froge, Direction.DOWN);
+        ItemStorage.SIDED.registerFallback((level, pos, state, blockEntity, context) -> {
+            if (context == Direction.DOWN && level.getBlockEntity(pos.above()) instanceof ForgeControllerBlockEntity froge){
+                return ItemStorage.SIDED.find(level, pos, state, froge, Direction.DOWN);
             }
 
             return null;

@@ -15,6 +15,7 @@ dependencies {
     annotationProcessor implementation("io.wispforest:owo-lib:${owo_lib_version}") {
         exclude "group": "net.fabricmc.fabric-api"
     }
+    implementation(fabricApi.module("fabric-api-base", fabric_version))
 }
 
 configurations {

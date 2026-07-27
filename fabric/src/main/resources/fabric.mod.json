@@ -4,19 +4,16 @@
   "provides": [
     "alloy_forgery"
   ],
-  "version": "${mod_version}",
+  "version": "${version}",
   "name": "${mod_name}",
-  "description": "${mod_description}",
+  "description": "${description}",
   "authors": [
-    "${list_of_authors}"
+    "${authors}"
   ],
   "contributors": [
-    "${list_of_contributors}"
+    "${credits}"
   ],
-  "contact": {
-    "${contact_entry}": ""
-  },
-  "license": "${mod_license}",
+  "license": "${license}",
   "icon": "assets/${mod_id}/icon.png",
   "environment": "*",
   "entrypoints": {
@@ -28,12 +25,6 @@
     ],
     "fabric-datagen": [
       "io.wispforest.alloyforgery.fabric.data.AlloyForgeryData"
-    ],
-    "rei_common": [
-      "io.wispforest.alloyforgery.compat.rei.AlloyForgeryCommonPlugin"
-    ],
-    "rei_client": [
-      "io.wispforest.alloyforgery.compat.rei.AlloyForgeryClientPlugin"
     ]
   },
   "mixins": [
@@ -43,8 +34,8 @@
   "accessWidener": "${mod_id}.accesswidener",
   "depends": {
     "fabricloader": "${fabric_loader_version_range}",
-    "fabric-api": "${fabric_api_version_range}",
-    "minecraft": "${fabric_minecraft_version_range}",
+    "fabric-api": "${fabric_version_range}",
+    "minecraft": "${minecraft_version_range}",
     "owo": "${owo_fabric_version_range}"
   },
   "custom": {

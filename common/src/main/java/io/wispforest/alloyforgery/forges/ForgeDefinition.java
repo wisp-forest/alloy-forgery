@@ -11,8 +11,8 @@ import io.wispforest.endec.impl.StructEndecBuilder;
 import io.wispforest.owo.registration.ComplexRegistryAction;
 import io.wispforest.owo.registration.RegistryHelper;
 import io.wispforest.owo.serialization.endec.MinecraftEndecs;
+import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.RegistryOps;
 import net.minecraft.resources.Identifier;
@@ -140,8 +140,7 @@ public record ForgeDefinition(Block material, ImmutableList<Block> additionalMat
                 var id = forgeEntry.getKey();
 
                 try {
-                    var recipe = RecipeSerializer.SHAPED_RECIPE.codec()
-                            .codec()
+                    var recipe = ShapedRecipe.CODEC
                             .decode(RegistryOps.create(JsonOps.INSTANCE, instance.lookup()), forgeEntry.getValue().generateRecipe(id))
                             .getOrThrow(string -> new IllegalStateException("Unable to generate recipe for given ForgeDefinition [" + id + "]: " + string))
                             .getFirst();

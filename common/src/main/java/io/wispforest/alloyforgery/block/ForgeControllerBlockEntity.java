@@ -317,7 +317,7 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
             if (remainderList != null) this.handleForgingRemainders(remainderList);
 
             var outputStack = this.getItem(10);
-            var recipeOutput = recipe.assemble(recipeInput, this.level.registryAccess());
+            var recipeOutput = recipe.assemble(recipeInput);
 
             recipe.consumeIngredients(recipeInput);
 

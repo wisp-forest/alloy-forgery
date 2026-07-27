@@ -28,11 +28,9 @@ import org.jetbrains.annotations.Nullable;
 import io.wispforest.alloyforgery.AlloyForgery;
 import io.wispforest.alloyforgery.block.ForgeControllerBlockEntity;
 
-import java.lang.reflect.Array;
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -123,6 +121,16 @@ public class AlloyForgeRecipe implements Recipe<AlloyForgeRecipeInput> {
     }
 
     @Override
+    public boolean showNotification() {
+        return false;
+    }
+
+    @Override
+    public String group() {
+        return "";
+    }
+
+    @Override
     public boolean matches(AlloyForgeRecipeInput input, Level world) {
         return tryBind(input) != null;
     }
@@ -192,7 +200,7 @@ public class AlloyForgeRecipe implements Recipe<AlloyForgeRecipeInput> {
     // Attempt to test if the passed inventory is a Controller to try and get the forgeTier
     // Better to use the getOutput though other means rather than this if not a controller
     @Override
-    public ItemStack assemble(AlloyForgeRecipeInput input, HolderLookup.Provider lookup) {
+    public ItemStack assemble(AlloyForgeRecipeInput input) {
         return (input.inventory() instanceof ForgeControllerBlockEntity controller)
             ? getResult(controller.forgeTier().value())
             : getBaseResult();
@@ -221,7 +229,8 @@ public class AlloyForgeRecipe implements Recipe<AlloyForgeRecipeInput> {
             if (!owoRemainders.isEmpty()) {
                 if (!owoRemainders.containsKey(item)) continue;
 
-                remainders.set(i, owoRemainders.get(item).copy());
+                // FIXME - owo remainders no longer have any real item context
+                //remainders.set(i, new ItemStack(owoRemainders.get(item)));
 
                 setAnyRemainders = true;
             } else if (GLOBAL_REMAINDERS.containsKey(item)) {

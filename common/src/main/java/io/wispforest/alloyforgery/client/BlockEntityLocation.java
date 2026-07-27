@@ -14,7 +14,7 @@ import net.minecraft.world.level.Level;
 public record BlockEntityLocation(BlockPos blockPos, ResourceKey<Level> worldKey) {
     public static final StructEndec<BlockEntityLocation> ENDEC = StructEndecBuilder.of(
         MinecraftEndecs.BLOCK_POS.fieldOf("blockPos", BlockEntityLocation::blockPos),
-        MinecraftEndecs.IDENTIFIER.xmap(id -> ResourceKey.create(Registries.DIMENSION, id), ResourceKey::location).fieldOf("dimensionType", BlockEntityLocation::worldKey),
+        MinecraftEndecs.IDENTIFIER.xmap(id -> ResourceKey.create(Registries.DIMENSION, id), ResourceKey::identifier).fieldOf("dimensionType", BlockEntityLocation::worldKey),
         BlockEntityLocation::new
     );
 
@@ -44,10 +44,10 @@ public record BlockEntityLocation(BlockPos blockPos, ResourceKey<Level> worldKey
         }
 
         if (world == null) {
-            throw new IllegalStateException("Unable to get the given block entity due to a inability to get the needed origin world! [World: " + this.worldKey().location() + "]");
+            throw new IllegalStateException("Unable to get the given block entity due to a inability to get the needed origin world! [World: " + this.worldKey().identifier() + "]");
         }
 
         return world.getBlockEntity(this.blockPos(), blockEntityType)
-            .orElseThrow(() -> new IllegalStateException("Unable to get the given block entity due not finding any block entity at the given location! [World: " + this.worldKey().location() + ", Pos: " + this.blockPos() + "]"));
+            .orElseThrow(() -> new IllegalStateException("Unable to get the given block entity due not finding any block entity at the given location! [World: " + this.worldKey().identifier() + ", Pos: " + this.blockPos() + "]"));
     }
 }

@@ -82,7 +82,8 @@ public class AlloyForgery {
         Endec<Map<Item, ItemStack>> remaindersEndec = Endec.map(
                 item -> BuiltInRegistries.ITEM.getKey(item).toString(),
                 id -> BuiltInRegistries.ITEM.getValue(Identifier.parse(id)),
-                CodecUtils.eitherEndec(CodecUtils.toEndec(ItemStack.STRICT_CODEC), MinecraftEndecs.ofRegistry(BuiltInRegistries.ITEM))
+                // VERIFY: Used Strict codec before, no longer exists
+                CodecUtils.eitherEndec(CodecUtils.toEndec(ItemStack.CODEC), MinecraftEndecs.ofRegistry(BuiltInRegistries.ITEM))
                         .xmap(either -> Either.unwrap(either.mapRight(Item::getDefaultInstance)), Either::left)
         );
 

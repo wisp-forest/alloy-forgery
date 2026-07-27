@@ -21,7 +21,6 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.*;
 import java.util.function.Function;
-import java.util.stream.Stream;
 
 public class AlloyForgeScreenHandler extends AbstractContainerMenu {
 
@@ -160,7 +159,7 @@ public class AlloyForgeScreenHandler extends AbstractContainerMenu {
 
     @Override
     public ItemStack quickMoveStack(Player player, int invSlot) {
-        return ScreenUtils.handleSlotTransfer(this, invSlot, this.controllerInventory.getContainerSize());
+        return MenuUtils.handleSlotTransfer(this, invSlot, this.controllerInventory.getContainerSize());
     }
 
     public int getSmeltProgress() {

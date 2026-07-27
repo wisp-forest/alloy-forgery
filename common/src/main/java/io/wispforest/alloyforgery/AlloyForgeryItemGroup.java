@@ -19,9 +19,9 @@ public class AlloyForgeryItemGroup {
 
     public static final OwoItemGroup GROUP = OwoItemGroup.builder(AlloyForgery.id("main"), () -> {
         if (CONTROLLER_CACHE == null) return null;
-        return Icon.of(CONTROLLER_CACHE.isEmpty() ? Items.BARRIER.getDefaultInstance() : CONTROLLER_CACHE.get(0));
+        return Icon.of(() -> CONTROLLER_CACHE.isEmpty() ? Items.BARRIER.getDefaultInstance() : CONTROLLER_CACHE.getFirst());
     }).initializer(group -> {
-        group.tabs.add(new ItemGroupTab(Icon.of(ItemStack.EMPTY), Component.empty(), (context, entries) -> {
+        group.tabs.add(new ItemGroupTab(Icon.of(() -> ItemStack.EMPTY), Component.empty(), (context, entries) -> {
             if (CONTROLLER_CACHE == null) createControllerCache();
             CONTROLLER_CACHE.forEach(entries::accept);
         }, ItemGroupTab.DEFAULT_TEXTURE, true));
