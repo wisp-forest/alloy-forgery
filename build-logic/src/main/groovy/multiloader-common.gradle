@@ -34,9 +34,11 @@ jar {
     }
 }
 
+// TODO - Look into making author and credits/contributor metadata look nicer on both loaders
+
 processResources {
     var expandProps = [
-            'version'                      : version,
+            'version'                      : mod_version,
             'group'                        : project.group, //Else we target the task's group.
             'minecraft_version'            : minecraft_version,
             'minecraft_version_range'      : minecraft_version_range,

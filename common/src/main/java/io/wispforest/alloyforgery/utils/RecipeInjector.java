@@ -27,13 +27,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
-/**
- * Helper class to safety allow for injecting recipes into the Recipe Manager <b>without
- * overriding or modifying existing Recipes. </b>
- * <p/>
- * Primarily used to either add compatibility for existing recipes by converting to another form
- * or adding new recipes.
- */
+///
+/// Helper class to safety allow for injecting recipes into the Recipe Manager <b>without
+/// overriding or modifying existing Recipes.
+///
+/// Primarily used to either add compatibility for existing recipes by converting to another form
+/// or adding new recipes.
+///
 public final class RecipeInjector {
 
     private static final Logger LOGGER = LogUtils.getLogger();
