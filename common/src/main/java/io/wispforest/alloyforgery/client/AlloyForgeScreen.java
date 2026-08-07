@@ -45,11 +45,7 @@ public class AlloyForgeScreen extends BaseOwoContainerScreen<FlowLayout, AlloyFo
 
 
     public AlloyForgeScreen(AlloyForgeScreenHandler handler, Inventory inventory, Component title) {
-        super(handler, inventory, title);
-        // FIXME - owo-lib does not expose second constructor, so these values can not be set to the correct amount
-        //this.imageWidth = 176;
-        //this.imageHeight = 189;
-
+        super(handler, inventory, title, 176, 189);
         this.titleLabelY = 69420;
         this.inventoryLabelY = this.imageHeight - 93;
     }
@@ -129,13 +125,7 @@ public class AlloyForgeScreen extends BaseOwoContainerScreen<FlowLayout, AlloyFo
                         .positioning(Positioning.absolute(140, 75))
                 )
                 .child(
-                    makeInputSlots(this.getMenu().getInputSlots(), 1, AlloyForgery.CONFIG::darkModeTheme, slot -> new SlotComponent(slot.index){
-                        // TODO: REMOVE AS THIS IS Used to resolve clipping item text and other effects due to how rendering is more buffered and uses the wrong scissor
-              /*          @Override
-                        public void draw(OwoUIDrawContext context, int mouseX, int mouseY, float partialTicks, float delta) {
-                            this.didDraw = true;
-                        }*/
-                    }, this.menu::isSlotDisabled)
+                    makeInputSlots(this.getMenu().getInputSlots(), 1, AlloyForgery.CONFIG::darkModeTheme, slot -> slotAsComponent(slot.index), this.menu::isSlotDisabled)
                         .positioning(Positioning.absolute(42, 41))
                 )
                 .surface((context, component) -> {
