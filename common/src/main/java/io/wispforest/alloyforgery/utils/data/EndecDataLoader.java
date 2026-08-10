@@ -156,6 +156,7 @@ public abstract class EndecDataLoader<T> extends SimpleJsonResourceReloadListene
         return this;
     }
 
+    // FIXME - This is marked final in NeoForge
     private SerializationContext getContext() {
         if (requiresRegistries) {
             Objects.requireNonNull(registries, "Can not build the needed context for the ManagedEndecDataLoader: " + this.getLoaderId());

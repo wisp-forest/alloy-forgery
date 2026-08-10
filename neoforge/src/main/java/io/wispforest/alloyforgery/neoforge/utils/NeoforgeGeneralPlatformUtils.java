@@ -23,7 +23,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.recipe.*;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.server.packs.PackType;

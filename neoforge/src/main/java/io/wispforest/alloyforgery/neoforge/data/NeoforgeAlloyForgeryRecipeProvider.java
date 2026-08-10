@@ -34,7 +34,7 @@ public class NeoforgeAlloyForgeryRecipeProvider extends AlloyForgeryRecipeProvid
             @Override
             public void accept(ResourceKey<Recipe<?>> arg, Recipe<?> arg2, @Nullable AdvancementHolder arg3, ICondition... iConditions) {
                 if (overrideModid != null) {
-                    arg = ResourceKey.create(arg.registryKey(), Identifier.fromNamespaceAndPath(overrideModid, arg.location().getPath()));
+                    arg = ResourceKey.create(arg.registryKey(), Identifier.fromNamespaceAndPath(overrideModid, arg.identifier().getPath()));
                 }
 
                 recipeExporter.accept(arg, arg2, arg3, iConditions);
