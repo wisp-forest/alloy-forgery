@@ -10,7 +10,7 @@ base {
 java {
     toolchain.languageVersion = JavaLanguageVersion.of(java_version)
     withSourcesJar()
-    withJavadocJar()
+    //withJavadocJar()
 }
 
 tasks.withType(Jar).configureEach {
