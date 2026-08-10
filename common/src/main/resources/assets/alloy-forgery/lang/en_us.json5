@@ -126,24 +126,33 @@
   "text.config.alloy-forgery.section.blasting_adaption": "Blasting Adaption",
 
   "text.config.alloy-forgery.option.allowHigherTierOutput": "Allow Higher Tier Output",
-  "text.config.alloy-forgery.option.allowHigherTierOutput.tooltip": "Toggle for turning on or off the Higher Tier Output of Blasting Adaption for all Recipes",
+  "text.config.alloy-forgery.option.allowHigherTierOutput.tooltip": "Toggle for increasing outputs for all adapted Blast Furnace Recipes when using a high tier Alloy Forge",
 
-  "text.config.alloy-forgery.option.allowBlastingFurnaceAdaption": "Allow Blasting Furnace Recipe Adaption",
-  "text.config.alloy-forgery.option.allowBlastingFurnaceAdaption.tooltip": "Toggle for turning on or off the Blasting Adaption for all Blasting Recipes",
+  "text.config.alloy-forgery.option.allowBlastingFurnaceAdaption": "Allow Blast Furnace Recipe Adaption",
+  "text.config.alloy-forgery.option.allowBlastingFurnaceAdaption.tooltip": "Toggle for automatically adapting Blast Furnace recipes into Alloy Forge recipes",
 
   "text.config.alloy-forgery.option.baseInputAmount": "Base Input Amount",
-  "text.config.alloy-forgery.option.baseInputAmount.tooltip": "Adjusts the base input count for adapted recipes",
+  "text.config.alloy-forgery.option.baseInputAmount.tooltip": [
+    "Sets the amount of items required for forging adapted recipes.\n",
+    "This is also used for the base output.\n",
+    "E.G.: Setting this to '2' will make any blasting recipe require two items,\n",
+    "resulting in two items."
+  ],
 
   "text.config.alloy-forgery.option.higherTierOutputIncrease": "Addition Tier Output Amount",
-  "text.config.alloy-forgery.option.higherTierOutputAmount.tooltip": "Adjusts the additional amount increased when reaching tier 3",
+  "text.config.alloy-forgery.option.higherTierOutputIncrease.tooltip": [
+    "Adjusts the output of items from an adapted recipe by this amount.\n",
+    "This is applied when using a tier 3+ Alloy Forge.\n",
+    "For example: Setting this to '1' will output an extra item for all\n",
+    "adapted recipes when using a tier 3 Alloy Forge."
+  ],
 
   "text.config.alloy-forgery.section.screen": "Screen Settings",
 
   "text.config.alloy-forgery.option.darkModeTheme": "Dark Mode",
-  "text.config.alloy-forgery.option.darkModeTheme.tooltip": "Changes the Alloy Screen to use the Dark mode textures",
+  "text.config.alloy-forgery.option.darkModeTheme.tooltip": "Changes the Alloy Forging Screen to use darker textures",
 
   "text.config.alloy-forgery.section.debug": "Debug Values",
 
-  "text.config.alloy-forgery.option.strictRecipeChecks": "Strict Recipe Checks",
-  "text.config.alloy-forgery.option.strictRecipeChecks.tooltip": "Used to adjust the strictness when validating recipe input values for Forge recipes"
+  "text.config.alloy-forgery.option.strictRecipeChecks": "Strict Recipe Checks"
 }
