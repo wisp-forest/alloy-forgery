@@ -11,9 +11,7 @@ import it.unimi.dsi.fastutil.ints.Int2IntMap;
 import net.minecraft.core.*;
 import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
+import net.minecraft.world.item.*;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.tags.TagKey;
 import net.minecraft.network.chat.Component;
@@ -51,14 +49,14 @@ public class AlloyForgeRecipe implements Recipe<AlloyForgeRecipeInput> {
     private Optional<Identifier> secondaryID = Optional.empty();
 
     private final Map<Ingredient, Integer> inputs;
-    private ItemStack output;
+    private ItemStackTemplate output;
 
     private final int minForgeTier;
     private final int fuelPerTick;
 
-    private ImmutableMap<OverrideRange, ItemStack> tierOverrides;
+    private ImmutableMap<OverrideRange, ItemStackTemplate> tierOverrides;
 
-    public AlloyForgeRecipe(Optional<RawAlloyForgeRecipe> rawRecipeData, Map<Ingredient, Integer> inputs, ItemStack output, int minForgeTier, int fuelPerTick, Map<OverrideRange, ItemStack> overrides) {
+    public AlloyForgeRecipe(Optional<RawAlloyForgeRecipe> rawRecipeData, Map<Ingredient, Integer> inputs, ItemStackTemplate output, int minForgeTier, int fuelPerTick, Map<OverrideRange, ItemStackTemplate> overrides) {
         this.rawRecipeData = rawRecipeData;
 
         this.inputs = inputs;
@@ -69,7 +67,7 @@ public class AlloyForgeRecipe implements Recipe<AlloyForgeRecipeInput> {
         this.tierOverrides = ImmutableMap.copyOf(overrides);
     }
 
-    public AlloyForgeRecipe(Map<Ingredient, Integer> inputs, ItemStack output, int minForgeTier, int fuelPerTick, Map<OverrideRange, ItemStack> overrides, Optional<Identifier> secondaryID) {
+    public AlloyForgeRecipe(Map<Ingredient, Integer> inputs, ItemStackTemplate output, int minForgeTier, int fuelPerTick, Map<OverrideRange, ItemStackTemplate> overrides, Optional<Identifier> secondaryID) {
         this(Optional.empty(), inputs, output, minForgeTier, fuelPerTick, overrides);
 
         this.secondaryID = secondaryID;
@@ -84,28 +82,25 @@ public class AlloyForgeRecipe implements Recipe<AlloyForgeRecipeInput> {
             final var itemEntryList = registryLookup.lookupOrThrow(Registries.ITEM).get(pendingData.defaultTag().getA());
 
             itemEntryList.ifPresentOrElse(registryEntries -> {
-                this.output = registryEntries.get(0).value().getDefaultInstance();
-                this.output.setCount(pendingData.defaultTag().getB());
+                this.output = ItemStackTemplate.fromNonEmptyStack(registryEntries.get(0).value().getDefaultInstance()).withCount(pendingData.defaultTag().getB());
             }, () -> {
                 throw new InvalidTagException("Default tag " + pendingData.defaultTag().getA().location() + " of recipe " + lookup.apply(this) + " must not be empty");
             });
         }
 
-        final var overrides = ImmutableMap.<OverrideRange, ItemStack>builder();
+        final var overrides = ImmutableMap.<OverrideRange, ItemStackTemplate>builder();
 
         pendingData.unfinishedTierOverrides().forEach((range, override) -> {
+            ItemStackTemplate template;
             if (override.isCountOnly()) {
-                ItemStack stack = this.output.copy();
-                stack.setCount(override.count());
-
-                if (!override.components().isEmpty()) {
-                    stack.applyComponentsAndValidate(override.components());
-                }
-
-                overrides.put(range, stack);
+                template = this.output;
             } else {
-                overrides.put(range, override.stack());
+                template = this.output.withCount(override.count);
             }
+            if (!override.components().isEmpty()) {
+                template.apply(override.components);
+            }
+            overrides.put(range, template);
         });
 
         this.tierOverrides = overrides.build();
@@ -202,8 +197,8 @@ public class AlloyForgeRecipe implements Recipe<AlloyForgeRecipeInput> {
     @Override
     public ItemStack assemble(AlloyForgeRecipeInput input) {
         return (input.inventory() instanceof ForgeControllerBlockEntity controller)
-            ? getResult(controller.forgeTier().value())
-            : getBaseResult();
+            ? getResult(controller.forgeTier().value()).create()
+            : getBaseResult().create();
     }
 
     public void consumeIngredients(AlloyForgeRecipeInput input) {
@@ -247,26 +242,15 @@ public class AlloyForgeRecipe implements Recipe<AlloyForgeRecipeInput> {
      * Quickly copy the base output for a recipe, skips calculations from {@link #getResult(int)}
      */
     @ApiStatus.Internal
-    public ItemStack getBaseResult() {
-        return this.output.copy();
+    public ItemStackTemplate getBaseResult() {
+        return this.output;
     }
 
-    public ItemStack getResult(int forgeTier) {
-        ItemStack stack = tierOverrides.getOrDefault(tierOverrides.keySet().stream()
+    public ItemStackTemplate getResult(int forgeTier) {
+        return tierOverrides.getOrDefault(tierOverrides.keySet().stream()
                 .filter(overrideRange -> overrideRange.test(forgeTier))
                 .findAny()
-                .orElse(null), output)
-            .copy();
-
-        if (stack.getItem() == Items.AIR) {
-            int stackCount = stack.getCount();
-
-            stack = this.output.copy();
-
-            stack.setCount(stackCount);
-        }
-
-        return stack;
+                .orElse(null), output);
     }
 
     @Override
@@ -292,7 +276,7 @@ public class AlloyForgeRecipe implements Recipe<AlloyForgeRecipeInput> {
         return fuelPerTick;
     }
 
-    public ImmutableMap<OverrideRange, ItemStack> getTierOverrides() {
+    public ImmutableMap<OverrideRange, ItemStackTemplate> getTierOverrides() {
         return tierOverrides;
     }
 

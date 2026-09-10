@@ -4,7 +4,8 @@ import com.google.common.collect.ImmutableMap;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonSyntaxException;
 import com.mojang.serialization.JsonOps;
-import io.wispforest.alloyforgery.utils.GeneralPlatformUtils;
+import io.wispforest.alloyforgery.AlloyForgery;
+import io.wispforest.alloyforgery.utils.EndecUtils;
 import io.wispforest.alloyforgery.utils.LoaderPlatformUtils;
 import io.wispforest.endec.Endec;
 import io.wispforest.endec.StructEndec;
@@ -13,19 +14,20 @@ import io.wispforest.owo.serialization.CodecUtils;
 import io.wispforest.owo.serialization.endec.MinecraftEndecs;
 import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
 import net.minecraft.core.component.DataComponentPatch;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.util.Tuple;
+import net.minecraft.world.item.ItemStackTemplate;
+import net.minecraft.world.item.crafting.Ingredient;
 import org.apache.commons.lang3.mutable.MutableInt;
-import io.wispforest.alloyforgery.AlloyForgery;
-import io.wispforest.alloyforgery.utils.EndecUtils;
-
 import java.util.*;
 
-public record RawAlloyForgeRecipe(Map<Ingredient, Integer> inputs, OutputData outputData,
-                                  int minForgeTier, int requiredFuel,
-                                  Map<AlloyForgeRecipe.OverrideRange, AlloyForgeRecipe.PendingOverride> overrideData) {
+public record RawAlloyForgeRecipe(
+    Map<Ingredient, Integer> inputs,
+    OutputData outputData,
+    int minForgeTier,
+    int requiredFuel,
+    Map<AlloyForgeRecipe.OverrideRange, AlloyForgeRecipe.PendingOverride> overrideData
+) {
 
     public static Endec<Map<Ingredient, Integer>> INPUTS = CountedIngredient.ENDEC.listOf().xmap(list -> {
         var unprocessedData = new Object2ObjectLinkedOpenHashMap<Ingredient, MutableInt>();
@@ -97,28 +99,28 @@ public record RawAlloyForgeRecipe(Map<Ingredient, Integer> inputs, OutputData ou
         RawAlloyForgeRecipe::new
     );
 
-    public Tuple<ItemStack, ImmutableMap<AlloyForgeRecipe.OverrideRange, ItemStack>> finalOutputData(Map<AlloyForgeRecipe.OverrideRange, AlloyForgeRecipe.PendingOverride> overridesBuilder) {
-        if (outputData.outputItem() == null) return new Tuple<>(ItemStack.EMPTY, ImmutableMap.of());
+    public Tuple<ItemStackTemplate, ImmutableMap<AlloyForgeRecipe.OverrideRange, ItemStackTemplate>> finalOutputData(Map<AlloyForgeRecipe.OverrideRange, AlloyForgeRecipe.PendingOverride> overridesBuilder) {
+        if (outputData.outputItem() == null) throw new NullPointerException("output item can not be null");
 
-        final var builder = ImmutableMap.<AlloyForgeRecipe.OverrideRange, ItemStack>builder();
+        final var builder = ImmutableMap.<AlloyForgeRecipe.OverrideRange, ItemStackTemplate>builder();
 
-        final var outputStack = new ItemStack(outputData.outputItem(), outputData.count());
+        final var outputStack = new ItemStackTemplate(outputData.outputItem(), outputData.count());
 
         for (var entry : overridesBuilder.entrySet()) {
-            ItemStack stack;
+            ItemStackTemplate template;
+            var override = entry.getValue();
 
             if (entry.getValue().isCountOnly()) {
-                stack = outputStack.copy();
-                stack.setCount(entry.getValue().count());
+                template = outputStack.withCount(entry.getValue().count());
             } else {
-                stack = entry.getValue().stack();
+                template = new ItemStackTemplate(override.item(), override.count());
             }
 
             if (!entry.getValue().components().isEmpty()) {
-                stack.applyComponentsAndValidate(entry.getValue().components());
+                template = new ItemStackTemplate(override.item(), override.components());
             }
 
-            builder.put(entry.getKey(), stack);
+            builder.put(entry.getKey(), template);
         }
 
         return new Tuple<>(outputStack, builder.build());

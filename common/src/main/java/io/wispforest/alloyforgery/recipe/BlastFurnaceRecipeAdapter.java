@@ -6,8 +6,7 @@ import com.mojang.logging.LogUtils;
 import io.wispforest.endec.SerializationContext;
 import io.wispforest.endec.format.gson.GsonDeserializer;
 import io.wispforest.owo.serialization.RegistriesAttribute;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.*;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.RegistryOps;
@@ -64,17 +63,12 @@ public class BlastFurnaceRecipeAdapter implements RecipeInjector.AddRecipes {
                 path = path.replace("blasting", "forging");
             }
 
-            var mainOutput = ((SingleItemRecipeAccessor)recipe).result().create();
+            var mainOutputTemplate = ((SingleItemRecipeAccessor)recipe).result().withCount(AlloyForgery.CONFIG.baseInputAmount());
 
-            mainOutput.setCount(AlloyForgery.CONFIG.baseInputAmount());
-
-            var extraOutput = ImmutableMap.<AlloyForgeRecipe.OverrideRange, ItemStack>builder();
+            var extraOutput = ImmutableMap.<AlloyForgeRecipe.OverrideRange, ItemStackTemplate>builder();
 
             if (AlloyForgery.CONFIG.allowHigherTierOutput() && !RecipeTagLoader.isWithinTag(false, BLACKLISTED_INCREASED_OUTPUT, recipeEntry) && !isDustRecipe(instance, recipeEntry)) {
-                var increasedOutput = mainOutput.copy();
-
-                increasedOutput.grow(AlloyForgery.CONFIG.higherTierOutputIncrease());
-
+                var increasedOutput = mainOutputTemplate.withCount(mainOutputTemplate.count() + AlloyForgery.CONFIG.higherTierOutputIncrease());
                 extraOutput.put(new AlloyForgeRecipe.OverrideRange(3), increasedOutput);
             }
 
@@ -82,7 +76,7 @@ public class BlastFurnaceRecipeAdapter implements RecipeInjector.AddRecipes {
 
             var convertRecipe = new AlloyForgeRecipe(
                 Map.of(recipe.placementInfo().ingredients().getFirst(), AlloyForgery.CONFIG.baseInputAmount()),
-                mainOutput,
+                mainOutputTemplate,
                 1,
                 Math.round(getFuelPerTick(recipe)),
                 extraOutput.build(),

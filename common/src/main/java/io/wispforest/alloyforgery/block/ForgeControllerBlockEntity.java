@@ -333,7 +333,7 @@ public class ForgeControllerBlockEntity extends BlockEntity implements Implement
 
     private boolean canSmelt(AlloyForgeRecipe recipe) {
         final var outputStack = this.getItem(10);
-        final var recipeOutput = recipe.getResult(this.forgeTier().value());
+        final var recipeOutput = recipe.getResult(this.forgeTier().value()).create();
 
         if (recipe.getMinForgeTier() > this.forgeTier().value()) {
             this.requiredTierToCraft.set(recipe.getMinForgeTier());

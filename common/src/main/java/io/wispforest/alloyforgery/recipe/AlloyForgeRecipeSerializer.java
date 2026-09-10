@@ -2,9 +2,11 @@ package io.wispforest.alloyforgery.recipe;
 
 import io.wispforest.endec.*;
 import io.wispforest.endec.impl.StructEndecBuilder;
+import io.wispforest.owo.serialization.CodecUtils;
 import io.wispforest.owo.serialization.EndecRecipeSerializer;
 import io.wispforest.owo.serialization.endec.MinecraftEndecs;
 import io.wispforest.alloyforgery.utils.EndecUtils;
+import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 
 public class AlloyForgeRecipeSerializer {
@@ -29,10 +31,10 @@ public class AlloyForgeRecipeSerializer {
         .orElse(
             StructEndecBuilder.of(
                 Endec.map(EndecUtils.INGREDIENT, Endec.INT).fieldOf("inputs", AlloyForgeRecipe::getIngredientsMap),
-                MinecraftEndecs.ITEM_STACK.fieldOf("result", AlloyForgeRecipe::getBaseResult),
+                CodecUtils.toEndec(ItemStackTemplate.CODEC).fieldOf("result", AlloyForgeRecipe::getBaseResult),
                 Endec.INT.fieldOf("min_forge_tier", AlloyForgeRecipe::getMinForgeTier),
                 Endec.INT.fieldOf("fuel_per_tick", AlloyForgeRecipe::getFuelPerTick),
-                Endec.map(AlloyForgeRecipe.OverrideRange.OVERRIDE_RANGE, MinecraftEndecs.ITEM_STACK).fieldOf("overrides", AlloyForgeRecipe::getTierOverrides),
+                Endec.map(AlloyForgeRecipe.OverrideRange.OVERRIDE_RANGE, CodecUtils.toEndec(ItemStackTemplate.CODEC)).fieldOf("overrides", AlloyForgeRecipe::getTierOverrides),
                 MinecraftEndecs.IDENTIFIER.optionalOf().fieldOf("secondary_id", AlloyForgeRecipe::secondaryID),
                 AlloyForgeRecipe::new
             )
